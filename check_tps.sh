@@ -14,10 +14,10 @@ NODESTART=$(curl --location --request POST 127.0.0.1:9000 \
 for I in {1..10}; do
   sleep 1
   BAR="$(yes . | head -n ${I} | tr -d '\n')"
-  printf "\r[%3d/100] %s" $((I * 10)) ${BAR}
+  printf "\rIN PROGRESS [%3d/100] %s" $((I * 10)) ${BAR}
 done
 
-echo
+printf "\n\n"
 
 SUIEND=$(curl --location --request POST https://fullnode.devnet.sui.io:443 \
 --header 'Content-Type: application/json' \
