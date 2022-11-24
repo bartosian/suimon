@@ -16,7 +16,8 @@ for I in {1..10}; do
   BAR="$(yes . | head -n ${I} | tr -d '\n')"
   printf "\r[%3d/100] %s" $((I * 10)) ${BAR}
 done
-printf "\n"
+
+echo
 
 SUIEND=$(curl --location --request POST https://fullnode.devnet.sui.io:443 \
 --header 'Content-Type: application/json' \
