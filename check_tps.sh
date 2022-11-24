@@ -2,16 +2,16 @@
   
 echo '-------------------------------------'
 echo $(date)
-SUIVER=$(curl --location --request POST https://fullnode.devnet.sui.io:443 \
+SUISTART=$(curl --location --request POST https://fullnode.devnet.sui.io:443 \
 --header 'Content-Type: application/json' \
 --data-raw '{ "jsonrpc":"2.0", "method":"sui_getTotalTransactionNumber","id":1}' 2>/dev/null | jq .result)
 
-MYVER=$(curl --location --request POST 127.0.0.1:9000 \
+NODESTART=$(curl --location --request POST 127.0.0.1:9000 \
 --header 'Content-Type: application/json' \
 --data-raw '{ "jsonrpc":"2.0", "method":"sui_getTotalTransactionNumber","id":1}' 2>/dev/null | jq .result)
 
-echo 'Sui ledger version : '$SUIVER
-echo 'My ledger version : '$MYVER
+echo 'SUI START TXS COUNT: '$SUISTART
+echo 'NODE START TXS COUNT: '$NODESTART
 
 for I in {1..10}; do
   sleep 1
@@ -22,18 +22,18 @@ printf "\n"
 
 echo '-------------------------------------'
 echo $(date)
-NOWSUIVER=$(curl --location --request POST https://fullnode.devnet.sui.io:443 \
+SUIEND=$(curl --location --request POST https://fullnode.devnet.sui.io:443 \
 --header 'Content-Type: application/json' \
 --data-raw '{ "jsonrpc":"2.0", "method":"sui_getTotalTransactionNumber","id":1}' 2>/dev/null | jq .result)
 
-NOWMYVER=$(curl --location --request POST 127.0.0.1:9000 \
+NODEEND=$(curl --location --request POST 127.0.0.1:9000 \
 --header 'Content-Type: application/json' \
 --data-raw '{ "jsonrpc":"2.0", "method":"sui_getTotalTransactionNumber","id":1}' 2>/dev/null | jq .result)
 
-SUITPS=$((($NOWSUIVER-$SUIVER)/10))
-MYTPS=$((($NOWMYVER-$MYVER)/10))
-echo 'Sui ledger version : '$NOWSUIVER
-echo 'My ledger version : '$NOWMYVER
+SUITPS=$((($SUIEND-$SUISTART)/10))
+MYTPS=$((($NODEEND-$NODESTART)/10))
+echo 'SUI END TXS COUNT: '$SUIEND
+echo 'NODE END TXS COUNT: '$NODEEND
 echo '-------------------------------------'
-echo 'Sui TPS : '$SUITPS
-echo 'My TPS : '$MYTPS
+echo 'SUI TPS: '$SUITPS
+echo 'NODE TPS: '$MYTPS
