@@ -1,5 +1,11 @@
 #!/bin/bash
   
+JQ_OK=$(dpkg-query -W --showformat='${Status}\n' jq|grep "install ok installed")
+if [ "" = "$PKG_OK" ]; then
+  sudo apt update
+  sudo apt install -y jq
+fi
+
 echo '-------------------------------------'
 echo $(date)
 echo 
