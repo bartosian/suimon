@@ -1,7 +1,7 @@
 #!/bin/bash
 
-JQ_OK=$(dpkg-query -W --showformat='${Status}\n' jq|grep "install ok installed")
-if [ "" = "$PKG_OK" ]; then
+if [ $(dpkg-query -W -f='${Status}' jq 2>/dev/null | grep -c "ok installed") -eq 0 ];
+then
   sudo apt update
   sudo apt install -y jq
 fi
