@@ -3,7 +3,7 @@
 echo '-------------------------------------'
 echo $(date)
 echo 
-SUISTART=$(curl --location --request POST  https://fullnode.testnet.sui.io:443 \
+SUISTART=$(curl --location --request POST https://fullnode.testnet.sui.io:443 \
 --header 'Content-Type: application/json' \
 --data-raw '{ "jsonrpc":"2.0", "method":"sui_getTotalTransactionNumber","id":1}' 2>/dev/null | jq .result)
 
@@ -19,7 +19,7 @@ done
 
 printf "\n\n"
 
-SUIEND=$(curl --location --request POST https://fullnode.devnet.sui.io:443 \
+SUIEND=$(curl --location --request POST https://fullnode.testnet.sui.io:443 \
 --header 'Content-Type: application/json' \
 --data-raw '{ "jsonrpc":"2.0", "method":"sui_getTotalTransactionNumber","id":1}' 2>/dev/null | jq .result)
 
