@@ -28,7 +28,7 @@ func main() {
 
 	var validators []Validator
 
-	err = json.Unmarshal(byteValue, &validators)
+	err = json.Unmarshal(byteData, &validators)
 	if err != nil {
 		fmt.Printf("could not unmarshal validators json: %s\n", err)
 
