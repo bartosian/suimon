@@ -24,7 +24,7 @@ func main() {
 
 	defer jsonFile.Close()
 
-	byteValue, _ := io.ReadAll(jsonFile)
+	byteData, _ := io.ReadAll(jsonFile)
 
 	var validators []Validator
 
@@ -42,10 +42,10 @@ func main() {
 	var totalStake int
 
 	for _, validator := range validators {
-		totalStake += validator.NextEpochDelegation
+		totalStake += validator.NextEpochDelegation + validator.NextEpochStake
 	}
 
-	totalStakeTwoThird := totalStake / 3 * 2
+	totalStakeTwoThird := 2.0 / 3.0 * float64(totalStake)
 
 	var (
 		partialStake int
@@ -53,13 +53,12 @@ func main() {
 	)
 
 	for _, validator := range validators {
-		if partialStake += validator.NextEpochDelegation; partialStake <= totalStakeTwoThird {
-			refGasPrice = validator.NextEpochGasPrice
-			
-			continue
-		}
+		refGasPrice = validator.NextEpochGasPrice
+		
+		if partialStake += validator.NextEpochDelegation + validator.NextEpochStake; float64(partialStake) >= totalStakeTwoThird {			
 
-		break 
+			break
+		}
 	}
 
 	fmt.Printf("\nNEXT EPOCH REFERENCE GAS PRICE: %d\n", refGasPrice)
