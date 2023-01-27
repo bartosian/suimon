@@ -55,7 +55,11 @@ func main() {
 	for _, validator := range validators {
 		if partialStake += validator.NextEpochDelegation; partialStake <= totalStakeTwoThird {
 			refGasPrice = validator.NextEpochGasPrice
+			
+			continue
 		}
+
+		break 
 	}
 
 	fmt.Printf("\nNEXT EPOCH REFERENCE GAS PRICE: %d\n", refGasPrice)
