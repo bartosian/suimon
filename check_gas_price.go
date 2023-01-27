@@ -35,8 +35,8 @@ func main() {
 		return
 	}
 
-	sort.Slice(validators, func(valA, valB int) bool {
-		return validators[valA].NextEpochGasPrice < validators[valB].NextEpochGasPrice
+	sort.Slice(validators, func(a, b int) bool {
+		return validators[a].NextEpochGasPrice < validators[b].NextEpochGasPrice
 	})
 
 	var totalStake int
