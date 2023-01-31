@@ -32,7 +32,7 @@ func main() {
 	for {
 		refGas, err := calculateRefGasPrice(rpcClient)
 		if err != nil {
-			fmt.Printf("Error calculating reference gas price: %v", err)
+			fmt.Printf("\nError calculating reference gas price: %v\n\n", err)
 
 			os.Exit(1)
 		}
@@ -42,7 +42,7 @@ func main() {
 		if *refGas != previousRefGas {
 			err = setGasPrice(*refGas)
 			if err != nil {
-				fmt.Printf("Error setting reference gas price: %v", err)
+				fmt.Printf("\nError setting reference gas price: %v\n\n", err)
 
 				os.Exit(1)
 			}
