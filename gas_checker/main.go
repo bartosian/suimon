@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/exec"
 	"sort"
 	"time"
 
@@ -21,6 +23,8 @@ const (
 	valVoteStakeLimit = 10
 )
 
+var previousRefGas uint64
+
 func main() {
 	rpcClient := jsonrpc.NewClient(rpcURL)
 	ticker := time.NewTicker(execFrequency * time.Second)
@@ -29,9 +33,22 @@ func main() {
 		refGas, err := calculateRefGasPrice(rpcClient)
 		if err != nil {
 			fmt.Printf("Error calculating reference gas price: %v", err)
+
+			os.Exit(1)
 		}
 
 		fmt.Printf("[-=-=-=-=- NEXT EPOCH REF GAS %d -=-=-=-=-]\n", *refGas)
+
+		if *refGas != previousRefGas {
+			err = setGasPrice(*refGas)
+			if err != nil {
+				fmt.Printf("Error setting reference gas price: %v", err)
+
+				os.Exit(1)
+			}
+
+			previousRefGas = *refGas
+		}
 
 		<-ticker.C
 	}
@@ -83,4 +100,25 @@ func calculateRefGasPrice(client jsonrpc.RPCClient) (gas *uint64, err error) {
 	}
 
 	return &referenceGasPrice, nil
+}
+
+func setGasPrice(gas uint64) error {
+	fmt.Printf("[-=-=-=-=- SETTING REF GAS TO: %d -=-=-=-=-]\n", gas)
+
+	command := "sui"
+	subcommand := "client call"
+	pkg := "--package 0x2"
+	mod := "--module sui_system"
+	fun := "--function request_set_gas_price"
+	args := fmt.Sprintf("--args 0x5 %d", gas)
+	gasBudget := "--gas-budget 11000"
+
+	_, err := exec.Command(command, subcommand, pkg, mod, fun, args, gasBudget).Output()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("[-=-=-=-=- UPDATED REF GAS TO: %d -=-=-=-=-]\n", gas)
+
+	return nil
 }
