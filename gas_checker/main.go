@@ -19,7 +19,7 @@ type GasQuote struct {
 
 const (
 	execFrequency     = 20
-	rpcURL            = "https://fullnode.testnet.sui.io"
+	rpcURL            = "https://rpc-ws-testnet-w2.suiscan.xyz"
 	valVoteStakeLimit = 10
 )
 
