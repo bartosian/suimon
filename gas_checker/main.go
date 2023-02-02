@@ -22,15 +22,12 @@ const (
 	ColorReset  = "\u001b[0m"
 )
 
-const (
-	valVoteStakeLimit = 10
-	suiCMD            = "sui"
-)
+const valVoteStakeLimit = 10
 
 var (
 	rpcURL         = flag.String("rpcURL", "https://fullnode.testnet.sui.io", "SUI RPC URL")
 	setGas         = flag.Bool("setGas", false, "set ref gas price")
-	frequency      = flag.Int("frequency", 20, "frequency of ref gas checks")
+	frequency      = flag.Int("frequency", 30, "frequency of ref gas checks")
 	previousRefGas uint64
 )
 
@@ -118,16 +115,16 @@ func colorize(color Color, message string) {
 }
 
 func setGasPrice(gas uint64) error {
-	colorize(ColorYellow, fmt.Sprintf("[-=-=-=-=- SETTING REF GAS TO: %d -=-=-=-=-]\n", gas))
+	colorize(ColorYellow, fmt.Sprintf("[-=-=-=-=- SETTING REF GAS TO: %d -=-=-=-=-]", gas))
 
-	gasCommand := `client call --package 0x2 --module sui_system --function request_set_gas_price --args 0x5 "425" --gas-budget 11000`
+	gasCommand := `sui client call --package 0x2 --module sui_system --function request_set_gas_price --args 0x5 "425" --gas-budget 11000`
 
-	_, err := exec.Command(suiCMD, gasCommand).Output()
+	_, err := exec.Command("bash", "-c", gasCommand).Output()
 	if err != nil {
 		return err
 	}
 
-	colorize(ColorYellow, fmt.Sprintf("[-=-=-=-=- UPDATED REF GAS TO: %d -=-=-=-=-]\n", gas))
+	colorize(ColorYellow, fmt.Sprintf("[-=-=-=-=- UPDATED REF GAS TO: %d -=-=-=-=-]", gas))
 
 	return nil
 }
