@@ -1,5 +1,10 @@
 package main
 
+type GasQuote struct {
+	Quote uint64
+	Stake uint64
+}
+
 type SuiSystemState struct {
 	Epoch                  uint64           `json:"epoch"`
 	EpochStartTimestampMs  uint64           `json:"epoch_start_timestamp_ms"`

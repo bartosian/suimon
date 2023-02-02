@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -12,42 +13,44 @@ import (
 	"github.com/ybbus/jsonrpc/v3"
 )
 
-type GasQuote struct {
-	Quote uint64
-	Stake uint64
-}
+type Color string
 
 const (
-	execFrequency     = 20
-	rpcURLDefault     = "https://fullnode.testnet.sui.io"
-	valVoteStakeLimit = 10
+	ColorRed   = "\u001b[31m"
+	ColorGreen = "\u001b[32m"
+	ColorBlue  = "\u001b[34m"
+	ColorReset = "\u001b[0m"
 )
 
-var previousRefGas uint64
+const valVoteStakeLimit = 10
+
+var (
+	rpcURL         = flag.String("rpcURL", "https://fullnode.testnet.sui.io", "SUI RPC URL")
+	setGas         = flag.Bool("setGas", false, "set ref gas price")
+	frequency      = flag.Int("frequency", 20, "frequency of ref gas checks")
+	previousRefGas uint64
+)
 
 func main() {
-	rpcURL, ok := os.LookupEnv("SUI_RPC_URL")
-	if !ok {
-		rpcURL = rpcURLDefault
-	}
+	flag.Parse()
 
-	rpcClient := jsonrpc.NewClient(rpcURL)
-	ticker := time.NewTicker(execFrequency * time.Second)
+	rpcClient := jsonrpc.NewClient(*rpcURL)
+	ticker := time.NewTicker(time.Duration(*frequency) * time.Second)
 
 	for {
 		refGas, err := calculateRefGasPrice(rpcClient)
 		if err != nil {
-			fmt.Printf("\nError calculating reference gas price: %v\n\n", err)
+			colorize(ColorRed, fmt.Sprintf("\nError calculating reference gas price: %v\n\n", err))
 
 			os.Exit(1)
 		}
 
-		fmt.Printf("[-=-=-=-=- NEXT EPOCH REF GAS %d -=-=-=-=-]\n", *refGas)
+		colorize(ColorGreen, fmt.Sprintf("[-=-=-=-=- NEXT EPOCH REF GAS %d -=-=-=-=-]\n", *refGas))
 
-		if *refGas != previousRefGas {
+		if *setGas && *refGas != previousRefGas {
 			err = setGasPrice(*refGas)
 			if err != nil {
-				fmt.Printf("\nError setting reference gas price: %v\n\n", err)
+				colorize(ColorRed, fmt.Sprintf("\nError setting reference gas price: %v\n\n", err))
 
 				os.Exit(1)
 			}
@@ -107,8 +110,12 @@ func calculateRefGasPrice(client jsonrpc.RPCClient) (gas *uint64, err error) {
 	return &referenceGasPrice, nil
 }
 
+func colorize(color Color, message string) {
+	fmt.Println(string(color), message, string(ColorReset))
+}
+
 func setGasPrice(gas uint64) error {
-	fmt.Printf("[-=-=-=-=- SETTING REF GAS TO: %d -=-=-=-=-]\n", gas)
+	colorize(ColorBlue, fmt.Sprintf("[-=-=-=-=- SETTING REF GAS TO: %d -=-=-=-=-]\n", gas))
 
 	command := "sui"
 	subcommand := "client call"
@@ -123,7 +130,7 @@ func setGasPrice(gas uint64) error {
 		return err
 	}
 
-	fmt.Printf("[-=-=-=-=- UPDATED REF GAS TO: %d -=-=-=-=-]\n", gas)
+	colorize(ColorBlue, fmt.Sprintf("[-=-=-=-=- UPDATED REF GAS TO: %d -=-=-=-=-]\n", gas))
 
 	return nil
 }
