@@ -122,7 +122,7 @@ func setGasPrice(gas uint64) error {
 	pkg := "--package 0x2"
 	mod := "--module sui_system"
 	fun := "--function request_set_gas_price"
-	args := fmt.Sprintf("--args 0x5 %d", gas)
+	args := fmt.Sprintf("--args 0x5 \"%d\"", gas)
 	gasBudget := "--gas-budget 11000"
 
 	_, err := exec.Command(command, subcommand, pkg, mod, fun, args, gasBudget).Output()
