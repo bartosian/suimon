@@ -16,10 +16,10 @@ import (
 type Color string
 
 const (
-	ColorRed   = "\u001b[31m"
-	ColorGreen = "\u001b[32m"
-	ColorBlue  = "\u001b[34m"
-	ColorReset = "\u001b[0m"
+	ColorRed    = "\u001b[31m"
+	ColorGreen  = "\u001b[32m"
+	ColorYellow = "\u001b[33m"
+	ColorReset  = "\u001b[0m"
 )
 
 const valVoteStakeLimit = 10
@@ -45,10 +45,10 @@ func main() {
 			os.Exit(1)
 		}
 
-		colorize(ColorGreen, fmt.Sprintf("[-=-=-=-=- NEXT EPOCH REF GAS %d -=-=-=-=-]\n", *refGas))
+		colorize(ColorGreen, fmt.Sprintf("[-=-=-=-=- NEXT EPOCH REF GAS %d -=-=-=-=-]", *refGas))
 
 		if *setGas && *refGas != previousRefGas {
-			err = setGasPrice(*refGas)
+			err = setGasPrice(*refGas - 1)
 			if err != nil {
 				colorize(ColorRed, fmt.Sprintf("\nError setting reference gas price: %v\n\n", err))
 
@@ -115,7 +115,7 @@ func colorize(color Color, message string) {
 }
 
 func setGasPrice(gas uint64) error {
-	colorize(ColorBlue, fmt.Sprintf("[-=-=-=-=- SETTING REF GAS TO: %d -=-=-=-=-]\n", gas))
+	colorize(ColorYellow, fmt.Sprintf("[-=-=-=-=- SETTING REF GAS TO: %d -=-=-=-=-]\n", gas))
 
 	command := "sui"
 	subcommand := "client call"
@@ -130,7 +130,7 @@ func setGasPrice(gas uint64) error {
 		return err
 	}
 
-	colorize(ColorBlue, fmt.Sprintf("[-=-=-=-=- UPDATED REF GAS TO: %d -=-=-=-=-]\n", gas))
+	colorize(ColorYellow, fmt.Sprintf("[-=-=-=-=- UPDATED REF GAS TO: %d -=-=-=-=-]\n", gas))
 
 	return nil
 }
