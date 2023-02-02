@@ -1,4 +1,4 @@
-module github.com/bartosian/sui_helpers/gas_checker
+module github.com/Hacker-web-Vi/sui_helpers/gas_checker
 
 go 1.19
 
