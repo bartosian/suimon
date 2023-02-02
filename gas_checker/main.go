@@ -19,13 +19,18 @@ type GasQuote struct {
 
 const (
 	execFrequency     = 20
-	rpcURL            = "https://fullnode.testnet.sui.io"
+	rpcURLDefault     = "https://fullnode.testnet.sui.io"
 	valVoteStakeLimit = 10
 )
 
 var previousRefGas uint64
 
 func main() {
+	rpcURL, ok := os.LookupEnv("SUI_RPC_URL")
+	if !ok {
+		rpcURL = rpcURLDefault
+	}
+
 	rpcClient := jsonrpc.NewClient(rpcURL)
 	ticker := time.NewTicker(execFrequency * time.Second)
 
