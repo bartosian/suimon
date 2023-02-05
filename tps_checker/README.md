@@ -76,7 +76,7 @@ NODE TPS: 5 ❗
 -------------------------------------
 ```
 
-`sui remote RPC server doesnt respond`
+`sui remote RPC server doesnt respond and node is catching the history up`
 
 ```
 ------------------TESTNET TPS-------------------
