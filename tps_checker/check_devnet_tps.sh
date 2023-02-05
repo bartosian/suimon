@@ -5,17 +5,35 @@ then
   sudo apt update
   sudo apt install -y jq
 fi
-  
-echo '-------------------------------------'
-echo $(date)
-echo 
-SUISTART=$(curl --location --request POST https://fullnode.devnet.sui.io:443 \
---header 'Content-Type: application/json' \
---data-raw '{ "jsonrpc":"2.0", "method":"sui_getTotalTransactionNumber","id":1}' 2>/dev/null | jq .result)
 
-NODESTART=$(curl --location --request POST 127.0.0.1:9000 \
---header 'Content-Type: application/json' \
---data-raw '{ "jsonrpc":"2.0", "method":"sui_getTotalTransactionNumber","id":1}' 2>/dev/null | jq .result)
+echo '------------------DEVNET TPS-------------------'
+echo $(date)
+echo
+
+REMOTE_RPC="https://fullnode.devnet.sui.io:443"
+LOCAL_RPC="127.0.0.1:9000"
+
+function get_transactions {
+  result=$(curl -m 2 --location --request POST $1 \
+  --header 'Content-Type: application/json' \
+  --data-raw '{ "jsonrpc":"2.0", "method":"sui_getTotalTransactionNumber","id":1}' 2>/dev/null | jq .result)
+
+  echo "$result"
+}
+
+SUISTART=$(get_transactions $REMOTE_RPC)
+if [ -z "$SUISTART" ]; then
+    echo "Failed to calculate TPS: check if remote devnet RPC is up and running"
+
+    exit 1
+fi
+
+NODESTART=$(get_transactions $LOCAL_RPC)
+if [ -z "$NODESTART" ]; then
+  echo "Failed to calculate TPS: check if your node is up and running on port 9000"
+
+  exit 1
+fi
 
 for I in {1..10}; do
   sleep 1
@@ -25,16 +43,11 @@ done
 
 printf "\n\n"
 
-SUIEND=$(curl --location --request POST https://fullnode.devnet.sui.io:443 \
---header 'Content-Type: application/json' \
---data-raw '{ "jsonrpc":"2.0", "method":"sui_getTotalTransactionNumber","id":1}' 2>/dev/null | jq .result)
+SUIEND=$(get_transactions $REMOTE_RPC)
+NODEEND=$(get_transactions $LOCAL_RPC)
 
-NODEEND=$(curl --location --request POST 127.0.0.1:9000 \
---header 'Content-Type: application/json' \
---data-raw '{ "jsonrpc":"2.0", "method":"sui_getTotalTransactionNumber","id":1}' 2>/dev/null | jq .result)
-
-SUITPS=$((($SUIEND-$SUISTART)/10))
-MYTPS=$((($NODEEND-$NODESTART)/10))
+SUITPS=$(((SUIEND-SUISTART)/10))
+MYTPS=$(((NODEEND-NODESTART)/10))
 
 echo 'SUI TPS: '$SUITPS
 echo 'NODE TPS: '$MYTPS
