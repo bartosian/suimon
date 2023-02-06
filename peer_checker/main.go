@@ -36,7 +36,7 @@ func main() {
 		return
 	}
 
-	colorPrint(enums.ColorGreen, checker.Peers)
+	checker.DrawTable()
 }
 
 func colorPrint(color enums.Color, messages ...any) {

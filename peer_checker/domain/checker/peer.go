@@ -4,18 +4,11 @@ import (
 	"fmt"
 	"net"
 
-	emoji "github.com/jayco/go-emoji-flag"
 	"github.com/oschwald/geoip2-golang"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/peer_checker/domain/enums"
 )
-
-type Location struct {
-	CountryCode string
-	CountryName string
-	Flag        string
-}
 
 type Peer struct {
 	Address     string
@@ -23,35 +16,35 @@ type Peer struct {
 	Port        string
 	Location    Location
 
-	rpcClient jsonrpc.RPCClient
+	rpcClient   jsonrpc.RPCClient
+	geoDbClient *geoip2.Reader
 }
 
-func newPeer(geoDB *geoip2.Reader, address, port string) (*Peer, error) {
-	peer := &Peer{
-		Address: address,
-		Port:    port,
+func newPeer(geoDB *geoip2.Reader, address, port string) *Peer {
+	return &Peer{
+		Address:     address,
+		Port:        port,
+		geoDbClient: geoDB,
 	}
+}
 
-	if ip := net.ParseIP(address); ip != nil {
+func (peer *Peer) Parse() error {
+	if ip := net.ParseIP(peer.Address); ip != nil {
 		peer.AddressType = enums.AddressTypeIP
 
-		record, err := geoDB.Country(ip)
+		record, err := peer.geoDbClient.Country(ip)
 		if err == nil {
-			peer.Location = Location{
-				CountryCode: record.Country.IsoCode,
-				CountryName: record.Country.Names["en"],
-				Flag:        emoji.GetFlag(record.Country.IsoCode),
-			}
+			peer.Location = newLocation(record)
 		}
-	} else if isValidDomain(address) {
+	} else if isValidDomain(peer.Address) {
 		peer.AddressType = enums.AddressTypeDomain
 	} else {
-		return nil, fmt.Errorf("invalid ip/host value provided %s", address)
+		return fmt.Errorf("invalid ip/host value provided %s", peer.Address)
 	}
 
-	if !isValidPort(port) {
-		return nil, fmt.Errorf("invalid port value provided %s", port)
+	if !isValidPort(peer.Port) {
+		return fmt.Errorf("invalid port value provided %s", peer.Port)
 	}
 
-	return peer, nil
+	return nil
 }

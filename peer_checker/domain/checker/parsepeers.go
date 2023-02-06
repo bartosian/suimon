@@ -9,6 +9,10 @@ import (
 	"github.com/oschwald/geoip2-golang"
 )
 
+type P2PConfig struct {
+	SeedPeers []PeerData `yaml:"seed-peers"`
+}
+
 func (config *P2PConfig) parsePeers() ([]Peer, error) {
 	filePath, _ := filepath.Abs("./vendors/geodb/GeoLite2-Country.mmdb")
 
@@ -26,7 +30,9 @@ func (config *P2PConfig) parsePeers() ([]Peer, error) {
 		if isValidCharCount(peer.Address, peerSeparator, peerCount) {
 			peerInfo := strings.Split(peer.Address, peerSeparator)
 
-			checkerPeer, err := newPeer(db, peerInfo[2], peerInfo[4])
+			checkerPeer := newPeer(db, peerInfo[2], peerInfo[4])
+
+			err := checkerPeer.Parse()
 			if err != nil {
 				return nil, err
 			}
