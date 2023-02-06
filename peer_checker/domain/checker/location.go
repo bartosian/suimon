@@ -2,6 +2,7 @@ package checker
 
 import (
 	"fmt"
+	
 	emoji "github.com/jayco/go-emoji-flag"
 	"github.com/oschwald/geoip2-golang"
 )
@@ -23,5 +24,5 @@ func newLocation(country *geoip2.Country) Location {
 }
 
 func (loc *Location) String() string {
-	return fmt.Sprintf("%s %s", loc.Flag, loc.CountryName)
+	return fmt.Sprintf("%s  %s", loc.Flag, loc.CountryName)
 }

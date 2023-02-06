@@ -10,6 +10,8 @@ import (
 	"github.com/bartosian/sui_helpers/peer_checker/domain/enums"
 )
 
+const rpcPortDefault = 9000
+
 type Peer struct {
 	Address     string
 	AddressType enums.AddressType
@@ -18,12 +20,15 @@ type Peer struct {
 
 	rpcClient   jsonrpc.RPCClient
 	geoDbClient *geoip2.Reader
+
+	TotalTransactionNumber *uint64
 }
 
 func newPeer(geoDB *geoip2.Reader, address, port string) *Peer {
 	return &Peer{
 		Address:     address,
 		Port:        port,
+		rpcClient:   jsonrpc.NewClient("http://" + address + ":9000"),
 		geoDbClient: geoDB,
 	}
 }

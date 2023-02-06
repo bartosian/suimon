@@ -2,9 +2,9 @@ package checker
 
 import (
 	"errors"
-	"fmt"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/oschwald/geoip2-golang"
 )
@@ -25,24 +25,42 @@ func (config *P2PConfig) parsePeers() ([]Peer, error) {
 
 	configPeers := config.SeedPeers
 	checkerPeers := make([]Peer, 0, len(configPeers))
+	peerCH := make(chan Peer, len(checkerPeers))
+
+	var wg sync.WaitGroup
 
 	for _, peer := range configPeers {
-		if isValidCharCount(peer.Address, peerSeparator, peerCount) {
+		wg.Add(1)
+
+		go func(peer PeerData) {
+			defer wg.Done()
+
+			if !isValidCharCount(peer.Address, peerSeparator, peerCount) {
+				return
+			}
+
 			peerInfo := strings.Split(peer.Address, peerSeparator)
 
 			checkerPeer := newPeer(db, peerInfo[2], peerInfo[4])
 
 			err := checkerPeer.Parse()
 			if err != nil {
-				return nil, err
+				return
 			}
 
-			checkerPeers = append(checkerPeers, *checkerPeer)
+			checkerPeer.GetTotalTransactionNumber()
 
-			continue
-		}
+			peerCH <- *checkerPeer
+		}(peer)
+	}
 
-		return nil, fmt.Errorf("invalid peer address value provided %s", peer.Address)
+	go func() {
+		wg.Wait()
+		close(peerCH)
+	}()
+
+	for peer := range peerCH {
+		checkerPeers = append(checkerPeers, peer)
 	}
 
 	if len(checkerPeers) == 0 {

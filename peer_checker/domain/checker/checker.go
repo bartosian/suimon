@@ -15,10 +15,6 @@ const (
 )
 
 type (
-	PeerData struct {
-		Address string `yaml:"address"`
-	}
-
 	NodeConfigYaml struct {
 		P2PConfig P2PConfig `yaml:"p2p-config"`
 	}
