@@ -1,13 +1,12 @@
 package checker
 
 import (
-	"errors"
-	"fmt"
 	"os"
-	"strings"
 
 	"github.com/ybbus/jsonrpc/v3"
 	"gopkg.in/yaml.v3"
+
+	"github.com/bartosian/sui_helpers/peer_checker/domain/enums"
 )
 
 const (
@@ -34,7 +33,7 @@ type (
 	}
 )
 
-func NewChecker(path string) (*Checker, error) {
+func NewChecker(path string, network enums.NetworkType) (*Checker, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -47,40 +46,13 @@ func NewChecker(path string) (*Checker, error) {
 		return nil, err
 	}
 
-	peers, err := configData.P2PConfig.MapToCheckerPeers()
+	peers, err := configData.P2PConfig.parsePeers()
 	if err != nil {
 		return nil, err
 	}
 
 	return &Checker{
-		Peers: peers,
+		Peers:     peers,
+		rpcClient: jsonrpc.NewClient(network.ToRPC()),
 	}, nil
-}
-
-func (config *P2PConfig) MapToCheckerPeers() ([]Peer, error) {
-	configPeers := config.SeedPeers
-	checkerPeers := make([]Peer, 0, len(configPeers))
-
-	for _, peer := range configPeers {
-		if isValidCharCount(peer.Address, peerSeparator, peerCount) {
-			peerInfo := strings.Split(peer.Address, peerSeparator)
-
-			checkerPeer, err := newPeer(peerInfo[2], peerInfo[4])
-			if err != nil {
-				return nil, err
-			}
-
-			checkerPeers = append(checkerPeers, *checkerPeer)
-
-			continue
-		}
-
-		return nil, fmt.Errorf("invalid peer address value provided %s", peer.Address)
-	}
-
-	if len(checkerPeers) == 0 {
-		return nil, errors.New("no peers found in config file")
-	}
-
-	return checkerPeers, nil
 }
