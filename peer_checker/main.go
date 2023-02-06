@@ -16,7 +16,7 @@ var (
 func main() {
 	flag.Parse()
 
-	if filePath == nil {
+	if *filePath == "" {
 		colorPrint(enums.ColorRed, "provide path to the config file by using -f option")
 
 		return

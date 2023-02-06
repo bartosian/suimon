@@ -2,7 +2,7 @@ package checker
 
 import (
 	"fmt"
-	
+
 	emoji "github.com/jayco/go-emoji-flag"
 	"github.com/oschwald/geoip2-golang"
 )
@@ -15,8 +15,8 @@ type Location struct {
 	Flag        string
 }
 
-func newLocation(country *geoip2.Country) Location {
-	return Location{
+func newLocation(country *geoip2.Country) *Location {
+	return &Location{
 		CountryCode: country.Country.IsoCode,
 		CountryName: country.Country.Names[countryNameLanguage],
 		Flag:        emoji.GetFlag(country.Country.IsoCode),

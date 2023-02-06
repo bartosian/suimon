@@ -7,14 +7,18 @@ import (
 	"sync"
 
 	"github.com/oschwald/geoip2-golang"
+
+	"github.com/bartosian/sui_helpers/peer_checker/pkg/validation"
 )
+
+const pathToGeoDB = "./vendors/geodb/GeoLite2-Country.mmdb"
 
 type P2PConfig struct {
 	SeedPeers []PeerData `yaml:"seed-peers"`
 }
 
 func (config *P2PConfig) parsePeers() ([]Peer, error) {
-	filePath, _ := filepath.Abs("./vendors/geodb/GeoLite2-Country.mmdb")
+	filePath, _ := filepath.Abs(pathToGeoDB)
 
 	db, err := geoip2.Open(filePath)
 	if err != nil {
@@ -23,8 +27,11 @@ func (config *P2PConfig) parsePeers() ([]Peer, error) {
 
 	defer db.Close()
 
-	configPeers := config.SeedPeers
-	checkerPeers := make([]Peer, 0, len(configPeers))
+	configPeers, checkerPeers := config.SeedPeers, make([]Peer, 0, len(config.SeedPeers))
+	if len(config.SeedPeers) == 0 {
+		return nil, errors.New("no peers found in config file")
+	}
+
 	peerCH := make(chan Peer, len(checkerPeers))
 
 	var wg sync.WaitGroup
@@ -35,7 +42,7 @@ func (config *P2PConfig) parsePeers() ([]Peer, error) {
 		go func(peer PeerData) {
 			defer wg.Done()
 
-			if !isValidCharCount(peer.Address, peerSeparator, peerCount) {
+			if !validation.IsValidCharCount(peer.Address, peerSeparator, peerCount) {
 				return
 			}
 
@@ -49,6 +56,7 @@ func (config *P2PConfig) parsePeers() ([]Peer, error) {
 			}
 
 			checkerPeer.GetTotalTransactionNumber()
+			checkerPeer.GetMetrics()
 
 			peerCH <- *checkerPeer
 		}(peer)
