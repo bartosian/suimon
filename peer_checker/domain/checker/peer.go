@@ -2,10 +2,10 @@ package checker
 
 import (
 	"fmt"
-	"net"
-
 	"github.com/oschwald/geoip2-golang"
 	"github.com/ybbus/jsonrpc/v3"
+	"net"
+	"net/http"
 
 	"github.com/bartosian/sui_helpers/peer_checker/domain/enums"
 	"github.com/bartosian/sui_helpers/peer_checker/pkg/validation"
@@ -29,16 +29,15 @@ type Peer struct {
 	Port        string
 	Location    *Location
 
-	rpcClient   jsonrpc.RPCClient
-	geoDbClient *geoip2.Reader
+	TotalTransactionNumber *uint64
+	Metrics                *Metrics
 
-	TotalTransactionNumber  *uint64
-	HighestSyncedCheckpoint *string
-	SuiNetworkPeers         *string
-	Uptime                  *string
+	rpcClient   jsonrpc.RPCClient
+	httpClient  *http.Client
+	geoDbClient *geoip2.Reader
 }
 
-func newPeer(geoDB *geoip2.Reader, address, port string) *Peer {
+func newPeer(geoDB *geoip2.Reader, httpClient *http.Client, address, port string) *Peer {
 	peer := &Peer{
 		Address:     address,
 		Port:        port,
@@ -46,6 +45,7 @@ func newPeer(geoDB *geoip2.Reader, address, port string) *Peer {
 	}
 
 	peer.rpcClient = jsonrpc.NewClient(peer.getUrl(requestTypeRPC, false))
+	peer.httpClient = httpClient
 
 	return peer
 }

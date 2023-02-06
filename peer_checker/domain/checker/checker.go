@@ -1,10 +1,9 @@
 package checker
 
 import (
-	"os"
-
 	"github.com/ybbus/jsonrpc/v3"
 	"gopkg.in/yaml.v3"
+	"os"
 
 	"github.com/bartosian/sui_helpers/peer_checker/domain/enums"
 )

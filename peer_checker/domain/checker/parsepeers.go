@@ -2,9 +2,11 @@ package checker
 
 import (
 	"errors"
+	"net/http"
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/oschwald/geoip2-golang"
 
@@ -27,6 +29,10 @@ func (config *P2PConfig) parsePeers() ([]Peer, error) {
 
 	defer db.Close()
 
+	httpClient := &http.Client{
+		Timeout: 2 * time.Second,
+	}
+
 	configPeers, checkerPeers := config.SeedPeers, make([]Peer, 0, len(config.SeedPeers))
 	if len(config.SeedPeers) == 0 {
 		return nil, errors.New("no peers found in config file")
@@ -37,7 +43,7 @@ func (config *P2PConfig) parsePeers() ([]Peer, error) {
 	var wg sync.WaitGroup
 
 	for _, peer := range configPeers {
-		wg.Add(1)
+		wg.Add(3)
 
 		go func(peer PeerData) {
 			defer wg.Done()
@@ -48,15 +54,34 @@ func (config *P2PConfig) parsePeers() ([]Peer, error) {
 
 			peerInfo := strings.Split(peer.Address, peerSeparator)
 
-			checkerPeer := newPeer(db, peerInfo[2], peerInfo[4])
+			checkerPeer := newPeer(db, httpClient, peerInfo[2], peerInfo[4])
 
 			err := checkerPeer.Parse()
 			if err != nil {
 				return
 			}
 
-			checkerPeer.GetTotalTransactionNumber()
-			checkerPeer.GetMetrics()
+			doneCH := make(chan struct{}, 2)
+
+			go func() {
+				defer wg.Done()
+
+				checkerPeer.GetTotalTransactionNumber()
+
+				doneCH <- struct{}{}
+			}()
+
+			go func() {
+				defer wg.Done()
+
+				checkerPeer.GetMetrics()
+
+				doneCH <- struct{}{}
+			}()
+
+			for i := 0; i < 2; i++ {
+				<-doneCH
+			}
 
 			peerCH <- *checkerPeer
 		}(peer)

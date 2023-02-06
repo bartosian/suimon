@@ -2,20 +2,26 @@ package checker
 
 import (
 	"bufio"
+	"fmt"
 	"io"
-	"net/http"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/bartosian/sui_helpers/peer_checker/domain/enums"
 )
 
 const (
-	metricSeparator = " "
-	metricComment   = "#"
+	metricSeparator     = " "
+	metricComment       = "#"
+	metricKeySeparator  = "="
+	metricVersionRegexp = `\{(.*?)\}`
 )
 
+var versionRegex = regexp.MustCompile(metricVersionRegexp)
+
 func (peer *Peer) GetMetrics() {
-	result, err := http.Get(peer.getUrl(requestTypeMetrics, false))
+	result, err := peer.httpClient.Get(peer.getUrl(requestTypeMetrics, false))
 	if err != nil {
 		return
 	}
@@ -36,12 +42,39 @@ func (peer *Peer) GetMetrics() {
 		}
 
 		// Split the line into a key and value
-		parts := strings.SplitN(line, metricSeparator, 2)
-		key := strings.TrimSpace(parts[0])
-		value := strings.TrimSpace(parts[1])
+		parts := strings.Split(line, metricSeparator)
+		if len(parts) != 2 {
+			continue
+		}
 
-		parsedResp[key] = value
+		key, value := strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1])
+
+		metricName, err := enums.MetricNameFromString(key)
+		if err != nil {
+			continue
+		}
+
+		if metricName == enums.MetricNameUptime {
+			version := versionRegex.FindStringSubmatch(key)
+			versionInfo := strings.Split(version[1], metricKeySeparator)
+
+			uptimeSeconds, err := strconv.Atoi(value)
+			if err != nil {
+				continue
+			}
+
+			value = fmt.Sprintf("%.1f days", float64(uptimeSeconds)/(60*60*24))
+			parsedResp[enums.MetricNameVersion] = versionInfo[1]
+		}
+
+		parsedResp[metricName] = value
 	}
+
+	if len(parsedResp) == 0 {
+		return
+	}
+
+	peer.Metrics = NewMetrics(parsedResp)
 
 	return
 }

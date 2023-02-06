@@ -25,7 +25,7 @@ func NewTableBuilder() *TableBuilder {
 
 func (tb *TableBuilder) BuildTable(data []Peer) {
 	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
-	tb.builder.AppendHeader(table.Row{"#", "Peer", "Port", "Country", "Total TXS"}, rowConfigAutoMerge)
+	tb.builder.AppendHeader(table.Row{"#", "Peer", "Port", "Country", "Total\nTransactions", "Highest\nCheckpoints", "Connected\n Peers", "Uptime", "Version"}, rowConfigAutoMerge)
 
 	for idx, peer := range data {
 		var totalTransactionsNumber any = noDataReceived
@@ -34,7 +34,18 @@ func (tb *TableBuilder) BuildTable(data []Peer) {
 			totalTransactionsNumber = *peer.TotalTransactionNumber
 		}
 
-		tb.builder.AppendRow(table.Row{idx + 1, peer.Address, peer.Port, peer.Location.String(), totalTransactionsNumber}, rowConfigAutoMerge)
+		tb.builder.AppendRow(
+			table.Row{
+				idx + 1,
+				peer.Address,
+				peer.Port,
+				peer.Location.String(),
+				totalTransactionsNumber,
+				peer.Metrics.HighestSyncedCheckpoint,
+				peer.Metrics.SuiNetworkPeers,
+				peer.Metrics.Uptime,
+				peer.Metrics.Version,
+			}, rowConfigAutoMerge)
 		tb.builder.AppendSeparator()
 	}
 
