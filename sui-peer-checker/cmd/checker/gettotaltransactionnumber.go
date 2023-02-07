@@ -2,24 +2,32 @@ package checker
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/ybbus/jsonrpc/v3"
 
-	"github.com/bartosian/sui_helpers/peer_checker/domain/enums"
+	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/enums"
 )
 
-func (checker *Checker) GetTotalTransactionNumber() (*uint64, error) {
+func (checker *Checker) GetTotalTransactionNumber() (*int, error) {
 	return getTotalTransactionNumber(checker.rpcClient)
 }
 
 func (peer *Peer) GetTotalTransactionNumber() {
 	result, err := getTotalTransactionNumber(peer.rpcClient)
-	if err == nil {
-		peer.TotalTransactionNumber = result
+	if err != nil {
+		return
+	}
+
+	totalTransactionNumber := strconv.Itoa(*result)
+
+	peer.Metrics = Metrics{
+		TotalTransactionNumber: totalTransactionNumber,
 	}
 }
 
-func getTotalTransactionNumber(rpcClient jsonrpc.RPCClient) (*uint64, error) {
-	var response *uint64
+func getTotalTransactionNumber(rpcClient jsonrpc.RPCClient) (*int, error) {
+	var response *int
 
 	err := rpcClient.CallFor(context.Background(), &response, enums.RPCMethodGetTotalTransactionNumber.String())
 	if err != nil {

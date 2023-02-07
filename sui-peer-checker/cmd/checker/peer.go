@@ -2,18 +2,22 @@ package checker
 
 import (
 	"fmt"
-	"github.com/oschwald/geoip2-golang"
-	"github.com/ybbus/jsonrpc/v3"
+	emoji "github.com/jayco/go-emoji-flag"
 	"net"
 	"net/http"
 
-	"github.com/bartosian/sui_helpers/peer_checker/domain/enums"
-	"github.com/bartosian/sui_helpers/peer_checker/pkg/validation"
+	"github.com/oschwald/geoip2-golang"
+	"github.com/ybbus/jsonrpc/v3"
+
+	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/sui-peer-checker/pkg/log"
+	"github.com/bartosian/sui_helpers/sui-peer-checker/pkg/validation"
 )
 
 const (
-	rpcPortDefault     = "9000"
-	metricsPortDefault = "9184"
+	rpcPortDefault      = "9000"
+	metricsPortDefault  = "9184"
+	countryNameLanguage = "en"
 )
 
 type requestType int
@@ -29,12 +33,13 @@ type Peer struct {
 	Port        string
 	Location    *Location
 
-	TotalTransactionNumber *uint64
-	Metrics                *Metrics
+	Metrics Metrics
 
 	rpcClient   jsonrpc.RPCClient
 	httpClient  *http.Client
 	geoDbClient *geoip2.Reader
+
+	logger log.Logger
 }
 
 func newPeer(geoDB *geoip2.Reader, httpClient *http.Client, address, port string) *Peer {
@@ -42,6 +47,7 @@ func newPeer(geoDB *geoip2.Reader, httpClient *http.Client, address, port string
 		Address:     address,
 		Port:        port,
 		geoDbClient: geoDB,
+		logger:      log.NewLogger(),
 	}
 
 	peer.rpcClient = jsonrpc.NewClient(peer.getUrl(requestTypeRPC, false))
@@ -56,7 +62,11 @@ func (peer *Peer) Parse() error {
 
 		record, err := peer.geoDbClient.Country(ip)
 		if err == nil {
-			peer.Location = newLocation(record)
+			countryISOCode := record.Country.IsoCode
+			countryName := record.Country.Names[countryNameLanguage]
+			flag := emoji.GetFlag(record.Country.IsoCode)
+
+			peer.Location = newLocation(countryISOCode, countryName, flag)
 		}
 	} else if validation.IsValidDomain(peer.Address) {
 		peer.AddressType = enums.AddressTypeDomain

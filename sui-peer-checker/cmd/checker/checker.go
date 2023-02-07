@@ -1,11 +1,12 @@
 package checker
 
 import (
-	"github.com/ybbus/jsonrpc/v3"
-	"gopkg.in/yaml.v3"
 	"os"
 
-	"github.com/bartosian/sui_helpers/peer_checker/domain/enums"
+	"github.com/ybbus/jsonrpc/v3"
+	"gopkg.in/yaml.v3"
+
+	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/enums"
 )
 
 const (
@@ -17,12 +18,13 @@ type (
 	PeerData struct {
 		Address string `yaml:"address"`
 	}
-	NodeConfigYaml struct {
-		P2PConfig P2PConfig `yaml:"p2p-config"`
+
+	NodeYaml struct {
+		Config Config `yaml:"p2p-config"`
 	}
 
 	Checker struct {
-		Peers        []Peer
+		peers        []Peer
 		rpcClient    jsonrpc.RPCClient
 		tableBuilder *TableBuilder
 	}
@@ -34,20 +36,19 @@ func NewChecker(path string, network enums.NetworkType) (*Checker, error) {
 		return nil, err
 	}
 
-	var configData NodeConfigYaml
-
-	err = yaml.Unmarshal(file, &configData)
+	var nodeYaml NodeYaml
+	err = yaml.Unmarshal(file, &nodeYaml)
 	if err != nil {
 		return nil, err
 	}
 
-	peers, err := configData.P2PConfig.parsePeers()
+	peers, err := nodeYaml.Config.parsePeers()
 	if err != nil {
 		return nil, err
 	}
 
 	return &Checker{
-		Peers:        peers,
+		peers:        peers,
 		rpcClient:    jsonrpc.NewClient(network.ToRPC()),
 		tableBuilder: NewTableBuilder(),
 	}, nil
