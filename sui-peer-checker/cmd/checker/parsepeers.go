@@ -45,11 +45,18 @@ func (cfg *Config) parsePeers() ([]Peer, error) {
 	}
 
 	var (
-		wg     sync.WaitGroup
-		peerCH = make(chan Peer)
+		wg             sync.WaitGroup
+		peerCH         = make(chan Peer)
+		processedPeers = make(map[string]struct{})
 	)
 
 	for _, cfgPeer := range cfgPeers {
+		if _, ok := processedPeers[cfgPeer.Address]; ok {
+			continue
+		}
+
+		processedPeers[cfgPeer.Address] = struct{}{}
+
 		wg.Add(1)
 
 		go func(cfgPeer PeerData) {
