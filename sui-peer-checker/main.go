@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"github.com/schollz/progressbar/v3"
+	"time"
 
 	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker"
 	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/enums"
@@ -31,6 +33,29 @@ func main() {
 		return
 	}
 
+	progressCH := make(chan struct{})
+	progressTicker := time.NewTicker(100 * time.Millisecond)
+
+	go func() {
+		bar := newProgressBar()
+
+		for {
+			select {
+			case <-progressCH:
+				bar.Finish()
+				bar.Clear()
+
+				return
+			case <-progressTicker.C:
+				for i := 0; i < 500; i++ {
+					bar.Add(1)
+
+					time.Sleep(4 * time.Millisecond)
+				}
+			}
+		}
+	}()
+
 	checker, err := checker.NewChecker(*filePath, network)
 	if err != nil {
 		logger.Error("failed to create peers checker: ", err)
@@ -38,6 +63,24 @@ func main() {
 		return
 	}
 
+	progressTicker.Stop()
+	progressCH <- struct{}{}
+
 	checker.GenerateTableConfig()
 	checker.DrawTable()
+}
+
+func newProgressBar() *progressbar.ProgressBar {
+	return progressbar.NewOptions(1000,
+		progressbar.OptionEnableColorCodes(true),
+		progressbar.OptionShowBytes(true),
+		progressbar.OptionSetWidth(15),
+		progressbar.OptionSetDescription("[blue]🔄 [ PROCESSING DATA... ][reset] "),
+		progressbar.OptionSetTheme(progressbar.Theme{
+			Saucer:        "[blue]=[reset]",
+			SaucerHead:    "[blue]>[reset]",
+			SaucerPadding: " ",
+			BarStart:      "[",
+			BarEnd:        "]",
+		}))
 }
