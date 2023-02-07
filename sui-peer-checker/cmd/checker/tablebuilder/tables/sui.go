@@ -8,8 +8,7 @@ import (
 type ColumnNameSUI int
 
 const (
-	ColumnNameSUIIDX ColumnNameSUI = iota
-	ColumnNameSUIPeer
+	ColumnNameSUIPeer ColumnNameSUI = iota
 	ColumnNameSUIPort
 	ColumnNameSUITotalTransactions
 	ColumnNameSUIHighestCheckpoints
@@ -25,71 +24,84 @@ var nameTransformer = text.Transformer(func(val interface{}) string {
 })
 
 var (
-	TableTitleSUI   = "💧 SUI PEERS CHECKER v0.1.0"
-	TableStyleSUI   = table.StyleLight
+	TableTitleSUI      = "💧 SUI PEERS CHECKER v0.1.0"
+	TableStyleSUI      = table.StyleLight
+	TableSortConfigSUI = []table.SortBy{
+		{Name: "PEER", Mode: table.Asc},
+		{Name: "UPTIME", Mode: table.Asc},
+	}
 	ColumnConfigSUI = [...]table.ColumnConfig{
-		ColumnNameSUIIDX: {
-			Name:         "#",
-			Align:        text.AlignCenter,
-			Colors:       text.Colors{text.FgHiRed, text.Bold},
-			ColorsHeader: text.Colors{text.FgHiRed},
-			ColorsFooter: text.Colors{text.FgHiRed},
-			Hidden:       false,
-			Transformer:  nameTransformer,
-		},
 		ColumnNameSUIPeer: {
-			Name:        "PEER",
-			Align:       text.AlignLeft,
-			AlignHeader: text.AlignCenter,
-			Hidden:      false,
+			Name:         "PEER",
+			Align:        text.AlignLeft,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
 		},
 		ColumnNameSUIPort: {
-			Name:        "PORT",
-			Align:       text.AlignCenter,
-			AlignHeader: text.AlignCenter,
-			Hidden:      false,
+			Name:         "PORT",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
 		},
 		ColumnNameSUITotalTransactions: {
-			Name:        "TOTAL\nTRANSACTIONS",
-			Align:       text.AlignCenter,
-			AlignHeader: text.AlignCenter,
-			Hidden:      false,
+			Name:         "TOTAL\nTRANSACTIONS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
 		},
 		ColumnNameSUIHighestCheckpoints: {
-			Name:        "HIGHEST\nCHECKPOINTS",
-			Align:       text.AlignCenter,
-			AlignHeader: text.AlignCenter,
-			Hidden:      false,
+			Name:         "HIGHEST\nCHECKPOINTS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
 		},
 		ColumnNameSUIConnectedPeers: {
-			Name:        "CONNECTED\nPEERS",
-			Align:       text.AlignCenter,
-			AlignHeader: text.AlignCenter,
-			Hidden:      false,
+			Name:         "CONNECTED\nPEERS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
 		},
 		ColumnNameSUIUptime: {
-			Name:        "UPTIME",
-			Align:       text.AlignCenter,
-			AlignHeader: text.AlignCenter,
-			Hidden:      false,
+			Name:         "UPTIME",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
 		},
 		ColumnNameSUIVersion: {
-			Name:        "VERSION",
-			Align:       text.AlignCenter,
-			AlignHeader: text.AlignCenter,
-			Hidden:      false,
+			Name:         "VERSION",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
 		},
 		ColumnNameSUICommit: {
-			Name:        "COMMIT",
-			Align:       text.AlignCenter,
-			AlignHeader: text.AlignCenter,
-			Hidden:      false,
+			Name:         "COMMIT",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
 		},
 		ColumnNameSUICountry: {
-			Name:        "COUNTRY",
-			Align:       text.AlignLeft,
-			AlignHeader: text.AlignCenter,
-			Hidden:      false,
+			Name:         "COUNTRY",
+			Align:        text.AlignLeft,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
 		},
 	}
 )

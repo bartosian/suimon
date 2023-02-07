@@ -62,6 +62,7 @@ func (checker *Checker) GenerateTableConfig() {
 		Style:        tables.TableStyleSUI,
 		RowsCount:    len(checker.peers),
 		ColumnsCount: len(tables.ColumnConfigSUI),
+		SortConfig:   tables.TableSortConfigSUI,
 	}
 
 	columns := make([]tablebuilder.Column, len(tables.ColumnConfigSUI))
@@ -70,8 +71,7 @@ func (checker *Checker) GenerateTableConfig() {
 		columns[idx].Config = config
 	}
 
-	for idx, peer := range checker.peers {
-		columns[tables.ColumnNameSUIIDX].SetValue(idx + 1)
+	for _, peer := range checker.peers {
 		columns[tables.ColumnNameSUIPeer].SetValue(peer.Address)
 		columns[tables.ColumnNameSUIPort].SetValue(peer.Port)
 		columns[tables.ColumnNameSUITotalTransactions].SetValue(peer.Metrics.TotalTransactionNumber)

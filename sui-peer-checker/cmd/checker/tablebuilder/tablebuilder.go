@@ -16,6 +16,7 @@ type TableConfig struct {
 	Name         string
 	Style        table.Style
 	Columns      []Column
+	SortConfig   []table.SortBy
 	RowsCount    int
 	ColumnsCount int
 }
@@ -66,6 +67,7 @@ func (tb *TableBuilder) SetRows() {
 
 	tb.builder.AppendHeader(header, rowConfigAutoMerge)
 	tb.builder.AppendFooter(footer, rowConfigAutoMerge)
+	tb.builder.SortBy(tb.config.SortConfig)
 }
 
 func (tb *TableBuilder) SetStyle() {
@@ -74,11 +76,13 @@ func (tb *TableBuilder) SetStyle() {
 	tb.builder.Style().Title.Colors = text.Colors{text.FgBlue}
 	tb.builder.Style().Title.Align = text.AlignCenter
 	tb.builder.Style().Box.RightSeparator = ""
+	tb.builder.SetAutoIndex(true)
 	tb.builder.Style().Color = table.ColorOptions{
 		Header: text.Colors{text.FgHiRed},
 		Row:    text.Colors{text.FgHiWhite},
 		Footer: text.Colors{text.FgBlue},
 	}
+	tb.builder.Style().Color.IndexColumn = text.Colors{text.FgHiRed}
 }
 
 func (tb *TableBuilder) Build() {
