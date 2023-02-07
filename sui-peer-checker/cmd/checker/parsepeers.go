@@ -62,13 +62,12 @@ func (cfg *Config) parsePeers() ([]Peer, error) {
 			peerInfo := strings.Split(cfgPeer.Address, peerSeparator)
 
 			peer := newPeer(db, httpClient, peerInfo[2], peerInfo[4])
-
 			err := peer.Parse()
 			if err != nil {
 				return
 			}
 
-			doneCH := make(chan struct{}, 2)
+			doneCH := make(chan struct{})
 
 			go func() {
 				peer.GetTotalTransactionNumber()

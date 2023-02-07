@@ -7,6 +7,8 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/tablebuilder"
+	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/tablebuilder/tables"
 )
 
 const (
@@ -26,7 +28,8 @@ type (
 	Checker struct {
 		peers        []Peer
 		rpcClient    jsonrpc.RPCClient
-		tableBuilder *TableBuilder
+		tableBuilder *tablebuilder.TableBuilder
+		tableConfig  tablebuilder.TableConfig
 	}
 )
 
@@ -48,8 +51,39 @@ func NewChecker(path string, network enums.NetworkType) (*Checker, error) {
 	}
 
 	return &Checker{
-		peers:        peers,
-		rpcClient:    jsonrpc.NewClient(network.ToRPC()),
-		tableBuilder: NewTableBuilder(),
+		peers:     peers,
+		rpcClient: jsonrpc.NewClient(network.ToRPC()),
 	}, nil
+}
+
+func (checker *Checker) GenerateTableConfig() {
+	tableConfig := tablebuilder.TableConfig{
+		Name:         tables.TableTitleSUI,
+		Style:        tables.TableStyleSUI,
+		RowsCount:    len(checker.peers),
+		ColumnsCount: len(tables.ColumnConfigSUI),
+	}
+
+	columns := make([]tablebuilder.Column, len(tables.ColumnConfigSUI))
+
+	for idx, config := range tables.ColumnConfigSUI {
+		columns[idx].Config = config
+	}
+
+	for idx, peer := range checker.peers {
+		columns[tables.ColumnNameSUIIDX].SetValue(idx + 1)
+		columns[tables.ColumnNameSUIPeer].SetValue(peer.Address)
+		columns[tables.ColumnNameSUIPort].SetValue(peer.Port)
+		columns[tables.ColumnNameSUITotalTransactions].SetValue(peer.Metrics.TotalTransactionNumber)
+		columns[tables.ColumnNameSUIHighestCheckpoints].SetValue(peer.Metrics.HighestSyncedCheckpoint)
+		columns[tables.ColumnNameSUIConnectedPeers].SetValue(peer.Metrics.SuiNetworkPeers)
+		columns[tables.ColumnNameSUIUptime].SetValue(peer.Metrics.Uptime)
+		columns[tables.ColumnNameSUIVersion].SetValue(peer.Metrics.Version)
+		columns[tables.ColumnNameSUICommit].SetValue(peer.Metrics.Commit)
+		columns[tables.ColumnNameSUICountry].SetValue(peer.Location.String())
+	}
+
+	tableConfig.Columns = columns
+
+	checker.tableBuilder = tablebuilder.NewTableBuilder(tableConfig)
 }

@@ -15,6 +15,7 @@ type (
 		SuiNetworkPeers         string
 		Uptime                  string
 		Version                 string
+		Commit                  string
 	}
 )
 
@@ -27,6 +28,8 @@ func NewMetrics(input MetricsMap) Metrics {
 			metrics.Uptime = value
 		case enums.MetricTypeVersion:
 			metrics.Version = strings.Trim(value, "\"")
+		case enums.MetricTypeCommit:
+			metrics.Commit = strings.Trim(value, "\"")
 		case enums.MetricTypeHighestSyncedCheckpoint:
 			metrics.HighestSyncedCheckpoint = value
 		case enums.MetricTypeSuiNetworkPeers:

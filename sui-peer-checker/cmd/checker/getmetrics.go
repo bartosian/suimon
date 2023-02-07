@@ -3,7 +3,6 @@ package checker
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"regexp"
 	"strconv"
 	"strings"
@@ -15,6 +14,7 @@ const (
 	metricSeparator     = " "
 	metricComment       = "#"
 	metricKeySeparator  = "="
+	metricValSeparator  = "-"
 	metricVersionRegexp = `\{(.*?)\}`
 )
 
@@ -31,11 +31,11 @@ func (peer *Peer) GetMetrics() {
 	defer result.Body.Close()
 
 	reader := bufio.NewReader(result.Body)
-	metrics := make(map[enums.MetricType]string)
 
+	metrics := make(map[enums.MetricType]string)
 	for {
 		line, err := reader.ReadString('\n')
-		if err == io.EOF {
+		if len(line) == 0 && err != nil {
 			break
 		}
 
@@ -65,7 +65,14 @@ func (peer *Peer) GetMetrics() {
 			}
 
 			value = fmt.Sprintf("%.1f days", float64(uptimeSeconds)/(60*60*24))
-			metrics[enums.MetricTypeVersion] = version[1]
+
+			versionInfo := strings.Split(version[1], metricValSeparator)
+			if len(versionInfo) != 2 {
+				continue
+			}
+
+			metrics[enums.MetricTypeVersion] = versionInfo[0]
+			metrics[enums.MetricTypeCommit] = versionInfo[1]
 		}
 
 		metrics[metricName] = value

@@ -38,5 +38,6 @@ func main() {
 		return
 	}
 
+	checker.GenerateTableConfig()
 	checker.DrawTable()
 }

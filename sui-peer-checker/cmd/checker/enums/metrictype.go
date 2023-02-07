@@ -11,6 +11,7 @@ const (
 	MetricTypeUndefined               MetricType = "UNDEFINED"
 	MetricTypeUptime                  MetricType = "UPTIME"
 	MetricTypeVersion                 MetricType = "VERSION"
+	MetricTypeCommit                  MetricType = "COMMIT"
 	MetricTypeHighestSyncedCheckpoint MetricType = "HIGHEST_SYNCED_CHECKPOINT"
 	MetricTypeSuiNetworkPeers         MetricType = "SUI_NETWORK_PEERS"
 	MetricTypeTotalTransactionsNumber MetricType = "TOTAL_TRANSACTIONS_NUMBER"
@@ -29,8 +30,11 @@ func MetricTypeFromString(value string) (MetricType, error) {
 
 	result, ok := map[string]MetricType{
 		"UPTIME":                    MetricTypeUptime,
+		"VERSION":                   MetricTypeVersion,
+		"COMMIT":                    MetricTypeCommit,
 		"HIGHEST_SYNCED_CHECKPOINT": MetricTypeHighestSyncedCheckpoint,
 		"SUI_NETWORK_PEERS":         MetricTypeSuiNetworkPeers,
+		"TOTAL_TRANSACTIONS_NUMBER": MetricTypeTotalTransactionsNumber,
 	}[value]
 
 	if ok {

@@ -19,5 +19,9 @@ func newLocation(countryCode, countryName, flag string) *Location {
 }
 
 func (loc *Location) String() string {
+	if loc == nil {
+		return ""
+	}
+	
 	return fmt.Sprintf("%s  %s", loc.Flag, loc.CountryName)
 }
