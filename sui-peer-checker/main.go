@@ -2,12 +2,13 @@ package main
 
 import (
 	"flag"
-	"github.com/schollz/progressbar/v3"
 	"time"
 
 	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker"
 	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/sui-peer-checker/pkg/log"
+
+	"github.com/schollz/progressbar/v3"
 )
 
 var (
@@ -42,7 +43,6 @@ func main() {
 		for {
 			select {
 			case <-progressCH:
-				bar.Finish()
 				bar.Clear()
 
 				return
@@ -50,7 +50,7 @@ func main() {
 				for i := 0; i < 500; i++ {
 					bar.Add(1)
 
-					time.Sleep(4 * time.Millisecond)
+					time.Sleep(8 * time.Millisecond)
 				}
 			}
 		}
@@ -66,7 +66,9 @@ func main() {
 	progressTicker.Stop()
 	progressCH <- struct{}{}
 
-	checker.GenerateTableConfig()
+	checker.GenerateSystemTable()
+	checker.GeneratePeersTable()
+
 	checker.DrawTable()
 }
 

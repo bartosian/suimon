@@ -31,8 +31,6 @@ func (peer *Peer) GetMetrics() {
 	defer result.Body.Close()
 
 	reader := bufio.NewReader(result.Body)
-
-	metrics := make(map[enums.MetricType]string)
 	for {
 		line, err := reader.ReadString('\n')
 		if len(line) == 0 && err != nil {
@@ -71,19 +69,10 @@ func (peer *Peer) GetMetrics() {
 				continue
 			}
 
-			metrics[enums.MetricTypeVersion] = versionInfo[0]
-			metrics[enums.MetricTypeCommit] = versionInfo[1]
+			peer.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0])
+			peer.Metrics.SetValue(enums.MetricTypeCommit, versionInfo[1])
 		}
 
-		metrics[metricName] = value
+		peer.Metrics.SetValue(metricName, value)
 	}
-
-	if len(metrics) == 0 {
-		return
-	}
-
-	metrics[enums.MetricTypeTotalTransactionsNumber] = peer.Metrics.TotalTransactionNumber
-	peer.Metrics = NewMetrics(metrics)
-
-	return
 }

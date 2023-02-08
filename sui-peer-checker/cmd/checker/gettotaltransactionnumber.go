@@ -1,38 +1,27 @@
 package checker
 
 import (
-	"context"
 	"strconv"
-
-	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/enums"
 )
 
-func (checker *Checker) GetTotalTransactionNumber() (*int, error) {
-	return getTotalTransactionNumber(checker.rpcClient)
-}
-
 func (peer *Peer) GetTotalTransactionNumber() {
-	result, err := getTotalTransactionNumber(peer.rpcClient)
-	if err != nil {
-		return
+	if result := getFromRPC(peer.rpcClient, enums.RPCMethodGetTotalTransactionNumber); result != nil {
+		totalTransactionNumber := strconv.Itoa(*result)
+
+		peer.Metrics.SetValue(enums.MetricTypeTotalTransactionsNumber, totalTransactionNumber)
 	}
 
-	totalTransactionNumber := strconv.Itoa(*result)
-
-	peer.Metrics = Metrics{
-		TotalTransactionNumber: totalTransactionNumber,
-	}
+	return
 }
 
-func getTotalTransactionNumber(rpcClient jsonrpc.RPCClient) (*int, error) {
-	var response *int
+func (host *RPCHost) GetTotalTransactionNumber() {
+	if result := getFromRPC(host.rpcClient, enums.RPCMethodGetTotalTransactionNumber); result != nil {
+		totalTransactionNumber := strconv.Itoa(*result)
 
-	err := rpcClient.CallFor(context.Background(), &response, enums.RPCMethodGetTotalTransactionNumber.String())
-	if err != nil {
-		return nil, err
+		host.Metrics.SetValue(enums.MetricTypeTotalTransactionsNumber, totalTransactionNumber)
 	}
 
-	return response, nil
+	return
 }

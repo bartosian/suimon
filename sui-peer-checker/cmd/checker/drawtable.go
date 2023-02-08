@@ -1,5 +1,6 @@
 package checker
 
 func (checker *Checker) DrawTable() {
-	checker.tableBuilder.Build()
+	checker.tableBuilderRPC.Build()
+	checker.tableBuilderPeer.Build()
 }

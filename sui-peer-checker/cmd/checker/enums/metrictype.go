@@ -15,6 +15,7 @@ const (
 	MetricTypeHighestSyncedCheckpoint MetricType = "HIGHEST_SYNCED_CHECKPOINT"
 	MetricTypeSuiNetworkPeers         MetricType = "SUI_NETWORK_PEERS"
 	MetricTypeTotalTransactionsNumber MetricType = "TOTAL_TRANSACTIONS_NUMBER"
+	MetricTypeLatestCheckpoint        MetricType = "LATEST_CHECKPOINT"
 )
 
 func (e MetricType) String() string {
@@ -35,6 +36,7 @@ func MetricTypeFromString(value string) (MetricType, error) {
 		"HIGHEST_SYNCED_CHECKPOINT": MetricTypeHighestSyncedCheckpoint,
 		"SUI_NETWORK_PEERS":         MetricTypeSuiNetworkPeers,
 		"TOTAL_TRANSACTIONS_NUMBER": MetricTypeTotalTransactionsNumber,
+		"LATEST_CHECKPOINT":         MetricTypeLatestCheckpoint,
 	}[value]
 
 	if ok {

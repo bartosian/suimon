@@ -1,10 +1,11 @@
 package tablebuilder
 
 import (
-	"os"
-
+	"fmt"
+	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/enums"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
+	"os"
 )
 
 type TableBuilder struct {
@@ -14,6 +15,7 @@ type TableBuilder struct {
 
 type TableConfig struct {
 	Name         string
+	Tag          string
 	Style        table.Style
 	Columns      []Column
 	SortConfig   []table.SortBy
@@ -54,6 +56,8 @@ func (tb *TableBuilder) SetRows() {
 		footer = append(footer, "")
 	}
 
+	footer[0] = fmt.Sprintf("%s%s%s", enums.ColorRed, tb.config.Tag, enums.ColorReset)
+
 	for i := 0; i < tb.config.RowsCount; i++ {
 		rowValues := make([]any, 0, tb.config.ColumnsCount)
 
@@ -74,7 +78,7 @@ func (tb *TableBuilder) SetStyle() {
 	tb.builder.SetTitle(tb.config.Name)
 	tb.builder.SetStyle(tb.config.Style)
 	tb.builder.Style().Title.Colors = text.Colors{text.FgBlue}
-	tb.builder.Style().Title.Align = text.AlignCenter
+	tb.builder.Style().Title.Align = text.AlignLeft
 	tb.builder.Style().Box.RightSeparator = ""
 	tb.builder.SetAutoIndex(true)
 	tb.builder.Style().Color = table.ColorOptions{

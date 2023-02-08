@@ -2,10 +2,10 @@ package checker
 
 import (
 	"fmt"
-	emoji "github.com/jayco/go-emoji-flag"
 	"net"
 	"net/http"
 
+	emoji "github.com/jayco/go-emoji-flag"
 	"github.com/oschwald/geoip2-golang"
 	"github.com/ybbus/jsonrpc/v3"
 

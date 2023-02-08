@@ -1,6 +1,7 @@
 package checker
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/ybbus/jsonrpc/v3"
@@ -8,7 +9,6 @@ import (
 
 	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/tablebuilder"
-	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/tablebuilder/tables"
 )
 
 const (
@@ -26,12 +26,29 @@ type (
 	}
 
 	Checker struct {
-		peers        []Peer
-		rpcClient    jsonrpc.RPCClient
-		tableBuilder *tablebuilder.TableBuilder
-		tableConfig  tablebuilder.TableConfig
+		peers            []Peer
+		rpcList          []RPCHost
+		rpcClient        jsonrpc.RPCClient
+		httpClient       *http.Client
+		tableBuilderPeer *tablebuilder.TableBuilder
+		tableBuilderRPC  *tablebuilder.TableBuilder
+		tableConfig      tablebuilder.TableConfig
+		network          enums.NetworkType
 	}
 )
+
+var rpcList = map[enums.NetworkType][]string{
+	enums.NetworkTypeDevnet: {
+		"https://fullnode.devnet.sui.io",
+	},
+	enums.NetworkTypeTestnet: {
+		"https://rpc-office.cosmostation.io/sui-testnet-wave-2",
+		"https://rpc.ankr.com/sui_testnet",
+		"https://sui-testnet.public.blastapi.io",
+		"https://sui-api.rpcpool.com",
+		"https://fullnode.testnet.sui.io",
+	},
+}
 
 func NewChecker(path string, network enums.NetworkType) (*Checker, error) {
 	file, err := os.ReadFile(path)
@@ -45,7 +62,12 @@ func NewChecker(path string, network enums.NetworkType) (*Checker, error) {
 		return nil, err
 	}
 
-	peers, err := nodeYaml.Config.parsePeers()
+	peers, err := parsePeers(nodeYaml.Config.SeedPeers)
+	if err != nil {
+		return nil, err
+	}
+
+	hosts, err := parseRPCHosts(rpcList[network])
 	if err != nil {
 		return nil, err
 	}
@@ -53,37 +75,7 @@ func NewChecker(path string, network enums.NetworkType) (*Checker, error) {
 	return &Checker{
 		peers:     peers,
 		rpcClient: jsonrpc.NewClient(network.ToRPC()),
+		rpcList:   hosts,
+		network:   network,
 	}, nil
-}
-
-func (checker *Checker) GenerateTableConfig() {
-	tableConfig := tablebuilder.TableConfig{
-		Name:         tables.TableTitleSUI,
-		Style:        tables.TableStyleSUI,
-		RowsCount:    len(checker.peers),
-		ColumnsCount: len(tables.ColumnConfigSUI),
-		SortConfig:   tables.TableSortConfigSUI,
-	}
-
-	columns := make([]tablebuilder.Column, len(tables.ColumnConfigSUI))
-
-	for idx, config := range tables.ColumnConfigSUI {
-		columns[idx].Config = config
-	}
-
-	for _, peer := range checker.peers {
-		columns[tables.ColumnNameSUIPeer].SetValue(peer.Address)
-		columns[tables.ColumnNameSUIPort].SetValue(peer.Port)
-		columns[tables.ColumnNameSUITotalTransactions].SetValue(peer.Metrics.TotalTransactionNumber)
-		columns[tables.ColumnNameSUIHighestCheckpoints].SetValue(peer.Metrics.HighestSyncedCheckpoint)
-		columns[tables.ColumnNameSUIConnectedPeers].SetValue(peer.Metrics.SuiNetworkPeers)
-		columns[tables.ColumnNameSUIUptime].SetValue(peer.Metrics.Uptime)
-		columns[tables.ColumnNameSUIVersion].SetValue(peer.Metrics.Version)
-		columns[tables.ColumnNameSUICommit].SetValue(peer.Metrics.Commit)
-		columns[tables.ColumnNameSUICountry].SetValue(peer.Location.String())
-	}
-
-	tableConfig.Columns = columns
-
-	checker.tableBuilder = tablebuilder.NewTableBuilder(tableConfig)
 }

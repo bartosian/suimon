@@ -22,7 +22,7 @@ type Config struct {
 	SeedPeers []PeerData `yaml:"seed-peers"`
 }
 
-func (cfg *Config) parsePeers() ([]Peer, error) {
+func parsePeers(seedPeers []PeerData) ([]Peer, error) {
 	filePath, err := filepath.Abs(pathToGeoDB)
 	if err != nil {
 		return nil, err
@@ -39,8 +39,8 @@ func (cfg *Config) parsePeers() ([]Peer, error) {
 		Timeout: httpClientTimeout,
 	}
 
-	cfgPeers, peers := cfg.SeedPeers, make([]Peer, 0, len(cfg.SeedPeers))
-	if len(cfg.SeedPeers) == 0 {
+	cfgPeers, peers := seedPeers, make([]Peer, 0, len(seedPeers))
+	if len(seedPeers) == 0 {
 		return nil, errors.New("no peers found in config file")
 	}
 

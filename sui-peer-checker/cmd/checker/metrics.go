@@ -10,8 +10,10 @@ type (
 	MetricsMap map[enums.MetricType]string
 
 	Metrics struct {
+		Updated                 bool
 		TotalTransactionNumber  string
 		HighestSyncedCheckpoint string
+		LatestCheckpoint        string
 		SuiNetworkPeers         string
 		Uptime                  string
 		Version                 string
@@ -19,25 +21,23 @@ type (
 	}
 )
 
-func NewMetrics(input MetricsMap) Metrics {
-	var metrics Metrics
+func (metrics *Metrics) SetValue(metric enums.MetricType, value string) {
+	metrics.Updated = true
 
-	for metric, value := range input {
-		switch metric {
-		case enums.MetricTypeUptime:
-			metrics.Uptime = value
-		case enums.MetricTypeVersion:
-			metrics.Version = strings.Trim(value, "\"")
-		case enums.MetricTypeCommit:
-			metrics.Commit = strings.Trim(value, "\"")
-		case enums.MetricTypeHighestSyncedCheckpoint:
-			metrics.HighestSyncedCheckpoint = value
-		case enums.MetricTypeSuiNetworkPeers:
-			metrics.SuiNetworkPeers = value
-		case enums.MetricTypeTotalTransactionsNumber:
-			metrics.TotalTransactionNumber = value
-		}
+	switch metric {
+	case enums.MetricTypeUptime:
+		metrics.Uptime = value
+	case enums.MetricTypeVersion:
+		metrics.Version = strings.Trim(value, "\"")
+	case enums.MetricTypeCommit:
+		metrics.Commit = strings.Trim(value, "\"")
+	case enums.MetricTypeHighestSyncedCheckpoint:
+		metrics.HighestSyncedCheckpoint = value
+	case enums.MetricTypeSuiNetworkPeers:
+		metrics.SuiNetworkPeers = value
+	case enums.MetricTypeTotalTransactionsNumber:
+		metrics.TotalTransactionNumber = value
+	case enums.MetricTypeLatestCheckpoint:
+		metrics.LatestCheckpoint = value
 	}
-
-	return metrics
 }
