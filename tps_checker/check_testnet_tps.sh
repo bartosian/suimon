@@ -1,12 +1,14 @@
+
+
 #!/bin/bash
-  
+
 if [ $(dpkg-query -W -f='${Status}' jq 2>/dev/null | grep -c "ok installed") -eq 0 ];
 then
   sudo apt update
   sudo apt install -y jq
 fi
 
-echo '------------------TESTNET TPS-------------------'
+echo '------------------TESTNET TPS 1.0.0-------------------'
 echo $(date)
 echo
 
@@ -56,4 +58,4 @@ MYTPS=$(((NODEEND-NODESTART)/10))
 
 echo 'SUI TPS: '$SUITPS
 echo 'NODE TPS: '$MYTPS
-echo '-------------------------------------'
+echo '-------------------------------------------------'

@@ -6,7 +6,7 @@ then
   sudo apt install -y jq
 fi
 
-echo '------------------DEVNET TPS-------------------'
+echo '------------------DEVNET TPS 1.0.0-------------------'
 echo $(date)
 echo
 
@@ -51,4 +51,4 @@ MYTPS=$(((NODEEND-NODESTART)/10))
 
 echo 'SUI TPS: '$SUITPS
 echo 'NODE TPS: '$MYTPS
-echo '-------------------------------------'
+echo '-----------------------------------------------------'
