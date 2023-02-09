@@ -2,11 +2,10 @@ package checker
 
 import (
 	"errors"
+	externalip "github.com/glendc/go-external-ip"
 	"net"
 	"strings"
 	"sync"
-
-	externalip "github.com/glendc/go-external-ip"
 )
 
 func (checker *Checker) parseNode() error {

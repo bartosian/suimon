@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	httpClientTimeout = 2 * time.Second
+	httpClientTimeout = 3 * time.Second
 	pathToGeoDB       = "./vendors/geodb/GeoLite2-Country.mmdb"
 	pathToRPCList     = "rpc.yaml"
 )

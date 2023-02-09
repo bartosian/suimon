@@ -3,7 +3,7 @@ package checker
 import (
 	"strings"
 
-	"github.com/bartosian/sui_helpers/sui-monitor/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
 type (

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/bartosian/sui_helpers/sui-monitor/pkg/validation"
+	"github.com/bartosian/sui_helpers/suimon/pkg/validation"
 )
 
 func (checker *Checker) parsePeers() error {

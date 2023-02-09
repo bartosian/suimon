@@ -1,4 +1,4 @@
-module github.com/bartosian/sui_helpers/sui-monitor
+module github.com/bartosian/sui_helpers/suimon
 
 go 1.19
 

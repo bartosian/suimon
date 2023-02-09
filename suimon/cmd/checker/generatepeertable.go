@@ -1,9 +1,9 @@
 package checker
 
 import (
-	"github.com/bartosian/sui_helpers/sui-monitor/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/sui-monitor/cmd/checker/tablebuilder"
-	"github.com/bartosian/sui_helpers/sui-monitor/cmd/checker/tablebuilder/tables"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder/tables"
 )
 
 func (checker *Checker) GeneratePeersTable() {

@@ -3,7 +3,7 @@ package checker
 import (
 	"strconv"
 
-	"github.com/bartosian/sui_helpers/sui-monitor/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
 func (peer *Peer) GetTotalTransactionNumber() {

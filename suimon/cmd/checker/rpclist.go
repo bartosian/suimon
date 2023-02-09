@@ -1,6 +1,6 @@
 package checker
 
-import "github.com/bartosian/sui_helpers/sui-monitor/cmd/checker/enums"
+import "github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 
 type RPCList struct {
 	Testnet []string `yaml:"testnet"`

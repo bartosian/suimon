@@ -9,9 +9,9 @@ import (
 	"github.com/oschwald/geoip2-golang"
 	"github.com/ybbus/jsonrpc/v3"
 
-	"github.com/bartosian/sui_helpers/sui-monitor/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/sui-monitor/pkg/log"
-	"github.com/bartosian/sui_helpers/sui-monitor/pkg/validation"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/pkg/log"
+	"github.com/bartosian/sui_helpers/suimon/pkg/validation"
 )
 
 const (

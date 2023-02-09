@@ -8,8 +8,8 @@ import (
 	"github.com/ybbus/jsonrpc/v3"
 	"gopkg.in/yaml.v3"
 
-	"github.com/bartosian/sui_helpers/sui-monitor/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/sui-monitor/cmd/checker/tablebuilder"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
 )
 
 const (
