@@ -7,6 +7,8 @@ import (
 const tableNoData = "no data"
 
 type (
+	Columns []Column
+
 	Column struct {
 		Values []any
 		Config table.ColumnConfig
@@ -19,4 +21,14 @@ func (col *Column) SetValue(value any) {
 	}
 
 	col.Values = append(col.Values, value)
+}
+
+func (col *Column) SetNoDataValue() {
+	col.SetValue(nil)
+}
+
+func (col Columns) SetNoDataValue() {
+	for idx := range col {
+		col[idx].SetNoDataValue()
+	}
 }

@@ -16,7 +16,7 @@ func (checker *Checker) GenerateSystemTable() {
 		SortConfig:   tables.TableSortConfigSystemSUI,
 	}
 
-	columns := make([]tablebuilder.Column, len(tables.ColumnConfigSystemSUI))
+	columns := make(tablebuilder.Columns, len(tables.ColumnConfigSystemSUI))
 
 	for idx, config := range tables.ColumnConfigSystemSUI {
 		columns[idx].Config = config
@@ -32,7 +32,9 @@ func (checker *Checker) GenerateSystemTable() {
 	}
 
 	if tableConfig.RowsCount == 0 {
-		return
+		columns.SetNoDataValue()
+
+		tableConfig.RowsCount++
 	}
 
 	tableConfig.Columns = columns

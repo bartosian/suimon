@@ -21,7 +21,7 @@ const (
 var versionRegex = regexp.MustCompile(metricVersionRegexp)
 
 func (peer *Peer) GetMetrics() {
-	metricsURL := peer.getUrl(requestTypeMetrics, false)
+	metricsURL := peer.getUrl(requestTypeMetrics, false, nil)
 
 	result, err := peer.httpClient.Get(metricsURL)
 	if err != nil {

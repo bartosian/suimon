@@ -22,14 +22,14 @@ func main() {
 	logger := log.NewLogger()
 
 	if *filePath == "" {
-		logger.Error("provide path to the config file by using -f option", nil)
+		logger.Error("provide path to the config file by using -f option")
 
 		return
 	}
 
 	network, err := enums.NetworkTypeFromString(*network)
 	if err != nil {
-		logger.Error("provide valid network type by using -n option", nil)
+		logger.Error("provide valid network type by using -n option")
 
 		return
 	}
@@ -50,7 +50,7 @@ func main() {
 				for i := 0; i < 500; i++ {
 					bar.Add(1)
 
-					time.Sleep(8 * time.Millisecond)
+					time.Sleep(5 * time.Millisecond)
 				}
 			}
 		}
@@ -63,10 +63,17 @@ func main() {
 		return
 	}
 
+	if err := checker.ParseData(); err != nil {
+		logger.Error("failed to parse data: ", err)
+
+		return
+	}
+
 	progressTicker.Stop()
 	progressCH <- struct{}{}
 
 	checker.GenerateSystemTable()
+	checker.GenerateNodeTable()
 	checker.GeneratePeersTable()
 
 	checker.DrawTable()

@@ -16,7 +16,7 @@ func (checker *Checker) GeneratePeersTable() {
 		SortConfig:   tables.TableSortConfigSUI,
 	}
 
-	columns := make([]tablebuilder.Column, len(tables.ColumnConfigSUI))
+	columns := make(tablebuilder.Columns, len(tables.ColumnConfigSUI))
 
 	for idx, config := range tables.ColumnConfigSUI {
 		columns[idx].Config = config
@@ -29,7 +29,7 @@ func (checker *Checker) GeneratePeersTable() {
 
 		tableConfig.RowsCount++
 
-		columns[tables.ColumnNameSUIPeer].SetValue(peer.Address)
+		columns[tables.ColumnNameSUIPeerAddress].SetValue(peer.Address)
 		columns[tables.ColumnNameSUIPort].SetValue(peer.Port)
 		columns[tables.ColumnNameSUITotalTransactions].SetValue(peer.Metrics.TotalTransactionNumber)
 		columns[tables.ColumnNameSUIHighestCheckpoints].SetValue(peer.Metrics.HighestSyncedCheckpoint)
@@ -41,7 +41,9 @@ func (checker *Checker) GeneratePeersTable() {
 	}
 
 	if tableConfig.RowsCount == 0 {
-		return
+		columns.SetNoDataValue()
+
+		tableConfig.RowsCount++
 	}
 
 	tableConfig.Columns = columns

@@ -1,53 +1,19 @@
 package checker
 
 import (
-	"errors"
-	"net/http"
-	"path/filepath"
 	"strings"
 	"sync"
-	"time"
-
-	"github.com/oschwald/geoip2-golang"
 
 	"github.com/bartosian/sui_helpers/sui-peer-checker/pkg/validation"
 )
 
-const (
-	httpClientTimeout = 2 * time.Second
-	pathToGeoDB       = "./vendors/geodb/GeoLite2-Country.mmdb"
-)
-
-type Config struct {
-	SeedPeers []PeerData `yaml:"seed-peers"`
-}
-
-func parsePeers(seedPeers []PeerData) ([]Peer, error) {
-	filePath, err := filepath.Abs(pathToGeoDB)
-	if err != nil {
-		return nil, err
-	}
-
-	db, err := geoip2.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	defer db.Close()
-
-	httpClient := &http.Client{
-		Timeout: httpClientTimeout,
-	}
-
-	cfgPeers, peers := seedPeers, make([]Peer, 0, len(seedPeers))
-	if len(seedPeers) == 0 {
-		return nil, errors.New("no peers found in config file")
-	}
-
+func (checker *Checker) parsePeers() error {
 	var (
 		wg             sync.WaitGroup
 		peerCH         = make(chan Peer)
 		processedPeers = make(map[string]struct{})
+		cfgPeers       = checker.nodeYaml.Config.SeedPeers
+		peers          = make([]Peer, 0, len(checker.nodeYaml.Config.SeedPeers))
 	)
 
 	for _, cfgPeer := range cfgPeers {
@@ -67,8 +33,7 @@ func parsePeers(seedPeers []PeerData) ([]Peer, error) {
 			}
 
 			peerInfo := strings.Split(cfgPeer.Address, peerSeparator)
-
-			peer := newPeer(db, httpClient, peerInfo[2], peerInfo[4])
+			peer := newPeer(checker.geoDbClient, checker.httpClient, peerInfo[2], peerInfo[4])
 			err := peer.Parse()
 			if err != nil {
 				return
@@ -107,5 +72,7 @@ func parsePeers(seedPeers []PeerData) ([]Peer, error) {
 		peers = append(peers, peer)
 	}
 
-	return peers, nil
+	checker.peers = peers
+
+	return nil
 }

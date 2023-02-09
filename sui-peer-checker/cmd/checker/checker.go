@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/oschwald/geoip2-golang"
 	"github.com/ybbus/jsonrpc/v3"
 	"gopkg.in/yaml.v3"
 
@@ -12,8 +13,9 @@ import (
 )
 
 const (
-	peerSeparator = "/"
-	peerCount     = 4
+	peerSeparator    = "/"
+	addressSeparator = ":"
+	peerCount        = 4
 )
 
 type (
@@ -21,34 +23,39 @@ type (
 		Address string `yaml:"address"`
 	}
 
+	Genesis struct {
+		GenesisFileLocation string `yaml:"genesis-file-location"`
+	}
+
+	Config struct {
+		SeedPeers []PeerData `yaml:"seed-peers"`
+	}
+
 	NodeYaml struct {
-		Config Config `yaml:"p2p-config"`
+		DbPath                string  `yaml:"db-path"`
+		MetricsAddress        string  `yaml:"metrics-address"`
+		JsonRPCAddress        string  `yaml:"json-rpc-address"`
+		WebsocketAddress      string  `yaml:"websocket-address"`
+		EnableEventProcessing bool    `yaml:"enable-event-processing"`
+		Config                Config  `yaml:"p2p-config"`
+		Genesis               Genesis `yaml:"genesis"`
 	}
 
 	Checker struct {
 		peers            []Peer
 		rpcList          []RPCHost
+		node             Node
 		rpcClient        jsonrpc.RPCClient
 		httpClient       *http.Client
+		geoDbClient      *geoip2.Reader
 		tableBuilderPeer *tablebuilder.TableBuilder
+		tableBuilderNode *tablebuilder.TableBuilder
 		tableBuilderRPC  *tablebuilder.TableBuilder
 		tableConfig      tablebuilder.TableConfig
 		network          enums.NetworkType
+		nodeYaml         NodeYaml
 	}
 )
-
-var rpcList = map[enums.NetworkType][]string{
-	enums.NetworkTypeDevnet: {
-		"https://fullnode.devnet.sui.io",
-	},
-	enums.NetworkTypeTestnet: {
-		"https://rpc-office.cosmostation.io/sui-testnet-wave-2",
-		"https://rpc.ankr.com/sui_testnet",
-		"https://sui-testnet.public.blastapi.io",
-		"https://sui-api.rpcpool.com",
-		"https://fullnode.testnet.sui.io",
-	},
-}
 
 func NewChecker(path string, network enums.NetworkType) (*Checker, error) {
 	file, err := os.ReadFile(path)
@@ -56,26 +63,20 @@ func NewChecker(path string, network enums.NetworkType) (*Checker, error) {
 		return nil, err
 	}
 
-	var nodeYaml NodeYaml
-	err = yaml.Unmarshal(file, &nodeYaml)
+	var result NodeYaml
+	err = yaml.Unmarshal(file, &result)
 	if err != nil {
 		return nil, err
 	}
 
-	peers, err := parsePeers(nodeYaml.Config.SeedPeers)
-	if err != nil {
-		return nil, err
-	}
-
-	hosts, err := parseRPCHosts(rpcList[network])
-	if err != nil {
-		return nil, err
+	httpClient := &http.Client{
+		Timeout: httpClientTimeout,
 	}
 
 	return &Checker{
-		peers:     peers,
-		rpcClient: jsonrpc.NewClient(network.ToRPC()),
-		rpcList:   hosts,
-		network:   network,
+		rpcClient:  jsonrpc.NewClient(network.ToRPC()),
+		httpClient: httpClient,
+		network:    network,
+		nodeYaml:   result,
 	}, nil
 }

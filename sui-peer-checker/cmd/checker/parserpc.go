@@ -1,19 +1,36 @@
 package checker
 
 import (
+	"gopkg.in/yaml.v3"
+	"os"
+	"path/filepath"
 	"sync"
-
-	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/enums"
 )
 
-type RpcList map[enums.NetworkType][]string
-
-func parseRPCHosts(hosts []string) ([]RPCHost, error) {
+func (checker *Checker) parseRPCHosts() error {
 	var (
 		wg      sync.WaitGroup
 		hostCH  = make(chan RPCHost)
-		rpcList = make([]RPCHost, 0, len(hosts))
+		rpcList []RPCHost
 	)
+
+	filePath, err := filepath.Abs(pathToRPCList)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	var result RPCList
+	err = yaml.Unmarshal(file, &result)
+	if err != nil {
+		return err
+	}
+
+	hosts := result.GetByNetwork(checker.network)
 
 	for _, host := range hosts {
 		wg.Add(1)
@@ -57,5 +74,7 @@ func parseRPCHosts(hosts []string) ([]RPCHost, error) {
 		rpcList = append(rpcList, rpc)
 	}
 
-	return rpcList, nil
+	checker.rpcList = rpcList
+
+	return nil
 }

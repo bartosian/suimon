@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+
 	"github.com/bartosian/sui_helpers/sui-peer-checker/cmd/checker/enums"
 )
 
@@ -11,16 +12,16 @@ func NewLogger() Logger {
 	return Logger{}
 }
 
-func (logger *Logger) Info(msg string, data interface{}) {
-	colorPrint(enums.ColorGreen, msg, data)
+func (logger *Logger) Info(messages ...any) {
+	colorPrint(enums.ColorGreen, messages)
 }
 
-func (logger *Logger) Warn(msg string, data interface{}) {
-	colorPrint(enums.ColorYellow, msg, data)
+func (logger *Logger) Warn(messages ...any) {
+	colorPrint(enums.ColorYellow, messages)
 }
 
-func (logger *Logger) Error(msg string, data interface{}) {
-	colorPrint(enums.ColorRed, msg, data)
+func (logger *Logger) Error(messages ...any) {
+	colorPrint(enums.ColorRed, messages)
 }
 
 func colorPrint(color enums.Color, messages ...any) {

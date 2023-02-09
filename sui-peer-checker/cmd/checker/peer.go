@@ -31,7 +31,8 @@ type Peer struct {
 	Address     string
 	AddressType enums.AddressType
 	Port        string
-	Location    *Location
+
+	Location *Location
 
 	Metrics Metrics
 
@@ -42,7 +43,11 @@ type Peer struct {
 	logger log.Logger
 }
 
-func newPeer(geoDB *geoip2.Reader, httpClient *http.Client, address, port string) *Peer {
+func newPeer(
+	geoDB *geoip2.Reader,
+	httpClient *http.Client,
+	address, port string,
+) *Peer {
 	peer := &Peer{
 		Address:     address,
 		Port:        port,
@@ -50,7 +55,9 @@ func newPeer(geoDB *geoip2.Reader, httpClient *http.Client, address, port string
 		logger:      log.NewLogger(),
 	}
 
-	peer.rpcClient = jsonrpc.NewClient(peer.getUrl(requestTypeRPC, false))
+	rpcURL := peer.getUrl(requestTypeRPC, false, nil)
+
+	peer.rpcClient = jsonrpc.NewClient(rpcURL)
 	peer.httpClient = httpClient
 
 	return peer
@@ -65,7 +72,6 @@ func (peer *Peer) Parse() error {
 			countryISOCode := record.Country.IsoCode
 			countryName := record.Country.Names[countryNameLanguage]
 			flag := emoji.GetFlag(record.Country.IsoCode)
-
 			peer.Location = newLocation(countryISOCode, countryName, flag)
 		}
 	} else if validation.IsValidDomain(peer.Address) {
@@ -81,19 +87,33 @@ func (peer *Peer) Parse() error {
 	return nil
 }
 
-func (peer *Peer) getUrl(request requestType, secure bool) string {
+func (peer *Peer) getUrl(
+	request requestType,
+	secure bool,
+	port *string,
+) string {
 	protocol := "http"
-
 	if secure {
 		protocol = protocol + "s"
 	}
 
+	portRPC := rpcPortDefault
+	portMetrics := metricsPortDefault
+
 	switch request {
 	case requestTypeRPC:
-		return fmt.Sprintf("%s://%s:%s", protocol, peer.Address, rpcPortDefault)
+		if port != nil {
+			portRPC = *port
+		}
+
+		return fmt.Sprintf("%s://%s:%s", protocol, peer.Address, portRPC)
 	case requestTypeMetrics:
 		fallthrough
 	default:
-		return fmt.Sprintf("%s://%s:%s/metrics", protocol, peer.Address, metricsPortDefault)
+		if port != nil {
+			portMetrics = *port
+		}
+
+		return fmt.Sprintf("%s://%s:%s/metrics", protocol, peer.Address, portMetrics)
 	}
 }
