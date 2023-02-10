@@ -12,7 +12,7 @@ func (checker *Checker) GenerateNodeTable() {
 	}
 
 	tableConfig := tablebuilder.TableConfig{
-		Name:         tables.GetTableTitleSUI(checker.suimonConfig.NetworkType, enums.TableTypePeers, checker.suimonConfig.MonitorsVisual.EnableEmojis),
+		Name:         tables.GetTableTitleSUI(checker.suimonConfig.NetworkType, enums.TableTypeNode, checker.suimonConfig.MonitorsVisual.EnableEmojis),
 		Tag:          tables.TableTagSUINode,
 		Colors:       tablebuilder.GetTBColorsFromString(checker.suimonConfig.MonitorsVisual.ColorScheme),
 		Style:        tables.TableStyleSUINode,
