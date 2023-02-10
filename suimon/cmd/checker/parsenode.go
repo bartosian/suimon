@@ -26,12 +26,12 @@ func (checker *Checker) parseNode() error {
 		return errors.New("invalid metrics-address in config file")
 	}
 
-	//publicIP := getPublicIP()
+	publicIP := getPublicIP()
 
 	node := newNode(
 		checker.ipClient,
 		checker.httpClient,
-		addressRPCInfo[0],
+		publicIP.String(),
 		addressRPCInfo[1],
 		addressMetricsInfo[1],
 	)
@@ -59,6 +59,7 @@ func (checker *Checker) parseNode() error {
 	wg.Wait()
 
 	node.SetStatus()
+
 	checker.node = *node
 
 	return nil

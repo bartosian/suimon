@@ -48,7 +48,7 @@ func (node *Node) SetStatus() {
 
 	if !metrics.Updated {
 		node.Status = enums.StatusRed
-	} else if metrics.TotalTransactionNumber == "" || metrics.LatestCheckpoint == "" {
+	} else if metrics.TotalTransactionNumber == "" && metrics.LatestCheckpoint == "" {
 		time.Sleep(3 * time.Second)
 
 		node.Status = enums.StatusYellow
