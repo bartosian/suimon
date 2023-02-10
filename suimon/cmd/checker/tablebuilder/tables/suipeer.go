@@ -21,7 +21,7 @@ const (
 
 var (
 	TableStyleSUI      = table.StyleLight
-	TableTagSUI        = "BartestneT 2023"
+	TableTagSUI        = "©BartestneT 2023"
 	TableSortConfigSUI = []table.SortBy{
 		{Name: "COUNTRY", Mode: table.Asc},
 		{Name: "UPTIME", Mode: table.Asc},

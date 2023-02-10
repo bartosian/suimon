@@ -56,7 +56,7 @@ func main() {
 		return
 	}
 
-	nodeConfig, err := config.ParseNodeConfig(nodeConfigPath)
+	nodeConfig, err := config.ParseNodeConfig(nodeConfigPath, suimonConfig.NodeConfigPath)
 	if err != nil {
 		logger.Error(nodeConfigNotFound)
 
@@ -122,7 +122,7 @@ func newProgressBar(progressChan chan struct{}) {
 			for i := 0; i < 500; i++ {
 				bar.Add(1)
 
-				time.Sleep(6 * time.Millisecond)
+				time.Sleep(7 * time.Millisecond)
 			}
 		}
 	}

@@ -3,7 +3,7 @@ package enums
 type TableType string
 
 const (
-	TableTypeRPC   TableType = "RPC"
-	TableTypeNode  TableType = "YOUR NODE"
+	TableTypeRPC   TableType = "REMOTE RPC"
+	TableTypeNode  TableType = "LOCAL NODE"
 	TableTypePeers TableType = "PEERS"
 )

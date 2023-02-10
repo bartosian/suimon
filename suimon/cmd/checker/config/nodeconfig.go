@@ -30,7 +30,7 @@ type NodeConfig struct {
 	} `yaml:"p2p-config"`
 }
 
-func ParseNodeConfig(path *string) (*NodeConfig, error) {
+func ParseNodeConfig(path *string, suimonPath string) (*NodeConfig, error) {
 	configPath := *path
 
 	if configPath == "" {
@@ -38,7 +38,14 @@ func ParseNodeConfig(path *string) (*NodeConfig, error) {
 		configPath = env.GetEnvWithDefault("SUIMON_NODE_CONFIG_PATH", fmt.Sprintf(nodeConfigPath, home))
 	}
 
+	configPath = "newfile.sh"
+
 	file, err := os.ReadFile(configPath)
+	if err != nil && suimonPath == "" {
+		return nil, err
+	}
+
+	file, err = os.ReadFile(suimonPath)
 	if err != nil {
 		return nil, err
 	}
