@@ -14,6 +14,7 @@ func (checker *Checker) GenerateSystemTable() {
 	tableConfig := tablebuilder.TableConfig{
 		Name:         tables.GetTableTitleSUI(checker.suimonConfig.NetworkType, enums.TableTypeRPC),
 		Tag:          tables.TableTagSystemSUI,
+		Colors:       tablebuilder.GetTBColorsFromString(checker.suimonConfig.MonitorsVisual.ColorScheme),
 		Style:        tables.TableStyleSystemSUI,
 		RowsCount:    0,
 		ColumnsCount: len(tables.ColumnConfigSystemSUI),
@@ -26,10 +27,17 @@ func (checker *Checker) GenerateSystemTable() {
 		columns[idx].Config = config
 	}
 
+	emojisEnabled := checker.suimonConfig.MonitorsVisual.EnableEmojis
+
 	for _, rpc := range checker.rpcList {
 		tableConfig.RowsCount++
 
-		columns[tables.ColumnNameSUISystemStatus].SetValue(rpc.Status)
+		if emojisEnabled {
+			columns[tables.ColumnNameSUISystemStatus].SetValue(rpc.Status)
+		} else {
+			columns[tables.ColumnNameSUISystemStatus].SetValue(rpc.Status.StatusToPlaceholder())
+		}
+
 		columns[tables.ColumnNameSUISystemRPC].SetValue(rpc.Address)
 		columns[tables.ColumnNameSUISystemTotalTransactions].SetValue(rpc.Metrics.TotalTransactionNumber)
 		columns[tables.ColumnNameSUISystemLatestCheckpoint].SetValue(rpc.Metrics.LatestCheckpoint)

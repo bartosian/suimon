@@ -27,7 +27,7 @@ go install github.com/bartosian/sui_helpers/suimon@latest
 3. Create ``suimon.yaml`` config file or download it with the following command:
 ```shell
 mkdir $HOME/.suimon && \
-wget -O $HOME/.suimon/suimon.yaml  https://raw.githubusercontent.com/bartosian/sui_helpers/main/suimon/cmd/checker/config/suiimon.template.yaml
+wget -O $HOME/.suimon/suimon.yaml  https://raw.githubusercontent.com/bartosian/sui_helpers/main/suimon/cmd/checker/config/suimon.template.yaml
 ```
 
 Using ``suimon.config`` file you can configure your monitors and default paths ``suimon`` is looking to. By default, it will check for this file in ``~/.suimon`` directory, but you can save it in any other place and provide ``-sf`` flag with the path to it or set ``SUIMON_CONFIG_PATH`` environment variable
@@ -55,12 +55,19 @@ rpc-config:
     - "https://rpc-office.cosmostation.io/sui-testnet-wave-2"
   devnet:
     - "https://fullnode.devnet.sui.io"
-    
-# update this value to the fullnode.yaml file location
-node-config-path: "/Users/admin/.suimon/fullnode.yaml"
 
-# set network to connect to. Possible values: devnet, testmet
+# update this value to the fullnode.yaml file location
+node-config-path: "$HOME/.suimon/fullnode.yaml"
+
+# set network to connect to. Possible values: devnet, testnet
 network: "testnet"
+
+monitors-visual:
+  # set different color schemes for monitor depending on your terminal. Possible values: dark, white, color
+  color-scheme: "dark"
+
+  # update this section if you want to enable/disable emojis in tables
+  enable-emojis: false
 ```
 4. Provide path to ``fullnode.yaml`` config file your node is using. You can do it by specifying ``node-config-path`` attribute in ``suimon.yaml``, providing ``-nf`` flag with the path to it or set ``SUIMON_NODE_CONFIG_PATH`` environment variable.
 You can check more details about it in [SUI Repository](https://github.com/MystenLabs/sui)
@@ -153,6 +160,14 @@ Usage of suimon:
 ```
 
 ## Preview
+
+Depending on the emojis and colors support by your terminal you can enable/disable different color options, to make it suitable for you. Check ``monitors-visual`` in the ``suimon.yaml`` config file.
+
+### White / Dark mode
+
+![Terminal Screenshot](./assets/screenshot_02.png "Screenshot Application")
+
+### Color mode
 
 ![Terminal Screenshot](./assets/screenshot_01.png "Screenshot Application")
 

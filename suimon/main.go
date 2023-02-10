@@ -102,10 +102,10 @@ func newProgressBar(progressChan chan struct{}) {
 		progressbar.OptionEnableColorCodes(true),
 		progressbar.OptionShowBytes(true),
 		progressbar.OptionSetWidth(15),
-		progressbar.OptionSetDescription("[blue]🔹 [ PROCESSING DATA... ][reset] "),
+		progressbar.OptionSetDescription(" [ PROCESSING DATA... ] "),
 		progressbar.OptionSetTheme(progressbar.Theme{
-			Saucer:        "[blue]=[reset]",
-			SaucerHead:    "[blue]>[reset]",
+			Saucer:        "[white]=[reset]",
+			SaucerHead:    "[white]>[reset]",
 			SaucerPadding: " ",
 			BarStart:      "[",
 			BarEnd:        "]",

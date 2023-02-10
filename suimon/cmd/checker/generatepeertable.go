@@ -14,6 +14,7 @@ func (checker *Checker) GeneratePeersTable() {
 	tableConfig := tablebuilder.TableConfig{
 		Name:         tables.GetTableTitleSUI(checker.suimonConfig.NetworkType, enums.TableTypePeers),
 		Tag:          tables.TableTagSUI,
+		Colors:       tablebuilder.GetTBColorsFromString(checker.suimonConfig.MonitorsVisual.ColorScheme),
 		Style:        tables.TableStyleSUI,
 		RowsCount:    0,
 		ColumnsCount: len(tables.ColumnConfigSUI),
@@ -21,6 +22,7 @@ func (checker *Checker) GeneratePeersTable() {
 	}
 
 	columns := make(tablebuilder.Columns, len(tables.ColumnConfigSUI))
+	emojisEnabled := checker.suimonConfig.MonitorsVisual.EnableEmojis
 
 	for idx, config := range tables.ColumnConfigSUI {
 		columns[idx].Config = config
@@ -47,7 +49,12 @@ func (checker *Checker) GeneratePeersTable() {
 			columns[tables.ColumnNameSUICountry].SetValue(nil)
 		} else {
 			columns[tables.ColumnNameSUICompany].SetValue(peer.Location.Provider)
-			columns[tables.ColumnNameSUICountry].SetValue(peer.Location.String())
+
+			if emojisEnabled {
+				columns[tables.ColumnNameSUICountry].SetValue(peer.Location.String())
+			} else {
+				columns[tables.ColumnNameSUICountry].SetValue(peer.Location.CountryName)
+			}
 		}
 	}
 

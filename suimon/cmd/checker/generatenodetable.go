@@ -14,6 +14,7 @@ func (checker *Checker) GenerateNodeTable() {
 	tableConfig := tablebuilder.TableConfig{
 		Name:         tables.GetTableTitleSUI(checker.suimonConfig.NetworkType, enums.TableTypeNode),
 		Tag:          tables.TableTagSUINode,
+		Colors:       tablebuilder.GetTBColorsFromString(checker.suimonConfig.MonitorsVisual.ColorScheme),
 		Style:        tables.TableStyleSUINode,
 		RowsCount:    0,
 		ColumnsCount: len(tables.ColumnConfigSUINode),
@@ -26,11 +27,17 @@ func (checker *Checker) GenerateNodeTable() {
 		columns[idx].Config = config
 	}
 
-	node := checker.node
-
 	tableConfig.RowsCount++
 
-	columns[tables.ColumnNameSUINodeStatus].SetValue(node.Status)
+	node := checker.node
+	emojisEnabled := checker.suimonConfig.MonitorsVisual.EnableEmojis
+
+	if emojisEnabled {
+		columns[tables.ColumnNameSUINodeStatus].SetValue(node.Status)
+	} else {
+		columns[tables.ColumnNameSUINodeStatus].SetValue(node.Status.StatusToPlaceholder())
+	}
+
 	columns[tables.ColumnNameSUINodeAddress].SetValue(node.Address)
 	columns[tables.ColumnNameSUINodePortRPC].SetValue(node.RpcPort)
 	columns[tables.ColumnNameSUINodeTotalTransactions].SetValue(node.Metrics.TotalTransactionNumber)
@@ -45,7 +52,12 @@ func (checker *Checker) GenerateNodeTable() {
 		columns[tables.ColumnNameSUINodeCountry].SetValue(nil)
 	} else {
 		columns[tables.ColumnNameSUINodeCompany].SetValue(node.Location.Provider)
-		columns[tables.ColumnNameSUINodeCountry].SetValue(node.Location.String())
+
+		if emojisEnabled {
+			columns[tables.ColumnNameSUINodeCountry].SetValue(node.Location.String())
+		} else {
+			columns[tables.ColumnNameSUINodeCountry].SetValue(node.Location.CountryName)
+		}
 	}
 
 	tableConfig.Columns = columns

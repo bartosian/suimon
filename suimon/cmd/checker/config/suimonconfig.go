@@ -33,6 +33,10 @@ type SuimonConfig struct {
 	NodeConfigPath string `yaml:"node-config-path"`
 	Network        string `yaml:"network"`
 	NetworkType    enums.NetworkType
+	MonitorsVisual struct {
+		ColorScheme  string `yaml:"color-scheme"`
+		EnableEmojis bool   `yaml:"enable-emojis"`
+	} `yaml:"monitors-visual"`
 }
 
 func ParseSuimonConfig(path *string) (*SuimonConfig, error) {
