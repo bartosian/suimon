@@ -14,6 +14,8 @@ $HOME/suimon_install.sh && \
 rm $HOME/suimon_install.sh
 ```
 
+### Step by Step Installation:
+
 1. The SUIMON installation ``requires Go``. If you don't already have Go installed, see https://golang.org/dl and https://go.dev/doc/install. Download the binary release that is suitable for your system and follow the installation instructions.
 
 ``Example Linux Installation``
