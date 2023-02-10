@@ -12,7 +12,7 @@ func (checker *Checker) GeneratePeersTable() {
 	}
 
 	tableConfig := tablebuilder.TableConfig{
-		Name:         tables.GetTableTitleSUI(checker.suimonConfig.NetworkType, enums.TableTypePeers),
+		Name:         tables.GetTableTitleSUI(checker.suimonConfig.NetworkType, enums.TableTypePeers, checker.suimonConfig.MonitorsVisual.EnableEmojis),
 		Tag:          tables.TableTagSUI,
 		Colors:       tablebuilder.GetTBColorsFromString(checker.suimonConfig.MonitorsVisual.ColorScheme),
 		Style:        tables.TableStyleSUI,

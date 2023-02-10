@@ -12,7 +12,7 @@ func (checker *Checker) GenerateSystemTable() {
 	}
 
 	tableConfig := tablebuilder.TableConfig{
-		Name:         tables.GetTableTitleSUI(checker.suimonConfig.NetworkType, enums.TableTypeRPC),
+		Name:         tables.GetTableTitleSUI(checker.suimonConfig.NetworkType, enums.TableTypePeers, checker.suimonConfig.MonitorsVisual.EnableEmojis),
 		Tag:          tables.TableTagSystemSUI,
 		Colors:       tablebuilder.GetTBColorsFromString(checker.suimonConfig.MonitorsVisual.ColorScheme),
 		Style:        tables.TableStyleSystemSUI,
