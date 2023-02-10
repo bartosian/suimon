@@ -37,7 +37,3 @@ fi
 echo "Suimon has been installed and configured successfully."
 echo
 suimon --help
-
-
-
-

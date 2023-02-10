@@ -32,12 +32,12 @@ func (checker *Checker) GenerateNodeTable() {
 	node := checker.node
 	emojisEnabled := checker.suimonConfig.MonitorsVisual.EnableEmojis
 
-	if emojisEnabled {
-		columns[tables.ColumnNameSUINodeStatus].SetValue(node.Status)
-	} else {
-		columns[tables.ColumnNameSUINodeStatus].SetValue(node.Status.StatusToPlaceholder())
+	var status any = node.Status
+	if !emojisEnabled {
+		status = node.Status.StatusToPlaceholder()
 	}
 
+	columns[tables.ColumnNameSUINodeStatus].SetValue(status)
 	columns[tables.ColumnNameSUINodeAddress].SetValue(node.Address)
 	columns[tables.ColumnNameSUINodePortRPC].SetValue(node.RpcPort)
 	columns[tables.ColumnNameSUINodeTotalTransactions].SetValue(node.Metrics.TotalTransactionNumber)

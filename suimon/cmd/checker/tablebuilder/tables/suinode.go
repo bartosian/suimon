@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	TableStyleSUINode      = table.StyleDefault
+	TableStyleSUINode      = table.StyleLight
 	TableTagSUINode        = ""
 	TableSortConfigSUINode = []table.SortBy{
 		{Name: "COUNTRY", Mode: table.Asc},

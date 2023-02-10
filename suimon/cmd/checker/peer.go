@@ -14,9 +14,8 @@ import (
 )
 
 const (
-	rpcPortDefault      = "9000"
-	metricsPortDefault  = "9184"
-	countryNameLanguage = "en"
+	rpcPortDefault     = "9000"
+	metricsPortDefault = "9184"
 )
 
 type requestType int
@@ -65,6 +64,7 @@ func newPeer(
 func (peer *Peer) Parse() error {
 	if ip := net.ParseIP(peer.Address); ip != nil {
 		peer.AddressType = enums.AddressTypeIP
+
 		record, err := peer.ipClient.GetIPInfo(ip)
 		if err == nil {
 			countryISOCode := record.Country

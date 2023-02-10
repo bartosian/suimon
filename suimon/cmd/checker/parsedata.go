@@ -14,10 +14,9 @@ const (
 func (checker *Checker) ParseData() error {
 	var (
 		wg             sync.WaitGroup
-		errChan        = make(chan error)
+		errChan        = make(chan error, 3)
 		suimonConfig   = checker.suimonConfig
 		monitorsConfig = suimonConfig.MonitorsConfig
-		errCounter     int
 		err            error
 	)
 
@@ -65,13 +64,15 @@ func (checker *Checker) ParseData() error {
 		close(errChan)
 	}()
 
+	var errCount int
+
 	for parseErr := range errChan {
 		err = multierror.Append(err, parseErr)
 
-		errCounter++
+		errCount++
 	}
 
-	if errCounter == 3 {
+	if errCount == 3 {
 		return err
 	}
 

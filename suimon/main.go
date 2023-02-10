@@ -49,6 +49,7 @@ func main() {
 	// start showing progress bar
 	go newProgressBar(progressChan)
 
+	// parse suimon.yaml config file
 	suimonConfig, err := config.ParseSuimonConfig(suimonConfigPath)
 	if err != nil {
 		logger.Error(suimonConfigNotFound)
@@ -56,6 +57,7 @@ func main() {
 		return
 	}
 
+	// parse fullnode/validator.yaml config file
 	nodeConfig, err := config.ParseNodeConfig(nodeConfigPath, suimonConfig.NodeConfigPath)
 	if err != nil {
 		logger.Error(nodeConfigNotFound)
@@ -63,6 +65,7 @@ func main() {
 		return
 	}
 
+	// parse network flag
 	networkConfig, err := config.ParseNetworkConfig(suimonConfig, network)
 	if err != nil {
 		logger.Error(invalidNetworkTypeProvided)
@@ -72,6 +75,7 @@ func main() {
 
 	suimonConfig.SetNetworkConfig(networkConfig)
 
+	// create checker instance to process to request all the required data and pass them to tablebuilder
 	checker, err := checker.NewChecker(*suimonConfig, *nodeConfig)
 	if err != nil {
 		logger.Error("failed to create peers checker: ", err)
@@ -85,13 +89,15 @@ func main() {
 		return
 	}
 
+	// initialize tables with the styles and data received
 	checker.GenerateSystemTable()
 	checker.GenerateNodeTable()
 	checker.GeneratePeersTable()
 
 	// stop showing progress bar
 	progressChan <- struct{}{}
-
+	
+	// draw initialized tables to the terminal
 	checker.DrawTable()
 }
 
@@ -100,12 +106,13 @@ func newProgressBar(progressChan chan struct{}) {
 
 	bar := progressbar.NewOptions(1000,
 		progressbar.OptionEnableColorCodes(true),
-		progressbar.OptionShowBytes(true),
-		progressbar.OptionSetWidth(15),
-		progressbar.OptionSetDescription(" [ PROCESSING DATA... ] "),
+		progressbar.OptionShowBytes(false),
+		progressbar.OptionClearOnFinish(),
+		progressbar.OptionSetWidth(25),
+		progressbar.OptionSetDescription(" [ GENERATING TABLES... ] "),
 		progressbar.OptionSetTheme(progressbar.Theme{
-			Saucer:        "[white]=[reset]",
-			SaucerHead:    "[white]>[reset]",
+			Saucer:        "=",
+			SaucerHead:    ">",
 			SaucerPadding: " ",
 			BarStart:      "[",
 			BarEnd:        "]",

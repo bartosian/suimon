@@ -32,12 +32,12 @@ func (checker *Checker) GenerateSystemTable() {
 	for _, rpc := range checker.rpcList {
 		tableConfig.RowsCount++
 
-		if emojisEnabled {
-			columns[tables.ColumnNameSUISystemStatus].SetValue(rpc.Status)
-		} else {
-			columns[tables.ColumnNameSUISystemStatus].SetValue(rpc.Status.StatusToPlaceholder())
+		var status any = rpc.Status
+		if !emojisEnabled {
+			status = rpc.Status.StatusToPlaceholder()
 		}
 
+		columns[tables.ColumnNameSUISystemStatus].SetValue(status)
 		columns[tables.ColumnNameSUISystemRPC].SetValue(rpc.Address)
 		columns[tables.ColumnNameSUISystemTotalTransactions].SetValue(rpc.Metrics.TotalTransactionNumber)
 		columns[tables.ColumnNameSUISystemLatestCheckpoint].SetValue(rpc.Metrics.LatestCheckpoint)

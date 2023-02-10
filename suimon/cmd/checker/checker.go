@@ -1,11 +1,11 @@
 package checker
 
 import (
-	"github.com/ipinfo/go/v2/ipinfo/cache"
 	"net/http"
 	"time"
 
 	"github.com/ipinfo/go/v2/ipinfo"
+	"github.com/ipinfo/go/v2/ipinfo/cache"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
@@ -46,8 +46,7 @@ func NewChecker(suimonConfig config.SuimonConfig, nodeConfig config.NodeConfig) 
 		Timeout: httpClientTimeout,
 	}
 
-	ipClient := ipinfo.NewClient(
-		nil, ipinfo.NewCache(cache.NewInMemory().WithExpiration(ipInfoCacheExp)), freeIpInfoToken)
+	ipClient := ipinfo.NewClient(nil, ipinfo.NewCache(cache.NewInMemory().WithExpiration(ipInfoCacheExp)), freeIpInfoToken)
 
 	return &Checker{
 		rpcClient:    jsonrpc.NewClient(suimonConfig.NetworkType.ToRPC()),

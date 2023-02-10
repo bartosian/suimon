@@ -6,14 +6,14 @@ import (
 	"strings"
 	"sync"
 
-	externalip "github.com/glendc/go-external-ip"
+	externalIP "github.com/glendc/go-external-ip"
 )
 
 func (checker *Checker) parseNode() error {
 	addressRPC, addressMetrics := checker.nodeConfig.JSONRPCAddress, checker.nodeConfig.MetricsAddress
 
-	if addressRPC == "" || addressMetrics == "" {
-		return errors.New("node addresses not found in fullnode.yaml")
+	if addressRPC == "" && addressMetrics == "" {
+		return errors.New("node address with ports not found in fullnode.yaml")
 	}
 
 	addressRPCInfo := strings.Split(addressRPC, addressSeparator)
@@ -26,12 +26,12 @@ func (checker *Checker) parseNode() error {
 		return errors.New("invalid metrics-address in config file")
 	}
 
-	publicIP := getPublicIP()
+	nodePublicIP := getPublicIP().String()
 
 	node := newNode(
 		checker.ipClient,
 		checker.httpClient,
-		publicIP.String(),
+		nodePublicIP,
 		addressRPCInfo[1],
 		addressMetricsInfo[1],
 	)
@@ -66,7 +66,7 @@ func (checker *Checker) parseNode() error {
 }
 
 func getPublicIP() net.IP {
-	consensus := externalip.DefaultConsensus(nil, nil)
+	consensus := externalIP.DefaultConsensus(nil, nil)
 	consensus.UseIPProtocol(4)
 
 	ip, err := consensus.ExternalIP()
