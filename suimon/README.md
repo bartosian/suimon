@@ -4,16 +4,33 @@ SUIMON is a terminal explorer for SUI node. The SUIMON explorer displays checkpo
 
 ## Install SUIMON
 
-The SUIMON installation ``requires Go``. If you don't already have Go installed, see https://golang.org/dl and https://go.dev/doc/install. Download the binary release that is suitable for your system and follow the installation instructions.
+1. The SUIMON installation ``requires Go``. If you don't already have Go installed, see https://golang.org/dl and https://go.dev/doc/install. Download the binary release that is suitable for your system and follow the installation instructions.
 
-### To install the SUIMON binary:
+``Example Linux Installation``
+```shell
+cd $HOME && \
+wget "https://golang.org/dl/go1.19.5.linux-amd64.tar.gz" && \
+sudo rm -rf /usr/local/go && \
+sudo tar -C /usr/local -xzf "go1.19.5.linux-amd64.tar.gz" && \
+rm "go1.19.5.linux-amd64.tar.gz" && \
+echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> $HOME/.bash_profile && \
+source $HOME/.bash_profile && \
+go version
+```
+
+2. Install the ``SUIMON`` binary
 
 ```shell
 go install github.com/bartosian/sui_helpers/suimon@latest
 ```
 
-Suimon parses information from the ``fullnode.yaml`` file and its behavior can be configured by using ``suimon.config`` file, ``environment variables`` and ``command line flags``.
-Default path where suimon will be looking for any configuration files is ~/.suimon,
+3. Create ``suimon.yaml`` config file or download it with the following command:
+```shell
+mkdir $HOME/.suimon && \
+wget -O $HOME/.suimon/suimon.yaml  https://raw.githubusercontent.com/bartosian/sui_helpers/main/suimon/cmd/checker/config/suiimon.template.yaml
+```
+
+Using ``suimon.config`` file you can configure your monitors and default paths ``suimon`` is looking to. By default, it will check for this file in ``~/.suimon`` directory, but you can save it in any other place and provide ``-sf`` flag with the path to it or set ``SUIMON_CONFIG_PATH`` environment variable
 
 ### Example suimon.yaml:
 ```yaml
@@ -38,20 +55,15 @@ rpc-config:
     - "https://rpc-office.cosmostation.io/sui-testnet-wave-2"
   devnet:
     - "https://fullnode.devnet.sui.io"
-
-# update this value if you want to enable/disable geolocation
-host-lookup-config:
-  enable-lookup: true
-  geo-db-path: "/Users/admin/.suimon/db"
-
+    
 # update this value to the fullnode.yaml file location
 node-config-path: "/Users/admin/.suimon/fullnode.yaml"
 
 # set network to connect to. Possible values: devnet, testmet
 network: "testnet"
 ```
-
-put this file in ``~/.suimon`` directory or use ``-sf`` flag to provide file path to the command or set ``SUIMON_CONFIG_PATH`` environment variable
+4. Provide path to ``fullnode.yaml`` config file your node is using. You can do it by specifying ``node-config-path`` attribute in ``suimon.yaml``, providing ``-nf`` flag with the path to it or set ``SUIMON_NODE_CONFIG_PATH`` environment variable.
+You can check more details about it in [SUI Repository](https://github.com/MystenLabs/sui)
 
 ### Example fullnode.yaml:
 ```yaml
@@ -59,9 +71,9 @@ put this file in ``~/.suimon`` directory or use ``-sf`` flag to provide file pat
 db-path: "/home/sui/.sui/db"
 
 network-address: "/dns/localhost/tcp/8080/http"
-metrics-address: "95.214.54.28:9184"
-json-rpc-address: "95.214.54.28:9000"
-websocket-address: "95.214.54.28:9001"
+metrics-address: "0.0.0.0:9184"
+json-rpc-address: "0.0.0.0:9000"
+websocket-address: "0.0.0.0:9001"
 enable-event-processing: true
 
 genesis:
@@ -77,8 +89,6 @@ p2p-config:
     - address: "/ip4/84.46.255.11/udp/8084"
     - address: "/ip4/135.181.6.243/udp/8088"
 ```
-
-``fullnode.yaml`` file is used by ``SUI`` to configure nodes and validators. ``Suimon`` requires for path to this file being provided. Put this file in ``~/.suimon`` directory or use ``-nf`` flag to provide file path to the command or set ``SUIMON_NODE_CONFIG_PATH`` environment variable
 
 ## Run SUIMON
 
