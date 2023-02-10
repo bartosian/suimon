@@ -16,6 +16,10 @@ func (checker *Checker) parsePeers() error {
 		peers           = make([]Peer, 0, len(nodeConfigPeers))
 	)
 
+	if len(nodeConfigPeers) == 0 {
+		return nil
+	}
+
 	for _, nodePeer := range nodeConfigPeers {
 		if _, ok := processedPeers[nodePeer.Address]; ok {
 			continue

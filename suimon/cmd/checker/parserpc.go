@@ -12,6 +12,10 @@ func (checker *Checker) parseRPCHosts() error {
 	)
 
 	hosts := checker.suimonConfig.GetRPCByNetwork()
+	if len(hosts) == 0 {
+		return nil
+	}
+
 	for _, host := range hosts {
 		wg.Add(1)
 

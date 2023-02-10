@@ -1,7 +1,6 @@
 package checker
 
 import (
-	"errors"
 	"sync"
 	"time"
 
@@ -13,20 +12,14 @@ const (
 )
 
 func (checker *Checker) ParseData() error {
-	suimonConfig, nodeConfig := checker.suimonConfig, checker.nodeConfig
-
-	if len(nodeConfig.P2PConfig.SeedPeers) == 0 {
-		return errors.New("no peers found in config file")
-	}
-
 	var (
-		wg         sync.WaitGroup
-		errChan    = make(chan error)
-		errCounter int
-		err        error
+		wg             sync.WaitGroup
+		errChan        = make(chan error)
+		suimonConfig   = checker.suimonConfig
+		monitorsConfig = suimonConfig.MonitorsConfig
+		errCounter     int
+		err            error
 	)
-
-	monitorsConfig := suimonConfig.MonitorsConfig
 
 	// parse data for the RPC table
 	if monitorsConfig.RPCTable.Display {
