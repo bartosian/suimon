@@ -1,5 +1,7 @@
 ## 💧 SUIMON In-Terminal SUI Node Explorer
 
+``Version: 0.1.0``
+
 SUIMON is a terminal explorer for SUI node. The SUIMON explorer displays checkpoints, transactions, uptime, network status, peers, remote RPC and more information.
 
 ## Install SUIMON
