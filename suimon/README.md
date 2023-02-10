@@ -6,6 +6,14 @@ SUIMON is a terminal explorer for SUI node. The SUIMON explorer displays checkpo
 
 ## Install SUIMON
 
+### Installation Script For Ubuntu:
+```shell
+wget -O $HOME/suimon_install.sh https://raw.githubusercontent.com/bartosian/sui_helpers/main/suimon/install.sh && \
+chmod +x $HOME/suimon_install.sh && \
+$HOME/suimon_install.sh && \
+rm $HOME/suimon_install.sh
+```
+
 1. The SUIMON installation ``requires Go``. If you don't already have Go installed, see https://golang.org/dl and https://go.dev/doc/install. Download the binary release that is suitable for your system and follow the installation instructions.
 
 ``Example Linux Installation``
