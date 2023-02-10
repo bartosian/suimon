@@ -79,14 +79,14 @@ func (tb *TableBuilder) SetRows() {
 func (tb *TableBuilder) SetStyle() {
 	tb.builder.SetTitle(tb.config.Name)
 	tb.builder.SetStyle(tb.config.Style)
-	tb.builder.Style().Title.Colors = text.Colors{text.FgBlue}
+	tb.builder.Style().Title.Colors = text.Colors{text.FgHiBlue}
 	tb.builder.Style().Title.Align = text.AlignLeft
 	tb.builder.Style().Box.RightSeparator = ""
 	tb.builder.SetAutoIndex(true)
 	tb.builder.Style().Color = table.ColorOptions{
 		Header: text.Colors{text.FgHiRed},
 		Row:    text.Colors{text.FgHiWhite},
-		Footer: text.Colors{text.FgBlue},
+		Footer: text.Colors{text.FgHiBlue},
 	}
 	tb.builder.Style().Color.IndexColumn = text.Colors{text.FgHiRed}
 }

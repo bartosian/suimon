@@ -67,6 +67,7 @@ func (checker *Checker) parseNode() error {
 
 func getPublicIP() net.IP {
 	consensus := externalip.DefaultConsensus(nil, nil)
+	consensus.UseIPProtocol(4)
 
 	ip, err := consensus.ExternalIP()
 	if err != nil {
