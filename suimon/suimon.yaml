@@ -1,0 +1,30 @@
+# update this section if you want to enable/disable tables
+monitors-config:
+  rpc-table:
+      display: true
+  node-table:
+      display: true
+  peers-table:
+      display: true
+
+# update this section to add/remove rpc hosts for rpc-table
+rpc-config:
+  testnet:
+    - "https://rpc-office.cosmostation.io/sui-testnet-wave-2"
+    - "https://rpc.ankr.com/sui_testnet"
+    - "https://sui-testnet.public.blastapi.io"
+    - "https://sui-api.rpcpool.com"
+    - "https://fullnode.testnet.sui.io"
+  devnet:
+    - "https://fullnode.devnet.sui.io"
+
+# update this value if you want to enable/disable geolocation
+host-lookup-config:
+  enable-lookup: true
+  geo-db-path: "~/.suimon/db"
+
+# update this value to the fullnode.yaml file location
+node-config-path: "~/.suimon/fullnode.yaml"
+
+# set network to connect to. Possible values: devnet, testmet
+network: "testnet"

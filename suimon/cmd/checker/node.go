@@ -1,6 +1,7 @@
 package checker
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"net/http"
 
 	"github.com/oschwald/geoip2-golang"
@@ -12,6 +13,7 @@ import (
 type Node struct {
 	Peer
 
+	Status      enums.Status
 	RpcPort     string
 	MetricsPort string
 }
@@ -38,4 +40,16 @@ func newNode(
 	node.httpClient = httpClient
 
 	return node
+}
+
+func (node *Node) SetStatus() {
+	metrics := node.Metrics
+
+	if !metrics.Updated {
+		node.Status = enums.StatusRed
+	} else if metrics.TotalTransactionNumber != "" && metrics.LatestCheckpoint != "" {
+		node.Status = enums.StatusGreen
+	} else {
+		node.Status = enums.StatusYellow
+	}
 }

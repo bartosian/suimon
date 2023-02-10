@@ -23,6 +23,10 @@ var networkTypeValues = [...]string{
 	"TESTNET",
 }
 
+func (i NetworkType) String() string {
+	return string(i)
+}
+
 func NetworkTypeFromString(value string) (NetworkType, error) {
 	value = strings.ToUpper(strings.TrimSpace(value))
 

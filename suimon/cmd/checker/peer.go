@@ -2,10 +2,10 @@ package checker
 
 import (
 	"fmt"
+	emoji "github.com/jayco/go-emoji-flag"
 	"net"
 	"net/http"
 
-	emoji "github.com/jayco/go-emoji-flag"
 	"github.com/oschwald/geoip2-golang"
 	"github.com/ybbus/jsonrpc/v3"
 
@@ -63,16 +63,18 @@ func newPeer(
 	return peer
 }
 
-func (peer *Peer) Parse() error {
+func (peer *Peer) Parse(lookupEnabled bool) error {
 	if ip := net.ParseIP(peer.Address); ip != nil {
 		peer.AddressType = enums.AddressTypeIP
 
-		record, err := peer.geoDbClient.Country(ip)
-		if err == nil {
-			countryISOCode := record.Country.IsoCode
-			countryName := record.Country.Names[countryNameLanguage]
-			flag := emoji.GetFlag(record.Country.IsoCode)
-			peer.Location = newLocation(countryISOCode, countryName, flag)
+		if lookupEnabled {
+			record, err := peer.geoDbClient.Country(ip)
+			if err == nil {
+				countryISOCode := record.Country.IsoCode
+				countryName := record.Country.Names[countryNameLanguage]
+				flag := emoji.GetFlag(record.Country.IsoCode)
+				peer.Location = newLocation(countryISOCode, countryName, flag)
+			}
 		}
 	} else if validation.IsValidDomain(peer.Address) {
 		peer.AddressType = enums.AddressTypeDomain

@@ -17,58 +17,62 @@ import (
 	"time"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 
 	"github.com/schollz/progressbar/v3"
 )
 
 var (
-	filePath = flag.String("f", "", "(required) path to node config file fullnode.yaml")
-	network  = flag.String("n", "devnet", "(optional) network name, possible values: testnet, devnet")
+	suimonConfigPath = flag.String("sf", "", "(optional) path to the node config file")
+	nodeConfigPath   = flag.String("nf", "", "(optional) path to the node config file")
+	network          = flag.String("n", "", "(optional) network name, possible values: testnet, devnet")
+)
+
+const (
+	suimonConfigNotFound = `provide path to the suimon.yaml file by using -sf option 
+or by setting SUIMON_CONFIG_PATH env variable
+or put suimon.yaml in $HOME/.suimon/suimon.yaml`
+	nodeConfigNotFound = `provide path to the fullnode.yaml file by using -sf option
+or by setting SUIMON_NODE_CONFIG_PATH env variable
+or set path to this file in suimon.yaml`
+	invalidNetworkTypeProvided = `provide valid network type by using -n option
+or set it in suimon.yaml`
 )
 
 func main() {
 	flag.Parse()
-
 	logger := log.NewLogger()
 
-	if *filePath == "" {
-		logger.Error("provide path to the config file by using -f option")
+	progressChan := make(chan struct{})
 
-		return
-	}
+	// start showing progress bar
+	go newProgressBar(progressChan)
 
-	network, err := enums.NetworkTypeFromString(*network)
+	suimonConfig, err := config.ParseSuimonConfig(suimonConfigPath)
 	if err != nil {
-		logger.Error("provide valid network type by using -n option")
+		logger.Error(suimonConfigNotFound)
 
 		return
 	}
 
-	progressCH := make(chan struct{})
-	progressTicker := time.NewTicker(100 * time.Millisecond)
+	nodeConfig, err := config.ParseNodeConfig(nodeConfigPath)
+	if err != nil {
+		logger.Error(nodeConfigNotFound)
 
-	go func() {
-		bar := newProgressBar()
+		return
+	}
 
-		for {
-			select {
-			case <-progressCH:
-				bar.Clear()
+	networkConfig, err := config.ParseNetworkConfig(suimonConfig, network)
+	if err != nil {
+		logger.Error(invalidNetworkTypeProvided)
 
-				return
-			case <-progressTicker.C:
-				for i := 0; i < 500; i++ {
-					bar.Add(1)
+		return
+	}
 
-					time.Sleep(5 * time.Millisecond)
-				}
-			}
-		}
-	}()
+	suimonConfig.SetNetworkConfig(networkConfig)
 
-	checker, err := checker.NewChecker(*filePath, network)
+	checker, err := checker.NewChecker(*suimonConfig, *nodeConfig)
 	if err != nil {
 		logger.Error("failed to create peers checker: ", err)
 
@@ -81,22 +85,24 @@ func main() {
 		return
 	}
 
-	progressTicker.Stop()
-	progressCH <- struct{}{}
-
 	checker.GenerateSystemTable()
 	checker.GenerateNodeTable()
 	checker.GeneratePeersTable()
 
+	// stop showing progress bar
+	progressChan <- struct{}{}
+
 	checker.DrawTable()
 }
 
-func newProgressBar() *progressbar.ProgressBar {
-	return progressbar.NewOptions(1000,
+func newProgressBar(progressChan chan struct{}) {
+	progressTicker := time.NewTicker(20 * time.Millisecond)
+
+	bar := progressbar.NewOptions(1000,
 		progressbar.OptionEnableColorCodes(true),
 		progressbar.OptionShowBytes(true),
 		progressbar.OptionSetWidth(15),
-		progressbar.OptionSetDescription("[blue]🔄 [ PROCESSING DATA... ][reset] "),
+		progressbar.OptionSetDescription("[blue]🔹 [ PROCESSING DATA... ][reset] "),
 		progressbar.OptionSetTheme(progressbar.Theme{
 			Saucer:        "[blue]=[reset]",
 			SaucerHead:    "[blue]>[reset]",
@@ -104,4 +110,20 @@ func newProgressBar() *progressbar.ProgressBar {
 			BarStart:      "[",
 			BarEnd:        "]",
 		}))
+
+	for {
+		select {
+		case <-progressChan:
+			progressTicker.Stop()
+			bar.Clear()
+
+			return
+		case <-progressTicker.C:
+			for i := 0; i < 500; i++ {
+				bar.Add(1)
+
+				time.Sleep(6 * time.Millisecond)
+			}
+		}
+	}
 }

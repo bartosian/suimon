@@ -9,32 +9,32 @@ import (
 
 func (checker *Checker) parsePeers() error {
 	var (
-		wg             sync.WaitGroup
-		peerCH         = make(chan Peer)
-		processedPeers = make(map[string]struct{})
-		cfgPeers       = checker.nodeYaml.Config.SeedPeers
-		peers          = make([]Peer, 0, len(checker.nodeYaml.Config.SeedPeers))
+		wg              sync.WaitGroup
+		peerCH          = make(chan Peer)
+		processedPeers  = make(map[string]struct{})
+		nodeConfigPeers = checker.nodeConfig.P2PConfig.SeedPeers
+		peers           = make([]Peer, 0, len(nodeConfigPeers))
 	)
 
-	for _, cfgPeer := range cfgPeers {
-		if _, ok := processedPeers[cfgPeer.Address]; ok {
+	for _, nodePeer := range nodeConfigPeers {
+		if _, ok := processedPeers[nodePeer.Address]; ok {
 			continue
 		}
 
-		processedPeers[cfgPeer.Address] = struct{}{}
+		processedPeers[nodePeer.Address] = struct{}{}
 
 		wg.Add(1)
 
-		go func(cfgPeer PeerData) {
+		go func(address string) {
 			defer wg.Done()
 
-			if !validation.IsValidCharCount(cfgPeer.Address, peerSeparator, peerCount) {
+			if !validation.IsValidCharCount(address, peerSeparator, peerCount) {
 				return
 			}
 
-			peerInfo := strings.Split(cfgPeer.Address, peerSeparator)
+			peerInfo := strings.Split(address, peerSeparator)
 			peer := newPeer(checker.geoDbClient, checker.httpClient, peerInfo[2], peerInfo[4])
-			err := peer.Parse()
+			err := peer.Parse(checker.suimonConfig.HostLookupConfig.EnableLookup)
 			if err != nil {
 				return
 			}
@@ -60,7 +60,7 @@ func (checker *Checker) parsePeers() error {
 			defer close(doneCH)
 
 			peerCH <- *peer
-		}(cfgPeer)
+		}(nodePeer.Address)
 	}
 
 	go func() {

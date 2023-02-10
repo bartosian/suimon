@@ -1,9 +1,5 @@
 package checker
 
-import (
-	"fmt"
-)
-
 type Location struct {
 	CountryCode string
 	CountryName string
@@ -22,6 +18,6 @@ func (loc *Location) String() string {
 	if loc == nil {
 		return ""
 	}
-	
-	return fmt.Sprintf("%s  %s", loc.Flag, loc.CountryName)
+
+	return loc.CountryName
 }

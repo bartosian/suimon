@@ -2,14 +2,19 @@ package checker
 
 import (
 	"errors"
-	externalip "github.com/glendc/go-external-ip"
 	"net"
 	"strings"
 	"sync"
+
+	externalip "github.com/glendc/go-external-ip"
 )
 
 func (checker *Checker) parseNode() error {
-	addressRPC, addressMetrics := checker.nodeYaml.JsonRPCAddress, checker.nodeYaml.MetricsAddress
+	addressRPC, addressMetrics := checker.nodeConfig.JSONRPCAddress, checker.nodeConfig.MetricsAddress
+
+	if addressRPC == "" || addressMetrics == "" {
+		return errors.New("node addresses not found in fullnode.yaml")
+	}
 
 	addressRPCInfo := strings.Split(addressRPC, addressSeparator)
 	if len(addressRPCInfo) != 2 {
@@ -31,7 +36,7 @@ func (checker *Checker) parseNode() error {
 		addressMetricsInfo[1],
 	)
 
-	if err := node.Parse(); err != nil {
+	if err := node.Parse(checker.suimonConfig.HostLookupConfig.EnableLookup); err != nil {
 		return err
 	}
 
@@ -53,6 +58,7 @@ func (checker *Checker) parseNode() error {
 
 	wg.Wait()
 
+	node.SetStatus()
 	checker.node = *node
 
 	return nil

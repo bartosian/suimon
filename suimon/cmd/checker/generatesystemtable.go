@@ -7,8 +7,12 @@ import (
 )
 
 func (checker *Checker) GenerateSystemTable() {
+	if !checker.suimonConfig.MonitorsConfig.RPCTable.Display {
+		return
+	}
+
 	tableConfig := tablebuilder.TableConfig{
-		Name:         tables.GetTableTitleSUI(checker.network, enums.TableTypeRPC),
+		Name:         tables.GetTableTitleSUI(checker.suimonConfig.NetworkType, enums.TableTypeRPC),
 		Tag:          tables.TableTagSystemSUI,
 		Style:        tables.TableStyleSystemSUI,
 		RowsCount:    0,

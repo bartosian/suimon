@@ -2,77 +2,96 @@ package checker
 
 import (
 	"errors"
+	"fmt"
+	"github.com/bartosian/sui_helpers/suimon/pkg/env"
+	"os"
 	"sync"
 	"time"
 
-	"path/filepath"
-
 	"github.com/hashicorp/go-multierror"
 	"github.com/oschwald/geoip2-golang"
+	"path/filepath"
+
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 )
 
 const (
-	httpClientTimeout = 3 * time.Second
-	pathToGeoDB       = "./vendors/geodb/GeoLite2-Country.mmdb"
-	pathToRPCList     = "rpc.yaml"
+	httpClientTimeout        = 3 * time.Second
+	suimonGeoDBPath          = "%s/.suimon/geodb.mmdb"
+	invalidGeoDBPathProvided = `provide valid geodb path by setting SUIMON_GEODB_PATH env variable
+or set it in suimon.yaml`
 )
 
 func (checker *Checker) ParseData() error {
-	if len(checker.nodeYaml.Config.SeedPeers) == 0 {
+	suimonConfig, nodeConfig := checker.suimonConfig, checker.nodeConfig
+
+	if len(nodeConfig.P2PConfig.SeedPeers) == 0 {
 		return errors.New("no peers found in config file")
 	}
 
-	filePath, err := filepath.Abs(pathToGeoDB)
-	if err != nil {
-		return err
+	if suimonConfig.HostLookupConfig.EnableLookup {
+		geoDBClient, err := initGeoDBClient(suimonConfig)
+		if err != nil {
+			return err
+		}
+
+		defer geoDBClient.Close()
+
+		checker.geoDbClient = geoDBClient
 	}
-
-	db, err := geoip2.Open(filePath)
-	if err != nil {
-		return err
-	}
-
-	defer db.Close()
-
-	checker.geoDbClient = db
 
 	var (
-		wg      sync.WaitGroup
-		errChan = make(chan error)
+		wg         sync.WaitGroup
+		errChan    = make(chan error)
+		errCounter int
+		err        error
 	)
 
-	wg.Add(3)
+	monitorsConfig := suimonConfig.MonitorsConfig
 
-	go func() {
-		defer wg.Done()
+	// parse data for the RPC table
+	if monitorsConfig.RPCTable.Display {
+		wg.Add(1)
 
-		if err := checker.parseRPCHosts(); err != nil {
-			errChan <- err
-		}
-	}()
+		go func() {
+			defer wg.Done()
 
-	go func() {
-		defer wg.Done()
+			if err := checker.parseRPCHosts(); err != nil {
+				errChan <- err
+			}
+		}()
+	}
 
-		if err := checker.parseNode(); err != nil {
-			errChan <- err
-		}
-	}()
+	// parse data for the NODE table
+	if monitorsConfig.NodeTable.Display {
+		wg.Add(1)
 
-	go func() {
-		defer wg.Done()
+		go func() {
+			defer wg.Done()
 
-		if err := checker.parsePeers(); err != nil {
-			errChan <- err
-		}
-	}()
+			if err := checker.parseNode(); err != nil {
+				errChan <- err
+			}
+		}()
+	}
+
+	// parse data for the PEERS table
+	if monitorsConfig.PeersTable.Display {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			if err := checker.parsePeers(); err != nil {
+				errChan <- err
+			}
+		}()
+	}
 
 	go func() {
 		wg.Wait()
 		close(errChan)
 	}()
-
-	var errCounter int
 
 	for parseErr := range errChan {
 		err = multierror.Append(err, parseErr)
@@ -85,4 +104,28 @@ func (checker *Checker) ParseData() error {
 	}
 
 	return nil
+}
+
+func initGeoDBClient(suimonConfig config.SuimonConfig) (*geoip2.Reader, error) {
+	dbPath := suimonConfig.HostLookupConfig.GeoDbPath
+
+	filePath, err := filepath.Abs(dbPath)
+	if err != nil {
+		return nil, errors.New(invalidGeoDBPathProvided)
+	}
+
+	db, err := geoip2.Open(filePath)
+	if err != nil {
+		home := os.Getenv("HOME")
+		dbPath = env.GetEnvWithDefault("SUIMON_GEODB_PATH", fmt.Sprintf(suimonGeoDBPath, home))
+
+		filePath, err := filepath.Abs(dbPath)
+		if err != nil {
+			return nil, errors.New(invalidGeoDBPathProvided)
+		}
+
+		return geoip2.Open(filePath)
+	}
+
+	return db, nil
 }

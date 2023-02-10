@@ -8,9 +8,9 @@ import (
 type ColumnNameSUINode int
 
 const (
-	ColumnNameSUINodeAddress ColumnNameSUINode = iota
+	ColumnNameSUINodeStatus ColumnNameSUINode = iota
+	ColumnNameSUINodeAddress
 	ColumnNameSUINodePortRPC
-	ColumnNameSUINodePortMetrics
 	ColumnNameSUINodeTotalTransactions
 	ColumnNameSUINodeHighestCheckpoints
 	ColumnNameSUINodeConnectedPeers
@@ -28,6 +28,14 @@ var (
 		{Name: "UPTIME", Mode: table.Asc},
 	}
 	ColumnConfigSUINode = [...]table.ColumnConfig{
+		ColumnNameSUINodeStatus: {
+			Name:         "STATUS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
 		ColumnNameSUINodeAddress: {
 			Name:         "ADDRESS",
 			Align:        text.AlignCenter,
@@ -38,14 +46,6 @@ var (
 		},
 		ColumnNameSUINodePortRPC: {
 			Name:         "RPC",
-			Align:        text.AlignCenter,
-			AlignHeader:  text.AlignCenter,
-			VAlign:       text.VAlignMiddle,
-			VAlignHeader: text.VAlignMiddle,
-			Hidden:       false,
-		},
-		ColumnNameSUINodePortMetrics: {
-			Name:         "Metrics",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,

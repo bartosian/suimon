@@ -1,9 +1,6 @@
 package checker
 
 import (
-	"gopkg.in/yaml.v3"
-	"os"
-	"path/filepath"
 	"sync"
 )
 
@@ -14,24 +11,7 @@ func (checker *Checker) parseRPCHosts() error {
 		rpcList []RPCHost
 	)
 
-	filePath, err := filepath.Abs(pathToRPCList)
-	if err != nil {
-		return err
-	}
-
-	file, err := os.ReadFile(filePath)
-	if err != nil {
-		return err
-	}
-
-	var result RPCList
-	err = yaml.Unmarshal(file, &result)
-	if err != nil {
-		return err
-	}
-
-	hosts := result.GetByNetwork(checker.network)
-
+	hosts := checker.suimonConfig.GetRPCByNetwork()
 	for _, host := range hosts {
 		wg.Add(1)
 
