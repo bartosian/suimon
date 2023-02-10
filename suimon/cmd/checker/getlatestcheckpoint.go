@@ -10,7 +10,7 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
-const prcClientTimeout = 4 * time.Second
+const prcClientTimeout = 3 * time.Second
 
 func (host *RPCHost) GetLatestCheckpoint() {
 	if result := getFromRPC(host.rpcClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result != nil {

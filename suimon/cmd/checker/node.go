@@ -4,6 +4,7 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/ipinfo/go/v2/ipinfo"
 	"net/http"
+	"time"
 
 	"github.com/ybbus/jsonrpc/v3"
 
@@ -47,9 +48,11 @@ func (node *Node) SetStatus() {
 
 	if !metrics.Updated {
 		node.Status = enums.StatusRed
-	} else if metrics.TotalTransactionNumber != "" && metrics.LatestCheckpoint != "" {
-		node.Status = enums.StatusGreen
-	} else {
+	} else if metrics.TotalTransactionNumber == "" || metrics.LatestCheckpoint == "" {
+		time.Sleep(3 * time.Second)
+
 		node.Status = enums.StatusYellow
+	} else {
+		node.Status = enums.StatusGreen
 	}
 }

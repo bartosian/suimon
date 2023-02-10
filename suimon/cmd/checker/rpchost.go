@@ -34,9 +34,9 @@ func (host *RPCHost) SetStatus() {
 
 	if !metrics.Updated {
 		host.Status = enums.StatusRed
-	} else if metrics.TotalTransactionNumber != "" && metrics.LatestCheckpoint != "" {
-		host.Status = enums.StatusGreen
-	} else {
+	} else if metrics.TotalTransactionNumber == "" && metrics.LatestCheckpoint == "" {
 		host.Status = enums.StatusYellow
+	} else {
+		host.Status = enums.StatusGreen
 	}
 }

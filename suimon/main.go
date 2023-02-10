@@ -24,8 +24,8 @@ import (
 )
 
 var (
-	suimonConfigPath = flag.String("sf", "", "(optional) path to the node config file")
-	nodeConfigPath   = flag.String("nf", "", "(optional) path to the node config file")
+	suimonConfigPath = flag.String("sf", "", "(optional) path to the suimon config file, can use SUIMON_CONFIG_PATH env variable instead")
+	nodeConfigPath   = flag.String("nf", "", "(optional) path to the node config file, can use SUIMON_NODE_CONFIG_PATH variable instead")
 	network          = flag.String("n", "", "(optional) network name, possible values: testnet, devnet")
 )
 
