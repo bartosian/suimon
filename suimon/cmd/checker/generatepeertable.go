@@ -41,8 +41,14 @@ func (checker *Checker) GeneratePeersTable() {
 		columns[tables.ColumnNameSUIUptime].SetValue(peer.Metrics.Uptime)
 		columns[tables.ColumnNameSUIVersion].SetValue(peer.Metrics.Version)
 		columns[tables.ColumnNameSUICommit].SetValue(peer.Metrics.Commit)
-		columns[tables.ColumnNameSUICompany].SetValue(peer.Location.Provider)
-		columns[tables.ColumnNameSUICountry].SetValue(peer.Location.String())
+
+		if peer.Location == nil {
+			columns[tables.ColumnNameSUICompany].SetValue(nil)
+			columns[tables.ColumnNameSUICountry].SetValue(nil)
+		} else {
+			columns[tables.ColumnNameSUICompany].SetValue(peer.Location.Provider)
+			columns[tables.ColumnNameSUICountry].SetValue(peer.Location.String())
+		}
 	}
 
 	if tableConfig.RowsCount == 0 {

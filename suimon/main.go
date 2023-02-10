@@ -122,7 +122,7 @@ func newProgressBar(progressChan chan struct{}) {
 			for i := 0; i < 500; i++ {
 				bar.Add(1)
 
-				time.Sleep(5 * time.Millisecond)
+				time.Sleep(7 * time.Millisecond)
 			}
 		}
 	}

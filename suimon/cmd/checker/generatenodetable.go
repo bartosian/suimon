@@ -39,8 +39,14 @@ func (checker *Checker) GenerateNodeTable() {
 	columns[tables.ColumnNameSUINodeUptime].SetValue(node.Metrics.Uptime)
 	columns[tables.ColumnNameSUINodeVersion].SetValue(node.Metrics.Version)
 	columns[tables.ColumnNameSUINodeCommit].SetValue(node.Metrics.Commit)
-	columns[tables.ColumnNameSUINodeCompany].SetValue(node.Location.Provider)
-	columns[tables.ColumnNameSUINodeCountry].SetValue(node.Location.String())
+
+	if node.Location == nil {
+		columns[tables.ColumnNameSUINodeCompany].SetValue(nil)
+		columns[tables.ColumnNameSUINodeCountry].SetValue(nil)
+	} else {
+		columns[tables.ColumnNameSUINodeCompany].SetValue(node.Location.Provider)
+		columns[tables.ColumnNameSUINodeCountry].SetValue(node.Location.String())
+	}
 
 	tableConfig.Columns = columns
 
