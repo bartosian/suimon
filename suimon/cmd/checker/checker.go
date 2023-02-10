@@ -1,9 +1,11 @@
 package checker
 
 import (
+	"github.com/ipinfo/go/v2/ipinfo/cache"
 	"net/http"
+	"time"
 
-	"github.com/oschwald/geoip2-golang"
+	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
@@ -14,6 +16,8 @@ const (
 	peerSeparator    = "/"
 	addressSeparator = ":"
 	peerCount        = 4
+	freeIpInfoToken  = "55f30ce0213aa7"
+	ipInfoCacheExp   = 5 * time.Minute
 )
 
 type (
@@ -25,9 +29,9 @@ type (
 		rpcList []RPCHost
 		node    Node
 
-		rpcClient   jsonrpc.RPCClient
-		httpClient  *http.Client
-		geoDbClient *geoip2.Reader
+		rpcClient  jsonrpc.RPCClient
+		httpClient *http.Client
+		ipClient   *ipinfo.Client
 
 		tableBuilderPeer *tablebuilder.TableBuilder
 		tableBuilderNode *tablebuilder.TableBuilder
@@ -42,9 +46,13 @@ func NewChecker(suimonConfig config.SuimonConfig, nodeConfig config.NodeConfig) 
 		Timeout: httpClientTimeout,
 	}
 
+	ipClient := ipinfo.NewClient(
+		nil, ipinfo.NewCache(cache.NewInMemory().WithExpiration(ipInfoCacheExp)), freeIpInfoToken)
+
 	return &Checker{
 		rpcClient:    jsonrpc.NewClient(suimonConfig.NetworkType.ToRPC()),
 		httpClient:   httpClient,
+		ipClient:     ipClient,
 		suimonConfig: suimonConfig,
 		nodeConfig:   nodeConfig,
 	}, nil

@@ -33,8 +33,8 @@ func (checker *Checker) parsePeers() error {
 			}
 
 			peerInfo := strings.Split(address, peerSeparator)
-			peer := newPeer(checker.geoDbClient, checker.httpClient, peerInfo[2], peerInfo[4])
-			err := peer.Parse(checker.suimonConfig.HostLookupConfig.EnableLookup)
+			peer := newPeer(checker.ipClient, checker.httpClient, peerInfo[2], peerInfo[4])
+			err := peer.Parse()
 			if err != nil {
 				return
 			}

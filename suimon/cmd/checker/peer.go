@@ -2,11 +2,10 @@ package checker
 
 import (
 	"fmt"
-	emoji "github.com/jayco/go-emoji-flag"
 	"net"
 	"net/http"
 
-	"github.com/oschwald/geoip2-golang"
+	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
@@ -36,23 +35,23 @@ type Peer struct {
 
 	Metrics Metrics
 
-	rpcClient   jsonrpc.RPCClient
-	httpClient  *http.Client
-	geoDbClient *geoip2.Reader
+	rpcClient  jsonrpc.RPCClient
+	httpClient *http.Client
+	ipClient   *ipinfo.Client
 
 	logger log.Logger
 }
 
 func newPeer(
-	geoDB *geoip2.Reader,
+	ipClient *ipinfo.Client,
 	httpClient *http.Client,
 	address, port string,
 ) *Peer {
 	peer := &Peer{
-		Address:     address,
-		Port:        port,
-		geoDbClient: geoDB,
-		logger:      log.NewLogger(),
+		Address:  address,
+		Port:     port,
+		ipClient: ipClient,
+		logger:   log.NewLogger(),
 	}
 
 	rpcURL := peer.getUrl(requestTypeRPC, false, nil)
@@ -63,18 +62,17 @@ func newPeer(
 	return peer
 }
 
-func (peer *Peer) Parse(lookupEnabled bool) error {
+func (peer *Peer) Parse() error {
 	if ip := net.ParseIP(peer.Address); ip != nil {
 		peer.AddressType = enums.AddressTypeIP
+		record, err := peer.ipClient.GetIPInfo(ip)
+		if err == nil {
+			countryISOCode := record.Country
+			countryName := record.CountryName
+			flag := record.CountryFlag.Emoji
+			company := record.Company.Name
 
-		if lookupEnabled {
-			record, err := peer.geoDbClient.Country(ip)
-			if err == nil {
-				countryISOCode := record.Country.IsoCode
-				countryName := record.Country.Names[countryNameLanguage]
-				flag := emoji.GetFlag(record.Country.IsoCode)
-				peer.Location = newLocation(countryISOCode, countryName, flag)
-			}
+			peer.Location = newLocation(countryISOCode, countryName, flag, company)
 		}
 	} else if validation.IsValidDomain(peer.Address) {
 		peer.AddressType = enums.AddressTypeDomain

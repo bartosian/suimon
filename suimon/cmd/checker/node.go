@@ -2,9 +2,9 @@ package checker
 
 import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/ipinfo/go/v2/ipinfo"
 	"net/http"
 
-	"github.com/oschwald/geoip2-golang"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
@@ -19,16 +19,16 @@ type Node struct {
 }
 
 func newNode(
-	geoDB *geoip2.Reader,
+	ipClient *ipinfo.Client,
 	httpClient *http.Client,
 	address, rpcPort, metricsPort string,
 ) *Node {
 	node := &Node{
 		Peer: Peer{
-			Address:     address,
-			Port:        rpcPort,
-			geoDbClient: geoDB,
-			logger:      log.NewLogger(),
+			Address:  address,
+			Port:     rpcPort,
+			ipClient: ipClient,
+			logger:   log.NewLogger(),
 		},
 		RpcPort:     rpcPort,
 		MetricsPort: metricsPort,

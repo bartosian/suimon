@@ -16,6 +16,7 @@ const (
 	ColumnNameSUIUptime
 	ColumnNameSUIVersion
 	ColumnNameSUICommit
+	ColumnNameSUICompany
 	ColumnNameSUICountry
 )
 
@@ -85,6 +86,14 @@ var (
 		},
 		ColumnNameSUICommit: {
 			Name:         "COMMIT",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		ColumnNameSUICompany: {
+			Name:         "PROVIDER",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,

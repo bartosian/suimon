@@ -30,10 +30,6 @@ type SuimonConfig struct {
 		Testnet []string `yaml:"testnet"`
 		Devnet  []string `yaml:"devnet"`
 	} `yaml:"rpc-config"`
-	HostLookupConfig struct {
-		EnableLookup bool   `yaml:"enable-lookup"`
-		GeoDbPath    string `yaml:"geo-db-path"`
-	} `yaml:"host-lookup-config"`
 	NodeConfigPath string `yaml:"node-config-path"`
 	Network        string `yaml:"network"`
 	NetworkType    enums.NetworkType

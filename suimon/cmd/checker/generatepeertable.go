@@ -41,12 +41,8 @@ func (checker *Checker) GeneratePeersTable() {
 		columns[tables.ColumnNameSUIUptime].SetValue(peer.Metrics.Uptime)
 		columns[tables.ColumnNameSUIVersion].SetValue(peer.Metrics.Version)
 		columns[tables.ColumnNameSUICommit].SetValue(peer.Metrics.Commit)
-
-		if checker.suimonConfig.HostLookupConfig.EnableLookup {
-			columns[tables.ColumnNameSUICountry].SetValue(peer.Location.CountryName)
-		} else {
-			columns[tables.ColumnNameSUICountry].SetValue(nil)
-		}
+		columns[tables.ColumnNameSUICompany].SetValue(peer.Location.Provider)
+		columns[tables.ColumnNameSUICountry].SetValue(peer.Location.String())
 	}
 
 	if tableConfig.RowsCount == 0 {

@@ -20,11 +20,6 @@ rpc-config:
   devnet:
     - "https://fullnode.devnet.sui.io"
 
-# update this value if you want to enable/disable geolocation
-host-lookup-config:
-  enable-lookup: true
-  geo-db-path: "$HOME/.suimon/db"
-
 # update this value to the fullnode.yaml file location
 node-config-path: "$HOME/.suimon/fullnode.yaml"
 

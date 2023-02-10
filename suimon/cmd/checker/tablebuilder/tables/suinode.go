@@ -17,6 +17,7 @@ const (
 	ColumnNameSUINodeUptime
 	ColumnNameSUINodeVersion
 	ColumnNameSUINodeCommit
+	ColumnNameSUINodeCompany
 	ColumnNameSUINodeCountry
 )
 
@@ -94,6 +95,14 @@ var (
 		},
 		ColumnNameSUINodeCommit: {
 			Name:         "COMMIT",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		ColumnNameSUINodeCompany: {
+			Name:         "PROVIDER",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,

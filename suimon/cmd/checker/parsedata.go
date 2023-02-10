@@ -2,24 +2,14 @@ package checker
 
 import (
 	"errors"
-	"fmt"
-	"github.com/bartosian/sui_helpers/suimon/pkg/env"
-	"os"
 	"sync"
 	"time"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/oschwald/geoip2-golang"
-	"path/filepath"
-
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 )
 
 const (
-	httpClientTimeout        = 3 * time.Second
-	suimonGeoDBPath          = "%s/.suimon/geodb.mmdb"
-	invalidGeoDBPathProvided = `provide valid geodb path by setting SUIMON_GEODB_PATH env variable
-or set it in suimon.yaml`
+	httpClientTimeout = 3 * time.Second
 )
 
 func (checker *Checker) ParseData() error {
@@ -27,17 +17,6 @@ func (checker *Checker) ParseData() error {
 
 	if len(nodeConfig.P2PConfig.SeedPeers) == 0 {
 		return errors.New("no peers found in config file")
-	}
-
-	if suimonConfig.HostLookupConfig.EnableLookup {
-		geoDBClient, err := initGeoDBClient(suimonConfig)
-		if err != nil {
-			return err
-		}
-
-		defer geoDBClient.Close()
-
-		checker.geoDbClient = geoDBClient
 	}
 
 	var (
@@ -104,28 +83,4 @@ func (checker *Checker) ParseData() error {
 	}
 
 	return nil
-}
-
-func initGeoDBClient(suimonConfig config.SuimonConfig) (*geoip2.Reader, error) {
-	dbPath := suimonConfig.HostLookupConfig.GeoDbPath
-
-	filePath, err := filepath.Abs(dbPath)
-	if err != nil {
-		return nil, errors.New(invalidGeoDBPathProvided)
-	}
-
-	db, err := geoip2.Open(filePath)
-	if err != nil {
-		home := os.Getenv("HOME")
-		dbPath = env.GetEnvWithDefault("SUIMON_GEODB_PATH", fmt.Sprintf(suimonGeoDBPath, home))
-
-		filePath, err := filepath.Abs(dbPath)
-		if err != nil {
-			return nil, errors.New(invalidGeoDBPathProvided)
-		}
-
-		return geoip2.Open(filePath)
-	}
-
-	return db, nil
 }

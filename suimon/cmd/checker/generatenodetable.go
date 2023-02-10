@@ -39,12 +39,8 @@ func (checker *Checker) GenerateNodeTable() {
 	columns[tables.ColumnNameSUINodeUptime].SetValue(node.Metrics.Uptime)
 	columns[tables.ColumnNameSUINodeVersion].SetValue(node.Metrics.Version)
 	columns[tables.ColumnNameSUINodeCommit].SetValue(node.Metrics.Commit)
-
-	if checker.suimonConfig.HostLookupConfig.EnableLookup {
-		columns[tables.ColumnNameSUINodeCountry].SetValue(node.Location.CountryName)
-	} else {
-		columns[tables.ColumnNameSUINodeCountry].SetValue(nil)
-	}
+	columns[tables.ColumnNameSUINodeCompany].SetValue(node.Location.Provider)
+	columns[tables.ColumnNameSUINodeCountry].SetValue(node.Location.String())
 
 	tableConfig.Columns = columns
 

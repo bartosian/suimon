@@ -29,14 +29,14 @@ func (checker *Checker) parseNode() error {
 	publicIP := getPublicIP()
 
 	node := newNode(
-		checker.geoDbClient,
+		checker.ipClient,
 		checker.httpClient,
 		publicIP.String(),
 		addressRPCInfo[1],
 		addressMetricsInfo[1],
 	)
 
-	if err := node.Parse(checker.suimonConfig.HostLookupConfig.EnableLookup); err != nil {
+	if err := node.Parse(); err != nil {
 		return err
 	}
 
