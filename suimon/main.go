@@ -14,6 +14,8 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"github.com/common-nighthawk/go-figure"
 	"time"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker"
@@ -42,9 +44,11 @@ or set it in suimon.yaml`
 
 func main() {
 	flag.Parse()
-	logger := log.NewLogger()
 
+	logger := log.NewLogger()
 	progressChan := make(chan struct{})
+	
+	printLogo()
 
 	// start showing progress bar
 	go newProgressBar(progressChan)
@@ -96,9 +100,20 @@ func main() {
 
 	// stop showing progress bar
 	progressChan <- struct{}{}
-	
+
 	// draw initialized tables to the terminal
 	checker.DrawTable()
+}
+
+func printLogo() {
+	fmt.Println()
+	fmt.Println()
+	logo := figure.NewColorFigure("suimon", "banner3", "blue", true)
+	logo.Print()
+	version := figure.NewColorFigure("      v0.1.0", "3x5", "red", true)
+	version.Print()
+	fmt.Println()
+	fmt.Println()
 }
 
 func newProgressBar(progressChan chan struct{}) {
