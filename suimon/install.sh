@@ -27,10 +27,14 @@ go install "github.com/bartosian/sui_helpers/suimon@$suimon_version"
 
 result=$(find / -name "$config_file_name" 2>/dev/null)
 if [ -z "$result" ]; then
-  echo "File not found."
+  echo
+  echo "‼️ File $config_file_name not found."
+
+  exit 1
 elif [ $(echo "$result" | wc -l) -eq 1 ]; then
   sed -i -e "s%node-config-path:.*%node-config-path: \"$result\"%;" $HOME/.suimon/suimon.yaml
 else
+  echo
   echo "Multiple instances of the $config_file_name found: $result. Please specify path to one of them by using '-nf' flag or 'SUIMON_NODE_CONFIG_PATH' env variable."
 fi
 
