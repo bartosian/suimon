@@ -38,8 +38,6 @@ func ParseNodeConfig(path *string, suimonPath string) (*NodeConfig, error) {
 		configPath = env.GetEnvWithDefault("SUIMON_NODE_CONFIG_PATH", fmt.Sprintf(nodeConfigPath, home))
 	}
 
-	configPath = "newfile.sh"
-
 	file, err := os.ReadFile(configPath)
 	if err != nil && suimonPath == "" {
 		return nil, err

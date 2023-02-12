@@ -171,6 +171,10 @@ Usage of suimon:
     	(optional) path to the suimon config file, can use SUIMON_CONFIG_PATH env variable instead
 ```
 
+## IP Information Lookup
+``Provider`` and ``country`` information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
+which is free and gives you ``50k requests`` per month, which is sufficient for individual usage. There is a free token included in ``suimon.yaml`` file, which has the same limits and can be used by everyone.
+
 ## Preview
 
 Depending on the emojis and colors support by your terminal you can enable/disable different color options, to make it suitable for you. Check ``monitors-visual`` in the ``suimon.yaml`` config file.

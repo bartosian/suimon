@@ -33,6 +33,9 @@ type SuimonConfig struct {
 	NodeConfigPath string `yaml:"node-config-path"`
 	Network        string `yaml:"network"`
 	NetworkType    enums.NetworkType
+	IPLookup       struct {
+		AccessToken string `yaml:"access-token"`
+	} `yaml:"ip-lookup"`
 	MonitorsVisual struct {
 		ColorScheme  string `yaml:"color-scheme"`
 		EnableEmojis bool   `yaml:"enable-emojis"`

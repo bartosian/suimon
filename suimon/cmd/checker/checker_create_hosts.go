@@ -27,7 +27,9 @@ func (checker *Checker) createHosts(addresses []AddressInfo) ([]Host, error) {
 
 			host := newHost(addressInfo, checker.ipClient)
 
-			host.SetLocation()
+			if checker.suimonConfig.IPLookup.AccessToken != "" {
+				host.SetLocation()
+			}
 
 			doneCH := make(chan struct{})
 

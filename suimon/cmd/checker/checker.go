@@ -14,8 +14,7 @@ import (
 )
 
 const (
-	freeIpInfoToken = "55f30ce0213aa7"
-	ipInfoCacheExp  = 5 * time.Minute
+	ipInfoCacheExp = 5 * time.Minute
 )
 
 type (
@@ -44,7 +43,7 @@ func NewChecker(suimonConfig config.SuimonConfig, nodeConfig config.NodeConfig, 
 
 	rpcClient := jsonrpc.NewClient(suimonConfig.NetworkType.ToRPC())
 	httpClient := &http.Client{Timeout: httpClientTimeout}
-	ipClient := ipinfo.NewClient(httpClient, ipinfo.NewCache(cache.NewInMemory().WithExpiration(ipInfoCacheExp)), freeIpInfoToken)
+	ipClient := ipinfo.NewClient(httpClient, ipinfo.NewCache(cache.NewInMemory().WithExpiration(ipInfoCacheExp)), suimonConfig.IPLookup.AccessToken)
 
 	return &Checker{
 		rpcClient:    rpcClient,
