@@ -43,7 +43,7 @@ func ParseIpPort(address string) (*HostPort, error) {
 		return nil, fmt.Errorf("invalid port provided: %s", address)
 	}
 
-	if net.ParseIP(ip).IsLoopback() {
+	if parsedIP := net.ParseIP(ip); parsedIP.IsLoopback() || parsedIP.IsUnspecified() {
 		ip = GetPublicIP().String()
 	}
 
