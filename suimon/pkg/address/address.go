@@ -45,6 +45,7 @@ func ParseIpPort(address string) (*HostPort, error) {
 
 	if parsedIP := net.ParseIP(ip); parsedIP.IsLoopback() || parsedIP.IsUnspecified() {
 		ip = GetPublicIP().String()
+		address = fmt.Sprintf("%s:%s", ip, port)
 	}
 
 	return &HostPort{
