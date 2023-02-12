@@ -1,4 +1,4 @@
-## 💧 SUIMON In-Terminal SUI Node Explorer
+## 💧 SUIMON In-Terminal SUI Node Monitor
 
 ``Version: 0.1.0``
 
