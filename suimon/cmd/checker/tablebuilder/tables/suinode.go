@@ -25,9 +25,9 @@ var (
 	TableStyleSUINode      = table.StyleLight
 	TableTagSUINode        = ""
 	TableSortConfigSUINode = []table.SortBy{
+		{Name: "STATUS", Mode: table.Dsc},
 		{Name: "COUNTRY", Mode: table.Asc},
-		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Asc},
-		{Name: "UPTIME", Mode: table.Asc},
+		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
 	}
 	ColumnConfigSUINode = [...]table.ColumnConfig{
 		ColumnNameSUINodeStatus: {
