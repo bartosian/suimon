@@ -39,7 +39,11 @@ func (host *Host) SetLocation() {
 		countryISOCode := record.Country
 		countryName := record.CountryName
 		flag := record.CountryFlag.Emoji
-		company := record.Company.Name
+
+		var company string
+		if record.Company != nil {
+			company = record.Company.Name
+		}
 
 		host.Location = newLocation(countryISOCode, countryName, flag, company)
 	}

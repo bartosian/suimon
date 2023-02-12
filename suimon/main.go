@@ -48,6 +48,14 @@ func main() {
 	logger := log.NewLogger()
 	progressChan := make(chan struct{})
 
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error("failed to execute suimon, please check an issue: ", err)
+		}
+
+		return
+	}()
+
 	printLogo()
 
 	// start showing progress bar
