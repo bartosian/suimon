@@ -26,6 +26,7 @@ var (
 	TableTagSUINode        = ""
 	TableSortConfigSUINode = []table.SortBy{
 		{Name: "COUNTRY", Mode: table.Asc},
+		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Asc},
 		{Name: "UPTIME", Mode: table.Asc},
 	}
 	ColumnConfigSUINode = [...]table.ColumnConfig{
@@ -39,7 +40,7 @@ var (
 		},
 		ColumnNameSUINodeAddress: {
 			Name:         "ADDRESS",
-			Align:        text.AlignCenter,
+			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,

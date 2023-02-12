@@ -10,7 +10,7 @@ const (
 
 var statusValues = map[Status]string{
 	StatusGreen:  "+",
-	StatusYellow: "!",
+	StatusYellow: "+/-",
 	StatusRed:    "-",
 }
 

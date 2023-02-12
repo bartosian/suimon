@@ -14,9 +14,7 @@ rpc-config:
     - "https://rpc.ankr.com/sui_testnet"
     - "https://sui-api.rpcpool.com"
     - "https://sui-testnet.public.blastapi.io"
-    - "https://rpc.ankr.com/sui_testnet"
     - "https://fullnode.testnet.vincagame.com"
-    - "https://rpc-office.cosmostation.io/sui-testnet-wave-2"
   devnet:
     - "https://fullnode.devnet.sui.io"
 

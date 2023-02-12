@@ -10,7 +10,8 @@ type (
 	MetricsMap map[enums.MetricType]string
 
 	Metrics struct {
-		Updated                 bool
+		Updated bool
+
 		TotalTransactionNumber  string
 		HighestSyncedCheckpoint string
 		LatestCheckpoint        string

@@ -15,14 +15,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/common-nighthawk/go-figure"
 	"time"
+
+	"github.com/common-nighthawk/go-figure"
+	"github.com/schollz/progressbar/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
-
-	"github.com/schollz/progressbar/v3"
 )
 
 var (
@@ -47,7 +47,7 @@ func main() {
 
 	logger := log.NewLogger()
 	progressChan := make(chan struct{})
-	
+
 	printLogo()
 
 	// start showing progress bar
@@ -77,26 +77,22 @@ func main() {
 		return
 	}
 
-	suimonConfig.SetNetworkConfig(networkConfig)
-
 	// create checker instance to process to request all the required data and pass them to tablebuilder
-	checker, err := checker.NewChecker(*suimonConfig, *nodeConfig)
+	checker, err := checker.NewChecker(*suimonConfig, *nodeConfig, networkConfig)
 	if err != nil {
 		logger.Error("failed to create peers checker: ", err)
 
 		return
 	}
 
-	if err := checker.ParseData(); err != nil {
-		logger.Error("failed to parse data: ", err)
+	if err := checker.GetTablesData(); err != nil {
+		logger.Error("failed to get data for tables: ", err)
 
 		return
 	}
 
 	// initialize tables with the styles and data received
-	checker.GenerateSystemTable()
-	checker.GenerateNodeTable()
-	checker.GeneratePeersTable()
+	checker.InitTables()
 
 	// stop showing progress bar
 	progressChan <- struct{}{}

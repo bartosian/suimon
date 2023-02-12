@@ -23,6 +23,10 @@ func IsValidPort(port string) bool {
 	return portInt >= 1 || portInt <= 65535
 }
 
+func IsInvalidPort(port string) bool {
+	return !IsValidPort(port)
+}
+
 func IsValidCharCount(str string, char string, count int) bool {
 	charCount := strings.Count(str, char)
 	if charCount != count {

@@ -40,7 +40,7 @@ var tbColorsValues = map[enums.ColorTable]TableColors{
 	enums.ColorTableColor: {Title: text.FgHiBlue, Header: text.FgHiRed, Row: text.FgHiWhite, Footer: text.FgHiBlue, Index: text.FgHiRed},
 }
 
-func GetTBColorsFromString(color string) TableColors {
+func GetTableColorsFromString(color string) TableColors {
 	colorTable := enums.ColorTableFromString(color)
 
 	return tbColorsValues[colorTable]

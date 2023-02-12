@@ -1,62 +1,149 @@
 package checker
 
 import (
+	"errors"
+	"fmt"
 	"sync"
 	"time"
 
 	"github.com/hashicorp/go-multierror"
+
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/pkg/address"
 )
 
-const (
-	httpClientTimeout = 3 * time.Second
-)
+const httpClientTimeout = 3 * time.Second
 
-func (checker *Checker) ParseData() error {
+func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]AddressInfo, error) {
+	var addresses []AddressInfo
+
+	switch tableType {
+	case enums.TableTypeNode:
+		addressRPC, addressMetrics := checker.nodeConfig.JSONRPCAddress, checker.nodeConfig.MetricsAddress
+
+		var (
+			hostPortRPC     *address.HostPort
+			hostPortMetrics *address.HostPort
+		)
+
+		if addressRPC != "" {
+			hostPort, err := address.ParseIpPort(addressRPC)
+			if err != nil {
+				return nil, errors.New("invalid json-rpc-address in fullnode.yaml")
+			}
+
+			hostPortRPC = hostPort
+		}
+
+		if addressMetrics != "" {
+			hostPort, err := address.ParseIpPort(addressMetrics)
+			if err != nil {
+				return nil, errors.New("invalid metrics-address in fullnode.yaml")
+			}
+
+			hostPortMetrics = hostPort
+		}
+
+		addressInfo := AddressInfo{HostPort: *hostPortRPC, Ports: make(map[enums.PortType]string)}
+		if hostPortRPC.Port != nil {
+			addressInfo.Ports[enums.PortTypeRPC] = *hostPortRPC.Port
+		}
+
+		if hostPortMetrics.Port != nil {
+			addressInfo.Ports[enums.PortTypeMetrics] = *hostPortMetrics.Port
+		}
+
+		addresses = append(addresses, addressInfo)
+	case enums.TableTypePeers:
+		peers := checker.nodeConfig.P2PConfig.SeedPeers
+		if len(peers) == 0 {
+			return nil, errors.New("peers not found in fullnode.yaml")
+		}
+
+		for _, peer := range peers {
+			hostPort, err := address.ParsePeer(peer.Address)
+			if err != nil {
+				return nil, errors.New("invalid peer in fullnode.yaml")
+			}
+
+			addressInfo := AddressInfo{HostPort: *hostPort, Ports: make(map[enums.PortType]string)}
+			if hostPort.Port != nil {
+				addressInfo.Ports[enums.PortTypePeer] = *hostPort.Port
+			}
+
+			addresses = append(addresses, addressInfo)
+		}
+	case enums.TableTypeRPC:
+		rpc := checker.suimonConfig.GetRPCByNetwork()
+		if len(rpc) == 0 {
+			return nil, errors.New("rpc not found in suimon.yaml")
+		}
+
+		for _, url := range rpc {
+			hostPort, err := address.ParseURL(url)
+			if err != nil {
+				return nil, errors.New("invalid rpc url in suimon.yaml")
+			}
+
+			if hostPort.IP != nil {
+				fmt.Printf("%s %s %s", hostPort.Address, *hostPort.IP)
+			}
+
+			addressInfo := AddressInfo{HostPort: *hostPort, Ports: make(map[enums.PortType]string)}
+			if hostPort.Port != nil {
+				addressInfo.Ports[enums.PortTypeRPC] = *hostPort.Port
+			}
+
+			addresses = append(addresses, addressInfo)
+		}
+	}
+
+	return addresses, nil
+}
+
+func (checker *Checker) GetTablesData() error {
 	var (
 		wg             sync.WaitGroup
 		errChan        = make(chan error, 3)
 		suimonConfig   = checker.suimonConfig
 		monitorsConfig = suimonConfig.MonitorsConfig
-		err            error
 	)
+
+	var getTableData = func(tableType enums.TableType) {
+		addresses, err := checker.getAddressInfoByTableType(tableType)
+		if err != nil {
+			errChan <- err
+		}
+
+		defer wg.Done()
+
+		hosts, err := checker.createHosts(addresses)
+		if err != nil {
+			errChan <- err
+		}
+
+		checker.setHostsByTableType(tableType, hosts)
+	}
 
 	// parse data for the RPC table
 	if monitorsConfig.RPCTable.Display {
 		wg.Add(1)
 
-		go func() {
-			defer wg.Done()
-
-			if err := checker.parseRPCHosts(); err != nil {
-				errChan <- err
-			}
-		}()
+		go getTableData(enums.TableTypeRPC)
 	}
 
 	// parse data for the NODE table
 	if monitorsConfig.NodeTable.Display {
 		wg.Add(1)
 
-		go func() {
-			defer wg.Done()
-
-			if err := checker.parseNode(); err != nil {
-				errChan <- err
-			}
-		}()
+		go getTableData(enums.TableTypeNode)
 	}
 
 	// parse data for the PEERS table
 	if monitorsConfig.PeersTable.Display {
 		wg.Add(1)
 
-		go func() {
-			defer wg.Done()
-
-			if err := checker.parsePeers(); err != nil {
-				errChan <- err
-			}
-		}()
+		go getTableData(enums.TableTypePeers)
 	}
 
 	go func() {
@@ -64,15 +151,13 @@ func (checker *Checker) ParseData() error {
 		close(errChan)
 	}()
 
-	var errCount int
+	if len(checker.peers) == 0 && len(checker.rpc) == 0 && len(checker.node) == 0 {
+		var err error
 
-	for parseErr := range errChan {
-		err = multierror.Append(err, parseErr)
+		for parseErr := range errChan {
+			err = multierror.Append(err, parseErr)
+		}
 
-		errCount++
-	}
-
-	if errCount == 3 {
 		return err
 	}
 
