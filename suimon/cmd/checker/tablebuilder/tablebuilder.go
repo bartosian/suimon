@@ -67,7 +67,7 @@ func (tb *TableBuilder) SetColumns() {
 }
 
 func (tb *TableBuilder) SetRows() {
-	rowConfigAutoMerge := table.RowConfig{AutoMerge: false}
+	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
 
 	var (
 		header table.Row
