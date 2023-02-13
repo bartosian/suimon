@@ -40,12 +40,18 @@ func (checker *Checker) createHosts(addresses []AddressInfo) ([]Host, error) {
 			}()
 
 			go func() {
+				host.GetLatestCheckpoint()
+
+				doneCH <- struct{}{}
+			}()
+
+			go func() {
 				host.GetMetrics(checker.httpClient)
 
 				doneCH <- struct{}{}
 			}()
 
-			for i := 0; i < 2; i++ {
+			for i := 0; i < 3; i++ {
 				<-doneCH
 			}
 
@@ -61,8 +67,6 @@ func (checker *Checker) createHosts(addresses []AddressInfo) ([]Host, error) {
 	}()
 
 	for host := range hostCH {
-		host.SetStatus()
-
 		hosts = append(hosts, host)
 	}
 

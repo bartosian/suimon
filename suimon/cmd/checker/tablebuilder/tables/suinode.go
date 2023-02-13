@@ -12,7 +12,8 @@ const (
 	ColumnNameSUINodeAddress
 	ColumnNameSUINodePortRPC
 	ColumnNameSUINodeTotalTransactions
-	ColumnNameSUINodeHighestCheckpoints
+	ColumnNameSUINodeLatestCheckpoint
+	ColumnNameSUINodeHighestCheckpoint
 	ColumnNameSUINodeConnectedPeers
 	ColumnNameSUINodeUptime
 	ColumnNameSUINodeVersion
@@ -62,8 +63,16 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodeHighestCheckpoints: {
-			Name:         "HIGHEST\nCHECKPOINTS",
+		ColumnNameSUINodeLatestCheckpoint: {
+			Name:         "LATEST\nCHECKPOINT",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		ColumnNameSUINodeHighestCheckpoint: {
+			Name:         "SYNCED\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,

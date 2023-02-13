@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -78,7 +79,7 @@ func (host *Host) GetTotalTransactionNumber() {
 		return
 	}
 
-	if result := getRequestAttempt(host.rpcHttpsClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result != nil {
+	if result := getRequestAttempt(host.rpcHttpsClient, enums.RPCMethodGetTotalTransactionNumber); result != nil {
 		host.Metrics.SetValue(enums.MetricTypeTotalTransactionsNumber, *result)
 	}
 }
@@ -129,43 +130,45 @@ func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) *int {
 
 func (host *Host) getUrl(request requestType, secure bool) string {
 	var (
-		address  string
-		port     string
 		protocol = "http"
+		hostPort = host.HostPort
+		hostUrl  = new(url.URL)
 	)
+
+	if hostPort.Host != nil {
+		hostUrl.Host = *hostPort.Host
+	} else {
+		hostUrl.Host = *hostPort.IP
+	}
+
+	if hostPort.Path != nil {
+		hostUrl.Path = *hostPort.Path
+	}
 
 	if secure {
 		protocol = protocol + "s"
 	}
 
-	hostPort := host.HostPort
-
-	if hostPort.IP != nil {
-		address = *hostPort.IP
-	} else if hostPort.Host != nil {
-		address = *hostPort.GetHostWithPath()
-
-		if hostPort.Path != nil {
-			return fmt.Sprintf("%s://%s", protocol, address)
-		}
-	}
+	hostUrl.Scheme = protocol
 
 	switch request {
 	case requestTypeRPC:
-		port = rpcPortDefault
-		if portRPC, ok := host.Ports[enums.PortTypeRPC]; ok {
-			port = portRPC
+		if port, ok := host.Ports[enums.PortTypeRPC]; ok {
+			hostUrl.Host = hostUrl.Hostname() + ":" + port
+		} else if hostPort.Host == nil {
+			hostUrl.Host = hostUrl.Hostname() + ":" + rpcPortDefault
 		}
-
-		return fmt.Sprintf("%s://%s:%s", protocol, address, port)
 	case requestTypeMetrics:
 		fallthrough
 	default:
-		port = metricsPortDefault
-		if portMetrics, ok := host.Ports[enums.PortTypeMetrics]; ok {
-			port = portMetrics
-		}
+		hostUrl.Path = "/metrics"
 
-		return fmt.Sprintf("%s://%s:%s/metrics", protocol, address, port)
+		if port, ok := host.Ports[enums.PortTypeMetrics]; ok {
+			hostUrl.Host = hostUrl.Hostname() + ":" + port
+		} else {
+			hostUrl.Host = hostUrl.Hostname() + ":" + metricsPortDefault
+		}
 	}
+
+	return hostUrl.String()
 }

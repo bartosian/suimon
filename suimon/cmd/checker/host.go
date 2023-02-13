@@ -58,30 +58,67 @@ func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client) *Host {
 	return host
 }
 
-func (host *Host) SetStatus() {
-	metrics := host.Metrics
+func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
+	status := enums.StatusGreen
+	metricsHost := host.Metrics
+	metricsRPC := rpc.Metrics
 
-	if !metrics.Updated {
-		host.Status = enums.StatusRed
-	} else if metrics.TotalTransactionNumber == "" || metrics.HighestSyncedCheckpoint == "" {
-		host.Status = enums.StatusYellow
-	} else {
-		host.Status = enums.StatusGreen
-	}
-}
+	switch metricsHost.Updated {
+	case false:
+		status = enums.StatusRed
 
-type RPCList struct {
-	Testnet []string `yaml:"testnet"`
-	Devnet  []string `yaml:"devnet"`
-}
+		if tableType == enums.TableTypePeers {
+			status = enums.StatusYellow
+		}
 
-func (rpc RPCList) GetByNetwork(network enums.NetworkType) []string {
-	switch network {
-	case enums.NetworkTypeTestnet:
-		return rpc.Testnet
-	case enums.NetworkTypeDevnet:
-		fallthrough
-	default:
-		return rpc.Devnet
+		host.Status = status
+	case true:
+		if metricsHost.TotalTransactionNumber == "" {
+			status = enums.StatusRed
+
+			if tableType == enums.TableTypePeers {
+				status = enums.StatusYellow
+			}
+
+			host.Status = status
+
+			return
+		}
+
+		if metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionsNumber, metricsRPC.TotalTransactionNumber) ||
+			metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
+			status = enums.StatusYellow
+
+			host.Status = status
+
+			return
+		}
+
+		if metricsHost.HighestSyncedCheckpoint == "" {
+			if tableType == enums.TableTypeNode {
+				status = enums.StatusRed
+			}
+
+			host.Status = status
+
+			return
+		}
+
+		if metricsRPC.HighestSyncedCheckpoint == "" {
+			host.Status = status
+
+			return
+		}
+
+		if metricsHost.IsHealthy(enums.MetricTypeHighestSyncedCheckpoint, metricsRPC.HighestSyncedCheckpoint) ||
+			metricsHost.IsUnhealthy(enums.MetricTypeVersion, metricsRPC.Version) {
+			status = enums.StatusYellow
+
+			host.Status = status
+
+			return
+		}
+
+		host.Status = status
 	}
 }

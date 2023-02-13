@@ -2,6 +2,7 @@ package checker
 
 import (
 	"errors"
+	"sort"
 	"sync"
 	"time"
 
@@ -11,7 +12,9 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/pkg/address"
 )
 
-const httpClientTimeout = 3 * time.Second
+const (
+	httpClientTimeout = 3 * time.Second
+)
 
 func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]AddressInfo, error) {
 	var addresses []AddressInfo
@@ -121,11 +124,9 @@ func (checker *Checker) GetTablesData() error {
 	}
 
 	// parse data for the RPC table
-	if monitorsConfig.RPCTable.Display {
-		wg.Add(1)
+	wg.Add(1)
 
-		go getTableData(enums.TableTypeRPC)
-	}
+	go getTableData(enums.TableTypeRPC)
 
 	// parse data for the NODE table
 	if monitorsConfig.NodeTable.Display {
@@ -141,12 +142,10 @@ func (checker *Checker) GetTablesData() error {
 		go getTableData(enums.TableTypePeers)
 	}
 
-	go func() {
-		wg.Wait()
-		close(errChan)
-	}()
+	wg.Wait()
+	close(errChan)
 
-	if len(checker.peers) == 0 && len(checker.rpc) == 0 && len(checker.node) == 0 {
+	if len(checker.rpc) == 0 || len(checker.peers) == 0 && len(checker.node) == 0 {
 		var err error
 
 		for parseErr := range errChan {
@@ -154,6 +153,30 @@ func (checker *Checker) GetTablesData() error {
 		}
 
 		return err
+	}
+
+	var rpc = checker.rpc
+
+	if len(rpc) > 1 {
+		sort.Slice(rpc, func(left, right int) bool {
+			return rpc[left].Metrics.TotalTransactionNumber > rpc[right].Metrics.TotalTransactionNumber
+		})
+
+		sort.SliceStable(rpc, func(left, right int) bool {
+			return rpc[left].Metrics.LatestCheckpoint > rpc[right].Metrics.LatestCheckpoint
+		})
+	}
+
+	for idx := range checker.peers {
+		checker.peers[idx].SetStatus(enums.TableTypePeers, rpc[0])
+	}
+
+	for idx := range checker.rpc {
+		checker.rpc[idx].SetStatus(enums.TableTypeRPC, rpc[0])
+	}
+
+	for idx := range checker.node {
+		checker.node[idx].SetStatus(enums.TableTypeNode, rpc[0])
 	}
 
 	return nil

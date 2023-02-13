@@ -35,7 +35,7 @@ const (
 	suimonConfigNotFound = `provide path to the suimon.yaml file by using -sf option 
 or by setting SUIMON_CONFIG_PATH env variable
 or put suimon.yaml in $HOME/.suimon/suimon.yaml`
-	nodeConfigNotFound = `provide path to the fullnode.yaml file by using -sf option
+	nodeConfigNotFound = `provide path to the fullnode.yaml file by using -nf option
 or by setting SUIMON_NODE_CONFIG_PATH env variable
 or set path to this file in suimon.yaml`
 	invalidNetworkTypeProvided = `provide valid network type by using -n option
@@ -148,7 +148,7 @@ func newProgressBar(progressChan chan struct{}) {
 			for i := 0; i < 500; i++ {
 				bar.Add(1)
 
-				time.Sleep(7 * time.Millisecond)
+				time.Sleep(8 * time.Millisecond)
 			}
 		}
 	}

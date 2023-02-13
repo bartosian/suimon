@@ -44,7 +44,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 	}
 
 	for _, host := range hosts {
-		if !host.Metrics.Updated {
+		if !host.Metrics.Updated && tableType == enums.TableTypePeers {
 			continue
 		}
 
@@ -56,17 +56,21 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 
 		port := host.Ports[enums.PortTypeRPC]
-		if tableType == enums.TableTypePeers {
-			port = host.Ports[enums.PortTypePeer]
-		} else if tableType == enums.TableTypeRPC && port == "" {
+		if port == "" {
 			port = rpcPortDefault
 		}
 
+		address := host.HostPort.Address
+		if tableType == enums.TableTypeNode {
+			address = *host.HostPort.IP
+		}
+
 		columns[tables.ColumnNameSUINodeStatus].SetValue(status)
-		columns[tables.ColumnNameSUINodeAddress].SetValue(host.HostPort.Address)
+		columns[tables.ColumnNameSUINodeAddress].SetValue(address)
 		columns[tables.ColumnNameSUINodePortRPC].SetValue(port)
 		columns[tables.ColumnNameSUINodeTotalTransactions].SetValue(host.Metrics.TotalTransactionNumber)
-		columns[tables.ColumnNameSUINodeHighestCheckpoints].SetValue(host.Metrics.HighestSyncedCheckpoint)
+		columns[tables.ColumnNameSUINodeLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
+		columns[tables.ColumnNameSUINodeHighestCheckpoint].SetValue(host.Metrics.HighestSyncedCheckpoint)
 		columns[tables.ColumnNameSUINodeConnectedPeers].SetValue(host.Metrics.SuiNetworkPeers)
 		columns[tables.ColumnNameSUINodeUptime].SetValue(host.Metrics.Uptime)
 		columns[tables.ColumnNameSUINodeVersion].SetValue(host.Metrics.Version)
