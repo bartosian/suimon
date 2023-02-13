@@ -27,20 +27,25 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 	suimonConfig := checker.suimonConfig
 
 	tableConfig := tablebuilder.TableConfig{
-		Name:         tables.GetTableTitleSUI(suimonConfig.NetworkType, tableType, suimonConfig.MonitorsVisual.EnableEmojis),
-		Colors:       tablebuilder.GetTableColorsFromString(suimonConfig.MonitorsVisual.ColorScheme),
-		Tag:          tables.TableTagSUINode,
-		Style:        tables.TableStyleSUINode,
-		RowsCount:    0,
-		ColumnsCount: len(tables.ColumnConfigSUINode),
-		SortConfig:   tables.TableSortConfigSUINode,
+		Name:       tables.GetTableTitleSUI(suimonConfig.NetworkType, tableType, suimonConfig.MonitorsVisual.EnableEmojis),
+		Colors:     tablebuilder.GetTableColorsFromString(suimonConfig.MonitorsVisual.ColorScheme),
+		Tag:        tables.TableTagSUINode,
+		Style:      tables.TableStyleSUINode,
+		RowsCount:  0,
+		SortConfig: tables.TableSortConfigSUINode,
 	}
 
-	columns := make(tablebuilder.Columns, len(tables.ColumnConfigSUINode))
+	lastColumn := tables.ColumnNameSUINodeCountry
+	if tableType == enums.TableTypeRPC {
+		lastColumn = tables.ColumnNameSUINodeLatestCheckpoint
+	}
+
+	columnsCount := int(lastColumn) + 1
+	columns := make(tablebuilder.Columns, columnsCount)
 	emojisEnabled := checker.suimonConfig.MonitorsVisual.EnableEmojis
 
-	for idx, config := range tables.ColumnConfigSUINode {
-		columns[idx].Config = config
+	for i := 0; i < columnsCount; i++ {
+		columns[i].Config = tables.ColumnConfigSUINode[i]
 	}
 
 	for _, host := range hosts {
@@ -70,27 +75,30 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		columns[tables.ColumnNameSUINodePortRPC].SetValue(port)
 		columns[tables.ColumnNameSUINodeTotalTransactions].SetValue(host.Metrics.TotalTransactionNumber)
 		columns[tables.ColumnNameSUINodeLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
-		columns[tables.ColumnNameSUINodeHighestCheckpoint].SetValue(host.Metrics.HighestSyncedCheckpoint)
-		columns[tables.ColumnNameSUINodeConnectedPeers].SetValue(host.Metrics.SuiNetworkPeers)
-		columns[tables.ColumnNameSUINodeUptime].SetValue(host.Metrics.Uptime)
-		columns[tables.ColumnNameSUINodeVersion].SetValue(host.Metrics.Version)
-		columns[tables.ColumnNameSUINodeCommit].SetValue(host.Metrics.Commit)
 
-		if host.Location == nil {
-			columns[tables.ColumnNameSUINodeCompany].SetValue(nil)
-			columns[tables.ColumnNameSUINodeCountry].SetValue(nil)
+		if tableType != enums.TableTypeRPC {
+			columns[tables.ColumnNameSUINodeHighestCheckpoint].SetValue(host.Metrics.HighestSyncedCheckpoint)
+			columns[tables.ColumnNameSUINodeConnectedPeers].SetValue(host.Metrics.SuiNetworkPeers)
+			columns[tables.ColumnNameSUINodeUptime].SetValue(host.Metrics.Uptime)
+			columns[tables.ColumnNameSUINodeVersion].SetValue(host.Metrics.Version)
+			columns[tables.ColumnNameSUINodeCommit].SetValue(host.Metrics.Commit)
 
-			continue
+			if host.Location == nil {
+				columns[tables.ColumnNameSUINodeCompany].SetValue(nil)
+				columns[tables.ColumnNameSUINodeCountry].SetValue(nil)
+
+				continue
+			}
+
+			columns[tables.ColumnNameSUINodeCompany].SetValue(host.Location.Provider)
+
+			var country any = host.Location.String()
+			if !emojisEnabled {
+				country = host.Location.CountryName
+			}
+
+			columns[tables.ColumnNameSUINodeCountry].SetValue(country)
 		}
-
-		columns[tables.ColumnNameSUINodeCompany].SetValue(host.Location.Provider)
-
-		var country any = host.Location.String()
-		if !emojisEnabled {
-			country = host.Location.CountryName
-		}
-
-		columns[tables.ColumnNameSUINodeCountry].SetValue(country)
 	}
 
 	tableConfig.Columns = columns

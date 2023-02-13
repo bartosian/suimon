@@ -2,6 +2,7 @@ package tablebuilder
 
 import (
 	"fmt"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder/tables"
 	"os"
 
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -82,7 +83,7 @@ func (tb *TableBuilder) SetRows() {
 	footer[0] = fmt.Sprintf("%s%s%s", enums.ColorRed, tb.config.Tag, enums.ColorReset)
 
 	for i := 0; i < tb.config.RowsCount; i++ {
-		rowValues := make([]any, 0, tb.config.ColumnsCount)
+		rowValues := make([]any, 0, len(tables.ColumnConfigSUINode))
 
 		for _, column := range tb.config.Columns {
 			rowValues = append(rowValues, column.Values[i])

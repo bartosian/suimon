@@ -71,7 +71,7 @@ func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
 			status = enums.StatusYellow
 		}
 	case true:
-		if metricsHost.TotalTransactionNumber == "" {
+		if metricsHost.TotalTransactionNumber == "" || metricsHost.LatestCheckpoint == "" {
 			status = enums.StatusRed
 
 			if tableType == enums.TableTypePeers {
