@@ -179,11 +179,11 @@ which is free and gives you ``50k requests`` per month, which is sufficient for 
 
 Depending on the emojis and colors support by your terminal you can enable/disable different color options, to make it suitable for you. Check ``monitors-visual`` in the ``suimon.yaml`` config file.
 
-### White / Dark mode
+### White / Dark Mode
 
 ![Terminal Screenshot](./assets/screenshot_02.png "Screenshot Application")
 
-### Color mode
+### Color Mode
 
 ![Terminal Screenshot](./assets/screenshot_01.png "Screenshot Application")
 
