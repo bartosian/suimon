@@ -18,7 +18,7 @@ type (
 
 func (col *Column) SetValue(value any) {
 	if value == nil || value == "" {
-		value = enums.ColorRed + tableNoData + enums.ColorReset
+		value = enums.ColorYellow + tableNoData + enums.ColorReset
 	}
 
 	col.Values = append(col.Values, value)

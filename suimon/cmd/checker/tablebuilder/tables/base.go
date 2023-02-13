@@ -13,6 +13,15 @@ var nameTransformer = text.Transformer(func(val interface{}) string {
 	return text.Bold.Sprint(val)
 })
 
+//func colorStatusTransformer(val interface{}) string {
+//	fmt.Println(val)
+//
+//	if status, ok := val.(enums.Status); ok {
+//		return status.ColorStatus()
+//	}
+//	return text.BgYellow.Sprintf("%v", val)
+//}
+
 func GetTableTitleSUI(network enums.NetworkType, table enums.TableType, emojisEnabled bool) string {
 	var emoji string
 	if emojisEnabled {

@@ -2,7 +2,6 @@ package checker
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -83,10 +82,6 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 			hostPort, err := address.ParseURL(url)
 			if err != nil {
 				return nil, errors.New("invalid rpc url in suimon.yaml")
-			}
-
-			if hostPort.IP != nil {
-				fmt.Printf("%s %s %s", hostPort.Address, *hostPort.IP)
 			}
 
 			addressInfo := AddressInfo{HostPort: *hostPort, Ports: make(map[enums.PortType]string)}
