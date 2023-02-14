@@ -15,12 +15,25 @@ if go version | grep -q "$go_version"; then
   echo "Go $go_version is already installed."
 else
   echo "Installing Go $go_version..."
-  wget "https://dl.google.com/go/go$go_version.linux-amd64.tar.gz" && \
-  sudo tar -C /usr/local -xzf "go$go_version.linux-amd64.tar.gz" && \
-  rm "go$go_version.linux-amd64.tar.gz" && \
-  echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> $HOME/.bash_profile && \
-  source $HOME/.bash_profile && \
-  echo "Go $go_version has been installed successfully."
+  wget "https://dl.google.com/go/go$go_version.linux-amd64.tar.gz"
+
+  if [ -d "/usr/local/" ]; then
+    sudo tar -C /usr/local/ -xzf go1.19.linux-amd64.tar.gz && \
+    echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> $HOME/.bash_profile && \
+    source $HOME/.bash_profile && \
+    echo "Go $go_version has been installed successfully."
+  else
+    if [ -d "/usr/bin/" ]; then
+      sudo tar -C /usr/bin/ -xzf go1.19.linux-amd64.tar.gz
+      echo "export PATH=$PATH:/usr/bin/go/bin:$HOME/go/bin" >> $HOME/.bash_profile && \
+      source $HOME/.bash_profile && \
+      echo "Go $go_version has been installed successfully."
+    else
+      echo "Could not find /usr/local/ or /usr/bin/ directory. Please create one of these directories and run the script again."
+
+      exit 1
+    fi
+  fi
 fi
 
 go install "github.com/bartosian/sui_helpers/suimon@$suimon_version"
@@ -32,6 +45,8 @@ elif [ $(echo "$result" | wc -l) -eq 1 ]; then
   sed -i -e "s%node-config-path:.*%node-config-path: \"$result\"%;" $HOME/.suimon/suimon.yaml
 else
   echo "Multiple instances of the $config_file_name found: $result. Please specify path to one of them by using '-nf' flag or 'SUIMON_NODE_CONFIG_PATH' env variable."
+
+  exit 1
 fi
 
 echo "Suimon has been installed and configured successfully."
