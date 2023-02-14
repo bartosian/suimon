@@ -18,18 +18,6 @@ rm $HOME/suimon_install.sh
 
 1. The SUIMON installation ``requires Go``. If you don't already have Go installed, see https://golang.org/dl and https://go.dev/doc/install. Download the binary release that is suitable for your system and follow the installation instructions.
 
-``Example Linux Installation``
-```shell
-cd $HOME && \
-wget "https://golang.org/dl/go1.19.5.linux-amd64.tar.gz" && \
-sudo rm -rf /usr/local/go && \
-sudo tar -C /usr/local -xzf "go1.19.5.linux-amd64.tar.gz" && \
-rm "go1.19.5.linux-amd64.tar.gz" && \
-echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> $HOME/.bash_profile && \
-source $HOME/.bash_profile && \
-go version
-```
-
 2. Install the ``SUIMON`` binary
 
 ```shell
