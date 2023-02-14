@@ -15,6 +15,8 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
+const transactionsPerSecondTimeout = 10
+
 func (host *Host) GetMetrics(httpClient *http.Client) {
 	metricsURL := host.getUrl(requestTypeMetrics, false)
 
@@ -72,28 +74,60 @@ func (host *Host) GetMetrics(httpClient *http.Client) {
 	}
 }
 
-func (host *Host) GetTotalTransactionNumber() {
-	if result := getRequestAttempt(host.rpcHttpClient, enums.RPCMethodGetTotalTransactionNumber); result != nil {
-		host.Metrics.SetValue(enums.MetricTypeTotalTransactionsNumber, *result)
+func (host *Host) GetTPS() {
+	var (
+		transactionsNow       *string
+		transactionsNowInt    int
+		transactionsBefore    = host.Metrics.TotalTransactionNumber
+		transactionsBeforeInt int
+		err                   error
+	)
 
+	if transactionsBefore == "" {
 		return
 	}
 
-	if result := getRequestAttempt(host.rpcHttpsClient, enums.RPCMethodGetTotalTransactionNumber); result != nil {
-		host.Metrics.SetValue(enums.MetricTypeTotalTransactionsNumber, *result)
+	if transactionsNow = getRequestAttempt(host.rpcHttpClient, enums.RPCMethodGetTotalTransactionNumber); transactionsNow == nil {
+		if transactionsNow = getRequestAttempt(host.rpcHttpsClient, enums.RPCMethodGetTotalTransactionNumber); transactionsNow == nil {
+			return
+		}
 	}
+
+	if transactionsNowInt, err = strconv.Atoi(*transactionsNow); err != nil {
+		return
+	}
+
+	if transactionsBeforeInt, err = strconv.Atoi(transactionsBefore); err != nil {
+		return
+	}
+
+	tps := (transactionsNowInt - transactionsBeforeInt) / transactionsPerSecondTimeout
+
+	host.Metrics.SetValue(enums.MetricTypeTransactionsPerSecond, fmt.Sprintf("%d", tps))
+}
+
+func (host *Host) GetTotalTransactionNumber() {
+	var result *string
+
+	if result = getRequestAttempt(host.rpcHttpClient, enums.RPCMethodGetTotalTransactionNumber); result == nil {
+		if result = getRequestAttempt(host.rpcHttpsClient, enums.RPCMethodGetTotalTransactionNumber); result == nil {
+			return
+		}
+	}
+
+	host.Metrics.SetValue(enums.MetricTypeTotalTransactionsNumber, *result)
 }
 
 func (host *Host) GetLatestCheckpoint() {
-	if result := getRequestAttempt(host.rpcHttpClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result != nil {
-		host.Metrics.SetValue(enums.MetricTypeLatestCheckpoint, *result)
+	var result *string
 
-		return
+	if result = getRequestAttempt(host.rpcHttpClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result == nil {
+		if result = getRequestAttempt(host.rpcHttpsClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result == nil {
+			return
+		}
 	}
 
-	if result := getRequestAttempt(host.rpcHttpsClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result != nil {
-		host.Metrics.SetValue(enums.MetricTypeLatestCheckpoint, *result)
-	}
+	host.Metrics.SetValue(enums.MetricTypeLatestCheckpoint, *result)
 }
 
 func getRequestAttempt(client jsonrpc.RPCClient, method enums.RPCMethod) *string {

@@ -13,6 +13,7 @@ type (
 	Metrics struct {
 		Updated bool
 
+		TransactionsPerSecond   string
 		TotalTransactionNumber  string
 		HighestSyncedCheckpoint string
 		LatestCheckpoint        string
@@ -37,6 +38,8 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value string) {
 		metrics.HighestSyncedCheckpoint = value
 	case enums.MetricTypeSuiNetworkPeers:
 		metrics.SuiNetworkPeers = value
+	case enums.MetricTypeTransactionsPerSecond:
+		metrics.TransactionsPerSecond = value
 	case enums.MetricTypeTotalTransactionsNumber:
 		metrics.TotalTransactionNumber = value
 	case enums.MetricTypeLatestCheckpoint:
@@ -62,15 +65,19 @@ func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC string) bool
 	case enums.MetricTypeTotalTransactionsNumber:
 		values := convertToInt(metrics.TotalTransactionNumber, valueRPC)
 
-		return values[0] >= values[1]-100
+		return len(values) == 2 && (values[0] >= values[1]-100)
+	case enums.MetricTypeTransactionsPerSecond:
+		values := convertToInt(metrics.TransactionsPerSecond, valueRPC)
+
+		return len(values) == 2 && (values[0] != 0 || values[1] == 0)
 	case enums.MetricTypeLatestCheckpoint:
 		values := convertToInt(metrics.LatestCheckpoint, valueRPC)
 
-		return values[0] >= values[1]-10
+		return len(values) == 2 && (values[0] >= values[1]-10)
 	case enums.MetricTypeHighestSyncedCheckpoint:
 		values := convertToInt(metrics.HighestSyncedCheckpoint, valueRPC)
 
-		return values[0] >= values[1]-10
+		return len(values) == 2 && (values[0] >= values[1]-10)
 	case enums.MetricTypeVersion:
 		return metrics.Version == valueRPC
 	}

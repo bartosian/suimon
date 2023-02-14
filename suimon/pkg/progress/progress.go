@@ -26,7 +26,7 @@ func NewProgressBar(action string, color Color) chan<- struct{} {
 		progressbar.OptionShowBytes(false),
 		progressbar.OptionClearOnFinish(),
 		progressbar.OptionSetWidth(30),
-		progressbar.OptionSetDescription(fmt.Sprintf("%s [ %s... ]", color, action)),
+		progressbar.OptionSetDescription(fmt.Sprintf("%s [ %s... ] [reset]", color, action)),
 		progressbar.OptionSetTheme(progressbar.Theme{
 			Saucer:        "=",
 			SaucerHead:    ">>",

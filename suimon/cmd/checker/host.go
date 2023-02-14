@@ -71,13 +71,24 @@ func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
 			status = enums.StatusYellow
 		}
 	case true:
+		if metricsHost.TotalTransactionNumber != "" &&
+			metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) {
+			status = enums.StatusRed
+
+			break
+		}
+
 		if metricsHost.TotalTransactionNumber == "" || metricsHost.LatestCheckpoint == "" {
 			status = enums.StatusRed
 
 			if tableType == enums.TableTypePeers {
 				status = enums.StatusYellow
 			}
-		} else if metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionsNumber, metricsRPC.TotalTransactionNumber) ||
+
+			break
+		}
+
+		if metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionsNumber, metricsRPC.TotalTransactionNumber) ||
 			metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
 			status = enums.StatusYellow
 		}

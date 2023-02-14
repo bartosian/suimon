@@ -14,6 +14,7 @@ const (
 	MetricTypeCommit                  MetricType = "COMMIT"
 	MetricTypeHighestSyncedCheckpoint MetricType = "HIGHEST_SYNCED_CHECKPOINT"
 	MetricTypeSuiNetworkPeers         MetricType = "SUI_NETWORK_PEERS"
+	MetricTypeTransactionsPerSecond   MetricType = "TRANSACTIONS_PER_SECOND"
 	MetricTypeTotalTransactionsNumber MetricType = "TOTAL_TRANSACTIONS_NUMBER"
 	MetricTypeLatestCheckpoint        MetricType = "LATEST_CHECKPOINT"
 )
@@ -35,6 +36,7 @@ func MetricTypeFromString(value string) (MetricType, error) {
 		"COMMIT":                    MetricTypeCommit,
 		"HIGHEST_SYNCED_CHECKPOINT": MetricTypeHighestSyncedCheckpoint,
 		"SUI_NETWORK_PEERS":         MetricTypeSuiNetworkPeers,
+		"TRANSACTIONS_PER_SECOND":   MetricTypeTransactionsPerSecond,
 		"TOTAL_TRANSACTIONS_NUMBER": MetricTypeTotalTransactionsNumber,
 		"LATEST_CHECKPOINT":         MetricTypeLatestCheckpoint,
 	}[value]

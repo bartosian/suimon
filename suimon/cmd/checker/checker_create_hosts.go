@@ -2,6 +2,7 @@ package checker
 
 import (
 	"sync"
+	"time"
 )
 
 func (checker *Checker) createHosts(addresses []AddressInfo) ([]Host, error) {
@@ -35,6 +36,10 @@ func (checker *Checker) createHosts(addresses []AddressInfo) ([]Host, error) {
 
 			go func() {
 				host.GetTotalTransactionNumber()
+
+				time.Sleep(transactionsPerSecondTimeout * time.Second)
+
+				host.GetTPS()
 
 				doneCH <- struct{}{}
 			}()

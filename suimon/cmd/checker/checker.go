@@ -11,6 +11,7 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
+	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
 const (
@@ -35,6 +36,8 @@ type (
 		tableBuilderRPC  *tablebuilder.TableBuilder
 
 		tableConfig tablebuilder.TableConfig
+
+		logger log.Logger
 	}
 )
 
@@ -51,6 +54,7 @@ func NewChecker(suimonConfig config.SuimonConfig, nodeConfig config.NodeConfig, 
 		ipClient:     ipClient,
 		suimonConfig: suimonConfig,
 		nodeConfig:   nodeConfig,
+		logger:       log.NewLogger(),
 	}, nil
 }
 
