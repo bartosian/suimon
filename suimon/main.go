@@ -15,14 +15,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"time"
-
-	"github.com/common-nighthawk/go-figure"
-	"github.com/schollz/progressbar/v3"
-
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
+	"github.com/common-nighthawk/go-figure"
 )
 
 var (
@@ -32,21 +28,15 @@ var (
 )
 
 const (
-	suimonConfigNotFound = `provide path to the suimon.yaml file by using -sf option 
-or by setting SUIMON_CONFIG_PATH env variable
-or put suimon.yaml in $HOME/.suimon/suimon.yaml`
-	nodeConfigNotFound = `provide path to the fullnode.yaml file by using -nf option
-or by setting SUIMON_NODE_CONFIG_PATH env variable
-or set path to this file in suimon.yaml`
-	invalidNetworkTypeProvided = `provide valid network type by using -n option
-or set it in suimon.yaml`
+	suimonConfigNotFound       = "provide path to the suimon.yaml file by using -sf option or by setting SUIMON_CONFIG_PATH env variable or put suimon.yaml in $HOME/.suimon/suimon.yaml"
+	nodeConfigNotFound         = "provide path to the fullnode.yaml file by using -nf option or by setting SUIMON_NODE_CONFIG_PATH env variable or set path to this file in suimon.yaml"
+	invalidNetworkTypeProvided = "provide valid network type by using -n option or set it in suimon.yaml"
 )
 
 func main() {
 	flag.Parse()
 
 	logger := log.NewLogger()
-	progressChan := make(chan struct{})
 
 	defer func() {
 		if err := recover(); err != nil {
@@ -57,9 +47,6 @@ func main() {
 	}()
 
 	printLogo()
-
-	// start showing progress bar
-	go newProgressBar(progressChan)
 
 	// parse suimon.yaml config file
 	suimonConfig, err := config.ParseSuimonConfig(suimonConfigPath)
@@ -102,9 +89,6 @@ func main() {
 	// initialize tables with the styles and data received
 	checker.InitTables()
 
-	// stop showing progress bar
-	progressChan <- struct{}{}
-
 	// draw initialized tables to the terminal
 	checker.DrawTable()
 }
@@ -118,38 +102,4 @@ func printLogo() {
 	version.Print()
 	fmt.Println()
 	fmt.Println()
-}
-
-func newProgressBar(progressChan chan struct{}) {
-	progressTicker := time.NewTicker(20 * time.Millisecond)
-
-	bar := progressbar.NewOptions(1000,
-		progressbar.OptionEnableColorCodes(true),
-		progressbar.OptionShowBytes(false),
-		progressbar.OptionClearOnFinish(),
-		progressbar.OptionSetWidth(25),
-		progressbar.OptionSetDescription(" [ GENERATING TABLES... ] "),
-		progressbar.OptionSetTheme(progressbar.Theme{
-			Saucer:        "=",
-			SaucerHead:    ">",
-			SaucerPadding: " ",
-			BarStart:      "[",
-			BarEnd:        "]",
-		}))
-
-	for {
-		select {
-		case <-progressChan:
-			progressTicker.Stop()
-			bar.Clear()
-
-			return
-		case <-progressTicker.C:
-			for i := 0; i < 500; i++ {
-				bar.Add(1)
-
-				time.Sleep(8 * time.Millisecond)
-			}
-		}
-	}
 }

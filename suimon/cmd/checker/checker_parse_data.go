@@ -10,6 +10,7 @@ import (
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/address"
+	"github.com/bartosian/sui_helpers/suimon/pkg/progress"
 )
 
 const (
@@ -107,7 +108,9 @@ func (checker *Checker) GetTablesData() error {
 		monitorsConfig = suimonConfig.MonitorsConfig
 	)
 
-	var getTableData = func(tableType enums.TableType) {
+	var getTableData = func(tableType enums.TableType, progressColor progress.Color) {
+		progressChan := progress.NewProgressBar("PARSING DATA FOR "+string(tableType)+" TABLE", progressColor)
+
 		addresses, err := checker.getAddressInfoByTableType(tableType)
 		if err != nil {
 			errChan <- err
@@ -121,25 +124,27 @@ func (checker *Checker) GetTablesData() error {
 		}
 
 		checker.setHostsByTableType(tableType, hosts)
+
+		progressChan <- struct{}{}
 	}
 
 	// parse data for the RPC table
 	wg.Add(1)
 
-	go getTableData(enums.TableTypeRPC)
+	go getTableData(enums.TableTypeRPC, progress.ColorBlue)
 
 	// parse data for the NODE table
 	if monitorsConfig.NodeTable.Display {
 		wg.Add(1)
 
-		go getTableData(enums.TableTypeNode)
+		go getTableData(enums.TableTypeNode, progress.ColorRed)
 	}
 
 	// parse data for the PEERS table
 	if monitorsConfig.PeersTable.Display {
 		wg.Add(1)
 
-		go getTableData(enums.TableTypePeers)
+		go getTableData(enums.TableTypePeers, progress.ColorGreen)
 	}
 
 	wg.Wait()
