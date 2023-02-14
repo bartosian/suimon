@@ -50,21 +50,25 @@ rpc-config:
     - "https://rpc.ankr.com/sui_testnet"
     - "https://sui-api.rpcpool.com"
     - "https://sui-testnet.public.blastapi.io"
-    - "https://rpc.ankr.com/sui_testnet"
     - "https://fullnode.testnet.vincagame.com"
-    - "https://rpc-office.cosmostation.io/sui-testnet-wave-2"
+    - "https://fullnode.testnet.sui.io"
   devnet:
     - "https://fullnode.devnet.sui.io"
 
 # update this value to the fullnode.yaml file location
-node-config-path: "$HOME/.suimon/fullnode.yaml"
+node-config-path: "/root/.suimon/fullnode.yaml"
 
 # set network to connect to. Possible values: devnet, testnet
 network: "testnet"
 
+# provider and country information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
+# which is free and gives you 50k requests per month, which is sufficient for individual usage.
+ip-lookup:
+  access-token: "<token value>" # temporary access token with requests limit
+
 monitors-visual:
   # set different color schemes for monitor depending on your terminal. Possible values: dark, white, color
-  color-scheme: "dark"
+  color-scheme: "white"
 
   # update this section if you want to enable/disable emojis in tables
   enable-emojis: false
