@@ -1,7 +1,9 @@
 package checker
 
 import (
+	"net/http"
 	"regexp"
+	"sync"
 	"time"
 
 	"github.com/ipinfo/go/v2/ipinfo"
@@ -32,6 +34,7 @@ type AddressInfo struct {
 }
 
 type Host struct {
+	stateMutex sync.RWMutex
 	AddressInfo
 
 	Status   enums.Status
@@ -40,15 +43,18 @@ type Host struct {
 
 	rpcHttpClient  jsonrpc.RPCClient
 	rpcHttpsClient jsonrpc.RPCClient
+	httpClient     *http.Client
 	ipClient       *ipinfo.Client
 
 	logger log.Logger
 }
 
-func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client) *Host {
+func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.Client) *Host {
 	host := &Host{
 		AddressInfo: addressInfo,
 		ipClient:    ipClient,
+		httpClient:  httpClient,
+		Metrics:     NewMetrics(),
 		logger:      log.NewLogger(),
 	}
 

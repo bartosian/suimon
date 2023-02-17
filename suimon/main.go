@@ -38,13 +38,13 @@ func main() {
 
 	logger := log.NewLogger()
 
-	//defer func() {
-	//	if err := recover(); err != nil {
-	//		logger.Error("failed to execute suimon, please check an issue: ", err)
-	//	}
-	//
-	//	return
-	//}()
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error("failed to execute suimon, please check an issue: ", err)
+		}
+
+		return
+	}()
 
 	printLogo()
 

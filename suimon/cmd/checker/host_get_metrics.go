@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -15,12 +14,10 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
-const transactionsPerSecondTimeout = 10
-
-func (host *Host) GetMetrics(httpClient *http.Client) {
+func (host *Host) GetMetrics() {
 	metricsURL := host.getUrl(requestTypeMetrics, false)
 
-	result, err := httpClient.Get(metricsURL)
+	result, err := host.httpClient.Get(metricsURL)
 	if err != nil {
 		return
 	}
@@ -72,38 +69,6 @@ func (host *Host) GetMetrics(httpClient *http.Client) {
 
 		host.Metrics.SetValue(metricName, value)
 	}
-}
-
-func (host *Host) GetTPS() {
-	var (
-		transactionsNow       *string
-		transactionsNowInt    int
-		transactionsBefore    = host.Metrics.TotalTransactionNumber
-		transactionsBeforeInt int
-		err                   error
-	)
-
-	if transactionsBefore == "" {
-		return
-	}
-
-	if transactionsNow = getRequestAttempt(host.rpcHttpClient, enums.RPCMethodGetTotalTransactionNumber); transactionsNow == nil {
-		if transactionsNow = getRequestAttempt(host.rpcHttpsClient, enums.RPCMethodGetTotalTransactionNumber); transactionsNow == nil {
-			return
-		}
-	}
-
-	if transactionsNowInt, err = strconv.Atoi(*transactionsNow); err != nil {
-		return
-	}
-
-	if transactionsBeforeInt, err = strconv.Atoi(transactionsBefore); err != nil {
-		return
-	}
-
-	tps := (transactionsNowInt - transactionsBeforeInt) / transactionsPerSecondTimeout
-
-	host.Metrics.SetValue(enums.MetricTypeTransactionsPerSecond, fmt.Sprintf("%d", tps))
 }
 
 func (host *Host) GetTotalTransactionNumber() {
