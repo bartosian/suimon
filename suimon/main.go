@@ -38,14 +38,6 @@ func main() {
 
 	logger := log.NewLogger()
 
-	defer func() {
-		if err := recover(); err != nil {
-			logger.Error("failed to execute suimon, please check an issue: ", err)
-		}
-
-		return
-	}()
-
 	printLogo()
 
 	// parse suimon.yaml config file
@@ -86,11 +78,25 @@ func main() {
 		return
 	}
 
-	// initialize tables with the styles and data received
-	checker.InitTables()
+	//// initialize tables with the styles
+	//checker.InitTables()
+	//
+	//// draw initialized tables to the terminal
+	//checker.DrawTables()
 
-	// draw initialized tables to the terminal
-	checker.DrawTable()
+	// initialize realtime dashboard with styles
+	checker.InitDashboard()
+
+	// draw initialized dashboard to the terminal
+	checker.DrawDashboards()
+
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error("failed to execute suimon, please check an issue: ", err)
+		}
+
+		return
+	}()
 }
 
 func printLogo() {

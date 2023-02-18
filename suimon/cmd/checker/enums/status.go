@@ -7,9 +7,9 @@ import (
 type Status string
 
 const (
-	StatusGreen  Status = "\U0001F7E2"
-	StatusYellow Status = "\U0001F7E1"
-	StatusRed    Status = "🔴"
+	StatusGreen  Status = "\U0001F7E9"
+	StatusYellow Status = "\U0001F7E8"
+	StatusRed    Status = "\U0001F7E5"
 )
 
 func (i Status) StatusToPlaceholder() string {
@@ -29,4 +29,17 @@ func (i Status) ColorStatus() string {
 	}
 
 	return colors.Sprint("|    |")
+}
+
+func (i Status) StatusToDashboard() string {
+	switch i {
+	case StatusRed:
+		return "\U0001F7E5\U0001F7E5\U0001F7E5\n\U0001F7E5\U0001F7E5\U0001F7E5\n\U0001F7E5\U0001F7E5\U0001F7E5"
+	case StatusYellow:
+		return "\U0001F7E8\U0001F7E8\U0001F7E8\n\U0001F7E8\U0001F7E8\U0001F7E8\n\U0001F7E8\U0001F7E8\U0001F7E8"
+	case StatusGreen:
+		return "\U0001F7E9\U0001F7E9\U0001F7E9\n\U0001F7E9\U0001F7E9\U0001F7E9\n\U0001F7E9\U0001F7E9\U0001F7E9"
+	}
+
+	return ""
 }

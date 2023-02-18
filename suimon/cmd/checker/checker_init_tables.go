@@ -73,7 +73,6 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		columns[tables.ColumnNameSUINodeStatus].SetValue(status)
 		columns[tables.ColumnNameSUINodeAddress].SetValue(address)
 		columns[tables.ColumnNameSUINodePortRPC].SetValue(port)
-		columns[tables.ColumnNameSUINodeTransactionsPerSecond].SetValue(host.Metrics.TransactionsPerSecond)
 		columns[tables.ColumnNameSUINodeTotalTransactions].SetValue(host.Metrics.TotalTransactionNumber)
 		columns[tables.ColumnNameSUINodeLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
 

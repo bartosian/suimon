@@ -1,7 +1,6 @@
 package checker
 
 import (
-	"context"
 	"sync"
 	"time"
 )
@@ -10,45 +9,60 @@ const (
 	watchHostsTimeout = 1 * time.Second
 )
 
-func (checker *Checker) WatchHosts(ctx context.Context) {
+func (checker *Checker) WatchHosts() {
 	var (
 		monitorsConfig = checker.suimonConfig.MonitorsConfig
 		ticker         = time.NewTicker(watchHostsTimeout)
-		hosts          []Host
+		ctx            = checker.DashboardBuilder.Ctx
+		wg             sync.WaitGroup
 	)
 
+	defer ticker.Stop()
+
+	var watch = func(hosts []Host) {
+		defer wg.Done()
+
+		doneCH := make(chan struct{}, len(hosts))
+
+		for {
+			select {
+			case <-ticker.C:
+				for idx := range hosts {
+					go func(idx int) {
+						hosts[idx].GetData()
+
+						doneCH <- struct{}{}
+					}(idx)
+				}
+
+				for i := 0; i < len(hosts); i++ {
+					<-doneCH
+				}
+			case <-ctx.Done():
+				return
+			}
+		}
+	}
+
 	if monitorsConfig.RPCTable.Display && len(checker.rpc) > 0 {
-		hosts = append(hosts, checker.rpc...)
+		wg.Add(1)
+
+		go watch(checker.rpc)
 	}
 
 	if monitorsConfig.NodeTable.Display && len(checker.node) > 0 {
-		hosts = append(hosts, checker.node...)
+		wg.Add(1)
+
+		go watch(checker.node)
 	}
 
 	if monitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
-		hosts = append(hosts, checker.peers...)
+		wg.Add(1)
+
+		go watch(checker.peers)
 	}
 
-	for {
-		select {
-		case <-ticker.C:
-			var wg sync.WaitGroup
-
-			for idx := range hosts {
-				wg.Add(1)
-
-				go func(idx int) {
-					defer wg.Done()
-
-					hosts[idx].GetData()
-				}(idx)
-			}
-
-			wg.Wait()
-		case <-ctx.Done():
-			return
-		}
-	}
+	wg.Wait()
 }
 
 func (host *Host) GetData() {

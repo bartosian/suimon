@@ -11,7 +11,6 @@ const (
 	ColumnNameSUINodeStatus ColumnNameSUINode = iota
 	ColumnNameSUINodeAddress
 	ColumnNameSUINodePortRPC
-	ColumnNameSUINodeTransactionsPerSecond
 	ColumnNameSUINodeTotalTransactions
 	ColumnNameSUINodeLatestCheckpoint
 	ColumnNameSUINodeHighestCheckpoint
@@ -50,14 +49,6 @@ var (
 		},
 		ColumnNameSUINodePortRPC: {
 			Name:         "RPC",
-			Align:        text.AlignCenter,
-			AlignHeader:  text.AlignCenter,
-			VAlign:       text.VAlignMiddle,
-			VAlignHeader: text.VAlignMiddle,
-			Hidden:       false,
-		},
-		ColumnNameSUINodeTransactionsPerSecond: {
-			Name:         "TPS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,

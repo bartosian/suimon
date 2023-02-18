@@ -20,6 +20,8 @@ type (
 		HighestSyncedCheckpoint string
 		LatestCheckpoint        string
 		SuiNetworkPeers         string
+		TxSyncPercentage        string
+		CheckSyncPercentage     string
 		Uptime                  string
 		Version                 string
 		Commit                  string
@@ -40,11 +42,16 @@ func (metrics *Metrics) CalculateTPS() {
 		err                 error
 	)
 
-	if len(transactionsHistory) != transactionsPerSecondTimeout {
+	transactionsHistory = append(transactionsHistory, metrics.TotalTransactionNumber)
+	if len(transactionsHistory) < transactionsPerSecondTimeout {
+		metrics.TransactionsHistory = transactionsHistory
+
 		return
 	}
 
-	transactionsHistory = append(transactionsHistory[1:], metrics.TotalTransactionNumber)
+	if len(transactionsHistory) > transactionsPerSecondTimeout {
+		transactionsHistory = transactionsHistory[1:]
+	}
 
 	if transactionsStart, err = strconv.Atoi(transactionsHistory[0]); err != nil {
 		return
@@ -56,7 +63,8 @@ func (metrics *Metrics) CalculateTPS() {
 
 	tps := (transactionsEnd - transactionsStart) / transactionsPerSecondTimeout
 
-	metrics.TransactionsPerSecond = fmt.Sprintf("%d", tps)
+	metrics.TransactionsHistory = transactionsHistory
+	metrics.TransactionsPerSecond = strconv.Itoa(tps)
 }
 
 func (metrics *Metrics) SetValue(metric enums.MetricType, value string) {
@@ -77,30 +85,69 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value string) {
 		metrics.TotalTransactionNumber = value
 
 		metrics.CalculateTPS()
+	case enums.MetricTypeTxSyncProgress:
+		metrics.TxSyncPercentage = value
+	case enums.MetricTypeCheckSyncProgress:
+		metrics.CheckSyncPercentage = value
 	case enums.MetricTypeLatestCheckpoint:
 		metrics.LatestCheckpoint = value
 	}
 }
 
-func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC string) bool {
-	var convertToInt = func(values ...string) []int {
-		valueAInt, err := strconv.Atoi(values[0])
-		if err != nil {
-			return nil
-		}
-		valueBInt, err := strconv.Atoi(values[1])
-		if err != nil {
-			return nil
+func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) string {
+	switch metric {
+	case enums.MetricTypeUptime:
+		return metrics.Uptime
+	case enums.MetricTypeVersion:
+		return metrics.Version
+	case enums.MetricTypeCommit:
+		return metrics.Commit
+	case enums.MetricTypeHighestSyncedCheckpoint:
+		return metrics.HighestSyncedCheckpoint
+	case enums.MetricTypeSuiNetworkPeers:
+		return metrics.SuiNetworkPeers
+	case enums.MetricTypeTotalTransactionsNumber:
+		return metrics.TotalTransactionNumber
+	case enums.MetricTypeTransactionsPerSecond:
+		return metrics.TransactionsPerSecond
+	case enums.MetricTypeTxSyncProgress:
+		return metrics.TotalTransactionNumber
+	case enums.MetricTypeCheckSyncProgress:
+		if rpc {
+			return metrics.LatestCheckpoint
 		}
 
-		return []int{valueAInt, valueBInt}
+		return metrics.HighestSyncedCheckpoint
+	case enums.MetricTypeLatestCheckpoint:
+		return metrics.LatestCheckpoint
 	}
 
+	return ""
+}
+
+var convertToInt = func(values ...string) []int {
+	var (
+		valueAInt int
+		valueBInt int
+		err       error
+	)
+
+	if valueAInt, err = strconv.Atoi(values[0]); err != nil {
+		return nil
+	}
+
+	if valueBInt, err = strconv.Atoi(values[1]); err != nil {
+		return nil
+	}
+
+	return []int{valueAInt, valueBInt}
+}
+
+func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC string) bool {
 	switch metric {
 	case enums.MetricTypeTotalTransactionsNumber:
-		values := convertToInt(metrics.TotalTransactionNumber, valueRPC)
-
-		return len(values) == 2 && values[0] >= values[1]-100
+		paddedPercentage := fmt.Sprintf("%03s", metrics.TxSyncPercentage)
+		return paddedPercentage <= "100" && paddedPercentage > "098"
 	case enums.MetricTypeTransactionsPerSecond:
 		values := convertToInt(metrics.TransactionsPerSecond, valueRPC)
 
@@ -108,11 +155,11 @@ func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC string) bool
 	case enums.MetricTypeLatestCheckpoint:
 		values := convertToInt(metrics.LatestCheckpoint, valueRPC)
 
-		return len(values) == 2 && values[0] >= values[1]-10
+		return len(values) == 2 && values[0] >= values[1]-30
 	case enums.MetricTypeHighestSyncedCheckpoint:
 		values := convertToInt(metrics.HighestSyncedCheckpoint, valueRPC)
 
-		return len(values) == 2 && values[0] >= values[1]-10
+		return len(values) == 2 && values[0] >= values[1]-30
 	case enums.MetricTypeVersion:
 		return metrics.Version == valueRPC
 	}
