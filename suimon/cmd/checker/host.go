@@ -1,17 +1,16 @@
 package checker
 
 import (
-	"github.com/dariubs/percent"
 	"net/http"
 	"regexp"
 	"strconv"
 	"sync"
 	"time"
 
+	"github.com/dariubs/percent"
 	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ybbus/jsonrpc/v3"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/address"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
@@ -31,26 +30,27 @@ const (
 
 var versionRegex = regexp.MustCompile(metricVersionRegexp)
 
-type AddressInfo struct {
-	HostPort address.HostPort
-	Ports    map[enums.PortType]string
-}
+type (
+	AddressInfo struct {
+		HostPort address.HostPort
+		Ports    map[enums.PortType]string
+	}
+	Host struct {
+		stateMutex sync.RWMutex
+		AddressInfo
 
-type Host struct {
-	stateMutex sync.RWMutex
-	AddressInfo
+		Status   enums.Status
+		Location *Location
+		Metrics  Metrics
 
-	Status   enums.Status
-	Location *Location
-	Metrics  Metrics
+		rpcHttpClient  jsonrpc.RPCClient
+		rpcHttpsClient jsonrpc.RPCClient
+		httpClient     *http.Client
+		ipClient       *ipinfo.Client
 
-	rpcHttpClient  jsonrpc.RPCClient
-	rpcHttpsClient jsonrpc.RPCClient
-	httpClient     *http.Client
-	ipClient       *ipinfo.Client
-
-	logger log.Logger
-}
+		logger log.Logger
+	}
+)
 
 func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.Client) *Host {
 	host := &Host{
@@ -137,35 +137,35 @@ func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
 	host.Status = status
 }
 
-func (host *Host) getMetricByDashboardCell(cellName dashboards.CellName) string {
+func (host *Host) getMetricByDashboardCell(cellName enums.CellName) string {
 	switch cellName {
-	case dashboards.CellNameStatus:
+	case enums.CellNameStatus:
 		return host.Status.StatusToDashboard()
-	case dashboards.CellNameAddress:
+	case enums.CellNameAddress:
 		return host.AddressInfo.HostPort.Address
-	case dashboards.CellNameTransactionsPerSecond:
+	case enums.CellNameTransactionsPerSecond:
 		return host.Metrics.TransactionsPerSecond
-	case dashboards.CellNameTotalTransactions:
+	case enums.CellNameTotalTransactions:
 		return host.Metrics.TotalTransactionNumber
-	case dashboards.CellNameLatestCheckpoint:
+	case enums.CellNameLatestCheckpoint:
 		return host.Metrics.LatestCheckpoint
-	case dashboards.CellNameHighestCheckpoint:
+	case enums.CellNameHighestCheckpoint:
 		return host.Metrics.HighestSyncedCheckpoint
-	case dashboards.CellNameConnectedPeers:
+	case enums.CellNameConnectedPeers:
 		return host.Metrics.SuiNetworkPeers
-	case dashboards.CellNameTXSyncProgress:
+	case enums.CellNameTXSyncProgress:
 		return host.Metrics.TxSyncPercentage
-	case dashboards.CellNameCheckSyncProgress:
+	case enums.CellNameCheckSyncProgress:
 		return host.Metrics.CheckSyncPercentage
-	case dashboards.CellNameUptime:
+	case enums.CellNameUptime:
 		return host.Metrics.Uptime
-	case dashboards.CellNameVersion:
+	case enums.CellNameVersion:
 		return host.Metrics.Version
-	case dashboards.CellNameCommit:
+	case enums.CellNameCommit:
 		return host.Metrics.Commit
-	case dashboards.CellNameCompany:
+	case enums.CellNameCompany:
 		return host.Location.Provider
-	case dashboards.CellNameCountry:
+	case enums.CellNameCountry:
 		return host.Location.String()
 	}
 

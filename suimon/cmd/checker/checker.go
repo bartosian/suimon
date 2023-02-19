@@ -1,8 +1,7 @@
 package checker
 
 import (
-	"github.com/mum4k/termdash/cell"
-	"github.com/mum4k/termdash/widgets/gauge"
+	"github.com/mum4k/termdash/widgets/segmentdisplay"
 	"net/http"
 	"strconv"
 	"sync"
@@ -11,19 +10,21 @@ import (
 	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ipinfo/go/v2/ipinfo/cache"
 	"github.com/mum4k/termdash"
+	"github.com/mum4k/termdash/cell"
+	"github.com/mum4k/termdash/widgets/gauge"
 	"github.com/mum4k/termdash/widgets/text"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
 const (
-	ipInfoCacheExp = 5 * time.Minute
+	ipInfoCacheExp  = 5 * time.Minute
+	dashboardNoData = "⌛ loading"
 )
 
 type (
@@ -138,19 +139,16 @@ func (checker *Checker) DrawDashboards() {
 			case <-ticker.C:
 				for _, host := range hosts {
 					go func(host Host) {
-						widgets := dashboardBuilder.Widgets
+						dashCells := dashboardBuilder.Cells
 
-						for idx, widget := range widgets {
-							var (
-								metric      = host.getMetricByDashboardCell(dashboards.CellName(idx))
-								placeholder = "⌛ loading"
-							)
+						for idx, dashCell := range dashCells {
+							metric := host.getMetricByDashboardCell(enums.CellName(idx))
 
 							if metric == "" {
-								metric = placeholder
+								metric = dashboardNoData
 							}
 
-							switch v := widget.(type) {
+							switch v := dashCell.Widget.(type) {
 							case *text.Text:
 								v.Reset()
 
@@ -158,11 +156,15 @@ func (checker *Checker) DrawDashboards() {
 							case *gauge.Gauge:
 								percentage := 0
 
-								if metric != placeholder {
+								if metric != dashboardNoData {
 									percentage, _ = strconv.Atoi(metric)
 								}
 
 								v.Percent(percentage)
+							case *segmentdisplay.SegmentDisplay:
+								v.Write([]*segmentdisplay.TextChunk{
+									segmentdisplay.NewChunk(metric),
+								})
 							}
 						}
 
@@ -199,11 +201,11 @@ func (checker *Checker) DrawDashboards() {
 		go draw(checker.node)
 	}
 
-	if monitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
-		wg.Add(1)
-
-		go draw(checker.peers)
-	}
+	//if monitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
+	//	wg.Add(1)
+	//
+	//	go draw(checker.peers)
+	//}
 
 	if err := termdash.Run(dashboardBuilder.Ctx, dashboardBuilder.Terminal, dashboardBuilder.Dashboard, termdash.KeyboardSubscriber(dashboardBuilder.Quitter)); err != nil {
 		panic(err)

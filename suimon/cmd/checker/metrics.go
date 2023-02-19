@@ -8,7 +8,14 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
-const transactionsPerSecondTimeout = 10
+const (
+	transactionsPerSecondTimeout   = 10
+	transactionsPerSecondLag       = 5
+	latestCheckpointLag            = 30
+	highestSyncedCheckpointLag     = 30
+	totalTransactionsNumberHealthy = "098"
+	totalTransactionsNumberLimit   = "100"
+)
 
 type (
 	Metrics struct {
@@ -126,40 +133,36 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) string {
 }
 
 var convertToInt = func(values ...string) []int {
-	var (
-		valueAInt int
-		valueBInt int
-		err       error
-	)
+	result := make([]int, len(values))
 
-	if valueAInt, err = strconv.Atoi(values[0]); err != nil {
-		return nil
+	for idx, value := range values {
+		if valueInt, err := strconv.Atoi(value); err != nil {
+			return nil
+		} else {
+			result[idx] = valueInt
+		}
 	}
 
-	if valueBInt, err = strconv.Atoi(values[1]); err != nil {
-		return nil
-	}
-
-	return []int{valueAInt, valueBInt}
+	return result
 }
 
 func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC string) bool {
 	switch metric {
 	case enums.MetricTypeTotalTransactionsNumber:
 		paddedPercentage := fmt.Sprintf("%03s", metrics.TxSyncPercentage)
-		return paddedPercentage <= "100" && paddedPercentage > "098"
+		return paddedPercentage > totalTransactionsNumberHealthy && paddedPercentage <= totalTransactionsNumberLimit
 	case enums.MetricTypeTransactionsPerSecond:
 		values := convertToInt(metrics.TransactionsPerSecond, valueRPC)
 
-		return len(values) == 2 && values[0] >= values[1]-5
+		return len(values) == 2 && values[0] >= values[1]-transactionsPerSecondLag
 	case enums.MetricTypeLatestCheckpoint:
 		values := convertToInt(metrics.LatestCheckpoint, valueRPC)
 
-		return len(values) == 2 && values[0] >= values[1]-30
+		return len(values) == 2 && values[0] >= values[1]-latestCheckpointLag
 	case enums.MetricTypeHighestSyncedCheckpoint:
 		values := convertToInt(metrics.HighestSyncedCheckpoint, valueRPC)
 
-		return len(values) == 2 && values[0] >= values[1]-30
+		return len(values) == 2 && values[0] >= values[1]-highestSyncedCheckpointLag
 	case enums.MetricTypeVersion:
 		return metrics.Version == valueRPC
 	}

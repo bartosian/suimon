@@ -3,6 +3,7 @@ package dashboardbuilder
 import (
 	"context"
 	"fmt"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 
 	"github.com/mum4k/termdash/align"
 	"github.com/mum4k/termdash/cell"
@@ -11,49 +12,15 @@ import (
 	"github.com/mum4k/termdash/linestyle"
 	"github.com/mum4k/termdash/terminal/termbox"
 	"github.com/mum4k/termdash/terminal/terminalapi"
-	"github.com/mum4k/termdash/widgetapi"
-	"github.com/mum4k/termdash/widgets/gauge"
-	"github.com/mum4k/termdash/widgets/text"
-
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 )
 
 const suiEmoji = "💧"
-
-func NewTextWidget() (*text.Text, error) {
-	return text.New(text.RollContent(), text.WrapAtWords())
-}
-
-func NewProgressWidget() (*gauge.Gauge, error) {
-	return gauge.New(
-		gauge.Height(3),
-		gauge.Border(linestyle.Light, cell.FgColor(cell.ColorGreen)),
-		gauge.Color(cell.ColorGreen),
-		gauge.FilledTextColor(cell.ColorBlack),
-		gauge.EmptyTextColor(cell.ColorWhite),
-		gauge.HorizontalTextAlign(align.HorizontalCenter),
-	)
-}
-
-func NewCell(title string, widget widgetapi.Widget) []container.Option {
-	return []container.Option{
-		container.FocusedColor(cell.ColorGreen),
-		container.Border(linestyle.Light),
-		container.BorderTitle(title),
-		container.PlaceWidget(widget),
-		container.AlignVertical(align.VerticalMiddle),
-		container.AlignHorizontal(align.HorizontalCenter),
-		container.PaddingTopPercent(2),
-		container.BorderColor(cell.ColorRed),
-		container.TitleColor(cell.ColorGreen),
-	}
-}
 
 type DashboardBuilder struct {
 	Ctx       context.Context
 	Terminal  *termbox.Terminal
 	Dashboard *container.Container
-	Widgets   []widgetapi.Widget
+	Cells     []*Cell
 	Quitter   func(k *terminalapi.Keyboard)
 }
 
@@ -61,11 +28,13 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 	var (
 		terminal  *termbox.Terminal
 		dashboard *container.Container
-		widgets   []widgetapi.Widget
+		cells     []*Cell
 		err       error
 	)
 
 	ctx, cancel := context.WithCancel(context.Background())
+
+	cells = initCells()
 
 	if terminal, err = termbox.New(); err != nil {
 		return nil, err
@@ -75,24 +44,18 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 		return nil, err
 	}
 
-	if widgets, err = initWidgets(); err != nil {
-		return nil, err
-	}
-
-	for idx, widget := range widgets {
-		cellNameEnum := dashboards.CellName(idx)
-		cellName := cellNameEnum.CellNameString()
+	for idx, cell := range cells {
+		cellNameEnum := enums.CellName(idx)
 		cellID := cellNameEnum.String()
-		cell := NewCell(cellName, widget)
 
-		dashboard.Update(cellID, cell...)
+		dashboard.Update(cellID, cell.Config...)
 	}
 
 	return &DashboardBuilder{
 		Ctx:       ctx,
 		Terminal:  terminal,
 		Dashboard: dashboard,
-		Widgets:   widgets,
+		Cells:     cells,
 		Quitter: func(k *terminalapi.Keyboard) {
 			if k.Key == 'q' || k.Key == 'Q' || k.Key == keyboard.KeyEsc {
 				terminal.Close()
@@ -102,97 +65,28 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 	}, nil
 }
 
-func initWidgets() ([]widgetapi.Widget, error) {
+func initCells() []*Cell {
 	var (
-		totalTransactionsWidget *text.Text
-		latestCheckpointWidget  *text.Text
-		syncedCheckpointWidget  *text.Text
-		connecetedPeersWidget   *text.Text
-		statusWidget            *text.Text
-		addressWidget           *text.Text
-		versionWidget           *text.Text
-		commitWidget            *text.Text
-		tpsWidget               *text.Text
-		uptimeWidget            *text.Text
-		providerWidget          *text.Text
-		countryWidget           *text.Text
-		txSyncWidget            *gauge.Gauge
-		checkSyncWidget         *gauge.Gauge
-		err                     error
+		cellNames = enums.CellNameValues()
+		cells     = make([]*Cell, len(cellNames))
 	)
 
-	if statusWidget, err = NewTextWidget(); err != nil {
-		return nil, err
+	for _, name := range cellNames {
+		var (
+			cellName = name.CellNameString()
+			cell     *Cell
+		)
+
+		if name == enums.CellNameCheckSyncProgress || name == enums.CellNameTXSyncProgress {
+			cell = NewProgressCell(cellName)
+		} else {
+			cell = NewTextCell(cellName)
+		}
+
+		cells[name] = cell
 	}
 
-	if addressWidget, err = NewTextWidget(); err != nil {
-		return nil, err
-	}
-
-	if tpsWidget, err = NewTextWidget(); err != nil {
-		return nil, err
-	}
-
-	if totalTransactionsWidget, err = NewTextWidget(); err != nil {
-		return nil, err
-	}
-
-	if latestCheckpointWidget, err = NewTextWidget(); err != nil {
-		return nil, err
-	}
-
-	if syncedCheckpointWidget, err = NewTextWidget(); err != nil {
-		return nil, err
-	}
-
-	if connecetedPeersWidget, err = NewTextWidget(); err != nil {
-		return nil, err
-	}
-
-	if uptimeWidget, err = NewTextWidget(); err != nil {
-		return nil, err
-	}
-
-	if versionWidget, err = NewTextWidget(); err != nil {
-		return nil, err
-	}
-
-	if commitWidget, err = NewTextWidget(); err != nil {
-		return nil, err
-	}
-
-	if providerWidget, err = NewTextWidget(); err != nil {
-		return nil, err
-	}
-
-	if countryWidget, err = NewTextWidget(); err != nil {
-		return nil, err
-	}
-
-	if txSyncWidget, err = NewProgressWidget(); err != nil {
-		return nil, err
-	}
-
-	if checkSyncWidget, err = NewProgressWidget(); err != nil {
-		return nil, err
-	}
-
-	return []widgetapi.Widget{
-		dashboards.CellNameStatus:                statusWidget,
-		dashboards.CellNameAddress:               addressWidget,
-		dashboards.CellNameTransactionsPerSecond: tpsWidget,
-		dashboards.CellNameTotalTransactions:     totalTransactionsWidget,
-		dashboards.CellNameLatestCheckpoint:      latestCheckpointWidget,
-		dashboards.CellNameHighestCheckpoint:     syncedCheckpointWidget,
-		dashboards.CellNameConnectedPeers:        connecetedPeersWidget,
-		dashboards.CellNameTXSyncProgress:        txSyncWidget,
-		dashboards.CellNameCheckSyncProgress:     checkSyncWidget,
-		dashboards.CellNameUptime:                uptimeWidget,
-		dashboards.CellNameVersion:               versionWidget,
-		dashboards.CellNameCommit:                commitWidget,
-		dashboards.CellNameCompany:               providerWidget,
-		dashboards.CellNameCountry:               countryWidget,
-	}, nil
+	return cells
 }
 
 func initDashboard(terminal *termbox.Terminal) (*container.Container, error) {
@@ -214,10 +108,10 @@ func initDashboard(terminal *termbox.Terminal) (*container.Container, error) {
 							container.Top(
 								container.SplitVertical(
 									container.Left(
-										container.ID(dashboards.CellNameStatus.String()),
+										container.ID(enums.CellNameStatus.String()),
 									),
 									container.Right(
-										container.ID(dashboards.CellNameAddress.String()),
+										container.ID(enums.CellNameAddress.String()),
 									),
 									container.SplitFixed(8),
 								),
@@ -225,10 +119,10 @@ func initDashboard(terminal *termbox.Terminal) (*container.Container, error) {
 							container.Bottom(
 								container.SplitVertical(
 									container.Left(
-										container.ID(dashboards.CellNameVersion.String()),
+										container.ID(enums.CellNameVersion.String()),
 									),
 									container.Right(
-										container.ID(dashboards.CellNameCommit.String()),
+										container.ID(enums.CellNameCommit.String()),
 									),
 								),
 							),
@@ -243,27 +137,27 @@ func initDashboard(terminal *termbox.Terminal) (*container.Container, error) {
 											container.Left(
 												container.SplitVertical(
 													container.Left(
-														container.ID(dashboards.CellNameLatestCheckpoint.String()),
+														container.ID(enums.CellNameLatestCheckpoint.String()),
 													),
 													container.Right(
-														container.ID(dashboards.CellNameHighestCheckpoint.String()),
+														container.ID(enums.CellNameHighestCheckpoint.String()),
 													),
 												),
 											),
 											container.Right(
 												container.SplitVertical(
 													container.Left(
-														container.ID(dashboards.CellNameConnectedPeers.String()),
+														container.ID(enums.CellNameConnectedPeers.String()),
 													),
 													container.Right(
-														container.ID(dashboards.CellNameUptime.String()),
+														container.ID(enums.CellNameUptime.String()),
 													),
 												),
 											),
 										),
 									),
 									container.Right(
-										container.ID(dashboards.CellNameTXSyncProgress.String()),
+										container.ID(enums.CellNameTXSyncProgress.String()),
 									),
 								),
 							),
@@ -274,27 +168,27 @@ func initDashboard(terminal *termbox.Terminal) (*container.Container, error) {
 											container.Left(
 												container.SplitVertical(
 													container.Left(
-														container.ID(dashboards.CellNameTotalTransactions.String()),
+														container.ID(enums.CellNameTotalTransactions.String()),
 													),
 													container.Right(
-														container.ID(dashboards.CellNameTransactionsPerSecond.String()),
+														container.ID(enums.CellNameTransactionsPerSecond.String()),
 													),
 												),
 											),
 											container.Right(
 												container.SplitVertical(
 													container.Left(
-														container.ID(dashboards.CellNameCountry.String()),
+														container.ID(enums.CellNameCountry.String()),
 													),
 													container.Right(
-														container.ID(dashboards.CellNameCompany.String()),
+														container.ID(enums.CellNameCompany.String()),
 													),
 												),
 											),
 										),
 									),
 									container.Right(
-										container.ID(dashboards.CellNameCheckSyncProgress.String()),
+										container.ID(enums.CellNameCheckSyncProgress.String()),
 									),
 								),
 							),

@@ -15,16 +15,19 @@ package main
 import (
 	"flag"
 	"fmt"
+
+	"github.com/common-nighthawk/go-figure"
+
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
-	"github.com/common-nighthawk/go-figure"
 )
 
 var (
 	suimonConfigPath = flag.String("sf", "", "(optional) path to the suimon config file, can use SUIMON_CONFIG_PATH env variable instead")
 	nodeConfigPath   = flag.String("nf", "", "(optional) path to the node config file, can use SUIMON_NODE_CONFIG_PATH variable instead")
 	network          = flag.String("n", "", "(optional) network name, possible values: testnet, devnet")
+	watch            = flag.Bool("w", false, "(optional) flag to enable watch mode with dynamic monitoring")
 )
 
 const (
@@ -78,17 +81,20 @@ func main() {
 		return
 	}
 
-	//// initialize tables with the styles
-	//checker.InitTables()
-	//
-	//// draw initialized tables to the terminal
-	//checker.DrawTables()
+	switch *watch {
+	case true:
+		// initialize realtime dashboard with styles
+		checker.InitDashboard()
 
-	// initialize realtime dashboard with styles
-	checker.InitDashboard()
+		// draw initialized dashboard to the terminal
+		checker.DrawDashboards()
+	default:
+		// initialize tables with the styles
+		checker.InitTables()
 
-	// draw initialized dashboard to the terminal
-	checker.DrawDashboards()
+		// draw initialized tables to the terminal
+		checker.DrawTables()
+	}
 
 	defer func() {
 		if err := recover(); err != nil {
