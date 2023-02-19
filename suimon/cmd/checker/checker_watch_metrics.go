@@ -64,35 +64,3 @@ func (checker *Checker) WatchHosts() {
 
 	wg.Wait()
 }
-
-func (host *Host) GetData() {
-	host.stateMutex.Lock()
-
-	defer host.stateMutex.Unlock()
-
-	doneCH := make(chan struct{})
-
-	defer close(doneCH)
-
-	go func() {
-		host.GetTotalTransactionNumber()
-
-		doneCH <- struct{}{}
-	}()
-
-	go func() {
-		host.GetLatestCheckpoint()
-
-		doneCH <- struct{}{}
-	}()
-
-	go func() {
-		host.GetMetrics()
-
-		doneCH <- struct{}{}
-	}()
-
-	for i := 0; i < 3; i++ {
-		<-doneCH
-	}
-}

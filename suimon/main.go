@@ -15,8 +15,8 @@ package main
 import (
 	"flag"
 	"fmt"
-
 	"github.com/common-nighthawk/go-figure"
+	"os"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
@@ -98,7 +98,12 @@ func main() {
 
 	defer func() {
 		if err := recover(); err != nil {
+			checker.DashboardBuilder.Terminal.Close()
+			checker.DashboardBuilder.Ctx.Done()
+
 			logger.Error("failed to execute suimon, please check an issue: ", err)
+
+			os.Exit(1)
 		}
 
 		return

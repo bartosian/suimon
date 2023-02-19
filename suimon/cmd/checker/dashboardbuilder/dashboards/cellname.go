@@ -18,6 +18,7 @@ const (
 	CellNameCommit
 	CellNameCompany
 	CellNameCountry
+	CellNameEpoch
 )
 
 var cellNameStringValues = [...]string{
@@ -35,6 +36,7 @@ var cellNameStringValues = [...]string{
 	"COMMIT",
 	"PROVIDER",
 	"COUNTRY",
+	"EPOCH",
 }
 
 func (i CellName) CellNameString() string {

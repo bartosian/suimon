@@ -24,7 +24,7 @@ type SuiSystemState struct {
 type Metrics struct {
 	Updated bool
 
-	SystemState *SuiSystemState
+	SystemState SuiSystemState
 
 	TxSyncPercentage        int
 	CheckSyncPercentage     int
@@ -128,6 +128,10 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 		valueInt := value.(int)
 
 		metrics.LatestCheckpoint = valueInt
+	case enums.MetricTypeCheckSystemState:
+		valueSystemState := value.(SuiSystemState)
+
+		metrics.SystemState = valueSystemState
 	}
 
 	metrics.Updated = true

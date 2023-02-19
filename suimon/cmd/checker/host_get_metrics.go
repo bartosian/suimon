@@ -104,7 +104,7 @@ func (host *Host) GetSUISystemState() {
 		}
 	}
 
-	host.Metrics.SetValue(enums.MetricTypeLatestCheckpoint, result)
+	host.Metrics.SetValue(enums.MetricTypeCheckSystemState, result)
 }
 
 func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) any {
@@ -143,6 +143,44 @@ func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) any {
 		return response
 	case <-timeout:
 		return nil
+	}
+}
+
+func (host *Host) GetData() {
+	host.stateMutex.Lock()
+
+	defer host.stateMutex.Unlock()
+
+	doneCH := make(chan struct{})
+
+	defer close(doneCH)
+
+	go func() {
+		host.GetTotalTransactionNumber()
+
+		doneCH <- struct{}{}
+	}()
+
+	go func() {
+		host.GetSUISystemState()
+
+		doneCH <- struct{}{}
+	}()
+
+	go func() {
+		host.GetLatestCheckpoint()
+
+		doneCH <- struct{}{}
+	}()
+
+	go func() {
+		host.GetMetrics()
+
+		doneCH <- struct{}{}
+	}()
+
+	for i := 0; i < 4; i++ {
+		<-doneCH
 	}
 }
 

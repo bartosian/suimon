@@ -19,6 +19,7 @@ const (
 	MetricTypeLatestCheckpoint        MetricType = "LATEST_CHECKPOINT"
 	MetricTypeTxSyncProgress          MetricType = "TX_SYNC_PROGRESS"
 	MetricTypeCheckSyncProgress       MetricType = "CHECK_SYNC_PROGRESS"
+	MetricTypeCheckSystemState        MetricType = "SYSTEM_STATE"
 )
 
 func (e MetricType) String() string {
@@ -43,6 +44,7 @@ func MetricTypeFromString(value string) (MetricType, error) {
 		"LATEST_CHECKPOINT":         MetricTypeLatestCheckpoint,
 		"TX_SYNC_PROGRESS":          MetricTypeTxSyncProgress,
 		"CHECK_SYNC_PROGRESS":       MetricTypeCheckSyncProgress,
+		"SYSTEM_STATE":              MetricTypeCheckSystemState,
 	}[value]
 
 	if ok {

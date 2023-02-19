@@ -36,6 +36,7 @@ var (
 		0: {Height: 7, Columns: []CellName{CellNameStatus, CellNameTransactionsPerSecond, CellNameUptime, CellNameConnectedPeers, CellNameVersion, CellNameCommit}},
 		1: {Height: 7, Columns: []CellName{CellNameTotalTransactions, CellNameLatestCheckpoint, CellNameHighestCheckpoint}},
 		2: {Height: 7, Columns: []CellName{CellNameTXSyncProgress, CellNameCheckSyncProgress}},
+		3: {Height: 20, Columns: []CellName{CellNameEpoch}},
 	}
 
 	ColumnConfigSUI = [...]ColumnConfig{
@@ -94,6 +95,10 @@ var (
 		CellNameCountry: {
 			Name:  "PROVIDER",
 			Width: 100,
+		},
+		CellNameEpoch: {
+			Name:  "EPOCH",
+			Width: 45,
 		},
 	}
 )

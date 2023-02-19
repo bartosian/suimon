@@ -2,12 +2,13 @@ package dashboardbuilder
 
 import (
 	"strconv"
-	
+
 	"github.com/mum4k/termdash/align"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/linestyle"
 	"github.com/mum4k/termdash/widgetapi"
+	"github.com/mum4k/termdash/widgets/donut"
 	"github.com/mum4k/termdash/widgets/gauge"
 	"github.com/mum4k/termdash/widgets/segmentdisplay"
 	"github.com/mum4k/termdash/widgets/text"
@@ -70,6 +71,10 @@ func (c *Cell) Write(value any) {
 		v.Write([]*segmentdisplay.TextChunk{
 			segmentdisplay.NewChunk(chunkValue),
 		})
+	case *donut.Donut:
+		valueInt := 70
+
+		v.Percent(valueInt)
 	}
 }
 
@@ -100,6 +105,15 @@ func NewDisplayCell(title string) *Cell {
 	return NewCell(title, displayWidget)
 }
 
+func NewDonutCell(title string) *Cell {
+	donutWidget, err := newDonutWidget()
+	if err != nil {
+		panic(err)
+	}
+
+	return NewCell(title, donutWidget)
+}
+
 func newTextWidget() (*text.Text, error) {
 	return text.New(text.RollContent(), text.WrapAtWords())
 }
@@ -125,6 +139,13 @@ func newDisplayWidget() (*segmentdisplay.SegmentDisplay, error) {
 	)
 }
 
+func newDonutWidget() (*donut.Donut, error) {
+	return donut.New(
+		donut.CellOpts(cell.FgColor(cell.ColorGreen), cell.Bold()),
+		donut.Label("EPOCH 2", cell.FgColor(cell.ColorGreen), cell.Bold()),
+	)
+}
+
 func initCells() []*Cell {
 	var cells = make([]*Cell, len(dashboards.ColumnConfigSUI))
 
@@ -140,6 +161,8 @@ func initCells() []*Cell {
 			cell = NewProgressCell(nameString)
 		case dashboards.CellNameStatus:
 			cell = NewTextCell(nameString)
+		case dashboards.CellNameEpoch:
+			cell = NewDonutCell(nameString)
 		default:
 			cell = NewDisplayCell(nameString)
 		}
