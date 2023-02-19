@@ -1,6 +1,7 @@
 package checker
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/mum4k/termdash/widgets/segmentdisplay"
 	"net/http"
 	"strconv"
@@ -142,7 +143,7 @@ func (checker *Checker) DrawDashboards() {
 						dashCells := dashboardBuilder.Cells
 
 						for idx, dashCell := range dashCells {
-							metric := host.getMetricByDashboardCell(enums.CellName(idx))
+							metric := host.getMetricByDashboardCell(dashboards.CellName(idx))
 
 							if metric == "" {
 								metric = dashboardNoData

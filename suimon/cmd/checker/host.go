@@ -1,9 +1,11 @@
 package checker
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -137,35 +139,35 @@ func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
 	host.Status = status
 }
 
-func (host *Host) getMetricByDashboardCell(cellName enums.CellName) string {
+func (host *Host) getMetricByDashboardCell(cellName dashboards.CellName) string {
 	switch cellName {
-	case enums.CellNameStatus:
+	case dashboards.CellNameStatus:
 		return host.Status.StatusToDashboard()
-	case enums.CellNameAddress:
+	case dashboards.CellNameAddress:
 		return host.AddressInfo.HostPort.Address
-	case enums.CellNameTransactionsPerSecond:
+	case dashboards.CellNameTransactionsPerSecond:
 		return host.Metrics.TransactionsPerSecond
-	case enums.CellNameTotalTransactions:
+	case dashboards.CellNameTotalTransactions:
 		return host.Metrics.TotalTransactionNumber
-	case enums.CellNameLatestCheckpoint:
+	case dashboards.CellNameLatestCheckpoint:
 		return host.Metrics.LatestCheckpoint
-	case enums.CellNameHighestCheckpoint:
+	case dashboards.CellNameHighestCheckpoint:
 		return host.Metrics.HighestSyncedCheckpoint
-	case enums.CellNameConnectedPeers:
+	case dashboards.CellNameConnectedPeers:
 		return host.Metrics.SuiNetworkPeers
-	case enums.CellNameTXSyncProgress:
+	case dashboards.CellNameTXSyncProgress:
 		return host.Metrics.TxSyncPercentage
-	case enums.CellNameCheckSyncProgress:
+	case dashboards.CellNameCheckSyncProgress:
 		return host.Metrics.CheckSyncPercentage
-	case enums.CellNameUptime:
-		return host.Metrics.Uptime
-	case enums.CellNameVersion:
+	case dashboards.CellNameUptime:
+		return strings.Split(host.Metrics.Uptime, " ")[0]
+	case dashboards.CellNameVersion:
 		return host.Metrics.Version
-	case enums.CellNameCommit:
+	case dashboards.CellNameCommit:
 		return host.Metrics.Commit
-	case enums.CellNameCompany:
+	case dashboards.CellNameCompany:
 		return host.Location.Provider
-	case enums.CellNameCountry:
+	case dashboards.CellNameCountry:
 		return host.Location.String()
 	}
 

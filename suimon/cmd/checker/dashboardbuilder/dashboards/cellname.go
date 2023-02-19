@@ -1,4 +1,4 @@
-package enums
+package dashboards
 
 //go:generate go run github.com/dmarkham/enumer -type=CellName -json -transform=snake-upper -output=./cellname.gen.go
 type CellName int
@@ -24,13 +24,13 @@ var cellNameStringValues = [...]string{
 	"STATUS",
 	"ADDRESS",
 	"TPS",
-	"TOTAL TX",
-	"LATEST CHECK",
-	"SYNCED CHECK",
-	"PEERS",
-	"SYNC TX PROGRESS",
-	"SYNC CHECK PROGRESS",
-	"UPTIME",
+	"TOTAL TRANSACTIONS",
+	"LATEST CHECKPOINT",
+	"HIGHEST SYNCED CHECKPOINT",
+	"CONNECTED PEERS",
+	"SYNC TRANSACTIONS STATUS",
+	"SYNC CHECKPOINTS STATUS",
+	"UPTIME DAYS",
 	"VERSION",
 	"COMMIT",
 	"PROVIDER",

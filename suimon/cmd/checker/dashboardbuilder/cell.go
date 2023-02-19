@@ -9,6 +9,8 @@ import (
 	"github.com/mum4k/termdash/widgets/gauge"
 	"github.com/mum4k/termdash/widgets/segmentdisplay"
 	"github.com/mum4k/termdash/widgets/text"
+
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 )
 
 type Cell struct {
@@ -71,9 +73,40 @@ func newProgressWidget() (*gauge.Gauge, error) {
 		gauge.FilledTextColor(cell.ColorBlack),
 		gauge.EmptyTextColor(cell.ColorWhite),
 		gauge.HorizontalTextAlign(align.HorizontalCenter),
+		gauge.VerticalTextAlign(align.VerticalMiddle),
 	)
 }
 
 func newDisplayWidget() (*segmentdisplay.SegmentDisplay, error) {
-	return segmentdisplay.New()
+	return segmentdisplay.New(
+		segmentdisplay.MaximizeDisplayedText(),
+		segmentdisplay.AlignHorizontal(align.HorizontalCenter),
+		segmentdisplay.AlignVertical(align.VerticalMiddle),
+		segmentdisplay.GapPercent(10),
+	)
+}
+
+func initCells() []*Cell {
+	var cells = make([]*Cell, len(dashboards.ColumnConfigSUI))
+
+	for name, config := range dashboards.ColumnConfigSUI {
+		var (
+			nameEnum   = dashboards.CellName(name)
+			nameString = config.Name
+			cell       *Cell
+		)
+
+		switch nameEnum {
+		case dashboards.CellNameCheckSyncProgress, dashboards.CellNameTXSyncProgress:
+			cell = NewProgressCell(nameString)
+		case dashboards.CellNameStatus:
+			cell = NewTextCell(nameString)
+		default:
+			cell = NewDisplayCell(nameString)
+		}
+
+		cells[name] = cell
+	}
+
+	return cells
 }
