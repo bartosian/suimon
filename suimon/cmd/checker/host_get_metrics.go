@@ -72,52 +72,71 @@ func (host *Host) GetMetrics() {
 }
 
 func (host *Host) GetTotalTransactionNumber() {
-	var result *string
+	var result any
 
-	if result = getRequestAttempt(host.rpcHttpClient, enums.RPCMethodGetTotalTransactionNumber); result == nil {
-		if result = getRequestAttempt(host.rpcHttpsClient, enums.RPCMethodGetTotalTransactionNumber); result == nil {
+	if result = getFromRPC(host.rpcHttpClient, enums.RPCMethodGetTotalTransactionNumber); result == nil {
+		if result = getFromRPC(host.rpcHttpsClient, enums.RPCMethodGetTotalTransactionNumber); result == nil {
 			return
 		}
 	}
 
-	host.Metrics.SetValue(enums.MetricTypeTotalTransactionsNumber, *result)
+	host.Metrics.SetValue(enums.MetricTypeTotalTransactionsNumber, result)
 }
 
 func (host *Host) GetLatestCheckpoint() {
-	var result *string
+	var result any
 
-	if result = getRequestAttempt(host.rpcHttpClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result == nil {
-		if result = getRequestAttempt(host.rpcHttpsClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result == nil {
+	if result = getFromRPC(host.rpcHttpClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result == nil {
+		if result = getFromRPC(host.rpcHttpsClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result == nil {
 			return
 		}
 	}
 
-	host.Metrics.SetValue(enums.MetricTypeLatestCheckpoint, *result)
+	host.Metrics.SetValue(enums.MetricTypeLatestCheckpoint, result)
 }
 
-func getRequestAttempt(client jsonrpc.RPCClient, method enums.RPCMethod) *string {
-	if result := getFromRPC(client, method); result != nil {
-		result := strconv.Itoa(*result)
+func (host *Host) GetSUISystemState() {
+	var result any
 
-		return &result
-	}
-
-	return nil
-}
-
-func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) *int {
-	respChan := make(chan *int)
-	timeout := time.After(rpcClientTimeout)
-
-	go func() {
-		var response *int
-
-		if err := rpcClient.CallFor(context.Background(), &response, method.String()); err != nil {
+	if result = getFromRPC(host.rpcHttpClient, enums.RPCMethodGetSuiSystemState); result == nil {
+		if result = getFromRPC(host.rpcHttpsClient, enums.RPCMethodGetSuiSystemState); result == nil {
 			return
 		}
+	}
 
-		respChan <- response
-	}()
+	host.Metrics.SetValue(enums.MetricTypeLatestCheckpoint, result)
+}
+
+func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) any {
+	var (
+		respChan = make(chan any)
+		timeout  = time.After(rpcClientTimeout)
+	)
+
+	defer close(respChan)
+
+	switch method {
+	case enums.RPCMethodGetSuiSystemState:
+		var response SuiSystemState
+
+		go func() {
+			if err := rpcClient.CallFor(context.Background(), &response, method.String()); err != nil {
+				return
+			}
+
+			respChan <- response
+		}()
+	default:
+		var response int
+
+		go func() {
+			if err := rpcClient.CallFor(context.Background(), &response, method.String()); err != nil {
+				return
+			}
+
+			respChan <- response
+		}()
+	}
 
 	select {
 	case response := <-respChan:

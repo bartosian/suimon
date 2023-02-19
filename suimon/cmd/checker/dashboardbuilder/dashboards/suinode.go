@@ -2,6 +2,7 @@ package dashboards
 
 import (
 	"fmt"
+
 	"github.com/mum4k/termdash/align"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/container"
@@ -32,8 +33,8 @@ var (
 	}
 
 	RowConfigSUI = [...]RowConfig{
-		0: {Height: 7, Columns: []CellName{CellNameStatus, CellNameUptime, CellNameConnectedPeers, CellNameVersion, CellNameCommit}},
-		1: {Height: 7, Columns: []CellName{CellNameTransactionsPerSecond, CellNameTotalTransactions, CellNameLatestCheckpoint, CellNameHighestCheckpoint}},
+		0: {Height: 7, Columns: []CellName{CellNameStatus, CellNameTransactionsPerSecond, CellNameUptime, CellNameConnectedPeers, CellNameVersion, CellNameCommit}},
+		1: {Height: 7, Columns: []CellName{CellNameTotalTransactions, CellNameLatestCheckpoint, CellNameHighestCheckpoint}},
 		2: {Height: 7, Columns: []CellName{CellNameTXSyncProgress, CellNameCheckSyncProgress}},
 	}
 
@@ -52,15 +53,15 @@ var (
 		},
 		CellNameTotalTransactions: {
 			Name:  "TOTAL TRANSACTIONS",
-			Width: 60,
+			Width: 70,
 		},
 		CellNameLatestCheckpoint: {
 			Name:  "LATEST CHECKPOINT",
-			Width: 55,
+			Width: 70,
 		},
 		CellNameHighestCheckpoint: {
 			Name:  "HIGHEST SYNCED CHECKPOINT",
-			Width: 55,
+			Width: 70,
 		},
 		CellNameConnectedPeers: {
 			Name:  "CONNECTED PEERS",
@@ -68,11 +69,11 @@ var (
 		},
 		CellNameTXSyncProgress: {
 			Name:  "SYNC TRANSACTIONS STATUS",
-			Width: 100,
+			Width: 105,
 		},
 		CellNameCheckSyncProgress: {
 			Name:  "SYNC CHECKPOINTS STATUS",
-			Width: 100,
+			Width: 105,
 		},
 		CellNameUptime: {
 			Name:  "UPTIME",
@@ -80,11 +81,11 @@ var (
 		},
 		CellNameVersion: {
 			Name:  "VERSION",
-			Width: 50,
+			Width: 45,
 		},
 		CellNameCommit: {
 			Name:  "COMMIT",
-			Width: 87,
+			Width: 72,
 		},
 		CellNameCompany: {
 			Name:  "PROVIDER",

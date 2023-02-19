@@ -1,6 +1,8 @@
 package dashboardbuilder
 
 import (
+	"strconv"
+	
 	"github.com/mum4k/termdash/align"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/container"
@@ -12,6 +14,8 @@ import (
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 )
+
+const dashboardInProgress = "LOAD"
 
 type Cell struct {
 	Config []container.Option
@@ -31,6 +35,41 @@ func NewCell(title string, widget widgetapi.Widget) *Cell {
 			container.TitleColor(cell.ColorGreen),
 		},
 		Widget: widget,
+	}
+}
+
+func (c *Cell) Write(value any) {
+	switch v := c.Widget.(type) {
+	case *text.Text:
+		valueString := value.(string)
+
+		if valueString == "" {
+			valueString = dashboardInProgress
+		}
+
+		v.Reset()
+		v.Write(valueString, text.WriteCellOpts(cell.Bold()))
+	case *gauge.Gauge:
+		valueInt := value.(int)
+
+		v.Percent(valueInt)
+	case *segmentdisplay.SegmentDisplay:
+		var chunkValue string
+
+		switch v := value.(type) {
+		case int:
+			chunkValue = strconv.Itoa(v)
+		case string:
+			chunkValue = v
+		}
+
+		if chunkValue == "" || chunkValue == "0" {
+			chunkValue = dashboardInProgress
+		}
+
+		v.Write([]*segmentdisplay.TextChunk{
+			segmentdisplay.NewChunk(chunkValue),
+		})
 	}
 }
 

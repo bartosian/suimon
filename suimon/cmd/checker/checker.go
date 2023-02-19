@@ -1,32 +1,24 @@
 package checker
 
 import (
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
-	"github.com/mum4k/termdash/widgets/segmentdisplay"
 	"net/http"
-	"strconv"
 	"sync"
 	"time"
 
 	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ipinfo/go/v2/ipinfo/cache"
 	"github.com/mum4k/termdash"
-	"github.com/mum4k/termdash/cell"
-	"github.com/mum4k/termdash/widgets/gauge"
-	"github.com/mum4k/termdash/widgets/text"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
-const (
-	ipInfoCacheExp  = 5 * time.Minute
-	dashboardNoData = "⌛ loading"
-)
+const ipInfoCacheExp = 5 * time.Minute
 
 type (
 	Checker struct {
@@ -145,28 +137,7 @@ func (checker *Checker) DrawDashboards() {
 						for idx, dashCell := range dashCells {
 							metric := host.getMetricByDashboardCell(dashboards.CellName(idx))
 
-							if metric == "" {
-								metric = dashboardNoData
-							}
-
-							switch v := dashCell.Widget.(type) {
-							case *text.Text:
-								v.Reset()
-
-								v.Write(metric, text.WriteCellOpts(cell.Bold()))
-							case *gauge.Gauge:
-								percentage := 0
-
-								if metric != dashboardNoData {
-									percentage, _ = strconv.Atoi(metric)
-								}
-
-								v.Percent(percentage)
-							case *segmentdisplay.SegmentDisplay:
-								v.Write([]*segmentdisplay.TextChunk{
-									segmentdisplay.NewChunk(metric),
-								})
-							}
+							dashCell.Write(metric)
 						}
 
 						doneCH <- struct{}{}

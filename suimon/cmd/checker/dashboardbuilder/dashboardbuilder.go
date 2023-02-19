@@ -2,7 +2,8 @@ package dashboardbuilder
 
 import (
 	"context"
-	
+	"os"
+
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/keyboard"
@@ -49,6 +50,7 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 			if k.Key == 'q' || k.Key == 'Q' || k.Key == keyboard.KeyEsc {
 				terminal.Close()
 				cancel()
+				os.Exit(0)
 			}
 		},
 	}, nil
@@ -84,10 +86,13 @@ func initDashboard(terminal *termbox.Terminal, cells []*Cell) (*container.Contai
 			rowColumns[idx] = columns[columnName]
 		}
 
+		rowColumns = append(rowColumns, grid.ColWidthFixed(0))
+
 		rows[idx] = grid.RowHeightFixed(height, rowColumns...)
 	}
 
-	rows = append(rows, grid.RowHeightFixed(10))
+	rows = append(rows, grid.RowHeightFixed(0))
+
 	builder.Add(rows...)
 
 	config, err := builder.Build()

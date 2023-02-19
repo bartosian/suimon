@@ -1,10 +1,8 @@
 package checker
 
 import (
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"net/http"
 	"regexp"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -13,6 +11,7 @@ import (
 	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ybbus/jsonrpc/v3"
 
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/address"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
@@ -70,22 +69,13 @@ func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.
 }
 
 func (host *Host) SetSyncProgress(metricType enums.MetricType, rpc Host) {
-	var (
-		hostMetric string
-		rpcMetric  string
-		valuesInt  []int
-	)
+	hostMetric := host.Metrics.GetValue(metricType, false)
+	rpcMetric := rpc.Metrics.GetValue(metricType, true)
+	hostMetricInt, rpcMetricInt := hostMetric.(int), rpcMetric.(int)
 
-	hostMetric = host.Metrics.GetValue(metricType, false)
-	rpcMetric = rpc.Metrics.GetValue(metricType, true)
+	percentage := int(percent.PercentOf(hostMetricInt, rpcMetricInt))
 
-	if valuesInt = convertToInt(hostMetric, rpcMetric); len(valuesInt) != 2 {
-		return
-	}
-
-	percentage := int(percent.PercentOf(valuesInt[0], valuesInt[1]))
-
-	host.Metrics.SetValue(metricType, strconv.Itoa(percentage))
+	host.Metrics.SetValue(metricType, percentage)
 }
 
 func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
@@ -101,7 +91,7 @@ func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
 			status = enums.StatusYellow
 		}
 	case true:
-		if metricsHost.TotalTransactionNumber == "" || metricsHost.LatestCheckpoint == "" {
+		if metricsHost.TotalTransactionNumber == 0 || metricsHost.LatestCheckpoint == 0 {
 			status = enums.StatusRed
 
 			if tableType == enums.TableTypePeers {
@@ -111,26 +101,25 @@ func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
 			break
 		}
 
-		if (metricsHost.TransactionsPerSecond == "" || metricsHost.TransactionsPerSecond == "0") &&
-			(rpc.Metrics.TransactionsPerSecond != "" && rpc.Metrics.TransactionsPerSecond != "0") {
+		if metricsHost.TransactionsPerSecond == 0 && rpc.Metrics.TransactionsPerSecond != 0 {
 			status = enums.StatusRed
 
 			break
 		}
 
-		if metricsHost.TransactionsPerSecond != "" &&
+		if metricsHost.TransactionsPerSecond != 0 &&
 			metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) {
 			status = enums.StatusYellow
 		}
 
-		if metricsHost.TotalTransactionNumber != "" &&
+		if metricsHost.TotalTransactionNumber != 0 &&
 			metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionsNumber, metricsRPC.TotalTransactionNumber) {
 			status = enums.StatusYellow
 
 			break
 		}
 
-		if metricsHost.LatestCheckpoint != "" &&
+		if metricsHost.LatestCheckpoint != 0 &&
 			metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
 			status = enums.StatusYellow
 		}
@@ -139,7 +128,7 @@ func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
 	host.Status = status
 }
 
-func (host *Host) getMetricByDashboardCell(cellName dashboards.CellName) string {
+func (host *Host) getMetricByDashboardCell(cellName dashboards.CellName) any {
 	switch cellName {
 	case dashboards.CellNameStatus:
 		return host.Status.StatusToDashboard()
