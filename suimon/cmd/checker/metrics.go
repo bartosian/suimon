@@ -1,8 +1,12 @@
 package checker
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/dariubs/percent"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
@@ -14,11 +18,44 @@ const (
 	highestSyncedCheckpointLag     = 30
 	totalTransactionsNumberHealthy = 98
 	totalTransactionsNumberLimit   = 100
+	epochLength                    = 24 * time.Hour
 )
 
 type SuiSystemState struct {
 	Epoch                 int `json:"epoch"`
 	EpochStartTimestampMs int `json:"epoch_start_timestamp_ms"`
+}
+
+func (metrics *Metrics) GetTimeTillNextEpoch() int {
+	nextEpochStartMs := metrics.SystemState.EpochStartTimestampMs + int(epochLength.Milliseconds())
+	currentTimeMs := int(time.Now().UnixNano() / 1000000)
+
+	return nextEpochStartMs - currentTimeMs
+}
+
+func (metrics *Metrics) GetEpochTimer() string {
+	duration := time.Duration(metrics.TimeTillNextEpochMs) * time.Millisecond
+	hours := int(duration.Hours())
+	minutes := int(duration.Minutes()) - (hours * 60)
+	second := time.Now().Second()
+
+	spacer := " "
+	if second%2 == 0 {
+		spacer = ":"
+	}
+
+	return fmt.Sprintf("%02d%s%02d", hours, spacer, minutes)
+}
+
+func (metrics *Metrics) GetEpochLabel() string {
+	return fmt.Sprintf("EPOCH %d", metrics.SystemState.Epoch)
+}
+
+func (metrics *Metrics) GetEpochProgress() int {
+	epochLength := int(epochLength.Milliseconds())
+	epochCurrentLength := epochLength - metrics.TimeTillNextEpochMs
+
+	return int(percent.PercentOf(epochCurrentLength, epochLength))
 }
 
 type Metrics struct {
@@ -27,6 +64,8 @@ type Metrics struct {
 	SystemState SuiSystemState
 
 	TxSyncPercentage        int
+	EpochPercentage         int
+	TimeTillNextEpochMs     int
 	CheckSyncPercentage     int
 	TransactionsPerSecond   int
 	TransactionsHistory     []int
@@ -128,10 +167,11 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 		valueInt := value.(int)
 
 		metrics.LatestCheckpoint = valueInt
-	case enums.MetricTypeCheckSystemState:
-		valueSystemState := value.(SuiSystemState)
-
-		metrics.SystemState = valueSystemState
+	case enums.MetricTypeCurrentEpoch:
+		if valueSystemState, ok := value.(SuiSystemState); ok {
+			metrics.SystemState = valueSystemState
+			metrics.TimeTillNextEpochMs = metrics.GetTimeTillNextEpoch()
+		}
 	}
 
 	metrics.Updated = true

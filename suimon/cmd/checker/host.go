@@ -11,6 +11,7 @@ import (
 	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ybbus/jsonrpc/v3"
 
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/address"
@@ -68,7 +69,7 @@ func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.
 	return host
 }
 
-func (host *Host) SetSyncProgress(metricType enums.MetricType, rpc Host) {
+func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) {
 	hostMetric := host.Metrics.GetValue(metricType, false)
 	rpcMetric := rpc.Metrics.GetValue(metricType, true)
 	hostMetricInt, rpcMetricInt := hostMetric.(int), rpcMetric.(int)
@@ -158,6 +159,13 @@ func (host *Host) getMetricByDashboardCell(cellName dashboards.CellName) any {
 		return host.Location.Provider
 	case dashboards.CellNameCountry:
 		return host.Location.String()
+	case dashboards.CellNameEpoch:
+		epochLabel := host.Metrics.GetEpochLabel()
+		epochPercentage := host.Metrics.GetEpochProgress()
+
+		return dashboardbuilder.NewDonutInput(epochLabel, epochPercentage)
+	case dashboards.CellNameEpochEnd:
+		return host.Metrics.GetEpochTimer()
 	}
 
 	return "no data"

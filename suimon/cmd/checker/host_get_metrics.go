@@ -104,7 +104,7 @@ func (host *Host) GetSUISystemState() {
 		}
 	}
 
-	host.Metrics.SetValue(enums.MetricTypeCheckSystemState, result)
+	host.Metrics.SetValue(enums.MetricTypeCurrentEpoch, result)
 }
 
 func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) any {

@@ -39,6 +39,18 @@ func NewCell(title string, widget widgetapi.Widget) *Cell {
 	}
 }
 
+type DonutWriteInput struct {
+	Label      string
+	Percentage int
+}
+
+func NewDonutInput(label string, pct int) DonutWriteInput {
+	return DonutWriteInput{
+		Label:      label,
+		Percentage: pct,
+	}
+}
+
 func (c *Cell) Write(value any) {
 	switch v := c.Widget.(type) {
 	case *text.Text:
@@ -72,9 +84,12 @@ func (c *Cell) Write(value any) {
 			segmentdisplay.NewChunk(chunkValue),
 		})
 	case *donut.Donut:
-		valueInt := 70
+		valueInput := value.(DonutWriteInput)
 
-		v.Percent(valueInt)
+		v.Percent(
+			valueInput.Percentage,
+			donut.Label(valueInput.Label, cell.FgColor(cell.ColorGreen), cell.Bold()),
+		)
 	}
 }
 
@@ -142,7 +157,6 @@ func newDisplayWidget() (*segmentdisplay.SegmentDisplay, error) {
 func newDonutWidget() (*donut.Donut, error) {
 	return donut.New(
 		donut.CellOpts(cell.FgColor(cell.ColorGreen), cell.Bold()),
-		donut.Label("EPOCH 2", cell.FgColor(cell.ColorGreen), cell.Bold()),
 	)
 }
 

@@ -14,13 +14,12 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"github.com/common-nighthawk/go-figure"
 	"os"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
+	"github.com/bartosian/sui_helpers/suimon/pkg/progress"
 )
 
 var (
@@ -41,7 +40,7 @@ func main() {
 
 	logger := log.NewLogger()
 
-	printLogo()
+	progress.PrintLogo()
 
 	// parse suimon.yaml config file
 	suimonConfig, err := config.ParseSuimonConfig(suimonConfigPath)
@@ -70,13 +69,13 @@ func main() {
 	// create checker instance to process to request all the required data and pass them to tablebuilder
 	checker, err := checker.NewChecker(*suimonConfig, *nodeConfig, networkConfig)
 	if err != nil {
-		logger.Error("failed to create peers checker: ", err)
+		logger.Error("failed to create suimon instance: ", err)
 
 		return
 	}
 
-	if err := checker.GetTablesData(); err != nil {
-		logger.Error("failed to get data for tables: ", err)
+	if err := checker.Init(); err != nil {
+		logger.Error("failed to init suimon instance: ", err)
 
 		return
 	}
@@ -108,15 +107,4 @@ func main() {
 
 		return
 	}()
-}
-
-func printLogo() {
-	fmt.Println()
-	fmt.Println()
-	logo := figure.NewColorFigure("suimon", "banner3", "blue", true)
-	logo.Print()
-	version := figure.NewColorFigure("      v0.1.0", "3x5", "red", true)
-	version.Print()
-	fmt.Println()
-	fmt.Println()
 }

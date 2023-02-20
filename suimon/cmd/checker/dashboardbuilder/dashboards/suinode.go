@@ -37,6 +37,7 @@ var (
 		1: {Height: 7, Columns: []CellName{CellNameTotalTransactions, CellNameLatestCheckpoint, CellNameHighestCheckpoint}},
 		2: {Height: 7, Columns: []CellName{CellNameTXSyncProgress, CellNameCheckSyncProgress}},
 		3: {Height: 20, Columns: []CellName{CellNameEpoch}},
+		4: {Height: 10, Columns: []CellName{CellNameEpochEnd}},
 	}
 
 	ColumnConfigSUI = [...]ColumnConfig{
@@ -93,12 +94,16 @@ var (
 			Width: 100,
 		},
 		CellNameCountry: {
-			Name:  "PROVIDER",
+			Name:  "COUNTRY",
 			Width: 100,
 		},
 		CellNameEpoch: {
 			Name:  "EPOCH",
-			Width: 45,
+			Width: 50,
+		},
+		CellNameEpochEnd: {
+			Name:  "TIME TILL THE END OF EPOCH",
+			Width: 50,
 		},
 	}
 )

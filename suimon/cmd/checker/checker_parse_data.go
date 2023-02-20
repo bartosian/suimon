@@ -100,7 +100,7 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 	return addresses, nil
 }
 
-func (checker *Checker) GetTablesData() error {
+func (checker *Checker) Init() error {
 	var (
 		wg             sync.WaitGroup
 		errChan        = make(chan error, 3)
@@ -179,8 +179,8 @@ func (checker *Checker) GetTablesData() error {
 		comparatorRPC := rpc[0]
 
 		for idx := range hosts {
-			hosts[idx].SetSyncProgress(enums.MetricTypeTxSyncProgress, comparatorRPC)
-			hosts[idx].SetSyncProgress(enums.MetricTypeCheckSyncProgress, comparatorRPC)
+			hosts[idx].SetPctProgress(enums.MetricTypeTxSyncProgress, comparatorRPC)
+			hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncProgress, comparatorRPC)
 			hosts[idx].SetStatus(tableType, comparatorRPC)
 		}
 	}
