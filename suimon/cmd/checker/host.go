@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/dariubs/percent"
@@ -38,7 +37,6 @@ type (
 		Ports    map[enums.PortType]string
 	}
 	Host struct {
-		stateMutex sync.RWMutex
 		AddressInfo
 
 		Status   enums.Status
@@ -129,45 +127,49 @@ func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
 	host.Status = status
 }
 
-func (host *Host) getMetricByDashboardCell(cellName dashboards.CellName) any {
+func (checker *Checker) getMetricByDashboardCell(cellName dashboards.CellName) any {
+	node, rpc := checker.node[0], checker.rpc[0]
+
 	switch cellName {
-	case dashboards.CellNameStatus:
-		return host.Status.DashboardStatus()
+	case dashboards.CellNameNodeStatus:
+		return node.Status.DashboardStatus()
+	case dashboards.CellNameNetworkStatus:
+		return rpc.Status.DashboardStatus()
 	case dashboards.CellNameAddress:
-		return host.AddressInfo.HostPort.Address
+		return node.AddressInfo.HostPort.Address
 	case dashboards.CellNameTransactionsPerSecond:
-		return host.Metrics.TransactionsPerSecond
+		return node.Metrics.TransactionsPerSecond
 	case dashboards.CellNameCheckpointsPerSecond:
-		return host.Metrics.CheckpointsPerSecond
+		return node.Metrics.CheckpointsPerSecond
 	case dashboards.CellNameTotalTransactions:
-		return host.Metrics.TotalTransactionNumber
+		return node.Metrics.TotalTransactionNumber
 	case dashboards.CellNameLatestCheckpoint:
-		return host.Metrics.LatestCheckpoint
+		return node.Metrics.LatestCheckpoint
 	case dashboards.CellNameHighestCheckpoint:
-		return host.Metrics.HighestSyncedCheckpoint
+		return node.Metrics.HighestSyncedCheckpoint
 	case dashboards.CellNameConnectedPeers:
-		return host.Metrics.SuiNetworkPeers
+		return node.Metrics.SuiNetworkPeers
 	case dashboards.CellNameTXSyncProgress:
-		return host.Metrics.TxSyncPercentage
+		return node.Metrics.TxSyncPercentage
 	case dashboards.CellNameCheckSyncProgress:
-		return host.Metrics.CheckSyncPercentage
+		return node.Metrics.CheckSyncPercentage
 	case dashboards.CellNameUptime:
-		return strings.Split(host.Metrics.Uptime, " ")[0]
+		return strings.Split(node.Metrics.Uptime, " ")[0]
 	case dashboards.CellNameVersion:
-		return host.Metrics.Version
+		return node.Metrics.Version
 	case dashboards.CellNameCommit:
-		return host.Metrics.Commit
+		return node.Metrics.Commit
 	case dashboards.CellNameCompany:
-		return host.Location.Provider
+		return node.Location.Provider
 	case dashboards.CellNameCountry:
-		return host.Location.String()
+		return node.Location.String()
 	case dashboards.CellNameEpoch:
-		epochLabel := host.Metrics.GetEpochLabel()
-		epochPercentage := host.Metrics.GetEpochProgress()
+		epochLabel := node.Metrics.GetEpochLabel()
+		epochPercentage := node.Metrics.GetEpochProgress()
 
 		return dashboardbuilder.NewDonutInput(epochLabel, epochPercentage)
 	case dashboards.CellNameEpochEnd:
-		return host.Metrics.GetEpochTimer()
+		return node.Metrics.GetEpochTimer()
 	}
 
 	return "no data"

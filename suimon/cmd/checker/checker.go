@@ -137,7 +137,7 @@ func (checker *Checker) DrawDashboards() {
 						dashCells := dashboardBuilder.Cells
 
 						for idx, dashCell := range dashCells {
-							metric := host.getMetricByDashboardCell(dashboards.CellName(idx))
+							metric := checker.getMetricByDashboardCell(dashboards.CellName(idx))
 
 							dashCell.Write(metric)
 						}

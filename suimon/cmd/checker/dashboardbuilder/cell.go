@@ -176,7 +176,7 @@ func initCells() []*Cell {
 		switch nameEnum {
 		case dashboards.CellNameCheckSyncProgress, dashboards.CellNameTXSyncProgress:
 			cell = NewProgressCell(nameString)
-		case dashboards.CellNameStatus:
+		case dashboards.CellNameNodeStatus, dashboards.CellNameNetworkStatus:
 			cell = NewTextCell(nameString)
 		case dashboards.CellNameEpoch:
 			cell = NewDonutCell(nameString)

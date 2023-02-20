@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _CellNameName = "CELL_NAME_STATUSCELL_NAME_ADDRESSCELL_NAME_TRANSACTIONS_PER_SECONDCELL_NAME_CHECKPOINTS_PER_SECONDCELL_NAME_TOTAL_TRANSACTIONSCELL_NAME_LATEST_CHECKPOINTCELL_NAME_HIGHEST_CHECKPOINTCELL_NAME_CONNECTED_PEERSCELL_NAME_TX_SYNC_PROGRESSCELL_NAME_CHECK_SYNC_PROGRESSCELL_NAME_UPTIMECELL_NAME_VERSIONCELL_NAME_COMMITCELL_NAME_COMPANYCELL_NAME_COUNTRYCELL_NAME_EPOCHCELL_NAME_EPOCH_END"
+const _CellNameName = "CELL_NAME_NODE_STATUSCELL_NAME_NETWORK_STATUSCELL_NAME_ADDRESSCELL_NAME_TRANSACTIONS_PER_SECONDCELL_NAME_CHECKPOINTS_PER_SECONDCELL_NAME_TOTAL_TRANSACTIONSCELL_NAME_LATEST_CHECKPOINTCELL_NAME_HIGHEST_CHECKPOINTCELL_NAME_CONNECTED_PEERSCELL_NAME_TX_SYNC_PROGRESSCELL_NAME_CHECK_SYNC_PROGRESSCELL_NAME_UPTIMECELL_NAME_VERSIONCELL_NAME_COMMITCELL_NAME_COMPANYCELL_NAME_COUNTRYCELL_NAME_EPOCHCELL_NAME_EPOCH_END"
 
-var _CellNameIndex = [...]uint16{0, 16, 33, 66, 98, 126, 153, 181, 206, 232, 261, 277, 294, 310, 327, 344, 359, 378}
+var _CellNameIndex = [...]uint16{0, 21, 45, 62, 95, 127, 155, 182, 210, 235, 261, 290, 306, 323, 339, 356, 373, 388, 407}
 
-const _CellNameLowerName = "cell_name_statuscell_name_addresscell_name_transactions_per_secondcell_name_checkpoints_per_secondcell_name_total_transactionscell_name_latest_checkpointcell_name_highest_checkpointcell_name_connected_peerscell_name_tx_sync_progresscell_name_check_sync_progresscell_name_uptimecell_name_versioncell_name_commitcell_name_companycell_name_countrycell_name_epochcell_name_epoch_end"
+const _CellNameLowerName = "cell_name_node_statuscell_name_network_statuscell_name_addresscell_name_transactions_per_secondcell_name_checkpoints_per_secondcell_name_total_transactionscell_name_latest_checkpointcell_name_highest_checkpointcell_name_connected_peerscell_name_tx_sync_progresscell_name_check_sync_progresscell_name_uptimecell_name_versioncell_name_commitcell_name_companycell_name_countrycell_name_epochcell_name_epoch_end"
 
 func (i CellName) String() string {
 	if i < 0 || i >= CellName(len(_CellNameIndex)-1) {
@@ -25,82 +25,86 @@ func (i CellName) String() string {
 // Re-run the stringer command to generate them again.
 func _CellNameNoOp() {
 	var x [1]struct{}
-	_ = x[CellNameStatus-(0)]
-	_ = x[CellNameAddress-(1)]
-	_ = x[CellNameTransactionsPerSecond-(2)]
-	_ = x[CellNameCheckpointsPerSecond-(3)]
-	_ = x[CellNameTotalTransactions-(4)]
-	_ = x[CellNameLatestCheckpoint-(5)]
-	_ = x[CellNameHighestCheckpoint-(6)]
-	_ = x[CellNameConnectedPeers-(7)]
-	_ = x[CellNameTXSyncProgress-(8)]
-	_ = x[CellNameCheckSyncProgress-(9)]
-	_ = x[CellNameUptime-(10)]
-	_ = x[CellNameVersion-(11)]
-	_ = x[CellNameCommit-(12)]
-	_ = x[CellNameCompany-(13)]
-	_ = x[CellNameCountry-(14)]
-	_ = x[CellNameEpoch-(15)]
-	_ = x[CellNameEpochEnd-(16)]
+	_ = x[CellNameNodeStatus-(0)]
+	_ = x[CellNameNetworkStatus-(1)]
+	_ = x[CellNameAddress-(2)]
+	_ = x[CellNameTransactionsPerSecond-(3)]
+	_ = x[CellNameCheckpointsPerSecond-(4)]
+	_ = x[CellNameTotalTransactions-(5)]
+	_ = x[CellNameLatestCheckpoint-(6)]
+	_ = x[CellNameHighestCheckpoint-(7)]
+	_ = x[CellNameConnectedPeers-(8)]
+	_ = x[CellNameTXSyncProgress-(9)]
+	_ = x[CellNameCheckSyncProgress-(10)]
+	_ = x[CellNameUptime-(11)]
+	_ = x[CellNameVersion-(12)]
+	_ = x[CellNameCommit-(13)]
+	_ = x[CellNameCompany-(14)]
+	_ = x[CellNameCountry-(15)]
+	_ = x[CellNameEpoch-(16)]
+	_ = x[CellNameEpochEnd-(17)]
 }
 
-var _CellNameValues = []CellName{CellNameStatus, CellNameAddress, CellNameTransactionsPerSecond, CellNameCheckpointsPerSecond, CellNameTotalTransactions, CellNameLatestCheckpoint, CellNameHighestCheckpoint, CellNameConnectedPeers, CellNameTXSyncProgress, CellNameCheckSyncProgress, CellNameUptime, CellNameVersion, CellNameCommit, CellNameCompany, CellNameCountry, CellNameEpoch, CellNameEpochEnd}
+var _CellNameValues = []CellName{CellNameNodeStatus, CellNameNetworkStatus, CellNameAddress, CellNameTransactionsPerSecond, CellNameCheckpointsPerSecond, CellNameTotalTransactions, CellNameLatestCheckpoint, CellNameHighestCheckpoint, CellNameConnectedPeers, CellNameTXSyncProgress, CellNameCheckSyncProgress, CellNameUptime, CellNameVersion, CellNameCommit, CellNameCompany, CellNameCountry, CellNameEpoch, CellNameEpochEnd}
 
 var _CellNameNameToValueMap = map[string]CellName{
-	_CellNameName[0:16]:         CellNameStatus,
-	_CellNameLowerName[0:16]:    CellNameStatus,
-	_CellNameName[16:33]:        CellNameAddress,
-	_CellNameLowerName[16:33]:   CellNameAddress,
-	_CellNameName[33:66]:        CellNameTransactionsPerSecond,
-	_CellNameLowerName[33:66]:   CellNameTransactionsPerSecond,
-	_CellNameName[66:98]:        CellNameCheckpointsPerSecond,
-	_CellNameLowerName[66:98]:   CellNameCheckpointsPerSecond,
-	_CellNameName[98:126]:       CellNameTotalTransactions,
-	_CellNameLowerName[98:126]:  CellNameTotalTransactions,
-	_CellNameName[126:153]:      CellNameLatestCheckpoint,
-	_CellNameLowerName[126:153]: CellNameLatestCheckpoint,
-	_CellNameName[153:181]:      CellNameHighestCheckpoint,
-	_CellNameLowerName[153:181]: CellNameHighestCheckpoint,
-	_CellNameName[181:206]:      CellNameConnectedPeers,
-	_CellNameLowerName[181:206]: CellNameConnectedPeers,
-	_CellNameName[206:232]:      CellNameTXSyncProgress,
-	_CellNameLowerName[206:232]: CellNameTXSyncProgress,
-	_CellNameName[232:261]:      CellNameCheckSyncProgress,
-	_CellNameLowerName[232:261]: CellNameCheckSyncProgress,
-	_CellNameName[261:277]:      CellNameUptime,
-	_CellNameLowerName[261:277]: CellNameUptime,
-	_CellNameName[277:294]:      CellNameVersion,
-	_CellNameLowerName[277:294]: CellNameVersion,
-	_CellNameName[294:310]:      CellNameCommit,
-	_CellNameLowerName[294:310]: CellNameCommit,
-	_CellNameName[310:327]:      CellNameCompany,
-	_CellNameLowerName[310:327]: CellNameCompany,
-	_CellNameName[327:344]:      CellNameCountry,
-	_CellNameLowerName[327:344]: CellNameCountry,
-	_CellNameName[344:359]:      CellNameEpoch,
-	_CellNameLowerName[344:359]: CellNameEpoch,
-	_CellNameName[359:378]:      CellNameEpochEnd,
-	_CellNameLowerName[359:378]: CellNameEpochEnd,
+	_CellNameName[0:21]:         CellNameNodeStatus,
+	_CellNameLowerName[0:21]:    CellNameNodeStatus,
+	_CellNameName[21:45]:        CellNameNetworkStatus,
+	_CellNameLowerName[21:45]:   CellNameNetworkStatus,
+	_CellNameName[45:62]:        CellNameAddress,
+	_CellNameLowerName[45:62]:   CellNameAddress,
+	_CellNameName[62:95]:        CellNameTransactionsPerSecond,
+	_CellNameLowerName[62:95]:   CellNameTransactionsPerSecond,
+	_CellNameName[95:127]:       CellNameCheckpointsPerSecond,
+	_CellNameLowerName[95:127]:  CellNameCheckpointsPerSecond,
+	_CellNameName[127:155]:      CellNameTotalTransactions,
+	_CellNameLowerName[127:155]: CellNameTotalTransactions,
+	_CellNameName[155:182]:      CellNameLatestCheckpoint,
+	_CellNameLowerName[155:182]: CellNameLatestCheckpoint,
+	_CellNameName[182:210]:      CellNameHighestCheckpoint,
+	_CellNameLowerName[182:210]: CellNameHighestCheckpoint,
+	_CellNameName[210:235]:      CellNameConnectedPeers,
+	_CellNameLowerName[210:235]: CellNameConnectedPeers,
+	_CellNameName[235:261]:      CellNameTXSyncProgress,
+	_CellNameLowerName[235:261]: CellNameTXSyncProgress,
+	_CellNameName[261:290]:      CellNameCheckSyncProgress,
+	_CellNameLowerName[261:290]: CellNameCheckSyncProgress,
+	_CellNameName[290:306]:      CellNameUptime,
+	_CellNameLowerName[290:306]: CellNameUptime,
+	_CellNameName[306:323]:      CellNameVersion,
+	_CellNameLowerName[306:323]: CellNameVersion,
+	_CellNameName[323:339]:      CellNameCommit,
+	_CellNameLowerName[323:339]: CellNameCommit,
+	_CellNameName[339:356]:      CellNameCompany,
+	_CellNameLowerName[339:356]: CellNameCompany,
+	_CellNameName[356:373]:      CellNameCountry,
+	_CellNameLowerName[356:373]: CellNameCountry,
+	_CellNameName[373:388]:      CellNameEpoch,
+	_CellNameLowerName[373:388]: CellNameEpoch,
+	_CellNameName[388:407]:      CellNameEpochEnd,
+	_CellNameLowerName[388:407]: CellNameEpochEnd,
 }
 
 var _CellNameNames = []string{
-	_CellNameName[0:16],
-	_CellNameName[16:33],
-	_CellNameName[33:66],
-	_CellNameName[66:98],
-	_CellNameName[98:126],
-	_CellNameName[126:153],
-	_CellNameName[153:181],
-	_CellNameName[181:206],
-	_CellNameName[206:232],
-	_CellNameName[232:261],
-	_CellNameName[261:277],
-	_CellNameName[277:294],
-	_CellNameName[294:310],
-	_CellNameName[310:327],
-	_CellNameName[327:344],
-	_CellNameName[344:359],
-	_CellNameName[359:378],
+	_CellNameName[0:21],
+	_CellNameName[21:45],
+	_CellNameName[45:62],
+	_CellNameName[62:95],
+	_CellNameName[95:127],
+	_CellNameName[127:155],
+	_CellNameName[155:182],
+	_CellNameName[182:210],
+	_CellNameName[210:235],
+	_CellNameName[235:261],
+	_CellNameName[261:290],
+	_CellNameName[290:306],
+	_CellNameName[306:323],
+	_CellNameName[323:339],
+	_CellNameName[339:356],
+	_CellNameName[356:373],
+	_CellNameName[373:388],
+	_CellNameName[388:407],
 }
 
 // CellNameString retrieves an enum value from the enum constants string name.

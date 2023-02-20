@@ -175,6 +175,8 @@ func (checker *Checker) Init() error {
 		})
 	}
 
+	checker.rpc = rpc
+
 	var setStatus = func(tableType enums.TableType) {
 		hosts := checker.getHostsByTableType(tableType)
 		comparatorRPC := rpc[0]

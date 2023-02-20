@@ -1,8 +1,9 @@
 package enums
 
 import (
-	"github.com/jedib0t/go-pretty/v6/text"
 	"strings"
+	
+	"github.com/jedib0t/go-pretty/v6/text"
 )
 
 type Status string

@@ -147,10 +147,6 @@ func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) any {
 }
 
 func (host *Host) GetData() {
-	host.stateMutex.Lock()
-
-	defer host.stateMutex.Unlock()
-
 	doneCH := make(chan struct{})
 
 	defer close(doneCH)

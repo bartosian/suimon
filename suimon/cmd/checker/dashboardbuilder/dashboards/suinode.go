@@ -33,16 +33,20 @@ var (
 	}
 
 	RowConfigSUI = [...]RowConfig{
-		0: {Height: 7, Columns: []CellName{CellNameStatus, CellNameUptime, CellNameTransactionsPerSecond, CellNameCheckpointsPerSecond, CellNameConnectedPeers, CellNameVersion, CellNameCommit}},
-		1: {Height: 7, Columns: []CellName{CellNameTotalTransactions, CellNameLatestCheckpoint, CellNameHighestCheckpoint}},
+		0: {Height: 7, Columns: []CellName{CellNameNodeStatus, CellNameNetworkStatus, CellNameTotalTransactions, CellNameLatestCheckpoint, CellNameHighestCheckpoint}},
+		1: {Height: 7, Columns: []CellName{CellNameUptime, CellNameTransactionsPerSecond, CellNameCheckpointsPerSecond, CellNameConnectedPeers, CellNameVersion, CellNameCommit}},
 		2: {Height: 7, Columns: []CellName{CellNameTXSyncProgress, CellNameCheckSyncProgress}},
 		3: {Height: 20, Columns: []CellName{CellNameEpoch}},
 		4: {Height: 10, Columns: []CellName{CellNameEpochEnd}},
 	}
 
 	ColumnConfigSUI = [...]ColumnConfig{
-		CellNameStatus: {
-			Name:  "STATUS",
+		CellNameNodeStatus: {
+			Name:  "NODE",
+			Width: 8,
+		},
+		CellNameNetworkStatus: {
+			Name:  "NET",
 			Width: 8,
 		},
 		CellNameAddress: {
@@ -75,11 +79,11 @@ var (
 		},
 		CellNameTXSyncProgress: {
 			Name:  "SYNC TRANSACTIONS STATUS",
-			Width: 105,
+			Width: 113,
 		},
 		CellNameCheckSyncProgress: {
 			Name:  "SYNC CHECKPOINTS STATUS",
-			Width: 105,
+			Width: 113,
 		},
 		CellNameUptime: {
 			Name:  "UPTIME",
@@ -87,11 +91,11 @@ var (
 		},
 		CellNameVersion: {
 			Name:  "VERSION",
-			Width: 45,
+			Width: 49,
 		},
 		CellNameCommit: {
 			Name:  "COMMIT",
-			Width: 62,
+			Width: 66,
 		},
 		CellNameCompany: {
 			Name:  "PROVIDER",

@@ -4,7 +4,8 @@ package dashboards
 type CellName int
 
 const (
-	CellNameStatus CellName = iota
+	CellNameNodeStatus CellName = iota
+	CellNameNetworkStatus
 	CellNameAddress
 	CellNameTransactionsPerSecond
 	CellNameCheckpointsPerSecond
@@ -24,7 +25,8 @@ const (
 )
 
 var cellNameStringValues = [...]string{
-	"STATUS",
+	"NODE STATUS",
+	"NETWORK STATUS",
 	"ADDRESS",
 	"TPS",
 	"CPS",
