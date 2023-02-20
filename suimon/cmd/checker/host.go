@@ -132,7 +132,7 @@ func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
 func (host *Host) getMetricByDashboardCell(cellName dashboards.CellName) any {
 	switch cellName {
 	case dashboards.CellNameStatus:
-		return host.Status.StatusToDashboard()
+		return host.Status.DashboardStatus()
 	case dashboards.CellNameAddress:
 		return host.AddressInfo.HostPort.Address
 	case dashboards.CellNameTransactionsPerSecond:

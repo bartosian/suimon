@@ -2,6 +2,7 @@ package enums
 
 import (
 	"github.com/jedib0t/go-pretty/v6/text"
+	"strings"
 )
 
 type Status string
@@ -31,15 +32,14 @@ func (i Status) ColorStatus() string {
 	return colors.Sprint("|    |")
 }
 
-func (i Status) StatusToDashboard() string {
-	switch i {
-	case StatusRed:
-		return "\U0001F7E5\U0001F7E5\U0001F7E5\n\U0001F7E5\U0001F7E5\U0001F7E5\n\U0001F7E5\U0001F7E5\U0001F7E5\n\U0001F7E5\U0001F7E5\U0001F7E5\n\U0001F7E5\U0001F7E5\U0001F7E5"
-	case StatusYellow:
-		return "\U0001F7E8\U0001F7E8\U0001F7E8\n\U0001F7E8\U0001F7E8\U0001F7E8\n\U0001F7E8\U0001F7E8\U0001F7E8\n\U0001F7E8\U0001F7E8\U0001F7E8\n\U0001F7E8\U0001F7E8\U0001F7E8"
-	case StatusGreen:
-		return "\U0001F7E9\U0001F7E9\U0001F7E9\n\U0001F7E9\U0001F7E9\U0001F7E9\n\U0001F7E9\U0001F7E9\U0001F7E9\n\U0001F7E9\U0001F7E9\U0001F7E9\n\U0001F7E9\U0001F7E9\U0001F7E9"
+func (i Status) DashboardStatus() string {
+	statusWidget := make([]string, 5)
+
+	repeatedPattern := strings.Repeat(string(i), 3)
+
+	for idx := range statusWidget {
+		statusWidget[idx] = repeatedPattern
 	}
 
-	return ""
+	return strings.Join(statusWidget, "\n")
 }

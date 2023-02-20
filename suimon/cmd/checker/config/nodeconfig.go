@@ -7,10 +7,13 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/bartosian/sui_helpers/suimon/pkg/env"
+	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
 const (
-	nodeConfigPath = "%s/.suimon/fullnode.yaml"
+	nodeConfigPath         = "%s/.suimon/fullnode.yaml"
+	configFullnodeNotFound = "provide path to the fullnode.yaml file by using -nf option or by setting SUIMON_NODE_CONFIG_PATH env variable or set path to this file in suimon.yaml"
+	configFullnodeInvalid  = "make sure fullnode.yaml file has correct syntax and properties"
 )
 
 type NodeConfig struct {
@@ -31,6 +34,7 @@ type NodeConfig struct {
 }
 
 func ParseNodeConfig(path *string, suimonPath string) (*NodeConfig, error) {
+	logger := log.NewLogger()
 	configPath := *path
 
 	if configPath == "" {
@@ -40,17 +44,23 @@ func ParseNodeConfig(path *string, suimonPath string) (*NodeConfig, error) {
 
 	file, err := os.ReadFile(configPath)
 	if err != nil && suimonPath == "" {
+		logger.Error(configFullnodeNotFound)
+
 		return nil, err
 	}
 
 	file, err = os.ReadFile(suimonPath)
 	if err != nil {
+		logger.Error(configFullnodeNotFound)
+
 		return nil, err
 	}
 
 	var result NodeConfig
 	err = yaml.Unmarshal(file, &result)
 	if err != nil {
+		logger.Error(configFullnodeInvalid)
+
 		return nil, err
 	}
 

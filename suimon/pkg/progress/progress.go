@@ -24,13 +24,14 @@ func NewProgressBar(action string, color Color) chan<- struct{} {
 
 	bar := progressbar.NewOptions(1000,
 		progressbar.OptionEnableColorCodes(true),
+		progressbar.OptionSetElapsedTime(false),
 		progressbar.OptionShowBytes(false),
 		progressbar.OptionClearOnFinish(),
 		progressbar.OptionSetWidth(30),
 		progressbar.OptionSetDescription(fmt.Sprintf("%s [ %s... ] [reset]", color, action)),
 		progressbar.OptionSetTheme(progressbar.Theme{
 			Saucer:        "=",
-			SaucerHead:    ">>",
+			SaucerHead:    ">",
 			SaucerPadding: " ",
 			BarStart:      "[",
 			BarEnd:        "]",
@@ -58,12 +59,8 @@ func NewProgressBar(action string, color Color) chan<- struct{} {
 }
 
 func PrintLogo() {
-	fmt.Println()
-	fmt.Println()
-	logo := figure.NewColorFigure("suimon", "banner3", "blue", true)
+	fmt.Print("\n\n")
+	logo := figure.NewColorFigure("suimon", "banner3", "red", true)
 	logo.Print()
-	version := figure.NewColorFigure("      v0.1.0", "3x5", "red", true)
-	version.Print()
-	fmt.Println()
-	fmt.Println()
+	fmt.Print("\n\n")
 }

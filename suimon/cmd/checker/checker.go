@@ -101,13 +101,13 @@ func (checker *Checker) setTableBuilderTableType(tableType enums.TableType, tc t
 }
 
 func (checker *Checker) DrawTables() {
-	if checker.suimonConfig.MonitorsConfig.RPCTable.Display {
+	if checker.suimonConfig.MonitorsConfig.RPCTable.Display && len(checker.rpc) > 0 {
 		checker.tableBuilderRPC.Build()
 	}
-	if checker.suimonConfig.MonitorsConfig.NodeTable.Display {
+	if checker.suimonConfig.MonitorsConfig.NodeTable.Display && len(checker.node) > 0 {
 		checker.tableBuilderNode.Build()
 	}
-	if checker.suimonConfig.MonitorsConfig.PeersTable.Display {
+	if checker.suimonConfig.MonitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
 		checker.tableBuilderPeer.Build()
 	}
 }
@@ -126,6 +126,8 @@ func (checker *Checker) DrawDashboards() {
 		defer wg.Done()
 
 		doneCH := make(chan struct{}, len(hosts))
+
+		defer close(doneCH)
 
 		for {
 			select {
@@ -161,42 +163,15 @@ func (checker *Checker) DrawDashboards() {
 		checker.WatchHosts()
 	}()
 
-	//if monitorsConfig.RPCTable.Display && len(checker.rpc) > 0 {
-	//	wg.Add(1)
-	//
-	//	go draw(checker.rpc)
-	//}
-
 	if monitorsConfig.NodeTable.Display && len(checker.node) > 0 {
 		wg.Add(1)
 
 		go draw(checker.node)
 	}
 
-	//if monitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
-	//	wg.Add(1)
-	//
-	//	go draw(checker.peers)
-	//}
-
 	if err := termdash.Run(dashboardBuilder.Ctx, dashboardBuilder.Terminal, dashboardBuilder.Dashboard, termdash.KeyboardSubscriber(dashboardBuilder.Quitter)); err != nil {
 		panic(err)
 	}
 
 	wg.Wait()
-}
-
-func (checker *Checker) InitDashboard() error {
-	var (
-		dashboard *dashboardbuilder.DashboardBuilder
-		err       error
-	)
-
-	if dashboard, err = dashboardbuilder.NewDashboardBuilder(); err != nil {
-		return err
-	}
-
-	checker.DashboardBuilder = dashboard
-
-	return nil
 }

@@ -108,18 +108,21 @@ func (checker *Checker) Init() error {
 		monitorsConfig = suimonConfig.MonitorsConfig
 	)
 
-	var getTableData = func(tableType enums.TableType, progressColor progress.Color) {
-		progressChan := progress.NewProgressBar("PARSING DATA FOR "+string(tableType)+" TABLE", progressColor)
-
-		addresses, err := checker.getAddressInfoByTableType(tableType)
-		if err != nil {
-			errChan <- err
-		}
+	var getData = func(tableType enums.TableType, progressColor progress.Color) {
+		var (
+			progressChan = progress.NewProgressBar("PARSING DATA FOR "+string(tableType), progressColor)
+			addresses    []AddressInfo
+			hosts        []Host
+			err          error
+		)
 
 		defer wg.Done()
 
-		hosts, err := checker.createHosts(addresses)
-		if err != nil {
+		if addresses, err = checker.getAddressInfoByTableType(tableType); err != nil {
+			errChan <- err
+		}
+
+		if hosts, err = checker.createHosts(addresses); err != nil {
 			errChan <- err
 		}
 
@@ -128,25 +131,23 @@ func (checker *Checker) Init() error {
 		progressChan <- struct{}{}
 	}
 
-	// parse data for the RPC table
+	// parse data for the RPC servers
+	wg.Add(1)
+
+	go getData(enums.TableTypeRPC, progress.ColorBlue)
+
+	// parse data for the user servers
 	if monitorsConfig.NodeTable.Display {
 		wg.Add(1)
 
-		go getTableData(enums.TableTypeRPC, progress.ColorBlue)
+		go getData(enums.TableTypeNode, progress.ColorRed)
 	}
 
-	// parse data for the NODE table
-	if monitorsConfig.NodeTable.Display {
-		wg.Add(1)
-
-		go getTableData(enums.TableTypeNode, progress.ColorRed)
-	}
-
-	// parse data for the PEERS table
+	// parse data for the peers servers
 	if monitorsConfig.PeersTable.Display {
 		wg.Add(1)
 
-		go getTableData(enums.TableTypePeers, progress.ColorGreen)
+		go getData(enums.TableTypePeers, progress.ColorGreen)
 	}
 
 	wg.Wait()

@@ -8,10 +8,13 @@ import (
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/env"
+	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
 const (
-	suimonConfigPath = "%s/.suimon/suimon.yaml"
+	suimonConfigPath     = "%s/.suimon/suimon.yaml"
+	configSuimonNotFound = "provide path to the suimon.yaml file by using -sf option or by setting SUIMON_CONFIG_PATH env variable or put suimon.yaml in $HOME/.suimon/suimon.yaml"
+	configSuimonInvalid  = "make sure suimon.yaml file has correct syntax and properties"
 )
 
 type SuimonConfig struct {
@@ -43,6 +46,7 @@ type SuimonConfig struct {
 }
 
 func ParseSuimonConfig(path *string) (*SuimonConfig, error) {
+	logger := log.NewLogger()
 	configPath := *path
 
 	if configPath == "" {
@@ -52,12 +56,16 @@ func ParseSuimonConfig(path *string) (*SuimonConfig, error) {
 
 	file, err := os.ReadFile(configPath)
 	if err != nil {
+		logger.Error(configSuimonNotFound)
+
 		return nil, err
 	}
 
 	var result SuimonConfig
 	err = yaml.Unmarshal(file, &result)
 	if err != nil {
+		logger.Error(configSuimonInvalid)
+
 		return nil, err
 	}
 
