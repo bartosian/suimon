@@ -156,7 +156,10 @@ func newDisplayWidget() (*segmentdisplay.SegmentDisplay, error) {
 
 func newDonutWidget() (*donut.Donut, error) {
 	return donut.New(
-		donut.CellOpts(cell.FgColor(cell.ColorGreen), cell.Bold()),
+		donut.CellOpts(
+			cell.FgColor(cell.ColorGreen),
+			cell.Bold(),
+		),
 	)
 }
 

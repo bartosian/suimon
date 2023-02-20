@@ -137,6 +137,8 @@ func (host *Host) getMetricByDashboardCell(cellName dashboards.CellName) any {
 		return host.AddressInfo.HostPort.Address
 	case dashboards.CellNameTransactionsPerSecond:
 		return host.Metrics.TransactionsPerSecond
+	case dashboards.CellNameCheckpointsPerSecond:
+		return host.Metrics.CheckpointsPerSecond
 	case dashboards.CellNameTotalTransactions:
 		return host.Metrics.TotalTransactionNumber
 	case dashboards.CellNameLatestCheckpoint:

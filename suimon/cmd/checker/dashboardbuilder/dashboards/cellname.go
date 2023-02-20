@@ -7,6 +7,7 @@ const (
 	CellNameStatus CellName = iota
 	CellNameAddress
 	CellNameTransactionsPerSecond
+	CellNameCheckpointsPerSecond
 	CellNameTotalTransactions
 	CellNameLatestCheckpoint
 	CellNameHighestCheckpoint
@@ -26,6 +27,7 @@ var cellNameStringValues = [...]string{
 	"STATUS",
 	"ADDRESS",
 	"TPS",
+	"CPS",
 	"TOTAL TRANSACTIONS",
 	"LATEST CHECKPOINT",
 	"HIGHEST SYNCED CHECKPOINT",

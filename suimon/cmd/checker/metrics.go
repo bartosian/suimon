@@ -13,6 +13,7 @@ import (
 
 const (
 	transactionsPerSecondTimeout   = 10
+	checkpointsPerSecondTimeout    = 10
 	transactionsPerSecondLag       = 5
 	latestCheckpointLag            = 30
 	highestSyncedCheckpointLag     = 30
@@ -71,6 +72,8 @@ type Metrics struct {
 	TransactionsHistory     []int
 	TotalTransactionNumber  int
 	LatestCheckpoint        int
+	CheckpointsPerSecond    int
+	CheckpointsHistory      []int
 	HighestSyncedCheckpoint int
 	SuiNetworkPeers         int
 	Uptime                  string
@@ -111,6 +114,33 @@ func (metrics *Metrics) CalculateTPS() {
 	metrics.TransactionsPerSecond = tps
 }
 
+func (metrics *Metrics) CalculateCPS() {
+	var (
+		checkpointsHistory = metrics.CheckpointsHistory
+		checkpointsStart   int
+		checkpointsEnd     int
+		cps                int
+	)
+
+	checkpointsHistory = append(checkpointsHistory, metrics.HighestSyncedCheckpoint)
+	if len(checkpointsHistory) < checkpointsPerSecondTimeout {
+		metrics.CheckpointsHistory = checkpointsHistory
+
+		return
+	}
+
+	if len(checkpointsHistory) > checkpointsPerSecondTimeout {
+		checkpointsHistory = checkpointsHistory[1:]
+	}
+
+	checkpointsStart = checkpointsHistory[0]
+	checkpointsEnd = checkpointsHistory[checkpointsPerSecondTimeout-1]
+	cps = (checkpointsEnd - checkpointsStart) / checkpointsPerSecondTimeout
+
+	metrics.CheckpointsHistory = checkpointsHistory
+	metrics.CheckpointsPerSecond = cps
+}
+
 func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 	switch metric {
 	case enums.MetricTypeUptime:
@@ -137,6 +167,8 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 		}
 
 		metrics.HighestSyncedCheckpoint = valueInt
+
+		metrics.CalculateCPS()
 	case enums.MetricTypeSuiNetworkPeers:
 		var (
 			valueString = value.(string)
@@ -193,6 +225,8 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
 		return metrics.TotalTransactionNumber
 	case enums.MetricTypeTransactionsPerSecond:
 		return metrics.TransactionsPerSecond
+	case enums.MetricTypeCheckpointsPerSecond:
+		return metrics.CheckpointsPerSecond
 	case enums.MetricTypeTxSyncProgress:
 		return metrics.TotalTransactionNumber
 	case enums.MetricTypeCheckSyncProgress:
