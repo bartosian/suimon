@@ -89,7 +89,7 @@ func (c *Cell) Write(value any) {
 
 		v.Percent(
 			valueInput.Percentage,
-			donut.Label(valueInput.Label, cell.FgColor(cell.ColorGreen), cell.Bold()),
+			donut.Label(valueInput.Label, cell.Bold()),
 		)
 	}
 }
@@ -171,21 +171,23 @@ func initCells() []*Cell {
 		var (
 			nameEnum   = dashboards.CellName(name)
 			nameString = config.Name
-			cell       *Cell
+			dashCell   *Cell
 		)
 
 		switch nameEnum {
 		case dashboards.CellNameCheckSyncProgress, dashboards.CellNameTXSyncProgress:
-			cell = NewProgressCell(nameString)
+			dashCell = NewProgressCell(nameString)
 		case dashboards.CellNameNodeStatus, dashboards.CellNameNetworkStatus:
-			cell = NewTextCell(nameString)
-		case dashboards.CellNameEpoch, dashboards.CellNameDiskUsage:
-			cell = NewDonutCell(nameString)
+			dashCell = NewTextCell(nameString)
+		case dashboards.CellNameEpoch:
+			dashCell = NewDonutCell(nameString)
+		case dashboards.CellNameDiskUsage:
+			dashCell = NewDonutCell(nameString)
 		default:
-			cell = NewDisplayCell(nameString)
+			dashCell = NewDisplayCell(nameString)
 		}
 
-		cells[name] = cell
+		cells[name] = dashCell
 	}
 
 	return cells
