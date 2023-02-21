@@ -1,6 +1,7 @@
 package checker
 
 import (
+	"fmt"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder/tables"
@@ -78,6 +79,8 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 
 		if tableType != enums.TableTypeRPC {
 			columns[tables.ColumnNameHighestCheckpoint].SetValue(host.Metrics.HighestSyncedCheckpoint)
+			columns[tables.ColumnNameTXSyncProgress].SetValue(fmt.Sprintf("%v%%", host.Metrics.TxSyncPercentage))
+			columns[tables.ColumnNameCheckSyncProgress].SetValue(fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage))
 			columns[tables.ColumnNameConnectedPeers].SetValue(host.Metrics.SuiNetworkPeers)
 			columns[tables.ColumnNameUptime].SetValue(host.Metrics.Uptime)
 			columns[tables.ColumnNameVersion].SetValue(host.Metrics.Version)

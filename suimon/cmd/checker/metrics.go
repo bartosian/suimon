@@ -15,10 +15,10 @@ const (
 	transactionsPerSecondTimeout   = 10
 	checkpointsPerSecondTimeout    = 10
 	transactionsPerSecondLag       = 5
+	checkpointsPerSecondLag        = 5
 	latestCheckpointLag            = 30
 	highestSyncedCheckpointLag     = 30
 	totalTransactionsNumberHealthy = 98
-	totalTransactionsNumberLimit   = 100
 	epochLength                    = 24 * time.Hour
 )
 
@@ -245,7 +245,7 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
 func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC any) bool {
 	switch metric {
 	case enums.MetricTypeTotalTransactionsNumber:
-		return metrics.TxSyncPercentage > totalTransactionsNumberHealthy && metrics.TxSyncPercentage <= totalTransactionsNumberLimit
+		return metrics.TxSyncPercentage > totalTransactionsNumberHealthy
 	case enums.MetricTypeTransactionsPerSecond:
 		valueRPCInt := valueRPC.(int)
 
@@ -258,6 +258,10 @@ func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC any) bool {
 		valueRPCInt := valueRPC.(int)
 
 		return metrics.HighestSyncedCheckpoint >= valueRPCInt-highestSyncedCheckpointLag
+	case enums.MetricTypeCheckpointsPerSecond:
+		valueRPCInt := valueRPC.(int)
+
+		return metrics.CheckpointsPerSecond >= valueRPCInt-checkpointsPerSecondLag
 	case enums.MetricTypeVersion:
 		return metrics.Version == valueRPC
 	}

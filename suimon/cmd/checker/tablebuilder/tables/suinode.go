@@ -62,6 +62,22 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
+		ColumnNameTXSyncProgress: {
+			Name:         "TRANSACTIONS\nSYNC PROGRESS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		ColumnNameCheckSyncProgress: {
+			Name:         "CHECKPOINTS\nSYNC PROGRESS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
 		ColumnNameConnectedPeers: {
 			Name:         "CONNECTED\nPEERS",
 			Align:        text.AlignCenter,

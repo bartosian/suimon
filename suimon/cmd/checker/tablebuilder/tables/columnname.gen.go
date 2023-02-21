@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _ColumnNameName = "COLUMN_NAME_STATUSCOLUMN_NAME_ADDRESSCOLUMN_NAME_PORT_RPCCOLUMN_NAME_TOTAL_TRANSACTIONSCOLUMN_NAME_LATEST_CHECKPOINTCOLUMN_NAME_HIGHEST_CHECKPOINTCOLUMN_NAME_CONNECTED_PEERSCOLUMN_NAME_UPTIMECOLUMN_NAME_VERSIONCOLUMN_NAME_COMMITCOLUMN_NAME_COMPANYCOLUMN_NAME_COUNTRY"
+const _ColumnNameName = "COLUMN_NAME_STATUSCOLUMN_NAME_ADDRESSCOLUMN_NAME_PORT_RPCCOLUMN_NAME_TOTAL_TRANSACTIONSCOLUMN_NAME_LATEST_CHECKPOINTCOLUMN_NAME_HIGHEST_CHECKPOINTCOLUMN_NAME_TX_SYNC_PROGRESSCOLUMN_NAME_CHECK_SYNC_PROGRESSCOLUMN_NAME_CONNECTED_PEERSCOLUMN_NAME_UPTIMECOLUMN_NAME_VERSIONCOLUMN_NAME_COMMITCOLUMN_NAME_COMPANYCOLUMN_NAME_COUNTRY"
 
-var _ColumnNameIndex = [...]uint16{0, 18, 37, 57, 87, 116, 146, 173, 191, 210, 228, 247, 266}
+var _ColumnNameIndex = [...]uint16{0, 18, 37, 57, 87, 116, 146, 174, 205, 232, 250, 269, 287, 306, 325}
 
-const _ColumnNameLowerName = "column_name_statuscolumn_name_addresscolumn_name_port_rpccolumn_name_total_transactionscolumn_name_latest_checkpointcolumn_name_highest_checkpointcolumn_name_connected_peerscolumn_name_uptimecolumn_name_versioncolumn_name_commitcolumn_name_companycolumn_name_country"
+const _ColumnNameLowerName = "column_name_statuscolumn_name_addresscolumn_name_port_rpccolumn_name_total_transactionscolumn_name_latest_checkpointcolumn_name_highest_checkpointcolumn_name_tx_sync_progresscolumn_name_check_sync_progresscolumn_name_connected_peerscolumn_name_uptimecolumn_name_versioncolumn_name_commitcolumn_name_companycolumn_name_country"
 
 func (i ColumnName) String() string {
 	if i < 0 || i >= ColumnName(len(_ColumnNameIndex)-1) {
@@ -31,15 +31,17 @@ func _ColumnNameNoOp() {
 	_ = x[ColumnNameTotalTransactions-(3)]
 	_ = x[ColumnNameLatestCheckpoint-(4)]
 	_ = x[ColumnNameHighestCheckpoint-(5)]
-	_ = x[ColumnNameConnectedPeers-(6)]
-	_ = x[ColumnNameUptime-(7)]
-	_ = x[ColumnNameVersion-(8)]
-	_ = x[ColumnNameCommit-(9)]
-	_ = x[ColumnNameCompany-(10)]
-	_ = x[ColumnNameCountry-(11)]
+	_ = x[ColumnNameTXSyncProgress-(6)]
+	_ = x[ColumnNameCheckSyncProgress-(7)]
+	_ = x[ColumnNameConnectedPeers-(8)]
+	_ = x[ColumnNameUptime-(9)]
+	_ = x[ColumnNameVersion-(10)]
+	_ = x[ColumnNameCommit-(11)]
+	_ = x[ColumnNameCompany-(12)]
+	_ = x[ColumnNameCountry-(13)]
 }
 
-var _ColumnNameValues = []ColumnName{ColumnNameStatus, ColumnNameAddress, ColumnNamePortRPC, ColumnNameTotalTransactions, ColumnNameLatestCheckpoint, ColumnNameHighestCheckpoint, ColumnNameConnectedPeers, ColumnNameUptime, ColumnNameVersion, ColumnNameCommit, ColumnNameCompany, ColumnNameCountry}
+var _ColumnNameValues = []ColumnName{ColumnNameStatus, ColumnNameAddress, ColumnNamePortRPC, ColumnNameTotalTransactions, ColumnNameLatestCheckpoint, ColumnNameHighestCheckpoint, ColumnNameTXSyncProgress, ColumnNameCheckSyncProgress, ColumnNameConnectedPeers, ColumnNameUptime, ColumnNameVersion, ColumnNameCommit, ColumnNameCompany, ColumnNameCountry}
 
 var _ColumnNameNameToValueMap = map[string]ColumnName{
 	_ColumnNameName[0:18]:         ColumnNameStatus,
@@ -54,18 +56,22 @@ var _ColumnNameNameToValueMap = map[string]ColumnName{
 	_ColumnNameLowerName[87:116]:  ColumnNameLatestCheckpoint,
 	_ColumnNameName[116:146]:      ColumnNameHighestCheckpoint,
 	_ColumnNameLowerName[116:146]: ColumnNameHighestCheckpoint,
-	_ColumnNameName[146:173]:      ColumnNameConnectedPeers,
-	_ColumnNameLowerName[146:173]: ColumnNameConnectedPeers,
-	_ColumnNameName[173:191]:      ColumnNameUptime,
-	_ColumnNameLowerName[173:191]: ColumnNameUptime,
-	_ColumnNameName[191:210]:      ColumnNameVersion,
-	_ColumnNameLowerName[191:210]: ColumnNameVersion,
-	_ColumnNameName[210:228]:      ColumnNameCommit,
-	_ColumnNameLowerName[210:228]: ColumnNameCommit,
-	_ColumnNameName[228:247]:      ColumnNameCompany,
-	_ColumnNameLowerName[228:247]: ColumnNameCompany,
-	_ColumnNameName[247:266]:      ColumnNameCountry,
-	_ColumnNameLowerName[247:266]: ColumnNameCountry,
+	_ColumnNameName[146:174]:      ColumnNameTXSyncProgress,
+	_ColumnNameLowerName[146:174]: ColumnNameTXSyncProgress,
+	_ColumnNameName[174:205]:      ColumnNameCheckSyncProgress,
+	_ColumnNameLowerName[174:205]: ColumnNameCheckSyncProgress,
+	_ColumnNameName[205:232]:      ColumnNameConnectedPeers,
+	_ColumnNameLowerName[205:232]: ColumnNameConnectedPeers,
+	_ColumnNameName[232:250]:      ColumnNameUptime,
+	_ColumnNameLowerName[232:250]: ColumnNameUptime,
+	_ColumnNameName[250:269]:      ColumnNameVersion,
+	_ColumnNameLowerName[250:269]: ColumnNameVersion,
+	_ColumnNameName[269:287]:      ColumnNameCommit,
+	_ColumnNameLowerName[269:287]: ColumnNameCommit,
+	_ColumnNameName[287:306]:      ColumnNameCompany,
+	_ColumnNameLowerName[287:306]: ColumnNameCompany,
+	_ColumnNameName[306:325]:      ColumnNameCountry,
+	_ColumnNameLowerName[306:325]: ColumnNameCountry,
 }
 
 var _ColumnNameNames = []string{
@@ -75,12 +81,14 @@ var _ColumnNameNames = []string{
 	_ColumnNameName[57:87],
 	_ColumnNameName[87:116],
 	_ColumnNameName[116:146],
-	_ColumnNameName[146:173],
-	_ColumnNameName[173:191],
-	_ColumnNameName[191:210],
-	_ColumnNameName[210:228],
-	_ColumnNameName[228:247],
-	_ColumnNameName[247:266],
+	_ColumnNameName[146:174],
+	_ColumnNameName[174:205],
+	_ColumnNameName[205:232],
+	_ColumnNameName[232:250],
+	_ColumnNameName[250:269],
+	_ColumnNameName[269:287],
+	_ColumnNameName[287:306],
+	_ColumnNameName[306:325],
 }
 
 // ColumnNameString retrieves an enum value from the enum constants string name.

@@ -77,7 +77,7 @@ func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) {
 	host.Metrics.SetValue(metricType, percentage)
 }
 
-func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
+func (host *Host) SetStatus(rpc Host) {
 	status := enums.StatusGreen
 	metricsHost := host.Metrics
 	metricsRPC := rpc.Metrics
@@ -85,40 +85,18 @@ func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
 	switch metricsHost.Updated {
 	case false:
 		status = enums.StatusRed
-
-		if tableType == enums.TableTypePeers {
-			status = enums.StatusYellow
-		}
 	case true:
-		if metricsHost.TotalTransactionNumber == 0 || metricsHost.LatestCheckpoint == 0 {
-			status = enums.StatusRed
-
-			if tableType == enums.TableTypePeers {
-				status = enums.StatusYellow
-			}
-
-			break
-		}
-
-		if metricsHost.TransactionsPerSecond == 0 && rpc.Metrics.TransactionsPerSecond != 0 {
+		if metricsHost.TotalTransactionNumber == 0 && metricsRPC.TotalTransactionNumber != 0 ||
+			metricsHost.LatestCheckpoint == 0 && metricsRPC.LatestCheckpoint != 0 ||
+			metricsHost.TransactionsPerSecond == 0 && metricsRPC.TransactionsPerSecond != 0 ||
+			metricsHost.TxSyncPercentage > 100 || metricsHost.CheckSyncPercentage > 100 {
 			status = enums.StatusRed
 
 			break
 		}
 
-		if metricsHost.TransactionsPerSecond != 0 &&
-			metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) {
-			status = enums.StatusYellow
-		}
-
-		if metricsHost.TotalTransactionNumber != 0 &&
-			metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionsNumber, metricsRPC.TotalTransactionNumber) {
-			status = enums.StatusYellow
-
-			break
-		}
-
-		if metricsHost.LatestCheckpoint != 0 &&
+		if metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) ||
+			metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionsNumber, metricsRPC.TotalTransactionNumber) ||
 			metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
 			status = enums.StatusYellow
 		}

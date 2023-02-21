@@ -24,18 +24,19 @@ const (
 	MetricTypeCheckpointsPerSecond    MetricType = "CHECKPOINTS_PER_SECOND"
 )
 
-func (e MetricType) String() string {
+func (e MetricType) ToString() string {
 	return string(e)
 }
 
 func MetricTypeFromString(value string) (MetricType, error) {
 	value = strings.ToUpper(strings.TrimSpace(value))
 
-	if strings.HasPrefix(value, MetricTypeUptime.String()) {
+	if strings.HasPrefix(value, MetricTypeUptime.ToString()) {
 		return MetricTypeUptime, nil
 	}
 
 	result, ok := map[string]MetricType{
+		"UNDEFINED":                 MetricTypeUndefined,
 		"UPTIME":                    MetricTypeUptime,
 		"VERSION":                   MetricTypeVersion,
 		"COMMIT":                    MetricTypeCommit,

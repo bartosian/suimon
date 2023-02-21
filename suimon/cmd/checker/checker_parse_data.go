@@ -184,7 +184,7 @@ func (checker *Checker) Init() error {
 		for idx := range hosts {
 			hosts[idx].SetPctProgress(enums.MetricTypeTxSyncProgress, comparatorRPC)
 			hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncProgress, comparatorRPC)
-			hosts[idx].SetStatus(tableType, comparatorRPC)
+			hosts[idx].SetStatus(comparatorRPC)
 		}
 	}
 

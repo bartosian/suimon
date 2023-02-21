@@ -10,6 +10,8 @@ const (
 	ColumnNameTotalTransactions
 	ColumnNameLatestCheckpoint
 	ColumnNameHighestCheckpoint
+	ColumnNameTXSyncProgress
+	ColumnNameCheckSyncProgress
 	ColumnNameConnectedPeers
 	ColumnNameUptime
 	ColumnNameVersion
