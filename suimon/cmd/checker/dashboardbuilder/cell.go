@@ -2,6 +2,8 @@ package dashboardbuilder
 
 import (
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/mum4k/termdash/align"
 	"github.com/mum4k/termdash/cell"
@@ -15,8 +17,6 @@ import (
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 )
-
-const dashboardInProgress = "LOAD"
 
 type Cell struct {
 	Config []container.Option
@@ -58,7 +58,7 @@ func (c *Cell) Write(value any) {
 		valueString := value.(string)
 
 		if valueString == "" {
-			valueString = dashboardInProgress
+			valueString = dashboardLoadingValue()
 		}
 
 		v.Reset()
@@ -78,7 +78,7 @@ func (c *Cell) Write(value any) {
 		}
 
 		if chunkValue == "" || chunkValue == "0" {
-			chunkValue = dashboardInProgress
+			chunkValue = dashboardLoadingValue()
 		}
 
 		v.Write([]*segmentdisplay.TextChunk{
@@ -191,4 +191,13 @@ func initCells() []*Cell {
 	}
 
 	return cells
+}
+
+func dashboardLoadingValue() string {
+	inProgress := []string{"-", "-", "-", "-", "-"}
+	second := time.Now().Second() % 10
+
+	inProgress[second/2] = " "
+
+	return strings.Join(inProgress, "")
 }
