@@ -37,7 +37,7 @@ var (
 		1: {Height: 7, Columns: []CellName{CellNameUptime, CellNameTransactionsPerSecond, CellNameCheckpointsPerSecond, CellNameConnectedPeers, CellNameVersion, CellNameCommit}},
 		2: {Height: 7, Columns: []CellName{CellNameTXSyncProgress, CellNameCheckSyncProgress}},
 		3: {Height: 20, Columns: []CellName{CellNameEpoch, CellNameDiskUsage}},
-		4: {Height: 10, Columns: []CellName{CellNameEpochEnd}},
+		4: {Height: 10, Columns: []CellName{CellNameEpochEnd, CellNameDatabaseSize}},
 	}
 
 	ColumnConfigSUI = [...]ColumnConfig{
@@ -115,6 +115,10 @@ var (
 		},
 		CellNameDiskUsage: {
 			Name:  "DISK USAGE",
+			Width: 50,
+		},
+		CellNameDatabaseSize: {
+			Name:  "DATABASE SIZE",
 			Width: 50,
 		},
 	}

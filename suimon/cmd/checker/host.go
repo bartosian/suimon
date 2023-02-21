@@ -164,7 +164,25 @@ func (checker *Checker) getMetricByDashboardCell(cellName dashboards.CellName) a
 		usagePercentage := diskUsage.PercentageUsed
 
 		return dashboardbuilder.NewDonutInput(usageLabel, usagePercentage)
-	}
+	case dashboards.CellNameDatabaseSize:
+		var (
+			dbPath = checker.nodeConfig.DbPath
+			dbSize float64
+			err    error
+		)
 
-	return "no data"
+		if dbSize, err = utility.GetDirSize(dbPath); err != nil {
+			if dbSize, err = utility.GetVolumeSize("suidb"); err != nil {
+				return 0
+			}
+		}
+
+		if dbSize >= 1000 {
+			dbSize = dbSize / 1000
+		}
+
+		return fmt.Sprintf("%.02fGB", dbSize)
+	default:
+		return ""
+	}
 }
