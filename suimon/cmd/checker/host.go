@@ -1,6 +1,7 @@
 package checker
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -15,6 +16,7 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/address"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
+	"github.com/bartosian/sui_helpers/suimon/pkg/utility"
 )
 
 type requestType int
@@ -148,6 +150,20 @@ func (checker *Checker) getMetricByDashboardCell(cellName dashboards.CellName) a
 		return dashboardbuilder.NewDonutInput(epochLabel, epochPercentage)
 	case dashboards.CellNameEpochEnd:
 		return node.Metrics.GetEpochTimer()
+	case dashboards.CellNameDiskUsage:
+		var (
+			diskUsage *utility.DiskUsage
+			err       error
+		)
+
+		if diskUsage, err = utility.GetDiskUsage(); err != nil {
+			panic(err)
+		}
+
+		usageLabel := fmt.Sprintf("TOTAL/USED: %d/%dGB", diskUsage.Total, diskUsage.Used)
+		usagePercentage := diskUsage.PercentageUsed
+
+		return dashboardbuilder.NewDonutInput(usageLabel, usagePercentage)
 	}
 
 	return "no data"

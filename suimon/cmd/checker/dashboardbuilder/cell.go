@@ -42,6 +42,7 @@ func NewCell(title string, widget widgetapi.Widget) *Cell {
 type DonutWriteInput struct {
 	Label      string
 	Percentage int
+	Color      cell.Color
 }
 
 func NewDonutInput(label string, pct int) DonutWriteInput {
@@ -178,7 +179,7 @@ func initCells() []*Cell {
 			cell = NewProgressCell(nameString)
 		case dashboards.CellNameNodeStatus, dashboards.CellNameNetworkStatus:
 			cell = NewTextCell(nameString)
-		case dashboards.CellNameEpoch:
+		case dashboards.CellNameEpoch, dashboards.CellNameDiskUsage:
 			cell = NewDonutCell(nameString)
 		default:
 			cell = NewDisplayCell(nameString)

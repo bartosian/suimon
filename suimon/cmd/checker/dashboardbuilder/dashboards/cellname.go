@@ -22,6 +22,7 @@ const (
 	CellNameCountry
 	CellNameEpoch
 	CellNameEpochEnd
+	CellNameDiskUsage
 )
 
 var cellNameStringValues = [...]string{
@@ -43,6 +44,7 @@ var cellNameStringValues = [...]string{
 	"COUNTRY",
 	"EPOCH",
 	"TIME TILL THE END OF EPOCH",
+	"DISK USAGE",
 }
 
 func (i CellName) CellNameString() string {

@@ -36,7 +36,7 @@ var (
 		0: {Height: 7, Columns: []CellName{CellNameNodeStatus, CellNameNetworkStatus, CellNameTotalTransactions, CellNameLatestCheckpoint, CellNameHighestCheckpoint}},
 		1: {Height: 7, Columns: []CellName{CellNameUptime, CellNameTransactionsPerSecond, CellNameCheckpointsPerSecond, CellNameConnectedPeers, CellNameVersion, CellNameCommit}},
 		2: {Height: 7, Columns: []CellName{CellNameTXSyncProgress, CellNameCheckSyncProgress}},
-		3: {Height: 20, Columns: []CellName{CellNameEpoch}},
+		3: {Height: 20, Columns: []CellName{CellNameEpoch, CellNameDiskUsage}},
 		4: {Height: 10, Columns: []CellName{CellNameEpochEnd}},
 	}
 
@@ -111,6 +111,10 @@ var (
 		},
 		CellNameEpochEnd: {
 			Name:  "TIME TILL THE END OF EPOCH",
+			Width: 50,
+		},
+		CellNameDiskUsage: {
+			Name:  "DISK USAGE",
 			Width: 50,
 		},
 	}
