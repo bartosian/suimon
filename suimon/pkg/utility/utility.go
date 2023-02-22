@@ -2,15 +2,16 @@ package utility
 
 import (
 	"context"
+	"os"
+	"path/filepath"
+	"syscall"
+	"time"
+
 	"github.com/dariubs/percent"
 	"github.com/docker/docker/client"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/mem"
 	"github.com/shirou/gopsutil/v3/net"
-	"os"
-	"path/filepath"
-	"syscall"
-	"time"
 )
 
 const gb = 1024 * 1024 * 1024

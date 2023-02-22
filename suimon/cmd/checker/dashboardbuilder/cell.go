@@ -121,8 +121,8 @@ func NewDisplayCell(title string) *Cell {
 	return NewCell(title, displayWidget)
 }
 
-func NewDonutCell(title string) *Cell {
-	donutWidget, err := newDonutWidget()
+func NewDonutCell(title string, color cell.Color) *Cell {
+	donutWidget, err := newDonutWidget(color)
 	if err != nil {
 		panic(err)
 	}
@@ -155,10 +155,10 @@ func newDisplayWidget() (*segmentdisplay.SegmentDisplay, error) {
 	)
 }
 
-func newDonutWidget() (*donut.Donut, error) {
+func newDonutWidget(color cell.Color) (*donut.Donut, error) {
 	return donut.New(
 		donut.CellOpts(
-			cell.FgColor(cell.ColorGreen),
+			cell.FgColor(color),
 			cell.Bold(),
 		),
 	)
@@ -180,13 +180,13 @@ func initCells() []*Cell {
 		case dashboards.CellNameNodeStatus, dashboards.CellNameNetworkStatus:
 			dashCell = NewTextCell(nameString)
 		case dashboards.CellNameEpoch:
-			dashCell = NewDonutCell(nameString)
+			dashCell = NewDonutCell(nameString, cell.ColorGreen)
 		case dashboards.CellNameDiskUsage:
-			dashCell = NewDonutCell(nameString)
+			dashCell = NewDonutCell(nameString, cell.ColorBlue)
 		case dashboards.CellNameMemoryUsage:
-			dashCell = NewDonutCell(nameString)
+			dashCell = NewDonutCell(nameString, cell.ColorRed)
 		case dashboards.CellNameCpuUsage:
-			dashCell = NewDonutCell(nameString)
+			dashCell = NewDonutCell(nameString, cell.ColorYellow)
 		default:
 			dashCell = NewDisplayCell(nameString)
 		}
