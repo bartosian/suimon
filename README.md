@@ -4,7 +4,6 @@ This repo contains helper scripts and packages for sui node operators and valida
 
 - [SUI HELPERS](#sui-helpers)
     - [Available tools](#available-tools)
-- [License](#license)
 
 ### Available tools
 
