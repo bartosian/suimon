@@ -4,12 +4,12 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"syscall"
 	"time"
 
 	"github.com/dariubs/percent"
 	"github.com/docker/docker/client"
 	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
 	"github.com/shirou/gopsutil/v3/net"
 )
@@ -17,37 +17,34 @@ import (
 const gb = 1024 * 1024 * 1024
 
 type (
-	usageData struct {
+	UsageData struct {
 		Total          int
 		Free           int
 		Used           int
 		PercentageUsed int
 	}
-	DiskUsage    usageData
-	MemoryUsage  usageData
-	CPUUsage     usageData
 	NetworkUsage struct {
 		Recv float64
 		Sent float64
 	}
 )
 
-func GetDiskUsage() (*DiskUsage, error) {
+func GetDiskUsage() (*UsageData, error) {
 	var (
-		stat syscall.Statfs_t
+		stat *disk.UsageStat
 		err  error
 	)
 
-	if err = syscall.Statfs("/", &stat); err != nil {
+	if stat, err = disk.Usage("/"); err != nil {
 		return nil, err
 	}
 
-	total := int(stat.Blocks*uint64(stat.Bsize)) / gb
-	free := int(stat.Bfree*uint64(stat.Bsize)) / gb
-	used := total - free
+	total := int(stat.Total) / gb
+	free := int(stat.Free) / gb
+	used := int(stat.Used) / gb
 	percentageUsed := int(percent.PercentOf(used, total))
 
-	return &DiskUsage{
+	return &UsageData{
 		Total:          total,
 		Free:           free,
 		Used:           used,
@@ -106,7 +103,7 @@ func GetNetworkUsage() (*NetworkUsage, error) {
 	}, nil
 }
 
-func GetMemoryUsage() (*MemoryUsage, error) {
+func GetMemoryUsage() (*UsageData, error) {
 	var (
 		stat *mem.VirtualMemoryStat
 		err  error
@@ -121,7 +118,7 @@ func GetMemoryUsage() (*MemoryUsage, error) {
 	used := int(stat.Used) / gb
 	percentageUsed := int(percent.PercentOf(used, total))
 
-	return &MemoryUsage{
+	return &UsageData{
 		Total:          total,
 		Free:           free,
 		Used:           used,
@@ -129,7 +126,7 @@ func GetMemoryUsage() (*MemoryUsage, error) {
 	}, nil
 }
 
-func GetCPUUsage() (*CPUUsage, error) {
+func GetCPUUsage() (*UsageData, error) {
 	var (
 		cores      int
 		percentage []float64
@@ -150,7 +147,7 @@ func GetCPUUsage() (*CPUUsage, error) {
 	free := total - int(percent.Percent(pct, total))
 	used := total - free
 
-	return &CPUUsage{
+	return &UsageData{
 		Total:          total,
 		Free:           free,
 		Used:           used,

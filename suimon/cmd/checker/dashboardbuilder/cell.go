@@ -198,11 +198,11 @@ func initCells() []*Cell {
 }
 
 func dashboardLoadingValue() string {
-	inProgress := strings.Repeat("-", 6)
+	inProgress := strings.Repeat("-", 8)
 	second := time.Now().Second() % 10
 
 	if second%2 == 0 {
-		inProgress = strings.Repeat("\u0020", 6)
+		inProgress = strings.Repeat("\u0020", 8)
 	}
 
 	return string(inProgress)

@@ -11,7 +11,10 @@ import (
 
 	"github.com/ybbus/jsonrpc/v3"
 
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/pkg/utility"
 )
 
 func (host *Host) GetMetrics() {
@@ -221,4 +224,163 @@ func (host *Host) getUrl(request requestType, secure bool) string {
 	}
 
 	return hostUrl.String()
+}
+
+func (checker *Checker) getMetricByDashboardCell(cellName dashboards.CellName) any {
+	node, rpc := checker.node[0], checker.rpc[0]
+
+	switch cellName {
+	case dashboards.CellNameNodeStatus:
+		return node.Status.DashboardStatus()
+	case dashboards.CellNameNetworkStatus:
+		return rpc.Status.DashboardStatus()
+	case dashboards.CellNameAddress:
+		return node.AddressInfo.HostPort.Address
+	case dashboards.CellNameTransactionsPerSecond:
+		return node.Metrics.TransactionsPerSecond
+	case dashboards.CellNameCheckpointsPerSecond:
+		return node.Metrics.CheckpointsPerSecond
+	case dashboards.CellNameTotalTransactions:
+		return node.Metrics.TotalTransactionNumber
+	case dashboards.CellNameLatestCheckpoint:
+		return node.Metrics.LatestCheckpoint
+	case dashboards.CellNameHighestCheckpoint:
+		return node.Metrics.HighestSyncedCheckpoint
+	case dashboards.CellNameConnectedPeers:
+		return node.Metrics.SuiNetworkPeers
+	case dashboards.CellNameTXSyncProgress:
+		return node.Metrics.TxSyncPercentage
+	case dashboards.CellNameCheckSyncProgress:
+		return node.Metrics.CheckSyncPercentage
+	case dashboards.CellNameUptime:
+		return strings.Split(node.Metrics.Uptime, " ")[0]
+	case dashboards.CellNameVersion:
+		return node.Metrics.Version
+	case dashboards.CellNameCommit:
+		return node.Metrics.Commit
+	case dashboards.CellNameCompany:
+		return node.Location.Provider
+	case dashboards.CellNameCountry:
+		return node.Location.String()
+	case dashboards.CellNameEpoch:
+		epochLabel := node.Metrics.GetEpochLabel()
+		epochPercentage := node.Metrics.GetEpochProgress()
+
+		return dashboardbuilder.NewDonutInput(epochLabel, epochPercentage)
+	case dashboards.CellNameEpochEnd:
+		return node.Metrics.GetEpochTimer()
+	case dashboards.CellNameDiskUsage:
+		usageLabel, usagePercentage := getDonutUsageMetric(utility.GetDiskUsage)
+
+		return dashboardbuilder.NewDonutInput(usageLabel, usagePercentage)
+	case dashboards.CellNameDatabaseSize:
+		dbSize := getDirectorySize(checker.nodeConfig.DbPath)
+
+		return dbSize
+	case dashboards.CellNameBytesSent:
+		bytesSent := getNetworkUsageMetric(dashboards.CellNameBytesSent)
+
+		return bytesSent
+	case dashboards.CellNameBytesReceived:
+		bytesReceived := getNetworkUsageMetric(dashboards.CellNameBytesReceived)
+
+		return bytesReceived
+	case dashboards.CellNameMemoryUsage:
+		usageLabel, usagePercentage := getDonutUsageMetric(utility.GetMemoryUsage)
+
+		return dashboardbuilder.NewDonutInput(usageLabel, usagePercentage)
+	case dashboards.CellNameCpuUsage:
+		usageLabel, usagePercentage := getDonutUsageMetric(utility.GetCPUUsage)
+
+		return dashboardbuilder.NewDonutInput(usageLabel, usagePercentage)
+	default:
+		return ""
+	}
+}
+
+func getDonutUsageMetric(option func() (*utility.UsageData, error)) (string, int) {
+	var (
+		usageLabel      = "TOTAL/USED: --/--"
+		usagePercentage = 0
+		usageData       *utility.UsageData
+		err             error
+	)
+
+	if usageData, err = option(); err == nil {
+		usageLabel = fmt.Sprintf("TOTAL/USED: %d/%d%%", usageData.Total, usageData.Used)
+		usagePercentage = usageData.PercentageUsed
+
+		if usagePercentage == 0 {
+			usagePercentage = 1
+		}
+	}
+
+	return usageLabel, usagePercentage
+}
+
+func getNetworkUsageMetric(networkMetric dashboards.CellName) string {
+	var (
+		usageData    = ""
+		networkUsage *utility.NetworkUsage
+		err          error
+	)
+
+	if networkUsage, err = utility.GetNetworkUsage(); err == nil {
+		metric := networkUsage.Sent
+		formatString := "%.02f%s"
+		unit := "GB"
+
+		if networkMetric == dashboards.CellNameBytesReceived {
+			metric = networkUsage.Recv
+		}
+
+		if metric >= 100 {
+			metric = metric / 100
+			unit = "TB"
+
+			if metric >= 100 {
+				formatString = "%.01f%s"
+			}
+		}
+
+		usageData = fmt.Sprintf(formatString, metric, unit)
+	}
+
+	return usageData
+}
+
+func getDirectorySize(dirPath string) string {
+	var (
+		usageData = ""
+		dirSize   float64
+		err       error
+	)
+
+	var processSize = func() {
+		formatString := "%.02f%s"
+		unit := "GB"
+
+		if dirSize >= 100 {
+			dirSize = dirSize / 100
+			unit = "TB"
+
+			if dirSize >= 100 {
+				formatString = "%.01f%s"
+			}
+		}
+
+		usageData = fmt.Sprintf(formatString, dirSize, unit)
+	}
+
+	if dirSize, err = utility.GetDirSize(dirPath); err == nil {
+		processSize()
+
+		return usageData
+	}
+
+	if dirSize, err = utility.GetVolumeSize("suidb"); err == nil {
+		processSize()
+	}
+
+	return usageData
 }

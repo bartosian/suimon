@@ -2,6 +2,7 @@ package checker
 
 import (
 	"fmt"
+
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder/tables"

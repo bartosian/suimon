@@ -45,7 +45,7 @@ func (metrics *Metrics) GetEpochTimer() string {
 		spacer = ":"
 	}
 
-	return fmt.Sprintf("%02d%s%02d", hours, spacer, minutes)
+	return fmt.Sprintf("%02d%s%02dH", hours, spacer, minutes)
 }
 
 func (metrics *Metrics) GetEpochLabel() string {
