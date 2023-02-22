@@ -52,17 +52,13 @@ func NewDonutInput(label string, pct int) DonutWriteInput {
 	}
 }
 
-func (c *Cell) Write(value any) {
+func (c *Cell) Write(value any, options ...cell.Option) {
 	switch v := c.Widget.(type) {
 	case *text.Text:
 		valueString := value.(string)
 
-		if valueString == "" {
-			valueString = dashboardLoadingValue()
-		}
-
 		v.Reset()
-		v.Write(valueString, text.WriteCellOpts(cell.Bold()))
+		v.Write(valueString, text.WriteCellOpts(options...))
 	case *gauge.Gauge:
 		valueInt := value.(int)
 
@@ -82,14 +78,14 @@ func (c *Cell) Write(value any) {
 		}
 
 		v.Write([]*segmentdisplay.TextChunk{
-			segmentdisplay.NewChunk(chunkValue),
+			segmentdisplay.NewChunk(chunkValue, segmentdisplay.WriteCellOpts(options...)),
 		})
 	case *donut.Donut:
 		valueInput := value.(DonutWriteInput)
 
 		v.Percent(
 			valueInput.Percentage,
-			donut.Label(valueInput.Label, cell.Bold()),
+			donut.Label(valueInput.Label, options...),
 		)
 	}
 }
@@ -198,11 +194,11 @@ func initCells() []*Cell {
 }
 
 func dashboardLoadingValue() string {
-	inProgress := strings.Repeat("-", 8)
+	inProgress := strings.Repeat("-", 15)
 	second := time.Now().Second() % 10
 
 	if second%2 == 0 {
-		inProgress = strings.Repeat("\u0020", 8)
+		inProgress = strings.Repeat("\u0020", 15)
 	}
 
 	return string(inProgress)

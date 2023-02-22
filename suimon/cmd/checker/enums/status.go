@@ -2,7 +2,7 @@ package enums
 
 import (
 	"strings"
-	
+
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
@@ -36,7 +36,7 @@ func (i Status) ColorStatus() string {
 func (i Status) DashboardStatus() string {
 	statusWidget := make([]string, 5)
 
-	repeatedPattern := strings.Repeat(string(i), 3)
+	repeatedPattern := "|    |"
 
 	for idx := range statusWidget {
 		statusWidget[idx] = repeatedPattern

@@ -15,6 +15,7 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/utility"
+	"github.com/mum4k/termdash/cell"
 )
 
 func (host *Host) GetMetrics() {
@@ -226,7 +227,7 @@ func (host *Host) getUrl(request requestType, secure bool) string {
 	return hostUrl.String()
 }
 
-func (checker *Checker) getMetricByDashboardCell(cellName dashboards.CellName) any {
+func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) any {
 	node, rpc := checker.node[0], checker.rpc[0]
 
 	switch cellName {
@@ -383,4 +384,40 @@ func getDirectorySize(dirPath string) string {
 	}
 
 	return usageData
+}
+
+func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName) []cell.Option {
+	var (
+		options []cell.Option
+		node    = checker.node[0]
+		rpc     = checker.rpc[0]
+	)
+
+	var getColorOptions = func(status enums.Status) cell.Color {
+		color := cell.ColorGreen
+
+		switch status {
+		case enums.StatusYellow:
+			color = cell.ColorYellow
+		case enums.StatusRed:
+			color = cell.ColorRed
+		}
+
+		return color
+	}
+
+	switch cellName {
+	case dashboards.CellNameNodeStatus:
+		color := getColorOptions(node.Status)
+
+		options = append(options, cell.BgColor(color), cell.FgColor(color))
+	case dashboards.CellNameNetworkStatus:
+		color := getColorOptions(rpc.Status)
+
+		options = append(options, cell.BgColor(color), cell.FgColor(color))
+	case dashboards.CellNameEpoch, dashboards.CellNameDiskUsage, dashboards.CellNameCpuUsage, dashboards.CellNameMemoryUsage:
+		options = append(options, cell.Bold())
+	}
+
+	return options
 }

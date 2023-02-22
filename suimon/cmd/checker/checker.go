@@ -137,9 +137,11 @@ func (checker *Checker) DrawDashboards() {
 						dashCells := dashboardBuilder.Cells
 
 						for idx, dashCell := range dashCells {
-							metric := checker.getMetricByDashboardCell(dashboards.CellName(idx))
+							cellName := dashboards.CellName(idx)
+							metric := checker.getMetricForDashboardCell(cellName)
+							options := checker.getOptionsForDashboardCell(cellName)
 
-							dashCell.Write(metric)
+							dashCell.Write(metric, options...)
 						}
 
 						doneCH <- struct{}{}
