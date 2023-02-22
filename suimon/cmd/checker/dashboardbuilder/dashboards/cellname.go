@@ -24,6 +24,10 @@ const (
 	CellNameEpochEnd
 	CellNameDiskUsage
 	CellNameDatabaseSize
+	CellNameBytesSent
+	CellNameBytesReceived
+	CellNameMemoryUsage
+	CellNameCpuUsage
 )
 
 var cellNameStringValues = [...]string{
@@ -47,6 +51,9 @@ var cellNameStringValues = [...]string{
 	"TIME TILL THE END OF EPOCH",
 	"DISK USAGE",
 	"DATABASE SIZE",
+	"NETWORK BYTES SENT",
+	"MEMORY USAGE",
+	"CPU USAGE",
 }
 
 func (i CellName) CellNameString() string {

@@ -163,6 +163,10 @@ func (checker *Checker) getMetricByDashboardCell(cellName dashboards.CellName) a
 		usageLabel := fmt.Sprintf("TOTAL/USED: %d/%dGB", diskUsage.Total, diskUsage.Used)
 		usagePercentage := diskUsage.PercentageUsed
 
+		if usagePercentage == 0 {
+			usagePercentage = 1
+		}
+
 		return dashboardbuilder.NewDonutInput(usageLabel, usagePercentage)
 	case dashboards.CellNameDatabaseSize:
 		var (
@@ -177,11 +181,87 @@ func (checker *Checker) getMetricByDashboardCell(cellName dashboards.CellName) a
 			}
 		}
 
-		if dbSize >= 1000 {
-			dbSize = dbSize / 1000
+		if dbSize >= 100 {
+			dbSize = dbSize / 100
+
+			return fmt.Sprintf("%.02fTB", dbSize)
 		}
 
-		return fmt.Sprintf("%.02fGB", dbSize)
+		return fmt.Sprintf("%.01fGB", dbSize)
+	case dashboards.CellNameBytesSent:
+		var (
+			networkUsage *utility.NetworkUsage
+			err          error
+		)
+
+		if networkUsage, err = utility.GetNetworkUsage(); err != nil {
+			panic(err)
+		}
+
+		sent := networkUsage.Sent
+
+		if sent >= 100 {
+			sent = sent / 100
+
+			return fmt.Sprintf("%.02fTB", sent)
+		}
+
+		return fmt.Sprintf("%.01fGB", sent)
+	case dashboards.CellNameBytesReceived:
+		var (
+			networkUsage *utility.NetworkUsage
+			err          error
+		)
+
+		if networkUsage, err = utility.GetNetworkUsage(); err != nil {
+			panic(err)
+		}
+
+		recv := networkUsage.Recv
+
+		if recv >= 100 {
+			recv = recv / 100
+
+			return fmt.Sprintf("%.02fTB", recv)
+		}
+
+		return fmt.Sprintf("%.01fGB", recv)
+	case dashboards.CellNameMemoryUsage:
+		var (
+			memoryUsage *utility.MemoryUsage
+			err         error
+		)
+
+		if memoryUsage, err = utility.GetMemoryUsage(); err != nil {
+			panic(err)
+		}
+
+		usageLabel := fmt.Sprintf("TOTAL/USED: %d/%dGB", memoryUsage.Total, memoryUsage.Used)
+		usagePercentage := memoryUsage.PercentageUsed
+
+		if usagePercentage == 0 {
+			usagePercentage = 1
+		}
+
+		return dashboardbuilder.NewDonutInput(usageLabel, usagePercentage)
+	case dashboards.CellNameCpuUsage:
+		var (
+			cpuUsage *utility.CPUUsage
+			err      error
+		)
+
+		if cpuUsage, err = utility.GetCPUUsage(); err != nil {
+			return dashboardbuilder.NewDonutInput("", 0)
+		}
+
+		usageLabel := fmt.Sprintf("TOTAL/USED: %d/%d%%", cpuUsage.Total, cpuUsage.Used)
+		usagePercentage := cpuUsage.PercentageUsed
+
+		if usagePercentage == 0 {
+			usagePercentage = 1
+		}
+
+		return dashboardbuilder.NewDonutInput(usageLabel, usagePercentage)
 	default:
 		return ""
 	}

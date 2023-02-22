@@ -113,8 +113,6 @@ func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) any {
 		timeout  = time.After(rpcClientTimeout)
 	)
 
-	defer close(respChan)
-
 	switch method {
 	case enums.RPCMethodGetSuiSystemState:
 		var response SuiSystemState

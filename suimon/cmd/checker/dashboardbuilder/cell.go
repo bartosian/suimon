@@ -183,6 +183,10 @@ func initCells() []*Cell {
 			dashCell = NewDonutCell(nameString)
 		case dashboards.CellNameDiskUsage:
 			dashCell = NewDonutCell(nameString)
+		case dashboards.CellNameMemoryUsage:
+			dashCell = NewDonutCell(nameString)
+		case dashboards.CellNameCpuUsage:
+			dashCell = NewDonutCell(nameString)
 		default:
 			dashCell = NewDisplayCell(nameString)
 		}
@@ -194,10 +198,12 @@ func initCells() []*Cell {
 }
 
 func dashboardLoadingValue() string {
-	inProgress := []string{"-", "-", "-", "-", "-"}
+	inProgress := strings.Repeat("-", 6)
 	second := time.Now().Second() % 10
 
-	inProgress[second/2] = " "
+	if second%2 == 0 {
+		inProgress = strings.Repeat("\u0020", 6)
+	}
 
-	return strings.Join(inProgress, "")
+	return string(inProgress)
 }

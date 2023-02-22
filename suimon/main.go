@@ -14,13 +14,13 @@ package main
 
 import (
 	"flag"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/pkg/progress"
 	"os"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
+	"github.com/bartosian/sui_helpers/suimon/pkg/progress"
 )
 
 var (

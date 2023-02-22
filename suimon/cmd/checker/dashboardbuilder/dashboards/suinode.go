@@ -36,8 +36,8 @@ var (
 		0: {Height: 7, Columns: []CellName{CellNameNodeStatus, CellNameNetworkStatus, CellNameTotalTransactions, CellNameLatestCheckpoint, CellNameHighestCheckpoint}},
 		1: {Height: 7, Columns: []CellName{CellNameUptime, CellNameTransactionsPerSecond, CellNameCheckpointsPerSecond, CellNameConnectedPeers, CellNameVersion, CellNameCommit}},
 		2: {Height: 7, Columns: []CellName{CellNameTXSyncProgress, CellNameCheckSyncProgress}},
-		3: {Height: 20, Columns: []CellName{CellNameEpoch, CellNameDiskUsage}},
-		4: {Height: 10, Columns: []CellName{CellNameEpochEnd, CellNameDatabaseSize}},
+		3: {Height: 20, Columns: []CellName{CellNameEpoch, CellNameDiskUsage, CellNameMemoryUsage, CellNameCpuUsage}},
+		4: {Height: 7, Columns: []CellName{CellNameEpochEnd, CellNameDatabaseSize, CellNameBytesSent, CellNameBytesReceived}},
 	}
 
 	ColumnConfigSUI = [...]ColumnConfig{
@@ -79,11 +79,11 @@ var (
 		},
 		CellNameTXSyncProgress: {
 			Name:  "SYNC TRANSACTIONS STATUS",
-			Width: 113,
+			Width: 48,
 		},
 		CellNameCheckSyncProgress: {
 			Name:  "SYNC CHECKPOINTS STATUS",
-			Width: 113,
+			Width: 48,
 		},
 		CellNameUptime: {
 			Name:  "UPTIME",
@@ -107,19 +107,35 @@ var (
 		},
 		CellNameEpoch: {
 			Name:  "EPOCH",
-			Width: 50,
+			Width: 48,
 		},
 		CellNameEpochEnd: {
 			Name:  "TIME TILL THE END OF EPOCH",
-			Width: 50,
+			Width: 40,
 		},
 		CellNameDiskUsage: {
 			Name:  "DISK USAGE",
-			Width: 50,
+			Width: 48,
 		},
 		CellNameDatabaseSize: {
 			Name:  "DATABASE SIZE",
-			Width: 50,
+			Width: 40,
+		},
+		CellNameBytesSent: {
+			Name:  "NETWORK BYTES SENT",
+			Width: 40,
+		},
+		CellNameBytesReceived: {
+			Name:  "NETWORK BYTES RECEIVED",
+			Width: 40,
+		},
+		CellNameMemoryUsage: {
+			Name:  "MEMORY USAGE",
+			Width: 48,
+		},
+		CellNameCpuUsage: {
+			Name:  "CPU USAGE",
+			Width: 48,
 		},
 	}
 )
