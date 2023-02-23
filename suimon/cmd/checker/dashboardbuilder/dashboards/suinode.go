@@ -2,6 +2,7 @@ package dashboards
 
 import (
 	"fmt"
+	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 	"strconv"
 	"strings"
 	"time"
@@ -306,7 +307,9 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 		var widget *text.Text
 
 		if widget, err = newTextWidget(); err == nil {
-			widget.Write("LOADING...", text.WriteCellOpts(cell.FgColor(cell.ColorGray), cell.Bold()))
+			defaultValue := log.GenerateLogoFrom("  Loading...", "banner", "gray")
+
+			widget.Write("\n\n"+defaultValue, text.WriteCellOpts(cell.FgColor(cell.ColorGray), cell.Bold()))
 
 			return widget
 		}

@@ -416,6 +416,8 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		options = append(options, cell.BgColor(color), cell.FgColor(color))
 	case dashboards.CellNameEpoch, dashboards.CellNameDiskUsage, dashboards.CellNameCpuUsage, dashboards.CellNameMemoryUsage:
 		options = append(options, cell.Bold())
+	default:
+		options = append(options, cell.FgColor(cell.ColorWhite))
 	}
 
 	return options

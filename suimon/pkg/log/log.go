@@ -6,6 +6,8 @@ import (
 	"io"
 	"os/exec"
 
+	"github.com/common-nighthawk/go-figure"
+
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
@@ -61,4 +63,17 @@ func (logger *Logger) StreamFrom(processName string, stream chan string) error {
 	}
 
 	return nil
+}
+
+func GenerateLogoFrom(text string, fontName string, color string) string {
+	logo := figure.NewColorFigure(text, fontName, color, true)
+
+	return logo.String()
+}
+
+func PrintLogo(text string, fontName string, color string) {
+	logo := figure.NewColorFigure(text, fontName, color, true)
+	fmt.Print("\n\n")
+	logo.Print()
+	fmt.Print("\n\n")
 }

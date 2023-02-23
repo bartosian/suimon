@@ -2,7 +2,6 @@ package progress
 
 import (
 	"fmt"
-	"github.com/common-nighthawk/go-figure"
 	"time"
 
 	"github.com/schollz/progressbar/v3"
@@ -56,11 +55,4 @@ func NewProgressBar(action string, color Color) chan<- struct{} {
 	}()
 
 	return progressChan
-}
-
-func PrintLogo() {
-	fmt.Print("\n\n")
-	logo := figure.NewColorFigure("suimon", "banner3", "red", true)
-	logo.Print()
-	fmt.Print("\n\n")
 }

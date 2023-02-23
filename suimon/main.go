@@ -20,7 +20,6 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
-	"github.com/bartosian/sui_helpers/suimon/pkg/progress"
 )
 
 var (
@@ -32,7 +31,8 @@ var (
 
 func main() {
 	flag.Parse()
-	progress.PrintLogo()
+	
+	log.PrintLogo("SUIMON", "banner3", "red")
 
 	var (
 		logger        = log.NewLogger()
