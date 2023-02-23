@@ -1,9 +1,7 @@
 package checker
 
 import (
-	"github.com/mum4k/termdash/cell"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 
@@ -156,17 +154,8 @@ func (checker *Checker) DrawDashboards() {
 				}
 			case log := <-logsCH:
 				dashCell := dashCells[dashboards.CellNameNodeLogs]
-				var options []cell.Option
 
-				if strings.Contains(log, "INFO") {
-					options = append(options, cell.FgColor(cell.ColorGreen))
-				} else if strings.Contains(log, "WARN") {
-					options = append(options, cell.FgColor(cell.ColorYellow))
-				} else if strings.Contains(log, "ERR") {
-					options = append(options, cell.FgColor(cell.ColorRed))
-				}
-
-				dashCell.Write(log+"\n", options...)
+				dashCell.Write(log + "\n")
 			case <-dashboardBuilder.Ctx.Done():
 				close(doneCH)
 				close(logsCH)

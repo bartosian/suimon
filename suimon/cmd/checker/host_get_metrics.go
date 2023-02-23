@@ -11,7 +11,6 @@ import (
 
 	"github.com/ybbus/jsonrpc/v3"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/utility"
@@ -267,13 +266,13 @@ func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) 
 		epochLabel := node.Metrics.GetEpochLabel()
 		epochPercentage := node.Metrics.GetEpochProgress()
 
-		return dashboardbuilder.NewDonutInput(epochLabel, epochPercentage)
+		return dashboards.NewDonutInput(epochLabel, epochPercentage)
 	case dashboards.CellNameEpochEnd:
 		return node.Metrics.GetEpochTimer()
 	case dashboards.CellNameDiskUsage:
 		usageLabel, usagePercentage := getDonutUsageMetric(utility.GetDiskUsage)
 
-		return dashboardbuilder.NewDonutInput(usageLabel, usagePercentage)
+		return dashboards.NewDonutInput(usageLabel, usagePercentage)
 	case dashboards.CellNameDatabaseSize:
 		dbSize := getDirectorySize(checker.nodeConfig.DbPath)
 
@@ -289,11 +288,11 @@ func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) 
 	case dashboards.CellNameMemoryUsage:
 		usageLabel, usagePercentage := getDonutUsageMetric(utility.GetMemoryUsage)
 
-		return dashboardbuilder.NewDonutInput(usageLabel, usagePercentage)
+		return dashboards.NewDonutInput(usageLabel, usagePercentage)
 	case dashboards.CellNameCpuUsage:
 		usageLabel, usagePercentage := getDonutUsageMetric(utility.GetCPUUsage)
 
-		return dashboardbuilder.NewDonutInput(usageLabel, usagePercentage)
+		return dashboards.NewDonutInput(usageLabel, usagePercentage)
 	default:
 		return ""
 	}

@@ -17,7 +17,7 @@ type DashboardBuilder struct {
 	Ctx       context.Context
 	Terminal  *termbox.Terminal
 	Dashboard *container.Container
-	Cells     []*Cell
+	Cells     []*dashboards.Cell
 	Quitter   func(k *terminalapi.Keyboard)
 }
 
@@ -25,7 +25,6 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 	var (
 		terminal  *termbox.Terminal
 		dashboard *container.Container
-		cells     []*Cell
 		err       error
 	)
 
@@ -35,9 +34,7 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 		return nil, err
 	}
 
-	cells = initCells()
-
-	if dashboard, err = initDashboard(terminal, cells); err != nil {
+	if dashboard, err = initDashboard(terminal); err != nil {
 		return nil, err
 	}
 
@@ -45,7 +42,7 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 		Ctx:       ctx,
 		Terminal:  terminal,
 		Dashboard: dashboard,
-		Cells:     cells,
+		Cells:     dashboards.Cells,
 		Quitter: func(k *terminalapi.Keyboard) {
 			if k.Key == 'q' || k.Key == 'Q' || k.Key == keyboard.KeyEsc {
 				terminal.Close()
@@ -56,42 +53,12 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 	}, nil
 }
 
-func initDashboard(terminal *termbox.Terminal, cells []*Cell) (*container.Container, error) {
+func initDashboard(terminal *termbox.Terminal) (*container.Container, error) {
 	var (
 		builder   = grid.New()
-		columns   = make([]grid.Element, len(dashboards.ColumnConfigSUI))
-		rows      = make([]grid.Element, len(dashboards.RowConfigSUI))
 		dashboard = dashboards.DashboardConfigSUI
+		rows      = dashboards.Rows
 	)
-
-	for idx, columnConfig := range dashboards.ColumnConfigSUI {
-		var (
-			width      = columnConfig.Width
-			cell       = cells[idx]
-			widget     = cell.Widget
-			cellConfig = cell.Config
-		)
-
-		columns[idx] = grid.ColWidthFixed(width, grid.Widget(widget, cellConfig...))
-	}
-
-	for idx, rowConfig := range dashboards.RowConfigSUI {
-		var (
-			height     = rowConfig.Height
-			colNames   = rowConfig.Columns
-			rowColumns = make([]grid.Element, len(colNames))
-		)
-
-		for idx, columnName := range colNames {
-			rowColumns[idx] = columns[columnName]
-		}
-
-		rowColumns = append(rowColumns, grid.ColWidthFixed(0))
-
-		rows[idx] = grid.RowHeightFixed(height, rowColumns...)
-	}
-
-	rows = append(rows, grid.RowHeightFixed(0))
 
 	builder.Add(rows...)
 
