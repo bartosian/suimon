@@ -28,6 +28,7 @@ const (
 	CellNameBytesReceived
 	CellNameMemoryUsage
 	CellNameCpuUsage
+	CellNameLogs
 )
 
 var cellNameStringValues = [...]string{

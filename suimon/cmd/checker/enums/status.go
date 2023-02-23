@@ -12,6 +12,7 @@ const (
 	StatusGreen  Status = "\U0001F7E9"
 	StatusYellow Status = "\U0001F7E8"
 	StatusRed    Status = "\U0001F7E5"
+	StatusGrey   Status = "\U0001F7E4"
 )
 
 func (i Status) StatusToPlaceholder() string {

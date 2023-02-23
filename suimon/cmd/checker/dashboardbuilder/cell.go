@@ -16,6 +16,7 @@ import (
 	"github.com/mum4k/termdash/widgets/text"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
 type Cell struct {
@@ -74,7 +75,7 @@ func (c *Cell) Write(value any, options ...cell.Option) {
 		}
 
 		if chunkValue == "" || chunkValue == "0" {
-			chunkValue = dashboardLoadingValue()
+			chunkValue = dashboardLoadingBlinkValue()
 		}
 
 		v.Write([]*segmentdisplay.TextChunk{
@@ -173,18 +174,40 @@ func initCells() []*Cell {
 		switch nameEnum {
 		case dashboards.CellNameCheckSyncProgress, dashboards.CellNameTXSyncProgress:
 			dashCell = NewProgressCell(nameString)
+
+			dashCell.Write(0, cell.FgColor(cell.ColorGray))
 		case dashboards.CellNameNodeStatus, dashboards.CellNameNetworkStatus:
 			dashCell = NewTextCell(nameString)
+
+			dashCell.Write(enums.StatusGrey.DashboardStatus(), cell.FgColor(cell.ColorGray), cell.BgColor(cell.ColorGray))
 		case dashboards.CellNameEpoch:
 			dashCell = NewDonutCell(nameString, cell.ColorGreen)
+
+			defaultValue := NewDonutInput("LOADING...", 1)
+
+			dashCell.Write(defaultValue, cell.FgColor(cell.ColorGray), cell.Bold())
 		case dashboards.CellNameDiskUsage:
 			dashCell = NewDonutCell(nameString, cell.ColorBlue)
+
+			defaultValue := NewDonutInput("LOADING...", 1)
+
+			dashCell.Write(defaultValue, cell.FgColor(cell.ColorGray), cell.Bold())
 		case dashboards.CellNameMemoryUsage:
 			dashCell = NewDonutCell(nameString, cell.ColorRed)
+
+			defaultValue := NewDonutInput("LOADING...", 1)
+
+			dashCell.Write(defaultValue, cell.FgColor(cell.ColorGray), cell.Bold())
 		case dashboards.CellNameCpuUsage:
 			dashCell = NewDonutCell(nameString, cell.ColorYellow)
+
+			defaultValue := NewDonutInput("LOADING...", 1)
+
+			dashCell.Write(defaultValue, cell.FgColor(cell.ColorGray), cell.Bold())
 		default:
 			dashCell = NewDisplayCell(nameString)
+
+			dashCell.Write(dashboardLoadingValue(), cell.FgColor(cell.ColorGray))
 		}
 
 		cells[name] = dashCell
@@ -194,6 +217,10 @@ func initCells() []*Cell {
 }
 
 func dashboardLoadingValue() string {
+	return strings.Repeat("-", 15)
+}
+
+func dashboardLoadingBlinkValue() string {
 	inProgress := strings.Repeat("-", 15)
 	second := time.Now().Second() % 10
 
@@ -201,5 +228,5 @@ func dashboardLoadingValue() string {
 		inProgress = strings.Repeat("\u0020", 15)
 	}
 
-	return string(inProgress)
+	return inProgress
 }

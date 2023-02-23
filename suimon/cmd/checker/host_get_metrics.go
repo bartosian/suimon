@@ -301,8 +301,8 @@ func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) 
 
 func getDonutUsageMetric(option func() (*utility.UsageData, error)) (string, int) {
 	var (
-		usageLabel      = "TOTAL/USED: --/--"
-		usagePercentage = 0
+		usageLabel      = "LOADING..."
+		usagePercentage = 1
 		usageData       *utility.UsageData
 		err             error
 	)
