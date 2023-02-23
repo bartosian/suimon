@@ -28,7 +28,7 @@ const (
 	CellNameBytesReceived
 	CellNameMemoryUsage
 	CellNameCpuUsage
-	CellNameLogs
+	CellNameNodeLogs
 )
 
 var cellNameStringValues = [...]string{
@@ -55,6 +55,7 @@ var cellNameStringValues = [...]string{
 	"NETWORK BYTES SENT",
 	"MEMORY USAGE",
 	"CPU USAGE",
+	"NODE LOGS",
 }
 
 func (i CellName) CellNameString() string {

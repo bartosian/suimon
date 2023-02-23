@@ -14,6 +14,7 @@ const suiEmoji = "💧"
 type ColumnConfig struct {
 	Name  string
 	Width int
+	Reset bool
 }
 
 type RowConfig struct {
@@ -39,16 +40,19 @@ var (
 		3: {Height: 18, Columns: []CellName{CellNameEpoch, CellNameDiskUsage}},
 		4: {Height: 18, Columns: []CellName{CellNameCpuUsage, CellNameMemoryUsage}},
 		5: {Height: 7, Columns: []CellName{CellNameBytesSent, CellNameBytesReceived}},
+		6: {Height: 42, Columns: []CellName{CellNameNodeLogs}},
 	}
 
 	ColumnConfigSUI = [...]ColumnConfig{
 		CellNameNodeStatus: {
 			Name:  "NODE",
 			Width: 8,
+			Reset: true,
 		},
 		CellNameNetworkStatus: {
 			Name:  "NET",
 			Width: 8,
+			Reset: true,
 		},
 		CellNameAddress: {
 			Name:  "ADDRESS",
@@ -137,6 +141,10 @@ var (
 		CellNameCpuUsage: {
 			Name:  "CPU USAGE",
 			Width: 43,
+		},
+		CellNameNodeLogs: {
+			Name:  "NODE LOGS",
+			Width: 140,
 		},
 	}
 )

@@ -22,9 +22,10 @@ import (
 type Cell struct {
 	Config []container.Option
 	Widget widgetapi.Widget
+	Reset  bool
 }
 
-func NewCell(title string, widget widgetapi.Widget) *Cell {
+func NewCell(title string, widget widgetapi.Widget, reset bool) *Cell {
 	return &Cell{
 		Config: []container.Option{
 			container.FocusedColor(cell.ColorGreen),
@@ -37,6 +38,7 @@ func NewCell(title string, widget widgetapi.Widget) *Cell {
 			container.TitleColor(cell.ColorGreen),
 		},
 		Widget: widget,
+		Reset:  reset,
 	}
 }
 
@@ -58,7 +60,10 @@ func (c *Cell) Write(value any, options ...cell.Option) {
 	case *text.Text:
 		valueString := value.(string)
 
-		v.Reset()
+		if c.Reset {
+			v.Reset()
+		}
+
 		v.Write(valueString, text.WriteCellOpts(options...))
 	case *gauge.Gauge:
 		valueInt := value.(int)
@@ -91,40 +96,40 @@ func (c *Cell) Write(value any, options ...cell.Option) {
 	}
 }
 
-func NewTextCell(title string) *Cell {
+func NewTextCell(title string, reset bool) *Cell {
 	textWidget, err := newTextWidget()
 	if err != nil {
 		panic(err)
 	}
 
-	return NewCell(title, textWidget)
+	return NewCell(title, textWidget, reset)
 }
 
-func NewProgressCell(title string) *Cell {
+func NewProgressCell(title string, reset bool) *Cell {
 	gaugeWidget, err := newProgressWidget()
 	if err != nil {
 		panic(err)
 	}
 
-	return NewCell(title, gaugeWidget)
+	return NewCell(title, gaugeWidget, reset)
 }
 
-func NewDisplayCell(title string) *Cell {
+func NewDisplayCell(title string, reset bool) *Cell {
 	displayWidget, err := newDisplayWidget()
 	if err != nil {
 		panic(err)
 	}
 
-	return NewCell(title, displayWidget)
+	return NewCell(title, displayWidget, reset)
 }
 
-func NewDonutCell(title string, color cell.Color) *Cell {
+func NewDonutCell(title string, color cell.Color, reset bool) *Cell {
 	donutWidget, err := newDonutWidget(color)
 	if err != nil {
 		panic(err)
 	}
 
-	return NewCell(title, donutWidget)
+	return NewCell(title, donutWidget, reset)
 }
 
 func newTextWidget() (*text.Text, error) {
@@ -173,39 +178,41 @@ func initCells() []*Cell {
 
 		switch nameEnum {
 		case dashboards.CellNameCheckSyncProgress, dashboards.CellNameTXSyncProgress:
-			dashCell = NewProgressCell(nameString)
+			dashCell = NewProgressCell(nameString, config.Reset)
 
 			dashCell.Write(0, cell.FgColor(cell.ColorGray))
 		case dashboards.CellNameNodeStatus, dashboards.CellNameNetworkStatus:
-			dashCell = NewTextCell(nameString)
+			dashCell = NewTextCell(nameString, config.Reset)
 
 			dashCell.Write(enums.StatusGrey.DashboardStatus(), cell.FgColor(cell.ColorGray), cell.BgColor(cell.ColorGray))
+		case dashboards.CellNameNodeLogs:
+			dashCell = NewTextCell(nameString, config.Reset)
 		case dashboards.CellNameEpoch:
-			dashCell = NewDonutCell(nameString, cell.ColorGreen)
+			dashCell = NewDonutCell(nameString, cell.ColorGreen, config.Reset)
 
 			defaultValue := NewDonutInput("LOADING...", 1)
 
 			dashCell.Write(defaultValue, cell.FgColor(cell.ColorGray), cell.Bold())
 		case dashboards.CellNameDiskUsage:
-			dashCell = NewDonutCell(nameString, cell.ColorBlue)
+			dashCell = NewDonutCell(nameString, cell.ColorBlue, config.Reset)
 
 			defaultValue := NewDonutInput("LOADING...", 1)
 
 			dashCell.Write(defaultValue, cell.FgColor(cell.ColorGray), cell.Bold())
 		case dashboards.CellNameMemoryUsage:
-			dashCell = NewDonutCell(nameString, cell.ColorRed)
+			dashCell = NewDonutCell(nameString, cell.ColorRed, config.Reset)
 
 			defaultValue := NewDonutInput("LOADING...", 1)
 
 			dashCell.Write(defaultValue, cell.FgColor(cell.ColorGray), cell.Bold())
 		case dashboards.CellNameCpuUsage:
-			dashCell = NewDonutCell(nameString, cell.ColorYellow)
+			dashCell = NewDonutCell(nameString, cell.ColorYellow, config.Reset)
 
 			defaultValue := NewDonutInput("LOADING...", 1)
 
 			dashCell.Write(defaultValue, cell.FgColor(cell.ColorGray), cell.Bold())
 		default:
-			dashCell = NewDisplayCell(nameString)
+			dashCell = NewDisplayCell(nameString, config.Reset)
 
 			dashCell.Write(dashboardLoadingValue(), cell.FgColor(cell.ColorGray))
 		}
