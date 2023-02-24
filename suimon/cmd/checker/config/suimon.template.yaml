@@ -18,12 +18,13 @@ rpc-config:
     - "https://fullnode.testnet.sui.io"
   devnet:
     - "https://fullnode.devnet.sui.io"
+    - "https://fullnode.devnet.vincagame.com"
 
 # update this value to the fullnode.yaml file location
 node-config-path: "/root/.suimon/fullnode.yaml"
 
 # set network to connect to. Possible values: devnet, testnet
-network: "testnet"
+network: "devnet"
 
 # provider and country information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
 # which is free and gives you 50k requests per month, which is sufficient for individual usage.

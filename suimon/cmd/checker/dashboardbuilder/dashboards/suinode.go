@@ -1,6 +1,7 @@
 package dashboards
 
 import (
+	"github.com/mum4k/termdash/widgets/button"
 	"strconv"
 	"strings"
 	"time"
@@ -68,7 +69,9 @@ var (
 				NewRow(21, Columns[CellNameCpuUsage], Columns[CellNameMemoryUsage]),
 				NewRow(7, Columns[CellNameBytesSent], Columns[CellNameBytesReceived]),
 			),
-			NewColumn(140, Columns[CellNameNodeLogs]),
+			NewColumn(140,
+				NewRow(4, NewColumn(86)),
+				Columns[CellNameNodeLogs]),
 			NewColumn(0), // window width limiter
 		),
 		5: NewRow(0), // window height limiter
@@ -274,6 +277,13 @@ func newDonutWidget(color cell.Color) (*donut.Donut, error) {
 			cell.FgColor(color),
 			cell.Bold(),
 		),
+	)
+}
+
+func newButtonWidget(text string, color cell.Color, action func() error) (*button.Button, error) {
+	return button.New(text, action,
+		button.WidthFor("Submit"),
+		button.FillColor(cell.ColorNumber(196)),
 	)
 }
 

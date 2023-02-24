@@ -23,15 +23,15 @@ import (
 )
 
 var (
-	suimonConfigPath = flag.String("sf", "", "(optional) path to the suimon config file, can use SUIMON_CONFIG_PATH env variable instead")
-	nodeConfigPath   = flag.String("nf", "", "(optional) path to the node config file, can use SUIMON_NODE_CONFIG_PATH variable instead")
+	suimonConfigPath = flag.String("s", "", "(optional) path to the suimon config file, can use SUIMON_CONFIG_PATH env variable instead")
+	nodeConfigPath   = flag.String("f", "", "(optional) path to the node config file, can use SUIMON_NODE_CONFIG_PATH variable instead")
 	network          = flag.String("n", "", "(optional) network name, possible values: testnet, devnet")
-	watch            = flag.Bool("w", false, "(optional) flag to enable watch mode with dynamic monitoring")
+	watch            = flag.Bool("w", false, "(optional) flag to enable a dynamic dashboard to monitor node metrics in real-time")
 )
 
 func main() {
 	flag.Parse()
-	
+
 	log.PrintLogo("SUIMON", "banner3", "red")
 
 	var (
