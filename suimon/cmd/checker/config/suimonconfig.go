@@ -13,7 +13,7 @@ import (
 
 const (
 	suimonConfigPath     = "%s/.suimon/suimon.yaml"
-	configSuimonNotFound = "provide path to the suimon.yaml file by using -sf option or by setting SUIMON_CONFIG_PATH env variable or put suimon.yaml in $HOME/.suimon/suimon.yaml"
+	configSuimonNotFound = "provide path to the suimon.yaml file by using -s option or by setting SUIMON_CONFIG_PATH env variable or put suimon.yaml in $HOME/.suimon/suimon.yaml"
 	configSuimonInvalid  = "make sure suimon.yaml file has correct syntax and properties"
 )
 

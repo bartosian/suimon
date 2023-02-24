@@ -12,7 +12,7 @@ import (
 
 const (
 	nodeConfigPath         = "%s/.suimon/fullnode.yaml"
-	configFullnodeNotFound = "provide path to the fullnode.yaml file by using -nf option or by setting SUIMON_NODE_CONFIG_PATH env variable or set path to this file in suimon.yaml"
+	configFullnodeNotFound = "provide path to the fullnode.yaml file by using -f option or by setting SUIMON_NODE_CONFIG_PATH env variable or set path to this file in suimon.yaml"
 	configFullnodeInvalid  = "make sure fullnode.yaml file has correct syntax and properties"
 )
 
