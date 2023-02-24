@@ -2,7 +2,6 @@ package checker
 
 import (
 	"sync"
-	"time"
 )
 
 func (checker *Checker) createHosts(addresses []AddressInfo) ([]Host, error) {
@@ -26,41 +25,13 @@ func (checker *Checker) createHosts(addresses []AddressInfo) ([]Host, error) {
 		go func(addressInfo AddressInfo) {
 			defer wg.Done()
 
-			host := newHost(addressInfo, checker.ipClient)
+			host := newHost(addressInfo, checker.ipClient, checker.httpClient)
 
 			if checker.suimonConfig.IPLookup.AccessToken != "" {
 				host.SetLocation()
 			}
 
-			doneCH := make(chan struct{})
-
-			go func() {
-				host.GetTotalTransactionNumber()
-
-				time.Sleep(transactionsPerSecondTimeout * time.Second)
-
-				host.GetTPS()
-
-				doneCH <- struct{}{}
-			}()
-
-			go func() {
-				host.GetLatestCheckpoint()
-
-				doneCH <- struct{}{}
-			}()
-
-			go func() {
-				host.GetMetrics(checker.httpClient)
-
-				doneCH <- struct{}{}
-			}()
-
-			for i := 0; i < 3; i++ {
-				<-doneCH
-			}
-
-			defer close(doneCH)
+			host.GetData()
 
 			hostCH <- *host
 		}(addressInfo)

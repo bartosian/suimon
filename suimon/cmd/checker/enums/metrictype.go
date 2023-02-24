@@ -17,20 +17,26 @@ const (
 	MetricTypeTransactionsPerSecond   MetricType = "TRANSACTIONS_PER_SECOND"
 	MetricTypeTotalTransactionsNumber MetricType = "TOTAL_TRANSACTIONS_NUMBER"
 	MetricTypeLatestCheckpoint        MetricType = "LATEST_CHECKPOINT"
+	MetricTypeTxSyncProgress          MetricType = "TX_SYNC_PROGRESS"
+	MetricTypeCheckSyncProgress       MetricType = "CHECK_SYNC_PROGRESS"
+	MetricTypeCurrentEpoch            MetricType = "CURRENT_EPOCH"
+	MetricTypeTimeTillNextEpoch       MetricType = "TIME_TILL_NEXT_EPOCH"
+	MetricTypeCheckpointsPerSecond    MetricType = "CHECKPOINTS_PER_SECOND"
 )
 
-func (e MetricType) String() string {
+func (e MetricType) ToString() string {
 	return string(e)
 }
 
 func MetricTypeFromString(value string) (MetricType, error) {
 	value = strings.ToUpper(strings.TrimSpace(value))
 
-	if strings.HasPrefix(value, MetricTypeUptime.String()) {
+	if strings.HasPrefix(value, MetricTypeUptime.ToString()) {
 		return MetricTypeUptime, nil
 	}
 
 	result, ok := map[string]MetricType{
+		"UNDEFINED":                 MetricTypeUndefined,
 		"UPTIME":                    MetricTypeUptime,
 		"VERSION":                   MetricTypeVersion,
 		"COMMIT":                    MetricTypeCommit,
@@ -39,6 +45,11 @@ func MetricTypeFromString(value string) (MetricType, error) {
 		"TRANSACTIONS_PER_SECOND":   MetricTypeTransactionsPerSecond,
 		"TOTAL_TRANSACTIONS_NUMBER": MetricTypeTotalTransactionsNumber,
 		"LATEST_CHECKPOINT":         MetricTypeLatestCheckpoint,
+		"TX_SYNC_PROGRESS":          MetricTypeTxSyncProgress,
+		"CHECK_SYNC_PROGRESS":       MetricTypeCheckSyncProgress,
+		"CURRENT_EPOCH":             MetricTypeCurrentEpoch,
+		"TIME_TILL_NEXT_EPOCH":      MetricTypeTimeTillNextEpoch,
+		"CHECKPOINTS_PER_SECOND":    MetricTypeCheckpointsPerSecond,
 	}[value]
 
 	if ok {

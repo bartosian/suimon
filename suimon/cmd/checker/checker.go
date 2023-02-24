@@ -2,21 +2,23 @@ package checker
 
 import (
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ipinfo/go/v2/ipinfo/cache"
+	"github.com/mum4k/termdash"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
-const (
-	ipInfoCacheExp = 5 * time.Minute
-)
+const ipInfoCacheExp = 5 * time.Minute
 
 type (
 	Checker struct {
@@ -34,8 +36,9 @@ type (
 		tableBuilderPeer *tablebuilder.TableBuilder
 		tableBuilderNode *tablebuilder.TableBuilder
 		tableBuilderRPC  *tablebuilder.TableBuilder
+		tableConfig      tablebuilder.TableConfig
 
-		tableConfig tablebuilder.TableConfig
+		DashboardBuilder *dashboardbuilder.DashboardBuilder
 
 		logger log.Logger
 	}
@@ -97,14 +100,88 @@ func (checker *Checker) setTableBuilderTableType(tableType enums.TableType, tc t
 	}
 }
 
-func (checker *Checker) DrawTable() {
-	if checker.suimonConfig.MonitorsConfig.RPCTable.Display {
+func (checker *Checker) DrawTables() {
+	if checker.suimonConfig.MonitorsConfig.RPCTable.Display && len(checker.rpc) > 0 {
 		checker.tableBuilderRPC.Build()
 	}
-	if checker.suimonConfig.MonitorsConfig.NodeTable.Display {
+	if checker.suimonConfig.MonitorsConfig.NodeTable.Display && len(checker.node) > 0 {
 		checker.tableBuilderNode.Build()
 	}
-	if checker.suimonConfig.MonitorsConfig.PeersTable.Display {
+	if checker.suimonConfig.MonitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
 		checker.tableBuilderPeer.Build()
 	}
+}
+
+func (checker *Checker) DrawDashboards() {
+	var (
+		monitorsConfig   = checker.suimonConfig.MonitorsConfig
+		dashboardBuilder = checker.DashboardBuilder
+		dashCells        = dashboardBuilder.Cells
+		ticker           = time.NewTicker(watchHostsTimeout)
+		wg               sync.WaitGroup
+	)
+
+	defer ticker.Stop()
+
+	var draw = func(hosts []Host) {
+		defer wg.Done()
+
+		doneCH := make(chan struct{}, len(hosts))
+		logsCH := make(chan string)
+
+		go checker.logger.StreamFrom("suid", logsCH)
+
+		for {
+			select {
+			case <-ticker.C:
+				for _, host := range hosts {
+					go func(host Host) {
+						for idx, dashCell := range dashCells {
+							cellName := dashboards.CellName(idx)
+
+							metric := checker.getMetricForDashboardCell(cellName)
+							options := checker.getOptionsForDashboardCell(cellName)
+
+							dashCell.Write(metric, options...)
+						}
+
+						doneCH <- struct{}{}
+					}(host)
+				}
+
+				for i := 0; i < len(hosts); i++ {
+					<-doneCH
+				}
+			case log := <-logsCH:
+				dashCell := dashCells[dashboards.CellNameNodeLogs]
+
+				dashCell.Write(log + "\n")
+			case <-dashboardBuilder.Ctx.Done():
+				close(doneCH)
+				close(logsCH)
+
+				return
+			}
+		}
+	}
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		checker.WatchHosts()
+	}()
+
+	if monitorsConfig.NodeTable.Display && len(checker.node) > 0 {
+		wg.Add(1)
+
+		go draw(checker.node)
+	}
+
+	if err := termdash.Run(dashboardBuilder.Ctx, dashboardBuilder.Terminal, dashboardBuilder.Dashboard, termdash.KeyboardSubscriber(dashboardBuilder.Quitter)); err != nil {
+		panic(err)
+	}
+
+	wg.Wait()
 }

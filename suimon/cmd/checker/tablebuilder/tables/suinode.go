@@ -5,34 +5,16 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-type ColumnNameSUINode int
-
-const (
-	ColumnNameSUINodeStatus ColumnNameSUINode = iota
-	ColumnNameSUINodeAddress
-	ColumnNameSUINodePortRPC
-	ColumnNameSUINodeTransactionsPerSecond
-	ColumnNameSUINodeTotalTransactions
-	ColumnNameSUINodeLatestCheckpoint
-	ColumnNameSUINodeHighestCheckpoint
-	ColumnNameSUINodeConnectedPeers
-	ColumnNameSUINodeUptime
-	ColumnNameSUINodeVersion
-	ColumnNameSUINodeCommit
-	ColumnNameSUINodeCompany
-	ColumnNameSUINodeCountry
-)
-
 var (
-	TableStyleSUINode      = table.StyleLight
-	TableTagSUINode        = ""
-	TableSortConfigSUINode = []table.SortBy{
+	TableStyleSUI      = table.StyleLight
+	TableTagSUI        = ""
+	TableSortConfigSUI = []table.SortBy{
 		{Name: "STATUS", Mode: table.Dsc},
 		{Name: "COUNTRY", Mode: table.Asc},
 		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
 	}
-	ColumnConfigSUINode = [...]table.ColumnConfig{
-		ColumnNameSUINodeStatus: {
+	ColumnConfigSUI = [...]table.ColumnConfig{
+		ColumnNameStatus: {
 			Name:         "STATUS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -40,7 +22,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodeAddress: {
+		ColumnNameAddress: {
 			Name:         "ADDRESS",
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
@@ -48,7 +30,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodePortRPC: {
+		ColumnNamePortRPC: {
 			Name:         "RPC",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -56,15 +38,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodeTransactionsPerSecond: {
-			Name:         "TPS",
-			Align:        text.AlignCenter,
-			AlignHeader:  text.AlignCenter,
-			VAlign:       text.VAlignMiddle,
-			VAlignHeader: text.VAlignMiddle,
-			Hidden:       false,
-		},
-		ColumnNameSUINodeTotalTransactions: {
+		ColumnNameTotalTransactions: {
 			Name:         "TOTAL\nTRANSACTIONS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -72,7 +46,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodeLatestCheckpoint: {
+		ColumnNameLatestCheckpoint: {
 			Name:         "LATEST\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -80,7 +54,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodeHighestCheckpoint: {
+		ColumnNameHighestCheckpoint: {
 			Name:         "SYNCED\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -88,7 +62,23 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodeConnectedPeers: {
+		ColumnNameTXSyncProgress: {
+			Name:         "TRANSACTIONS\nSYNC PROGRESS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		ColumnNameCheckSyncProgress: {
+			Name:         "CHECKPOINTS\nSYNC PROGRESS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		ColumnNameConnectedPeers: {
 			Name:         "CONNECTED\nPEERS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -96,7 +86,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodeUptime: {
+		ColumnNameUptime: {
 			Name:         "UPTIME",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -104,7 +94,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodeVersion: {
+		ColumnNameVersion: {
 			Name:         "VERSION",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -112,7 +102,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodeCommit: {
+		ColumnNameCommit: {
 			Name:         "COMMIT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -120,7 +110,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodeCompany: {
+		ColumnNameCompany: {
 			Name:         "PROVIDER",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -128,7 +118,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameSUINodeCountry: {
+		ColumnNameCountry: {
 			Name:         "COUNTRY",
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,

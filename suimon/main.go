@@ -14,92 +14,89 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"os"
+
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/log"
-	"github.com/common-nighthawk/go-figure"
 )
 
 var (
-	suimonConfigPath = flag.String("sf", "", "(optional) path to the suimon config file, can use SUIMON_CONFIG_PATH env variable instead")
-	nodeConfigPath   = flag.String("nf", "", "(optional) path to the node config file, can use SUIMON_NODE_CONFIG_PATH variable instead")
+	suimonConfigPath = flag.String("s", "", "(optional) path to the suimon config file, can use SUIMON_CONFIG_PATH env variable instead")
+	nodeConfigPath   = flag.String("f", "", "(optional) path to the node config file, can use SUIMON_NODE_CONFIG_PATH variable instead")
 	network          = flag.String("n", "", "(optional) network name, possible values: testnet, devnet")
-)
-
-const (
-	suimonConfigNotFound       = "provide path to the suimon.yaml file by using -sf option or by setting SUIMON_CONFIG_PATH env variable or put suimon.yaml in $HOME/.suimon/suimon.yaml"
-	nodeConfigNotFound         = "provide path to the fullnode.yaml file by using -nf option or by setting SUIMON_NODE_CONFIG_PATH env variable or set path to this file in suimon.yaml"
-	invalidNetworkTypeProvided = "provide valid network type by using -n option or set it in suimon.yaml"
+	watch            = flag.Bool("w", false, "(optional) flag to enable a dynamic dashboard to monitor node metrics in real-time")
 )
 
 func main() {
 	flag.Parse()
 
-	logger := log.NewLogger()
+	log.PrintLogo("SUIMON", "banner3", "red")
 
-	//defer func() {
-	//	if err := recover(); err != nil {
-	//		logger.Error("failed to execute suimon, please check an issue: ", err)
-	//	}
-	//
-	//	return
-	//}()
-
-	printLogo()
+	var (
+		logger        = log.NewLogger()
+		check         *checker.Checker
+		suimonConfig  *config.SuimonConfig
+		nodeConfig    *config.NodeConfig
+		networkConfig enums.NetworkType
+		err           error
+	)
 
 	// parse suimon.yaml config file
-	suimonConfig, err := config.ParseSuimonConfig(suimonConfigPath)
-	if err != nil {
-		logger.Error(suimonConfigNotFound)
-
+	if suimonConfig, err = config.ParseSuimonConfig(suimonConfigPath); err != nil {
 		return
 	}
 
 	// parse fullnode/validator.yaml config file
-	nodeConfig, err := config.ParseNodeConfig(nodeConfigPath, suimonConfig.NodeConfigPath)
-	if err != nil {
-		logger.Error(nodeConfigNotFound)
-
+	if nodeConfig, err = config.ParseNodeConfig(nodeConfigPath, suimonConfig.NodeConfigPath); err != nil {
 		return
 	}
 
 	// parse network flag
-	networkConfig, err := config.ParseNetworkConfig(suimonConfig, network)
-	if err != nil {
-		logger.Error(invalidNetworkTypeProvided)
+	if networkConfig, err = config.ParseNetworkConfig(suimonConfig, network); err != nil {
+		return
+	}
+
+	// create checker instance
+	if check, err = checker.NewChecker(*suimonConfig, *nodeConfig, networkConfig); err != nil {
+		logger.Error("failed to create suimon instance: ", err)
 
 		return
 	}
 
-	// create checker instance to process to request all the required data and pass them to tablebuilder
-	checker, err := checker.NewChecker(*suimonConfig, *nodeConfig, networkConfig)
-	if err != nil {
-		logger.Error("failed to create peers checker: ", err)
+	// initialize checker instance with seed data
+	if err = check.Init(); err != nil {
+		logger.Error("failed to init suimon instance: ", err)
 
 		return
 	}
 
-	if err := checker.GetTablesData(); err != nil {
-		logger.Error("failed to get data for tables: ", err)
+	switch *watch {
+	case true:
+		// initialize realtime dashboard with styles
+		check.InitDashboard()
 
-		return
+		// draw initialized dashboard to the terminal
+		check.DrawDashboards()
+	default:
+		// initialize tables with the styles
+		check.InitTables()
+
+		// draw initialized tables to the terminal
+		check.DrawTables()
 	}
 
-	// initialize tables with the styles and data received
-	checker.InitTables()
+	defer func() {
+		if err := recover(); err != nil {
+			check.DashboardBuilder.Terminal.Close()
+			check.DashboardBuilder.Ctx.Done()
 
-	// draw initialized tables to the terminal
-	checker.DrawTable()
-}
+			logger.Error("failed to execute suimon, please check an issue: ", err)
 
-func printLogo() {
-	fmt.Println()
-	fmt.Println()
-	logo := figure.NewColorFigure("suimon", "banner3", "blue", true)
-	logo.Print()
-	version := figure.NewColorFigure("      v0.1.0", "3x5", "red", true)
-	version.Print()
-	fmt.Println()
-	fmt.Println()
+			os.Exit(1)
+		}
+
+		return
+	}()
 }

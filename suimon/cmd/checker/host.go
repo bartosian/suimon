@@ -1,9 +1,11 @@
 package checker
 
 import (
+	"net/http"
 	"regexp"
 	"time"
 
+	"github.com/dariubs/percent"
 	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ybbus/jsonrpc/v3"
 
@@ -26,29 +28,33 @@ const (
 
 var versionRegex = regexp.MustCompile(metricVersionRegexp)
 
-type AddressInfo struct {
-	HostPort address.HostPort
-	Ports    map[enums.PortType]string
-}
+type (
+	AddressInfo struct {
+		HostPort address.HostPort
+		Ports    map[enums.PortType]string
+	}
+	Host struct {
+		AddressInfo
 
-type Host struct {
-	AddressInfo
+		Status   enums.Status
+		Location *Location
+		Metrics  Metrics
 
-	Status   enums.Status
-	Location *Location
-	Metrics  Metrics
+		rpcHttpClient  jsonrpc.RPCClient
+		rpcHttpsClient jsonrpc.RPCClient
+		httpClient     *http.Client
+		ipClient       *ipinfo.Client
 
-	rpcHttpClient  jsonrpc.RPCClient
-	rpcHttpsClient jsonrpc.RPCClient
-	ipClient       *ipinfo.Client
+		logger log.Logger
+	}
+)
 
-	logger log.Logger
-}
-
-func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client) *Host {
+func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.Client) *Host {
 	host := &Host{
 		AddressInfo: addressInfo,
 		ipClient:    ipClient,
+		httpClient:  httpClient,
+		Metrics:     NewMetrics(),
 		logger:      log.NewLogger(),
 	}
 
@@ -58,7 +64,17 @@ func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client) *Host {
 	return host
 }
 
-func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
+func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) {
+	hostMetric := host.Metrics.GetValue(metricType, false)
+	rpcMetric := rpc.Metrics.GetValue(metricType, true)
+	hostMetricInt, rpcMetricInt := hostMetric.(int), rpcMetric.(int)
+
+	percentage := int(percent.PercentOf(hostMetricInt, rpcMetricInt))
+
+	host.Metrics.SetValue(metricType, percentage)
+}
+
+func (host *Host) SetStatus(rpc Host) {
 	status := enums.StatusGreen
 	metricsHost := host.Metrics
 	metricsRPC := rpc.Metrics
@@ -66,29 +82,19 @@ func (host *Host) SetStatus(tableType enums.TableType, rpc Host) {
 	switch metricsHost.Updated {
 	case false:
 		status = enums.StatusRed
-
-		if tableType == enums.TableTypePeers {
-			status = enums.StatusYellow
-		}
 	case true:
-		if metricsHost.TotalTransactionNumber != "" &&
-			metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) {
+		if metricsHost.TotalTransactionNumber == 0 && metricsRPC.TotalTransactionNumber != 0 ||
+			metricsHost.LatestCheckpoint == 0 && metricsRPC.LatestCheckpoint != 0 ||
+			metricsHost.TransactionsPerSecond == 0 && metricsRPC.TransactionsPerSecond != 0 ||
+			metricsHost.TxSyncPercentage > 100 || metricsHost.CheckSyncPercentage > 100 ||
+			metricsHost.TxSyncPercentage == 0 && metricsRPC.TxSyncPercentage != 0 {
 			status = enums.StatusRed
 
 			break
 		}
 
-		if metricsHost.TotalTransactionNumber == "" || metricsHost.LatestCheckpoint == "" {
-			status = enums.StatusRed
-
-			if tableType == enums.TableTypePeers {
-				status = enums.StatusYellow
-			}
-
-			break
-		}
-
-		if metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionsNumber, metricsRPC.TotalTransactionNumber) ||
+		if metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) ||
+			metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionsNumber, metricsRPC.TotalTransactionNumber) ||
 			metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
 			status = enums.StatusYellow
 		}

@@ -100,7 +100,7 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 	return addresses, nil
 }
 
-func (checker *Checker) GetTablesData() error {
+func (checker *Checker) Init() error {
 	var (
 		wg             sync.WaitGroup
 		errChan        = make(chan error, 3)
@@ -108,18 +108,21 @@ func (checker *Checker) GetTablesData() error {
 		monitorsConfig = suimonConfig.MonitorsConfig
 	)
 
-	var getTableData = func(tableType enums.TableType, progressColor progress.Color) {
-		progressChan := progress.NewProgressBar("PARSING DATA FOR "+string(tableType)+" TABLE", progressColor)
-
-		addresses, err := checker.getAddressInfoByTableType(tableType)
-		if err != nil {
-			errChan <- err
-		}
+	var getData = func(tableType enums.TableType, progressColor progress.Color) {
+		var (
+			progressChan = progress.NewProgressBar("PARSING DATA FOR "+string(tableType), progressColor)
+			addresses    []AddressInfo
+			hosts        []Host
+			err          error
+		)
 
 		defer wg.Done()
 
-		hosts, err := checker.createHosts(addresses)
-		if err != nil {
+		if addresses, err = checker.getAddressInfoByTableType(tableType); err != nil {
+			errChan <- err
+		}
+
+		if hosts, err = checker.createHosts(addresses); err != nil {
 			errChan <- err
 		}
 
@@ -128,23 +131,23 @@ func (checker *Checker) GetTablesData() error {
 		progressChan <- struct{}{}
 	}
 
-	// parse data for the RPC table
+	// parse data for the RPC servers
 	wg.Add(1)
 
-	go getTableData(enums.TableTypeRPC, progress.ColorBlue)
+	go getData(enums.TableTypeRPC, progress.ColorBlue)
 
-	// parse data for the NODE table
+	// parse data for the user servers
 	if monitorsConfig.NodeTable.Display {
 		wg.Add(1)
 
-		go getTableData(enums.TableTypeNode, progress.ColorRed)
+		go getData(enums.TableTypeNode, progress.ColorRed)
 	}
 
-	// parse data for the PEERS table
+	// parse data for the peers servers
 	if monitorsConfig.PeersTable.Display {
 		wg.Add(1)
 
-		go getTableData(enums.TableTypePeers, progress.ColorGreen)
+		go getData(enums.TableTypePeers, progress.ColorGreen)
 	}
 
 	wg.Wait()
@@ -172,16 +175,29 @@ func (checker *Checker) GetTablesData() error {
 		})
 	}
 
-	for idx := range checker.peers {
-		checker.peers[idx].SetStatus(enums.TableTypePeers, rpc[0])
+	checker.rpc = rpc
+
+	var setStatus = func(tableType enums.TableType) {
+		hosts := checker.getHostsByTableType(tableType)
+		comparatorRPC := rpc[0]
+
+		for idx := range hosts {
+			hosts[idx].SetPctProgress(enums.MetricTypeTxSyncProgress, comparatorRPC)
+			hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncProgress, comparatorRPC)
+			hosts[idx].SetStatus(comparatorRPC)
+		}
 	}
 
-	for idx := range checker.rpc {
-		checker.rpc[idx].SetStatus(enums.TableTypeRPC, rpc[0])
+	if monitorsConfig.NodeTable.Display {
+		setStatus(enums.TableTypeNode)
 	}
 
-	for idx := range checker.node {
-		checker.node[idx].SetStatus(enums.TableTypeNode, rpc[0])
+	if monitorsConfig.RPCTable.Display {
+		setStatus(enums.TableTypeRPC)
+	}
+
+	if monitorsConfig.PeersTable.Display {
+		setStatus(enums.TableTypePeers)
 	}
 
 	return nil
