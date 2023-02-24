@@ -32,14 +32,19 @@ git clone https://github.com/bartosian/sui_helpers.git
 cd sui_helpers/suimon
 ```
 
-4. Build the ``SUIMON`` package by running the following command:
+4. Install packages and dependencies required by the ``SUIMON`` tool:
+```shell
+go get -u ./...
+```
+
+5. Build the ``SUIMON`` package by running the following command:
 ```shell
 go build -o suimon .
 ```
 
 This command will create a binary file named suimon in the current directory.
 
-5. Move the binary file to the Go executables PATH by running the following command:
+6. Move the binary file to the Go executables PATH by running the following command:
 ```shell
 sudo mv suimon /usr/local/go/bin/
 ```
@@ -47,7 +52,7 @@ sudo mv suimon /usr/local/go/bin/
 This command will move the suimon binary to the Go executables PATH, which is typically located in /usr/local/go/bin/.
 After completing these steps, you should be able to run the suimon command from anywhere in the terminal. Note that the sudo command may prompt you for your password in order to move the binary file to the /usr/local/go/bin/ directory.
 
-6. Create ``SUIMON`` config directory and put ``suimon.yaml`` file there:
+7. Create ``SUIMON`` config directory and put ``suimon.yaml`` file there:
 ```shell
 mkdir $HOME/.suimon && \
 cp $HOME/sui_helpers/suimon/cmd/checker/config/suimon.template.yaml $HOME/.suimon
@@ -98,7 +103,7 @@ monitors-visual:
   enable-emojis: false
 ```
 
-7. Provide path to ``fullnode.yaml`` config file your node is using. To specify the path to the ``fullnode.yaml`` configuration file for your node in the ``SUIMON`` tool, there are several options available. You may choose to specify the ``node-config-path`` attribute within the ``suimon.yaml`` configuration file, use the ``-f`` flag followed by the path to the file in the command line, or set the ``SUIMON_NODE_CONFIG_PATH`` environment variable to the path of the file.
+8. Provide path to ``fullnode.yaml`` config file your node is using. To specify the path to the ``fullnode.yaml`` configuration file for your node in the ``SUIMON`` tool, there are several options available. You may choose to specify the ``node-config-path`` attribute within the ``suimon.yaml`` configuration file, use the ``-f`` flag followed by the path to the file in the command line, or set the ``SUIMON_NODE_CONFIG_PATH`` environment variable to the path of the file.
 You can also use the following command for it:
 ```bash
 result=$(find / -name "$config_file_name" 2>/dev/null)
@@ -116,7 +121,7 @@ fi
 The ``fullnode.yaml`` file is a configuration file used to specify the various settings and options for a SUI Node. It contains settings related to the node's network and database configurations, as well as other options like logging and security settings. Some of the key configuration options available in this file include the network name, the node's peer-to-peer communication settings, the database backend to use, the node's storage settings, the logging configuration, and more.
 For more detailed information about setting up a SUI node and configuring the ``fullnode.yaml`` configuration file, users can refer to the official SUI documentation available at https://docs.sui.io/build/fullnode. This documentation provides detailed instructions and guidance on how to set up a SUI node and configure its various parameters, including the fullnode.yaml configuration file. By following the guidelines provided in the official documentation, users can ensure that their SUI node is set up correctly and operates optimally.
 
-8. You can run the ``suimon`` command from anywhere in the terminal, and it should start up the tool with the default configuration. However, if you encounter any issues or want to customize the behavior of the ``SUIMON`` tool, you can edit the ``suimon.yaml`` file to change the configuration settings.
+9. You can run the ``suimon`` command from anywhere in the terminal, and it should start up the tool with the default configuration. However, if you encounter any issues or want to customize the behavior of the ``SUIMON`` tool, you can edit the ``suimon.yaml`` file to change the configuration settings.
 
 ## Run SUIMON
 
@@ -254,7 +259,12 @@ git clone https://github.com/bartosian/sui_helpers.git
 cd sui_helpers/suimon
 ```
 
-3. Run ``SUIMON`` by running the following command:
+3. Install packages and dependencies required by the ``SUIMON`` tool:
+```shell
+go get -u ./...
+```
+
+4. Run ``SUIMON`` by running the following command:
 ```shell
 go run main.go
 ```
