@@ -58,12 +58,13 @@ func initDashboard(terminal *termbox.Terminal) (*container.Container, error) {
 		builder   = grid.New()
 		dashboard = dashboards.DashboardConfigSUI
 		rows      = dashboards.Rows
+		config    []container.Option
+		err       error
 	)
 
 	builder.Add(rows...)
 
-	config, err := builder.Build()
-	if err != nil {
+	if config, err = builder.Build(); err != nil {
 		return nil, err
 	}
 

@@ -12,14 +12,15 @@ import (
 )
 
 const (
-	transactionsPerSecondTimeout   = 10
-	checkpointsPerSecondTimeout    = 10
-	transactionsPerSecondLag       = 5
-	checkpointsPerSecondLag        = 5
-	latestCheckpointLag            = 30
-	highestSyncedCheckpointLag     = 30
-	totalTransactionsNumberHealthy = 98
-	epochLength                    = 24 * time.Hour
+	transactionsPerSecondTimeout    = 10
+	checkpointsPerSecondTimeout     = 10
+	transactionsPerSecondLag        = 5
+	checkpointsPerSecondLag         = 10
+	latestCheckpointLag             = 30
+	highestSyncedCheckpointLag      = 30
+	totalTransactionsSyncPercentage = 99
+	totalCheckpointsSyncPercentage  = 99
+	epochLength                     = 24 * time.Hour
 )
 
 type SuiSystemState struct {
@@ -34,7 +35,7 @@ func (metrics *Metrics) GetTimeTillNextEpoch() int {
 	return nextEpochStartMs - currentTimeMs
 }
 
-func (metrics *Metrics) GetEpochTimer() string {
+func (metrics *Metrics) GetEpochTimer() []string {
 	duration := time.Duration(metrics.TimeTillNextEpochMs) * time.Millisecond
 	hours := int(duration.Hours())
 	minutes := int(duration.Minutes()) - (hours * 60)
@@ -45,7 +46,7 @@ func (metrics *Metrics) GetEpochTimer() string {
 		spacer = ":"
 	}
 
-	return fmt.Sprintf("%02d%s%02dH", hours, spacer, minutes)
+	return []string{fmt.Sprintf("%02d%s%02d", hours, spacer, minutes), "H"}
 }
 
 func (metrics *Metrics) GetEpochLabel() string {
@@ -245,7 +246,7 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
 func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC any) bool {
 	switch metric {
 	case enums.MetricTypeTotalTransactionsNumber:
-		return metrics.TxSyncPercentage > totalTransactionsNumberHealthy
+		return metrics.TxSyncPercentage >= totalTransactionsSyncPercentage
 	case enums.MetricTypeTransactionsPerSecond:
 		valueRPCInt := valueRPC.(int)
 
@@ -253,11 +254,11 @@ func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC any) bool {
 	case enums.MetricTypeLatestCheckpoint:
 		valueRPCInt := valueRPC.(int)
 
-		return metrics.LatestCheckpoint >= valueRPCInt-latestCheckpointLag
+		return metrics.CheckSyncPercentage >= totalCheckpointsSyncPercentage || metrics.LatestCheckpoint >= valueRPCInt-latestCheckpointLag
 	case enums.MetricTypeHighestSyncedCheckpoint:
 		valueRPCInt := valueRPC.(int)
 
-		return metrics.HighestSyncedCheckpoint >= valueRPCInt-highestSyncedCheckpointLag
+		return metrics.CheckSyncPercentage >= totalCheckpointsSyncPercentage || metrics.HighestSyncedCheckpoint >= valueRPCInt-highestSyncedCheckpointLag
 	case enums.MetricTypeCheckpointsPerSecond:
 		valueRPCInt := valueRPC.(int)
 

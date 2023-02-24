@@ -1,8 +1,6 @@
 package dashboards
 
 import (
-	"fmt"
-	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 	"strconv"
 	"strings"
 	"time"
@@ -21,7 +19,10 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
-const suiEmoji = "💧"
+const (
+	dashboardName       = "💧 SUIMON: PRESS Q or ESC TO QUIT"
+	cellNodeLogsDefault = "THE SUI-NODE PROCESS COULD NOT BE FOUND. PLEASE CHECK IF THE PROCESS IS CURRENTLY RUNNING AND ENSURE THAT IT HAS NOT BEEN TERMINATED UNEXPECTEDLY. WITHOUT IT, LOGS CANNOT BE SHOWN."
+)
 
 var (
 	DashboardConfigSUI = []container.Option{
@@ -30,14 +31,16 @@ var (
 		container.FocusedColor(cell.ColorGreen),
 		container.AlignHorizontal(align.HorizontalCenter),
 		container.AlignVertical(align.VerticalMiddle),
-		container.BorderTitle(fmt.Sprintf("%s SUIMON: PRESS Q or ESC TO QUIT", suiEmoji)),
+		container.BorderTitle(dashboardName),
 		container.Focused(),
 	}
 
 	Rows = []grid.Element{
 		0: NewRow(7,
-			Columns[CellNameNodeStatus],
-			Columns[CellNameNetworkStatus],
+			NewColumn(16,
+				Columns[CellNameNodeStatus],
+				Columns[CellNameNetworkStatus],
+			),
 			Columns[CellNameTotalTransactions],
 			Columns[CellNameLatestCheckpoint],
 			Columns[CellNameHighestCheckpoint],
@@ -59,14 +62,16 @@ var (
 			Columns[CellNameCheckSyncProgress],
 			NewColumn(0), // window width limiter
 		),
-		3: NewRow(42,
+		3: NewRow(49,
 			NewColumn(86,
 				NewRow(21, Columns[CellNameEpoch], Columns[CellNameDiskUsage]),
-				NewRow(21, Columns[CellNameCpuUsage], Columns[CellNameMemoryUsage])),
+				NewRow(21, Columns[CellNameCpuUsage], Columns[CellNameMemoryUsage]),
+				NewRow(7, Columns[CellNameBytesSent], Columns[CellNameBytesReceived]),
+			),
 			NewColumn(140, Columns[CellNameNodeLogs]),
 			NewColumn(0), // window width limiter
 		),
-		4: NewRow(0), // window height limiter
+		5: NewRow(0), // window height limiter
 	}
 
 	Columns = []grid.Element{
@@ -126,29 +131,31 @@ var (
 	}
 )
 
-type Element interface {
-	isElement()
-}
+type (
+	Element interface {
+		isElement()
+	}
 
-type Row struct {
-	Height   int
-	Elements []Element
-}
+	Row struct {
+		Height   int
+		Elements []Element
+	}
+
+	Column struct {
+		Width    int
+		Elements []Element
+	}
+
+	Cell struct {
+		Name    CellName
+		Widget  widgetapi.Widget
+		Options []container.Option
+	}
+)
 
 func (Row) isElement() {}
 
-type Column struct {
-	Width    int
-	Elements []Element
-}
-
 func (Column) isElement() {}
-
-type Cell struct {
-	Name    CellName
-	Widget  widgetapi.Widget
-	Options []container.Option
-}
 
 func (Cell) isElement() {}
 
@@ -160,9 +167,9 @@ func NewCell(title string, name CellName) *Cell {
 			container.FocusedColor(cell.ColorGreen),
 			container.Border(linestyle.Light),
 			container.BorderTitle(title),
+			container.BorderColor(cell.ColorRed),
 			container.AlignVertical(align.VerticalMiddle),
 			container.AlignHorizontal(align.HorizontalCenter),
-			container.BorderColor(cell.ColorRed),
 			container.TitleColor(cell.ColorGreen),
 		},
 	}
@@ -204,22 +211,33 @@ func (c *Cell) Write(value any, options ...cell.Option) {
 
 		v.Percent(valueInt)
 	case *segmentdisplay.SegmentDisplay:
-		var chunkValue string
+		var segments []*segmentdisplay.TextChunk
 
 		switch v := value.(type) {
 		case int:
-			chunkValue = strconv.Itoa(v)
+			chunk := strconv.Itoa(v)
+			if chunk == "0" {
+				chunk = dashboardLoadingBlinkValue()
+			}
+
+			segments = append(segments, segmentdisplay.NewChunk(strconv.Itoa(v), segmentdisplay.WriteCellOpts(options...)))
 		case string:
-			chunkValue = v
+			if v == "" {
+				v = dashboardLoadingBlinkValue()
+			}
+
+			segments = append(segments, segmentdisplay.NewChunk(v, segmentdisplay.WriteCellOpts(options...)))
+		case []string:
+			for idx, chunk := range v {
+				if chunk == "" {
+					chunk = dashboardLoadingBlinkValue()
+				}
+
+				segments = append(segments, segmentdisplay.NewChunk(chunk, segmentdisplay.WriteCellOpts(options[idx])))
+			}
 		}
 
-		if chunkValue == "" || chunkValue == "0" {
-			chunkValue = dashboardLoadingBlinkValue()
-		}
-
-		v.Write([]*segmentdisplay.TextChunk{
-			segmentdisplay.NewChunk(chunkValue, segmentdisplay.WriteCellOpts(options...)),
-		})
+		v.Write(segments)
 	case *donut.Donut:
 		valueInput := value.(DonutWriteInput)
 
@@ -307,9 +325,7 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 		var widget *text.Text
 
 		if widget, err = newTextWidget(); err == nil {
-			defaultValue := log.GenerateLogoFrom("  Loading...", "banner", "gray")
-
-			widget.Write("\n\n"+defaultValue, text.WriteCellOpts(cell.FgColor(cell.ColorGray), cell.Bold()))
+			widget.Write(cellNodeLogsDefault, text.WriteCellOpts(cell.FgColor(cell.ColorWhite), cell.Bold()))
 
 			return widget
 		}
@@ -329,7 +345,7 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 		}
 
 		if widget, err = newDonutWidget(color); err == nil {
-			widget.Percent(1, donut.Label("LOADING...", cell.FgColor(cell.ColorGray), cell.Bold()))
+			widget.Percent(1, donut.Label("LOADING...", cell.FgColor(cell.ColorWhite), cell.Bold()))
 
 			return widget
 		}
@@ -338,7 +354,7 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 
 		if widget, err = newDisplayWidget(); err == nil {
 			widget.Write([]*segmentdisplay.TextChunk{
-				segmentdisplay.NewChunk(dashboardLoadingValue(), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorGray))),
+				segmentdisplay.NewChunk(dashboardLoadingValue(), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite))),
 			})
 
 			return widget

@@ -9,12 +9,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mum4k/termdash/cell"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/utility"
-	"github.com/mum4k/termdash/cell"
 )
 
 func (host *Host) GetMetrics() {
@@ -318,17 +318,18 @@ func getDonutUsageMetric(option func() (*utility.UsageData, error)) (string, int
 	return usageLabel, usagePercentage
 }
 
-func getNetworkUsageMetric(networkMetric dashboards.CellName) string {
+func getNetworkUsageMetric(networkMetric dashboards.CellName) []string {
 	var (
 		usageData    = ""
 		networkUsage *utility.NetworkUsage
+		unit         string
 		err          error
 	)
 
 	if networkUsage, err = utility.GetNetworkUsage(); err == nil {
 		metric := networkUsage.Sent
-		formatString := "%.02f%s"
-		unit := "GB"
+		formatString := "%.02f"
+		unit = "GB"
 
 		if networkMetric == dashboards.CellNameBytesReceived {
 			metric = networkUsage.Recv
@@ -339,50 +340,51 @@ func getNetworkUsageMetric(networkMetric dashboards.CellName) string {
 			unit = "TB"
 
 			if metric >= 100 {
-				formatString = "%.01f%s"
+				formatString = "%.01f"
 			}
 		}
 
-		usageData = fmt.Sprintf(formatString, metric, unit)
+		usageData = fmt.Sprintf(formatString, metric)
 	}
 
-	return usageData
+	return []string{usageData, unit}
 }
 
-func getDirectorySize(dirPath string) string {
+func getDirectorySize(dirPath string) []string {
 	var (
 		usageData = ""
 		dirSize   float64
+		unit      string
 		err       error
 	)
 
 	var processSize = func() {
-		formatString := "%.02f%s"
-		unit := "GB"
+		formatString := "%.02f"
+		unit = "GB"
 
 		if dirSize >= 100 {
 			dirSize = dirSize / 100
 			unit = "TB"
 
 			if dirSize >= 100 {
-				formatString = "%.01f%s"
+				formatString = "%.01f"
 			}
 		}
 
-		usageData = fmt.Sprintf(formatString, dirSize, unit)
+		usageData = fmt.Sprintf(formatString, dirSize)
 	}
 
 	if dirSize, err = utility.GetDirSize(dirPath); err == nil {
 		processSize()
 
-		return usageData
+		return []string{usageData, unit}
 	}
 
 	if dirSize, err = utility.GetVolumeSize("suidb"); err == nil {
 		processSize()
 	}
 
-	return usageData
+	return []string{usageData, unit}
 }
 
 func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName) []cell.Option {
@@ -416,6 +418,8 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		options = append(options, cell.BgColor(color), cell.FgColor(color))
 	case dashboards.CellNameEpoch, dashboards.CellNameDiskUsage, dashboards.CellNameCpuUsage, dashboards.CellNameMemoryUsage:
 		options = append(options, cell.Bold())
+	case dashboards.CellNameEpochEnd, dashboards.CellNameDatabaseSize, dashboards.CellNameBytesReceived, dashboards.CellNameBytesSent:
+		options = append(options, cell.FgColor(cell.ColorWhite), cell.FgColor(cell.ColorGreen))
 	default:
 		options = append(options, cell.FgColor(cell.ColorWhite))
 	}

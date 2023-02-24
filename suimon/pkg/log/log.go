@@ -2,6 +2,7 @@ package log
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"os/exec"
@@ -35,11 +36,24 @@ func colorPrint(color enums.Color, messages ...any) {
 
 func (logger *Logger) StreamFrom(processName string, stream chan string) error {
 	var (
-		command = fmt.Sprintf("sudo journalctl -f -u %s -o cat", processName)
-		cmd     = exec.Command("bash", "-c", command)
-		stdout  io.ReadCloser
-		err     error
+		cmdService = "sudo journalctl -f -u %s -o cat"
+		cmdPID     = "sudo journalctl -f _PID=%s -o cat"
+		stdout     io.ReadCloser
+		cmd        *exec.Cmd
+		err        error
 	)
+
+	if serviceExists(processName) {
+		cmd = exec.Command("bash", "-c", fmt.Sprintf(cmdService, processName))
+	} else {
+		var pid string
+
+		if pid, err = getPID(processName); err != nil {
+			return err
+		}
+
+		cmd = exec.Command("bash", "-c", fmt.Sprintf(cmdPID, pid))
+	}
 
 	if stdout, err = cmd.StdoutPipe(); err != nil {
 		return err
@@ -65,10 +79,36 @@ func (logger *Logger) StreamFrom(processName string, stream chan string) error {
 	return nil
 }
 
-func GenerateLogoFrom(text string, fontName string, color string) string {
-	logo := figure.NewColorFigure(text, fontName, color, true)
+func serviceExists(name string) bool {
+	var (
+		cmd    = exec.Command("systemctl", "status", name)
+		output bytes.Buffer
+		err    error
+	)
 
-	return logo.String()
+	cmd.Stdout = &output
+
+	if err = cmd.Run(); err != nil {
+		return false
+	}
+
+	return true
+}
+
+func getPID(command string) (string, error) {
+	var (
+		cmd    = exec.Command("pgrep", command)
+		output bytes.Buffer
+		err    error
+	)
+
+	cmd.Stdout = &output
+
+	if err = cmd.Run(); err != nil {
+		return "", err
+	}
+
+	return output.String(), nil
 }
 
 func PrintLogo(text string, fontName string, color string) {

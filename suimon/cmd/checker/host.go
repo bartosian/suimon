@@ -86,7 +86,8 @@ func (host *Host) SetStatus(rpc Host) {
 		if metricsHost.TotalTransactionNumber == 0 && metricsRPC.TotalTransactionNumber != 0 ||
 			metricsHost.LatestCheckpoint == 0 && metricsRPC.LatestCheckpoint != 0 ||
 			metricsHost.TransactionsPerSecond == 0 && metricsRPC.TransactionsPerSecond != 0 ||
-			metricsHost.TxSyncPercentage > 100 || metricsHost.CheckSyncPercentage > 100 {
+			metricsHost.TxSyncPercentage > 100 || metricsHost.CheckSyncPercentage > 100 ||
+			metricsHost.TxSyncPercentage == 0 && metricsRPC.TxSyncPercentage != 0 {
 			status = enums.StatusRed
 
 			break
