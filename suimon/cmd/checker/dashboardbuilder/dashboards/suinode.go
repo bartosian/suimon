@@ -221,7 +221,7 @@ func (c *Cell) Write(value any, options ...cell.Option) {
 				chunk = dashboardLoadingBlinkValue()
 			}
 
-			segments = append(segments, segmentdisplay.NewChunk(strconv.Itoa(v), segmentdisplay.WriteCellOpts(options...)))
+			segments = append(segments, segmentdisplay.NewChunk(chunk, segmentdisplay.WriteCellOpts(options...)))
 		case string:
 			if v == "" {
 				v = dashboardLoadingBlinkValue()
