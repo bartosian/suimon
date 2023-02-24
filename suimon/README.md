@@ -160,6 +160,25 @@ enables a dynamic dashboard to monitor node and system metrics in real-time
 suimon -w
 ```
 
+## Update SUIMON
+
+If ``suimon`` package was installed using the command ``go install``, it can be updated to the latest version on the main branch by running the following command:
+```shell
+go install github.com/bartosian/sui_helpers/suimon@main
+```
+
+If you have cloned the ``suimon`` repository, you can update it to the latest version on the main branch by pulling the latest updates from the remote repository, rebuilding the Go binary, and replacing the existing binary in the executables directory.
+
+```shell
+cd $HOME/sui_helpers && \
+git pull origin main && \
+cd suimon && \
+go build -o suimon . && \
+sudo mv suimon /usr/local/go/bin/
+```
+
+if you have cloned 
+
 ## Flags
 
 The ``SUIMON`` command-line tool provides several optional flags that can be used to customize its behavior. When the suimon command is executed with the ``--help`` flag, a list of available flags is displayed. The following is a description of the available flags:
