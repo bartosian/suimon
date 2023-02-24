@@ -69,9 +69,7 @@ var (
 				NewRow(21, Columns[CellNameCpuUsage], Columns[CellNameMemoryUsage]),
 				NewRow(7, Columns[CellNameBytesSent], Columns[CellNameBytesReceived]),
 			),
-			NewColumn(140,
-				NewRow(4, NewColumn(86)),
-				Columns[CellNameNodeLogs]),
+			Columns[CellNameNodeLogs],
 			NewColumn(0), // window width limiter
 		),
 		5: NewRow(0), // window height limiter
