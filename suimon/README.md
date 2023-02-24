@@ -242,10 +242,21 @@ Depending on the emojis and colors support by your terminal you can enable/disab
 
 ## Run In Development
 
-To manually run GEX, clone the `github.com/cosmos/gex` repository and then cd into the `gex` directory. Then to run GEX manually, type this command in a terminal window:
-
+To manually run ``SUIMON`` locally for the development cases:
+1. Clone the ``sui_helpers`` repository by running the following command:
 ```shell
-go run -f fullnode.yaml
+cd $HOME && \
+git clone https://github.com/bartosian/sui_helpers.git
+```
+
+2. Once the repository is cloned, navigate to the ``suimon`` folder by running the following command:
+```shell
+cd sui_helpers/suimon
+```
+
+3. Run ``SUIMON`` by running the following command:
+```shell
+go run main.go
 ```
 
 # License
