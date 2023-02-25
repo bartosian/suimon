@@ -234,8 +234,6 @@ func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) 
 		return node.Status.DashboardStatus()
 	case dashboards.CellNameNetworkStatus:
 		return rpc.Status.DashboardStatus()
-	case dashboards.CellNameAddress:
-		return node.AddressInfo.HostPort.Address
 	case dashboards.CellNameTransactionsPerSecond:
 		return node.Metrics.TransactionsPerSecond
 	case dashboards.CellNameCheckpointsPerSecond:
@@ -258,17 +256,15 @@ func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) 
 		return node.Metrics.Version
 	case dashboards.CellNameCommit:
 		return node.Metrics.Commit
-	case dashboards.CellNameCompany:
-		return node.Location.Provider
-	case dashboards.CellNameCountry:
-		return node.Location.String()
-	case dashboards.CellNameEpoch:
-		epochLabel := node.Metrics.GetEpochLabel()
-		epochPercentage := node.Metrics.GetEpochProgress()
+	case dashboards.CellNameEpochProgress:
+		epochLabel := rpc.Metrics.GetEpochLabel()
+		epochPercentage := rpc.Metrics.GetEpochProgress()
 
 		return dashboards.NewDonutInput(epochLabel, epochPercentage)
+	case dashboards.CellNameCurrentEpoch:
+		return rpc.Metrics.SystemState.Epoch
 	case dashboards.CellNameEpochEnd:
-		return node.Metrics.GetEpochTimer()
+		return rpc.Metrics.GetEpochTimer()
 	case dashboards.CellNameDiskUsage:
 		usageLabel, usagePercentage := getDonutUsageMetric("GB", utility.GetDiskUsage)
 
@@ -420,7 +416,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		color := getColorOptions(rpc.Status)
 
 		options = append(options, cell.BgColor(color), cell.FgColor(color))
-	case dashboards.CellNameEpoch, dashboards.CellNameDiskUsage, dashboards.CellNameCpuUsage, dashboards.CellNameMemoryUsage:
+	case dashboards.CellNameEpochProgress, dashboards.CellNameDiskUsage, dashboards.CellNameCpuUsage, dashboards.CellNameMemoryUsage:
 		options = append(options, cell.Bold())
 	case dashboards.CellNameEpochEnd, dashboards.CellNameDatabaseSize, dashboards.CellNameBytesReceived, dashboards.CellNameBytesSent, dashboards.CellNameUptime:
 		options = append(options, cell.FgColor(cell.ColorWhite), cell.FgColor(cell.ColorGreen))

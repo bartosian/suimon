@@ -35,9 +35,9 @@ func (i Status) ColorStatus() string {
 }
 
 func (i Status) DashboardStatus() string {
-	statusWidget := make([]string, 5)
+	statusWidget := make([]string, 100)
 
-	repeatedPattern := "|    |"
+	repeatedPattern := strings.Repeat("    ", 100)
 
 	for idx := range statusWidget {
 		statusWidget[idx] = repeatedPattern

@@ -37,76 +37,76 @@ var (
 	}
 
 	Rows = []grid.Element{
-		0: NewRow(7,
-			NewColumn(16,
-				Columns[CellNameNodeStatus],
-				Columns[CellNameNetworkStatus],
-			),
+		0: NewRowPct(10,
+			Columns[CellNameNodeStatus],
+			Columns[CellNameNetworkStatus],
 			Columns[CellNameTotalTransactions],
 			Columns[CellNameLatestCheckpoint],
 			Columns[CellNameHighestCheckpoint],
-			NewColumn(0), // window width limiter
 		),
-		1: NewRow(7,
+		1: NewRowPct(10,
 			Columns[CellNameUptime],
 			Columns[CellNameTransactionsPerSecond],
 			Columns[CellNameCheckpointsPerSecond],
 			Columns[CellNameConnectedPeers],
 			Columns[CellNameVersion],
 			Columns[CellNameCommit],
-			NewColumn(0), // window width limiter
 		),
-		2: NewRow(7,
+		2: NewRowPct(10,
+			Columns[CellNameCurrentEpoch],
 			Columns[CellNameEpochEnd],
 			Columns[CellNameDatabaseSize],
 			Columns[CellNameTXSyncProgress],
 			Columns[CellNameCheckSyncProgress],
-			NewColumn(0), // window width limiter
 		),
-		3: NewRow(49,
-			NewColumn(86,
-				NewRow(21, Columns[CellNameEpoch], Columns[CellNameDiskUsage]),
-				NewRow(21, Columns[CellNameCpuUsage], Columns[CellNameMemoryUsage]),
-				NewRow(7, Columns[CellNameBytesSent], Columns[CellNameBytesReceived]),
+		3: NewRowPct(70,
+			NewColumnPct(40,
+				NewRowPct(45,
+					Columns[CellNameEpochProgress],
+					Columns[CellNameDiskUsage],
+				),
+				NewRowPct(45,
+					Columns[CellNameCpuUsage],
+					Columns[CellNameMemoryUsage],
+				),
+				NewRowPct(10,
+					Columns[CellNameBytesSent],
+					Columns[CellNameBytesReceived],
+				),
 			),
 			Columns[CellNameNodeLogs],
-			NewColumn(0), // window width limiter
 		),
-		5: NewRow(0), // window height limiter
 	}
 
 	Columns = []grid.Element{
-		CellNameNodeStatus:            NewColumn(8, Cells[CellNameNodeStatus].GetGridWidget()),
-		CellNameNetworkStatus:         NewColumn(8, Cells[CellNameNetworkStatus].GetGridWidget()),
-		CellNameAddress:               NewColumn(8, Cells[CellNameAddress].GetGridWidget()),
-		CellNameTransactionsPerSecond: NewColumn(28, Cells[CellNameTransactionsPerSecond].GetGridWidget()),
-		CellNameCheckpointsPerSecond:  NewColumn(26, Cells[CellNameCheckpointsPerSecond].GetGridWidget()),
-		CellNameTotalTransactions:     NewColumn(70, Cells[CellNameTotalTransactions].GetGridWidget()),
-		CellNameLatestCheckpoint:      NewColumn(70, Cells[CellNameLatestCheckpoint].GetGridWidget()),
-		CellNameHighestCheckpoint:     NewColumn(70, Cells[CellNameHighestCheckpoint].GetGridWidget()),
-		CellNameConnectedPeers:        NewColumn(25, Cells[CellNameConnectedPeers].GetGridWidget()),
-		CellNameTXSyncProgress:        NewColumn(70, Cells[CellNameTXSyncProgress].GetGridWidget()),
-		CellNameCheckSyncProgress:     NewColumn(70, Cells[CellNameCheckSyncProgress].GetGridWidget()),
-		CellNameUptime:                NewColumn(32, Cells[CellNameUptime].GetGridWidget()),
-		CellNameVersion:               NewColumn(45, Cells[CellNameVersion].GetGridWidget()),
-		CellNameCommit:                NewColumn(70, Cells[CellNameCommit].GetGridWidget()),
-		CellNameCompany:               NewColumn(100, Cells[CellNameCompany].GetGridWidget()),
-		CellNameCountry:               NewColumn(100, Cells[CellNameCountry].GetGridWidget()),
-		CellNameEpoch:                 NewColumn(43, Cells[CellNameEpoch].GetGridWidget()),
-		CellNameEpochEnd:              NewColumn(43, Cells[CellNameEpochEnd].GetGridWidget()),
-		CellNameDiskUsage:             NewColumn(43, Cells[CellNameDiskUsage].GetGridWidget()),
-		CellNameDatabaseSize:          NewColumn(43, Cells[CellNameDatabaseSize].GetGridWidget()),
-		CellNameBytesSent:             NewColumn(43, Cells[CellNameBytesSent].GetGridWidget()),
-		CellNameBytesReceived:         NewColumn(43, Cells[CellNameBytesReceived].GetGridWidget()),
-		CellNameMemoryUsage:           NewColumn(43, Cells[CellNameMemoryUsage].GetGridWidget()),
-		CellNameCpuUsage:              NewColumn(43, Cells[CellNameCpuUsage].GetGridWidget()),
-		CellNameNodeLogs:              NewColumn(140, Cells[CellNameNodeLogs].GetGridWidget()),
+		CellNameNodeStatus:            NewColumnPct(5, Cells[CellNameNodeStatus].GetGridWidget()),
+		CellNameNetworkStatus:         NewColumnPct(5, Cells[CellNameNetworkStatus].GetGridWidget()),
+		CellNameTransactionsPerSecond: NewColumnPct(15, Cells[CellNameTransactionsPerSecond].GetGridWidget()),
+		CellNameCheckpointsPerSecond:  NewColumnPct(15, Cells[CellNameCheckpointsPerSecond].GetGridWidget()),
+		CellNameTotalTransactions:     NewColumnPct(30, Cells[CellNameTotalTransactions].GetGridWidget()),
+		CellNameLatestCheckpoint:      NewColumnPct(30, Cells[CellNameLatestCheckpoint].GetGridWidget()),
+		CellNameHighestCheckpoint:     NewColumnPct(30, Cells[CellNameHighestCheckpoint].GetGridWidget()),
+		CellNameConnectedPeers:        NewColumnPct(10, Cells[CellNameConnectedPeers].GetGridWidget()),
+		CellNameTXSyncProgress:        NewColumnPct(30, Cells[CellNameTXSyncProgress].GetGridWidget()),
+		CellNameCheckSyncProgress:     NewColumnPct(30, Cells[CellNameCheckSyncProgress].GetGridWidget()),
+		CellNameUptime:                NewColumnPct(10, Cells[CellNameUptime].GetGridWidget()),
+		CellNameVersion:               NewColumnPct(20, Cells[CellNameVersion].GetGridWidget()),
+		CellNameCommit:                NewColumnPct(10, Cells[CellNameCommit].GetGridWidget()),
+		CellNameCurrentEpoch:          NewColumnPct(10, Cells[CellNameCurrentEpoch].GetGridWidget()),
+		CellNameEpochProgress:         NewColumnPct(50, Cells[CellNameEpochProgress].GetGridWidget()),
+		CellNameEpochEnd:              NewColumnPct(15, Cells[CellNameEpochEnd].GetGridWidget()),
+		CellNameDiskUsage:             NewColumnPct(50, Cells[CellNameDiskUsage].GetGridWidget()),
+		CellNameDatabaseSize:          NewColumnPct(15, Cells[CellNameDatabaseSize].GetGridWidget()),
+		CellNameBytesSent:             NewColumnPct(50, Cells[CellNameBytesSent].GetGridWidget()),
+		CellNameBytesReceived:         NewColumnPct(50, Cells[CellNameBytesReceived].GetGridWidget()),
+		CellNameMemoryUsage:           NewColumnPct(50, Cells[CellNameMemoryUsage].GetGridWidget()),
+		CellNameCpuUsage:              NewColumnPct(50, Cells[CellNameCpuUsage].GetGridWidget()),
+		CellNameNodeLogs:              NewColumnPct(50, Cells[CellNameNodeLogs].GetGridWidget()),
 	}
 
 	Cells = []*Cell{
 		CellNameNodeStatus:            NewCell("NODE", CellNameNodeStatus),
 		CellNameNetworkStatus:         NewCell("NET", CellNameNetworkStatus),
-		CellNameAddress:               NewCell("ADDRESS", CellNameAddress),
 		CellNameTransactionsPerSecond: NewCell("TRANSACTIONS PER SECOND", CellNameTransactionsPerSecond),
 		CellNameCheckpointsPerSecond:  NewCell("CHECKPOINTS PER SECOND", CellNameCheckpointsPerSecond),
 		CellNameTotalTransactions:     NewCell("TOTAL TRANSACTIONS", CellNameTotalTransactions),
@@ -118,9 +118,8 @@ var (
 		CellNameUptime:                NewCell("UPTIME", CellNameUptime),
 		CellNameVersion:               NewCell("VERSION", CellNameVersion),
 		CellNameCommit:                NewCell("COMMIT", CellNameCommit),
-		CellNameCompany:               NewCell("PROVIDER", CellNameCompany),
-		CellNameCountry:               NewCell("COUNTRY", CellNameCountry),
-		CellNameEpoch:                 NewCell("EPOCH", CellNameEpoch),
+		CellNameCurrentEpoch:          NewCell("CURRENT EPOCH", CellNameCurrentEpoch),
+		CellNameEpochProgress:         NewCell("EPOCH PROGRESS", CellNameEpochProgress),
 		CellNameEpochEnd:              NewCell("TIME TILL THE END OF EPOCH", CellNameEpochEnd),
 		CellNameDiskUsage:             NewCell("DISK USAGE", CellNameDiskUsage),
 		CellNameDatabaseSize:          NewCell("DATABASE SIZE", CellNameDatabaseSize),
@@ -176,12 +175,16 @@ func NewCell(title string, name CellName) *Cell {
 	}
 }
 
-func NewRow(height int, elements ...grid.Element) grid.Element {
-	return grid.RowHeightFixed(height, elements...)
+func NewRowPct(height int, elements ...grid.Element) grid.Element {
+	return grid.RowHeightPerc(height, elements...)
 }
 
 func NewColumn(width int, elements ...grid.Element) grid.Element {
 	return grid.ColWidthFixed(width, elements...)
+}
+
+func NewColumnPct(width int, elements ...grid.Element) grid.Element {
+	return grid.ColWidthPerc(width, elements...)
 }
 
 type DonutWriteInput struct {
@@ -269,6 +272,10 @@ func newTextWidget() (*text.Text, error) {
 	return text.New(text.RollContent(), text.WrapAtWords())
 }
 
+func newTextNoScrollWidget() (*text.Text, error) {
+	return text.New(text.DisableScrolling(), text.WrapAtRunes())
+}
+
 func newDonutWidget(color cell.Color) (*donut.Donut, error) {
 	return donut.New(
 		donut.CellOpts(
@@ -324,7 +331,7 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 	case CellNameNodeStatus, CellNameNetworkStatus:
 		var widget *text.Text
 
-		if widget, err = newTextWidget(); err == nil {
+		if widget, err = newTextNoScrollWidget(); err == nil {
 			widget.Write(enums.StatusGrey.DashboardStatus(), text.WriteCellOpts(cell.FgColor(cell.ColorGray), cell.BgColor(cell.ColorGray)))
 
 			return widget
@@ -337,7 +344,7 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 
 			return widget
 		}
-	case CellNameEpoch, CellNameDiskUsage, CellNameMemoryUsage, CellNameCpuUsage:
+	case CellNameEpochProgress, CellNameDiskUsage, CellNameMemoryUsage, CellNameCpuUsage:
 		var (
 			widget *donut.Donut
 			color  = cell.ColorGreen
