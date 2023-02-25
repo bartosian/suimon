@@ -129,7 +129,15 @@ func (checker *Checker) DrawDashboards() {
 		doneCH := make(chan struct{}, len(hosts))
 		logsCH := make(chan string)
 
-		go checker.logger.StreamFrom("suid", logsCH)
+		go func() {
+			var err error
+
+			if err = checker.logger.StreamFromProcess("suid", logsCH); err != nil {
+				if err = checker.logger.StreamFromContainer("sui-node", logsCH); err != nil {
+					return
+				}
+			}
+		}()
 
 		for {
 			select {

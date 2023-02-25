@@ -3,11 +3,15 @@ package log
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 
 	"github.com/common-nighthawk/go-figure"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
@@ -34,7 +38,7 @@ func colorPrint(color enums.Color, messages ...any) {
 	fmt.Println(color, messages, enums.ColorReset)
 }
 
-func (logger *Logger) StreamFrom(processName string, stream chan string) error {
+func (logger *Logger) StreamFromProcess(processName string, stream chan string) error {
 	var (
 		cmdService = "sudo journalctl -f -u %s -o cat"
 		cmdPID     = "sudo journalctl -f _PID=%s -o cat"
@@ -74,6 +78,58 @@ func (logger *Logger) StreamFrom(processName string, stream chan string) error {
 
 	if err = cmd.Wait(); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (logger *Logger) StreamFromContainer(imageName string, stream chan string) error {
+	var (
+		cli        *client.Client
+		containers []types.Container
+		err        error
+	)
+
+	if cli, err = client.NewClientWithOpts(client.FromEnv); err != nil {
+		return err
+	}
+
+	if containers, err = cli.ContainerList(context.Background(), types.ContainerListOptions{}); err != nil {
+		return err
+	}
+
+	for _, container := range containers {
+		imageID := container.ImageID
+		imageInspect, _, err := cli.ImageInspectWithRaw(context.Background(), imageID)
+		if err != nil {
+			return err
+		}
+
+		if strings.Contains(imageInspect.RepoTags[0], imageName) && container.State == "running" {
+			var logs io.ReadCloser
+
+			if logs, err = cli.ContainerLogs(context.Background(), container.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true}); err != nil {
+				return err
+			}
+
+			defer logs.Close()
+
+			scanner := bufio.NewScanner(logs)
+
+			for scanner.Scan() {
+				select {
+				case stream <- scanner.Text():
+				case <-stream:
+					break
+				}
+			}
+
+			if err != nil && err.Error() != "EOF" {
+				return err
+			}
+
+			break
+		}
 	}
 
 	return nil
