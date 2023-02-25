@@ -286,7 +286,7 @@ func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) 
 
 		return dashboards.NewDonutInput(usageLabel, usagePercentage)
 	case dashboards.CellNameCpuUsage:
-		usageLabel, usagePercentage := getDonutUsageMetric("$%", utility.GetCPUUsage)
+		usageLabel, usagePercentage := getDonutUsageMetric("%", utility.GetCPUUsage)
 
 		return dashboards.NewDonutInput(usageLabel, usagePercentage)
 	default:

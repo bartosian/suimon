@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"github.com/common-nighthawk/go-figure"
@@ -115,7 +116,6 @@ func (logger *Logger) StreamFromContainer(imageName string, stream chan string) 
 			defer logs.Close()
 
 			scanner := bufio.NewScanner(logs)
-
 			for scanner.Scan() {
 				select {
 				case stream <- scanner.Text():
@@ -133,6 +133,11 @@ func (logger *Logger) StreamFromContainer(imageName string, stream chan string) 
 	}
 
 	return nil
+}
+
+func RemoveNonPrintableChars(str string) string {
+	reg := regexp.MustCompile("[^[:print:]\n]")
+	return reg.ReplaceAllString(str, "")
 }
 
 func serviceExists(name string) bool {

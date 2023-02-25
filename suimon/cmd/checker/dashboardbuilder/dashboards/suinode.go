@@ -18,11 +18,12 @@ import (
 	"github.com/mum4k/termdash/widgets/text"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
 const (
 	dashboardName       = "💧 SUIMON: PRESS Q or ESC TO QUIT"
-	cellNodeLogsDefault = "THE SUI-NODE PROCESS COULD NOT BE FOUND. PLEASE CHECK IF THE PROCESS IS CURRENTLY RUNNING AND ENSURE THAT IT HAS NOT BEEN TERMINATED UNEXPECTEDLY. WITHOUT IT, LOGS CANNOT BE SHOWN."
+	cellNodeLogsDefault = "THE SUI-NODE PROCESS COULD NOT BE FOUND. PLEASE CHECK IF THE PROCESS IS CURRENTLY RUNNING AND ENSURE THAT IT HAS NOT BEEN TERMINATED UNEXPECTEDLY. WITHOUT IT, LOGS CANNOT BE SHOWN.\n"
 )
 
 var (
@@ -204,6 +205,11 @@ func (c *Cell) Write(value any, options ...cell.Option) {
 	switch v := c.Widget.(type) {
 	case *text.Text:
 		valueString := value.(string)
+
+		valueString = log.RemoveNonPrintableChars(valueString)
+		if len(valueString) == 0 {
+			return
+		}
 
 		if c.Name != CellNameNodeLogs {
 			v.Reset()
