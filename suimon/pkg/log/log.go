@@ -141,19 +141,18 @@ func RemoveNonPrintableChars(str string) string {
 }
 
 func serviceExists(name string) bool {
-	var (
-		cmd    = exec.Command("systemctl", "status", name)
-		output bytes.Buffer
-		err    error
-	)
-
-	cmd.Stdout = &output
-
-	if err = cmd.Run(); err != nil {
+	out, err := exec.Command("systemctl", "is-active", name).Output()
+	if err != nil {
 		return false
 	}
 
-	return true
+	status := strings.TrimSpace(string(out))
+
+	if status == "active" {
+		return true
+	}
+
+	return false
 }
 
 func getPID(command string) (string, error) {
