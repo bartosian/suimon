@@ -85,6 +85,10 @@ func GetVolumeSize(volumeName string) (float64, error) {
 		return size, err
 	}
 
+	if volume.UsageData == nil {
+		return size, nil
+	}
+
 	return float64(volume.UsageData.Size) / gb, nil
 }
 

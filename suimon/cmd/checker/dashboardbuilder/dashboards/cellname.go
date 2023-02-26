@@ -6,7 +6,6 @@ type CellName int
 const (
 	CellNameNodeStatus CellName = iota
 	CellNameNetworkStatus
-	CellNameAddress
 	CellNameTransactionsPerSecond
 	CellNameCheckpointsPerSecond
 	CellNameTotalTransactions
@@ -18,9 +17,8 @@ const (
 	CellNameUptime
 	CellNameVersion
 	CellNameCommit
-	CellNameCompany
-	CellNameCountry
-	CellNameEpoch
+	CellNameCurrentEpoch
+	CellNameEpochProgress
 	CellNameEpochEnd
 	CellNameDiskUsage
 	CellNameDatabaseSize
@@ -34,7 +32,6 @@ const (
 var cellNameStringValues = [...]string{
 	"NODE STATUS",
 	"NETWORK STATUS",
-	"ADDRESS",
 	"TPS",
 	"CPS",
 	"TOTAL TRANSACTIONS",
@@ -46,9 +43,8 @@ var cellNameStringValues = [...]string{
 	"UPTIME DAYS",
 	"VERSION",
 	"COMMIT",
-	"PROVIDER",
-	"COUNTRY",
-	"EPOCH",
+	"CURRENT EPOCH",
+	"EPOCH PROGRESS",
 	"TIME TILL THE END OF EPOCH",
 	"DISK USAGE",
 	"DATABASE SIZE",

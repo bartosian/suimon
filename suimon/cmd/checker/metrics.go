@@ -41,6 +41,10 @@ func (metrics *Metrics) GetEpochTimer() []string {
 	minutes := int(duration.Minutes()) - (hours * 60)
 	second := time.Now().Second()
 
+	if hours < 0 {
+		return []string{""}
+	}
+
 	spacer := " "
 	if second%2 == 0 {
 		spacer = ":"
