@@ -22,8 +22,7 @@ import (
 )
 
 const (
-	dashboardName       = "💧 SUIMON: PRESS Q or ESC TO QUIT"
-	cellNodeLogsDefault = "THE SUI-NODE PROCESS COULD NOT BE FOUND. PLEASE CHECK IF THE PROCESS IS CURRENTLY RUNNING AND ENSURE THAT IT HAS NOT BEEN TERMINATED UNEXPECTEDLY. WITHOUT IT, LOGS CANNOT BE SHOWN.\n"
+	dashboardName = "💧 SUIMON: PRESS Q or ESC TO QUIT"
 )
 
 var (
@@ -38,39 +37,43 @@ var (
 	}
 
 	Rows = []grid.Element{
-		0: NewRowPct(10,
-			Columns[CellNameNodeStatus],
-			Columns[CellNameNetworkStatus],
-			Columns[CellNameTotalTransactions],
-			Columns[CellNameLatestCheckpoint],
-			Columns[CellNameHighestCheckpoint],
-		),
-		1: NewRowPct(10,
+		0: NewRowPct(12,
+			NewColumnPct(5,
+				NewRowPct(50, Columns[CellNameNodeStatus]),
+				NewRowPct(50, Columns[CellNameNetworkStatus]),
+			),
+			Columns[CellNameCurrentEpoch],
+			Columns[CellNameEpochEnd],
 			Columns[CellNameUptime],
-			Columns[CellNameTransactionsPerSecond],
-			Columns[CellNameCheckpointsPerSecond],
 			Columns[CellNameConnectedPeers],
 			Columns[CellNameVersion],
 			Columns[CellNameCommit],
 		),
-		2: NewRowPct(10,
-			Columns[CellNameCurrentEpoch],
-			Columns[CellNameEpochEnd],
-			Columns[CellNameDatabaseSize],
-			Columns[CellNameTXSyncProgress],
-			Columns[CellNameCheckSyncProgress],
+		1: NewRowPct(12,
+			Columns[CellNameTotalTransactions],
+			Columns[CellNameLatestCheckpoint],
+			Columns[CellNameHighestCheckpoint],
 		),
-		3: NewRowPct(70,
-			NewColumnPct(40,
-				NewRowPct(45,
+		2: NewRowPct(12,
+			Columns[CellNameTransactionsPerSecond],
+			Columns[CellNameCheckpointsPerSecond],
+			Columns[CellNameDatabaseSize],
+			NewColumnPct(50,
+				Columns[CellNameTXSyncProgress],
+				Columns[CellNameCheckSyncProgress],
+			),
+		),
+		3: NewRowPct(50,
+			NewColumnPct(50,
+				NewRowPct(44,
 					Columns[CellNameEpochProgress],
 					Columns[CellNameDiskUsage],
 				),
-				NewRowPct(45,
+				NewRowPct(44,
 					Columns[CellNameCpuUsage],
 					Columns[CellNameMemoryUsage],
 				),
-				NewRowPct(10,
+				NewRowPct(12,
 					Columns[CellNameBytesSent],
 					Columns[CellNameBytesReceived],
 				),
@@ -80,24 +83,24 @@ var (
 	}
 
 	Columns = []grid.Element{
-		CellNameNodeStatus:            NewColumnPct(5, Cells[CellNameNodeStatus].GetGridWidget()),
-		CellNameNetworkStatus:         NewColumnPct(5, Cells[CellNameNetworkStatus].GetGridWidget()),
+		CellNameNodeStatus:            NewColumnPct(99, Cells[CellNameNodeStatus].GetGridWidget()),
+		CellNameNetworkStatus:         NewColumnPct(99, Cells[CellNameNetworkStatus].GetGridWidget()),
 		CellNameTransactionsPerSecond: NewColumnPct(15, Cells[CellNameTransactionsPerSecond].GetGridWidget()),
 		CellNameCheckpointsPerSecond:  NewColumnPct(15, Cells[CellNameCheckpointsPerSecond].GetGridWidget()),
-		CellNameTotalTransactions:     NewColumnPct(30, Cells[CellNameTotalTransactions].GetGridWidget()),
-		CellNameLatestCheckpoint:      NewColumnPct(30, Cells[CellNameLatestCheckpoint].GetGridWidget()),
-		CellNameHighestCheckpoint:     NewColumnPct(30, Cells[CellNameHighestCheckpoint].GetGridWidget()),
+		CellNameTotalTransactions:     NewColumnPct(33, Cells[CellNameTotalTransactions].GetGridWidget()),
+		CellNameLatestCheckpoint:      NewColumnPct(33, Cells[CellNameLatestCheckpoint].GetGridWidget()),
+		CellNameHighestCheckpoint:     NewColumnPct(33, Cells[CellNameHighestCheckpoint].GetGridWidget()),
 		CellNameConnectedPeers:        NewColumnPct(10, Cells[CellNameConnectedPeers].GetGridWidget()),
-		CellNameTXSyncProgress:        NewColumnPct(30, Cells[CellNameTXSyncProgress].GetGridWidget()),
-		CellNameCheckSyncProgress:     NewColumnPct(30, Cells[CellNameCheckSyncProgress].GetGridWidget()),
+		CellNameTXSyncProgress:        NewColumnPct(50, Cells[CellNameTXSyncProgress].GetGridWidget()),
+		CellNameCheckSyncProgress:     NewColumnPct(50, Cells[CellNameCheckSyncProgress].GetGridWidget()),
 		CellNameUptime:                NewColumnPct(10, Cells[CellNameUptime].GetGridWidget()),
 		CellNameVersion:               NewColumnPct(20, Cells[CellNameVersion].GetGridWidget()),
 		CellNameCommit:                NewColumnPct(10, Cells[CellNameCommit].GetGridWidget()),
 		CellNameCurrentEpoch:          NewColumnPct(10, Cells[CellNameCurrentEpoch].GetGridWidget()),
 		CellNameEpochProgress:         NewColumnPct(50, Cells[CellNameEpochProgress].GetGridWidget()),
-		CellNameEpochEnd:              NewColumnPct(15, Cells[CellNameEpochEnd].GetGridWidget()),
+		CellNameEpochEnd:              NewColumnPct(20, Cells[CellNameEpochEnd].GetGridWidget()),
 		CellNameDiskUsage:             NewColumnPct(50, Cells[CellNameDiskUsage].GetGridWidget()),
-		CellNameDatabaseSize:          NewColumnPct(15, Cells[CellNameDatabaseSize].GetGridWidget()),
+		CellNameDatabaseSize:          NewColumnPct(20, Cells[CellNameDatabaseSize].GetGridWidget()),
 		CellNameBytesSent:             NewColumnPct(50, Cells[CellNameBytesSent].GetGridWidget()),
 		CellNameBytesReceived:         NewColumnPct(50, Cells[CellNameBytesReceived].GetGridWidget()),
 		CellNameMemoryUsage:           NewColumnPct(50, Cells[CellNameMemoryUsage].GetGridWidget()),
@@ -107,7 +110,7 @@ var (
 
 	Cells = []*Cell{
 		CellNameNodeStatus:            NewCell("NODE", CellNameNodeStatus),
-		CellNameNetworkStatus:         NewCell("NET", CellNameNetworkStatus),
+		CellNameNetworkStatus:         NewCell("NETWORK", CellNameNetworkStatus),
 		CellNameTransactionsPerSecond: NewCell("TRANSACTIONS PER SECOND", CellNameTransactionsPerSecond),
 		CellNameCheckpointsPerSecond:  NewCell("CHECKPOINTS PER SECOND", CellNameCheckpointsPerSecond),
 		CellNameTotalTransactions:     NewCell("TOTAL TRANSACTIONS", CellNameTotalTransactions),
@@ -264,13 +267,14 @@ func (c *Cell) GetGridWidget() grid.Element {
 
 func newProgressWidget() (*gauge.Gauge, error) {
 	return gauge.New(
-		gauge.Height(3),
+		gauge.Height(5),
 		gauge.Border(linestyle.Light, cell.FgColor(cell.ColorGreen)),
 		gauge.Color(cell.ColorGreen),
 		gauge.FilledTextColor(cell.ColorBlack),
 		gauge.EmptyTextColor(cell.ColorWhite),
 		gauge.HorizontalTextAlign(align.HorizontalCenter),
 		gauge.VerticalTextAlign(align.VerticalMiddle),
+		gauge.Threshold(99, linestyle.Double, cell.FgColor(cell.ColorYellow), cell.Bold()),
 	)
 }
 
@@ -346,7 +350,7 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 		var widget *text.Text
 
 		if widget, err = newTextWidget(); err == nil {
-			widget.Write(cellNodeLogsDefault, text.WriteCellOpts(cell.FgColor(cell.ColorWhite), cell.Bold()))
+			widget.Write("", text.WriteCellOpts(cell.FgColor(cell.ColorWhite), cell.Bold()))
 
 			return widget
 		}
