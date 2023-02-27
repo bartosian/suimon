@@ -567,6 +567,8 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
+	case dashboards.CellNameNodeLogs:
+		options = append(options, cell.FgColor(cell.ColorWhite), cell.Bold())
 	default:
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite))}
 	}
