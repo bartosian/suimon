@@ -4,6 +4,9 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"github.com/mum4k/termdash/linestyle"
+	"github.com/mum4k/termdash/widgets/gauge"
+	"github.com/mum4k/termdash/widgets/segmentdisplay"
 	"net/url"
 	"strconv"
 	"strings"
@@ -227,7 +230,10 @@ func (host *Host) getUrl(request requestType, secure bool) string {
 }
 
 func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) any {
-	node, rpc := checker.node[0], checker.rpc[0]
+	var (
+		node = checker.node[0]
+		rpc  = checker.rpc[0]
+	)
 
 	switch cellName {
 	case dashboards.CellNameNodeStatus:
@@ -358,10 +364,6 @@ func getDirectorySize(dirPath string) []string {
 		formatString := "%.02f"
 		unit = "GB"
 
-		if dirSize == 0 {
-			return
-		}
-
 		if dirSize >= 100 {
 			dirSize = dirSize / 100
 			unit = "TB"
@@ -371,7 +373,9 @@ func getDirectorySize(dirPath string) []string {
 			}
 		}
 
-		usageData = fmt.Sprintf(formatString, dirSize)
+		if usageData = fmt.Sprintf(formatString, dirSize); usageData == "0.00" {
+			usageData = ""
+		}
 	}
 
 	if dirSize, err = utility.GetDirSize(dirPath); err == nil {
@@ -387,15 +391,19 @@ func getDirectorySize(dirPath string) []string {
 	return []string{usageData, unit}
 }
 
-func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName) []cell.Option {
+func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName) any {
 	var (
-		options []cell.Option
 		node    = checker.node[0]
 		rpc     = checker.rpc[0]
+		options []cell.Option
 	)
 
-	var getColorOptions = func(status enums.Status) cell.Color {
-		color := cell.ColorGreen
+	switch cellName {
+	case dashboards.CellNameNodeStatus:
+		var (
+			status = node.Status
+			color  = cell.ColorGreen
+		)
 
 		switch status {
 		case enums.StatusYellow:
@@ -404,24 +412,163 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 			color = cell.ColorRed
 		}
 
-		return color
-	}
-
-	switch cellName {
-	case dashboards.CellNameNodeStatus:
-		color := getColorOptions(node.Status)
-
 		options = append(options, cell.BgColor(color), cell.FgColor(color))
 	case dashboards.CellNameNetworkStatus:
-		color := getColorOptions(rpc.Status)
+		var (
+			status = rpc.Status
+			color  = cell.ColorGreen
+		)
+
+		switch status {
+		case enums.StatusYellow:
+			color = cell.ColorYellow
+		case enums.StatusRed:
+			color = cell.ColorRed
+		}
 
 		options = append(options, cell.BgColor(color), cell.FgColor(color))
+	case dashboards.CellNameTotalTransactions:
+		var (
+			transactionsNode     = node.Metrics.TotalTransactionNumber
+			txSyncPercentageNode = node.Metrics.TxSyncPercentage
+			transactionsRpc      = rpc.Metrics.TotalTransactionNumber
+			color                = cell.ColorWhite
+		)
+
+		switch {
+		case transactionsNode == 0:
+			color = cell.ColorRed
+		case txSyncPercentageNode < totalTransactionsSyncPercentage:
+			color = cell.ColorYellow
+		case transactionsNode < transactionsRpc-totalTransactionsLag:
+			color = cell.ColorYellow
+		}
+
+		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
+	case dashboards.CellNameLatestCheckpoint:
+		var (
+			latestCheckpointNode = node.Metrics.LatestCheckpoint
+			latestCheckpointRpc  = rpc.Metrics.LatestCheckpoint
+			color                = cell.ColorWhite
+		)
+
+		switch {
+		case latestCheckpointNode == 0:
+			color = cell.ColorRed
+		case latestCheckpointNode < latestCheckpointRpc-latestCheckpointLag:
+			color = cell.ColorYellow
+		}
+
+		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
+	case dashboards.CellNameHighestCheckpoint:
+		var (
+			highestCheckpointNode = node.Metrics.HighestSyncedCheckpoint
+			highestCheckpointRpc  = rpc.Metrics.HighestSyncedCheckpoint
+			latestCheckpointRpc   = rpc.Metrics.LatestCheckpoint
+			color                 = cell.ColorWhite
+		)
+
+		switch {
+		case highestCheckpointNode == 0:
+			color = cell.ColorRed
+		case highestCheckpointNode < highestCheckpointRpc-highestSyncedCheckpointLag:
+			color = cell.ColorYellow
+		case highestCheckpointNode < latestCheckpointRpc-latestCheckpointLag:
+			color = cell.ColorYellow
+		}
+
+		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
+	case dashboards.CellNameTransactionsPerSecond:
+		var (
+			tpsNode = node.Metrics.TransactionsPerSecond
+			tpsRpc  = rpc.Metrics.TransactionsPerSecond
+			color   = cell.ColorWhite
+		)
+
+		switch {
+		case tpsNode == 0 && tpsRpc != 0:
+			color = cell.ColorRed
+		case tpsNode < tpsRpc-transactionsPerSecondLag:
+			color = cell.ColorYellow
+		}
+		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
+	case dashboards.CellNameCheckpointsPerSecond:
+		var (
+			checkNode = node.Metrics.CheckpointsPerSecond
+			checkRpc  = rpc.Metrics.CheckpointsPerSecond
+			color     = cell.ColorWhite
+		)
+
+		switch {
+		case checkNode == 0 && checkRpc != 0:
+			color = cell.ColorRed
+		case checkNode < checkRpc-checkpointsPerSecondLag:
+			color = cell.ColorYellow
+		}
+
+		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
+	case dashboards.CellNameTXSyncProgress:
+		var (
+			syncProgress = node.Metrics.TxSyncPercentage
+			color        = cell.ColorGreen
+		)
+
+		switch {
+		case syncProgress == 0:
+			color = cell.ColorRed
+		case syncProgress < totalTransactionsSyncPercentage:
+			color = cell.ColorYellow
+		}
+
+		return []gauge.Option{gauge.Color(color), gauge.Border(linestyle.Light, cell.FgColor(color))}
+	case dashboards.CellNameCheckSyncProgress:
+		var (
+			syncProgress = node.Metrics.CheckSyncPercentage
+			color        = cell.ColorGreen
+		)
+
+		switch {
+		case syncProgress == 0:
+			color = cell.ColorRed
+		case syncProgress < totalCheckpointsSyncPercentage:
+			color = cell.ColorYellow
+		}
+
+		return []gauge.Option{gauge.Color(color), gauge.Border(linestyle.Light, cell.FgColor(color))}
 	case dashboards.CellNameEpochProgress, dashboards.CellNameDiskUsage, dashboards.CellNameCpuUsage, dashboards.CellNameMemoryUsage:
 		options = append(options, cell.Bold())
-	case dashboards.CellNameEpochEnd, dashboards.CellNameDatabaseSize, dashboards.CellNameBytesReceived, dashboards.CellNameBytesSent, dashboards.CellNameUptime:
-		options = append(options, cell.FgColor(cell.ColorWhite), cell.FgColor(cell.ColorGreen))
+	case dashboards.CellNameEpochEnd, dashboards.CellNameDatabaseSize, dashboards.CellNameBytesReceived, dashboards.CellNameBytesSent:
+		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite)), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorGreen))}
+	case dashboards.CellNameUptime:
+		var (
+			uptime = node.Metrics.Uptime
+			color  = cell.ColorWhite
+		)
+
+		switch {
+		case uptime == "0.0":
+			color = cell.ColorRed
+		case uptime < "1.0":
+			color = cell.ColorYellow
+		}
+
+		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color)), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorGreen))}
+	case dashboards.CellNameConnectedPeers:
+		var (
+			peers = node.Metrics.SuiNetworkPeers
+			color = cell.ColorWhite
+		)
+
+		switch {
+		case peers == 0:
+			color = cell.ColorRed
+		case peers < 3:
+			color = cell.ColorYellow
+		}
+
+		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
 	default:
-		options = append(options, cell.FgColor(cell.ColorWhite))
+		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite))}
 	}
 
 	return options

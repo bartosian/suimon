@@ -150,7 +150,7 @@ func (checker *Checker) DrawDashboards() {
 							metric := checker.getMetricForDashboardCell(cellName)
 							options := checker.getOptionsForDashboardCell(cellName)
 
-							dashCell.Write(metric, options...)
+							dashCell.Write(metric, options)
 						}
 
 						doneCH <- struct{}{}
@@ -162,8 +162,9 @@ func (checker *Checker) DrawDashboards() {
 				}
 			case log := <-logsCH:
 				dashCell := dashCells[dashboards.CellNameNodeLogs]
+				options := checker.getOptionsForDashboardCell(dashboards.CellNameNodeLogs)
 
-				dashCell.Write(log + "\n")
+				dashCell.Write(log+"\n", options)
 			case <-dashboardBuilder.Ctx.Done():
 				close(doneCH)
 				close(logsCH)
