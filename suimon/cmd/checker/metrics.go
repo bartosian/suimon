@@ -15,6 +15,7 @@ const (
 	transactionsPerSecondTimeout    = 10
 	checkpointsPerSecondTimeout     = 10
 	transactionsPerSecondLag        = 5
+	totalTransactionsLag            = 100
 	checkpointsPerSecondLag         = 10
 	latestCheckpointLag             = 30
 	highestSyncedCheckpointLag      = 30

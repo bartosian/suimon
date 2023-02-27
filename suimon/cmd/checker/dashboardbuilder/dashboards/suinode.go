@@ -22,7 +22,8 @@ import (
 )
 
 const (
-	dashboardName = "💧 SUIMON: PRESS Q or ESC TO QUIT"
+	dashboardName     = "💧 SUIMON: PRESS Q or ESC TO QUIT"
+	logsWidgetMessage = "Please note that logs for sui-node can only be automatically captured from systemd services or Docker containers. If sui-node is run through other methods, such as manual start-up, logs may not be automatically captured and will need to be checked manually."
 )
 
 var (
@@ -38,10 +39,8 @@ var (
 
 	Rows = []grid.Element{
 		0: NewRowPct(12,
-			NewColumnPct(5,
-				NewRowPct(50, Columns[CellNameNodeStatus]),
-				NewRowPct(50, Columns[CellNameNetworkStatus]),
-			),
+			Columns[CellNameNodeStatus],
+			Columns[CellNameNetworkStatus],
 			Columns[CellNameCurrentEpoch],
 			Columns[CellNameEpochEnd],
 			Columns[CellNameUptime],
@@ -64,16 +63,16 @@ var (
 			),
 		),
 		3: NewRowPct(50,
-			NewColumnPct(50,
-				NewRowPct(44,
+			NewColumnPct(40,
+				NewRowPct(42,
 					Columns[CellNameEpochProgress],
 					Columns[CellNameDiskUsage],
 				),
-				NewRowPct(44,
+				NewRowPct(42,
 					Columns[CellNameCpuUsage],
 					Columns[CellNameMemoryUsage],
 				),
-				NewRowPct(12,
+				NewRowPct(16,
 					Columns[CellNameBytesSent],
 					Columns[CellNameBytesReceived],
 				),
@@ -83,8 +82,8 @@ var (
 	}
 
 	Columns = []grid.Element{
-		CellNameNodeStatus:            NewColumnPct(99, Cells[CellNameNodeStatus].GetGridWidget()),
-		CellNameNetworkStatus:         NewColumnPct(99, Cells[CellNameNetworkStatus].GetGridWidget()),
+		CellNameNodeStatus:            NewColumnPct(5, Cells[CellNameNodeStatus].GetGridWidget()),
+		CellNameNetworkStatus:         NewColumnPct(5, Cells[CellNameNetworkStatus].GetGridWidget()),
 		CellNameTransactionsPerSecond: NewColumnPct(15, Cells[CellNameTransactionsPerSecond].GetGridWidget()),
 		CellNameCheckpointsPerSecond:  NewColumnPct(15, Cells[CellNameCheckpointsPerSecond].GetGridWidget()),
 		CellNameTotalTransactions:     NewColumnPct(33, Cells[CellNameTotalTransactions].GetGridWidget()),
@@ -171,7 +170,7 @@ func NewCell(title string, name CellName) *Cell {
 			container.FocusedColor(cell.ColorGreen),
 			container.Border(linestyle.Light),
 			container.BorderTitle(title),
-			container.BorderColor(cell.ColorRed),
+			container.BorderColor(cell.ColorGreen),
 			container.AlignVertical(align.VerticalMiddle),
 			container.AlignHorizontal(align.HorizontalCenter),
 			container.TitleColor(cell.ColorGreen),
@@ -204,7 +203,7 @@ func NewDonutInput(label string, pct int) DonutWriteInput {
 	}
 }
 
-func (c *Cell) Write(value any, options ...cell.Option) {
+func (c *Cell) Write(value any, options any) {
 	switch v := c.Widget.(type) {
 	case *text.Text:
 		valueString := value.(string)
@@ -218,13 +217,19 @@ func (c *Cell) Write(value any, options ...cell.Option) {
 			v.Reset()
 		}
 
-		v.Write(valueString, text.WriteCellOpts(options...))
+		textOptions := options.([]cell.Option)
+
+		v.Write(valueString, text.WriteCellOpts(textOptions...))
 	case *gauge.Gauge:
 		valueInt := value.(int)
 
-		v.Percent(valueInt)
+		gaugeOptions := options.([]gauge.Option)
+
+		v.Percent(valueInt, gaugeOptions...)
 	case *segmentdisplay.SegmentDisplay:
 		var segments []*segmentdisplay.TextChunk
+
+		segmentOptions := options.([]segmentdisplay.WriteOption)
 
 		switch v := value.(type) {
 		case int:
@@ -233,20 +238,20 @@ func (c *Cell) Write(value any, options ...cell.Option) {
 				chunk = dashboardLoadingBlinkValue()
 			}
 
-			segments = append(segments, segmentdisplay.NewChunk(chunk, segmentdisplay.WriteCellOpts(options...)))
+			segments = append(segments, segmentdisplay.NewChunk(chunk, segmentOptions...))
 		case string:
 			if v == "" {
 				v = dashboardLoadingBlinkValue()
 			}
 
-			segments = append(segments, segmentdisplay.NewChunk(v, segmentdisplay.WriteCellOpts(options...)))
+			segments = append(segments, segmentdisplay.NewChunk(v, segmentOptions...))
 		case []string:
 			for idx, chunk := range v {
 				if chunk == "" {
 					chunk = dashboardLoadingBlinkValue()
 				}
 
-				segments = append(segments, segmentdisplay.NewChunk(chunk, segmentdisplay.WriteCellOpts(options[idx])))
+				segments = append(segments, segmentdisplay.NewChunk(chunk, segmentOptions[idx]))
 			}
 		}
 
@@ -254,9 +259,11 @@ func (c *Cell) Write(value any, options ...cell.Option) {
 	case *donut.Donut:
 		valueInput := value.(DonutWriteInput)
 
+		donutOptions := options.([]cell.Option)
+
 		v.Percent(
 			valueInput.Percentage,
-			donut.Label(valueInput.Label, options...),
+			donut.Label(valueInput.Label, donutOptions...),
 		)
 	}
 }
@@ -274,7 +281,7 @@ func newProgressWidget() (*gauge.Gauge, error) {
 		gauge.EmptyTextColor(cell.ColorWhite),
 		gauge.HorizontalTextAlign(align.HorizontalCenter),
 		gauge.VerticalTextAlign(align.VerticalMiddle),
-		gauge.Threshold(99, linestyle.Double, cell.FgColor(cell.ColorYellow), cell.Bold()),
+		gauge.Threshold(99, linestyle.Double, cell.FgColor(cell.ColorGreen), cell.Bold()),
 	)
 }
 
@@ -350,23 +357,25 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 		var widget *text.Text
 
 		if widget, err = newTextWidget(); err == nil {
-			widget.Write("", text.WriteCellOpts(cell.FgColor(cell.ColorWhite), cell.Bold()))
+			widget.Write(logsWidgetMessage, text.WriteCellOpts(cell.FgColor(cell.ColorWhite), cell.Bold()))
 
 			return widget
 		}
 	case CellNameEpochProgress, CellNameDiskUsage, CellNameMemoryUsage, CellNameCpuUsage:
 		var (
 			widget *donut.Donut
-			color  = cell.ColorGreen
+			color  cell.Color
 		)
 
 		switch name {
+		case CellNameEpochEnd:
+			color = cell.ColorRGB24(51, 153, 102)
 		case CellNameDiskUsage:
-			color = cell.ColorBlue
+			color = cell.ColorRGB24(0, 255, 255)
 		case CellNameCpuUsage:
-			color = cell.ColorYellow
+			color = cell.ColorRGB24(255, 165, 0)
 		case CellNameMemoryUsage:
-			color = cell.ColorRed
+			color = cell.ColorRGB24(255, 153, 204)
 		}
 
 		if widget, err = newDonutWidget(color); err == nil {

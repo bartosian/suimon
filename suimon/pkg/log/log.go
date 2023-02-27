@@ -39,25 +39,25 @@ func colorPrint(color enums.Color, messages ...any) {
 	fmt.Println(color, messages, enums.ColorReset)
 }
 
-func (logger *Logger) StreamFromProcess(processName string, stream chan string) error {
+func (logger *Logger) StreamFromService(serviceName string, command string, stream chan string) error {
 	var (
-		cmdService = "sudo journalctl -f -u %s -o cat"
-		cmdPID     = "sudo journalctl -f _PID=%s -o cat"
-		stdout     io.ReadCloser
-		cmd        *exec.Cmd
-		err        error
+		cmdUnitLogs    = "sudo journalctl -f -u %s -o cat"
+		cmdProcessLogs = "sudo journalctl -f _PID=%s -o cat"
+		stdout         io.ReadCloser
+		cmd            *exec.Cmd
+		err            error
 	)
 
-	if serviceExists(processName) {
-		cmd = exec.Command("bash", "-c", fmt.Sprintf(cmdService, processName))
+	if serviceExists(serviceName) {
+		cmd = exec.Command("bash", "-c", fmt.Sprintf(cmdUnitLogs, serviceName))
 	} else {
 		var pid string
 
-		if pid, err = getPID(processName); err != nil {
+		if pid, err = getPID(command); err != nil {
 			return err
 		}
 
-		cmd = exec.Command("bash", "-c", fmt.Sprintf(cmdPID, pid))
+		cmd = exec.Command("bash", "-c", fmt.Sprintf(cmdProcessLogs, pid))
 	}
 
 	if stdout, err = cmd.StdoutPipe(); err != nil {

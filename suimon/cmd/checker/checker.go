@@ -132,7 +132,7 @@ func (checker *Checker) DrawDashboards() {
 		go func() {
 			var err error
 
-			if err = checker.logger.StreamFromProcess("suid", logsCH); err != nil {
+			if err = checker.logger.StreamFromService("suid", "sui-node", logsCH); err != nil {
 				if err = checker.logger.StreamFromContainer("sui-node", logsCH); err != nil {
 					return
 				}
@@ -150,7 +150,7 @@ func (checker *Checker) DrawDashboards() {
 							metric := checker.getMetricForDashboardCell(cellName)
 							options := checker.getOptionsForDashboardCell(cellName)
 
-							dashCell.Write(metric, options...)
+							dashCell.Write(metric, options)
 						}
 
 						doneCH <- struct{}{}
@@ -162,8 +162,9 @@ func (checker *Checker) DrawDashboards() {
 				}
 			case log := <-logsCH:
 				dashCell := dashCells[dashboards.CellNameNodeLogs]
+				options := checker.getOptionsForDashboardCell(dashboards.CellNameNodeLogs)
 
-				dashCell.Write(log + "\n")
+				dashCell.Write(log+"\n", options)
 			case <-dashboardBuilder.Ctx.Done():
 				close(doneCH)
 				close(logsCH)
