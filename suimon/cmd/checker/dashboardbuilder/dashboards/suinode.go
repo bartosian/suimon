@@ -23,7 +23,7 @@ import (
 
 const (
 	dashboardName     = "💧 SUIMON: PRESS Q or ESC TO QUIT"
-	logsWidgetMessage = "Please note that logs for sui-node can only be automatically captured from systemd services or Docker containers. If sui-node is run through other methods, such as manual start-up, logs may not be automatically captured and will need to be checked manually."
+	logsWidgetMessage = "Please note that logs for sui-node can only be automatically captured from systemd services or Docker containers. If sui-node is run through other methods, such as manual start-up, logs may not be automatically captured and will need to be checked manually.\n\n"
 )
 
 var (
@@ -170,7 +170,7 @@ func NewCell(title string, name CellName) *Cell {
 			container.FocusedColor(cell.ColorGreen),
 			container.Border(linestyle.Light),
 			container.BorderTitle(title),
-			container.BorderColor(cell.ColorGreen),
+			container.BorderColor(cell.ColorRed),
 			container.AlignVertical(align.VerticalMiddle),
 			container.AlignHorizontal(align.HorizontalCenter),
 			container.TitleColor(cell.ColorGreen),
@@ -368,14 +368,14 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 		)
 
 		switch name {
-		case CellNameEpochEnd:
-			color = cell.ColorRGB24(51, 153, 102)
+		case CellNameEpochProgress:
+			color = cell.ColorGreen
 		case CellNameDiskUsage:
-			color = cell.ColorRGB24(0, 255, 255)
+			color = cell.ColorBlue
 		case CellNameCpuUsage:
-			color = cell.ColorRGB24(255, 165, 0)
+			color = cell.ColorYellow
 		case CellNameMemoryUsage:
-			color = cell.ColorRGB24(255, 153, 204)
+			color = cell.ColorRed
 		}
 
 		if widget, err = newDonutWidget(color); err == nil {
