@@ -118,28 +118,28 @@ func (checker *Checker) DrawDashboards() {
 		dashboardBuilder = checker.DashboardBuilder
 		dashCells        = dashboardBuilder.Cells
 		ticker           = time.NewTicker(watchHostsTimeout)
+		logsCH           = make(chan string)
 		wg               sync.WaitGroup
 	)
 
 	defer ticker.Stop()
 
+	var stream = func() {
+		defer wg.Done()
+
+		if err := checker.logger.StreamFromService("suid", logsCH); err != nil {
+			if err := checker.logger.StreamFromContainer("sui-node", logsCH); err != nil {
+				if err := checker.logger.StreamFromScreen("sui", logsCH); err != nil {
+					return
+				}
+			}
+		}
+	}
+
 	var draw = func(hosts []Host) {
 		defer wg.Done()
 
 		doneCH := make(chan struct{}, len(hosts))
-		logsCH := make(chan string)
-
-		go func() {
-			var err error
-
-			if err = checker.logger.StreamFromService("suid", logsCH); err != nil {
-				if err = checker.logger.StreamFromContainer("sui-node", logsCH); err != nil {
-					if err = checker.logger.StreamFromScreen("sui", logsCH); err != nil {
-						return
-					}
-				}
-			}
-		}()
 
 		for {
 			select {
@@ -185,8 +185,9 @@ func (checker *Checker) DrawDashboards() {
 	}()
 
 	if monitorsConfig.NodeTable.Display && len(checker.node) > 0 {
-		wg.Add(1)
+		wg.Add(2)
 
+		go stream()
 		go draw(checker.node)
 	}
 

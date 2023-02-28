@@ -3,6 +3,8 @@ package checker
 import (
 	"sync"
 	"time"
+	
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
 const (
@@ -12,6 +14,7 @@ const (
 func (checker *Checker) WatchHosts() {
 	var (
 		monitorsConfig = checker.suimonConfig.MonitorsConfig
+		comparatorRPC  = checker.rpc[0]
 		ticker         = time.NewTicker(watchHostsTimeout)
 		ctx            = checker.DashboardBuilder.Ctx
 		wg             sync.WaitGroup
@@ -30,6 +33,10 @@ func (checker *Checker) WatchHosts() {
 				for idx := range hosts {
 					go func(idx int) {
 						hosts[idx].GetData()
+
+						hosts[idx].SetPctProgress(enums.MetricTypeTxSyncProgress, comparatorRPC)
+						hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncProgress, comparatorRPC)
+						hosts[idx].SetStatus(comparatorRPC)
 
 						doneCH <- struct{}{}
 					}(idx)

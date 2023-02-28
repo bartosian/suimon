@@ -27,20 +27,21 @@ const (
 	CellNameMemoryUsage
 	CellNameCpuUsage
 	CellNameNodeLogs
+	CellNameButtonQuit
 )
 
 var cellNameStringValues = [...]string{
-	"NODE STATUS",
-	"NETWORK STATUS",
-	"TPS",
-	"CPS",
+	"NODE",
+	"NETWORK",
+	"TRANSACTIONS PER SECOND",
+	"CHECKPOINTS PER SECOND",
 	"TOTAL TRANSACTIONS",
 	"LATEST CHECKPOINT",
 	"HIGHEST SYNCED CHECKPOINT",
 	"CONNECTED PEERS",
 	"SYNC TRANSACTIONS STATUS",
 	"SYNC CHECKPOINTS STATUS",
-	"UPTIME DAYS",
+	"UPTIME",
 	"VERSION",
 	"COMMIT",
 	"CURRENT EPOCH",
@@ -49,9 +50,11 @@ var cellNameStringValues = [...]string{
 	"DISK USAGE",
 	"DATABASE SIZE",
 	"NETWORK BYTES SENT",
+	"NETWORK BYTES RECEIVED",
 	"MEMORY USAGE",
 	"CPU USAGE",
 	"NODE LOGS",
+	"QUIT",
 }
 
 func (i CellName) CellNameString() string {

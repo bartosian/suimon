@@ -11,7 +11,6 @@ import (
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/linestyle"
 	"github.com/mum4k/termdash/widgetapi"
-	"github.com/mum4k/termdash/widgets/button"
 	"github.com/mum4k/termdash/widgets/donut"
 	"github.com/mum4k/termdash/widgets/gauge"
 	"github.com/mum4k/termdash/widgets/segmentdisplay"
@@ -77,7 +76,9 @@ var (
 					Columns[CellNameBytesReceived],
 				),
 			),
-			Columns[CellNameNodeLogs],
+			NewColumnPct(60,
+				Columns[CellNameNodeLogs],
+			),
 		),
 	}
 
@@ -105,32 +106,34 @@ var (
 		CellNameMemoryUsage:           NewColumnPct(50, Cells[CellNameMemoryUsage].GetGridWidget()),
 		CellNameCpuUsage:              NewColumnPct(50, Cells[CellNameCpuUsage].GetGridWidget()),
 		CellNameNodeLogs:              NewColumnPct(50, Cells[CellNameNodeLogs].GetGridWidget()),
+		CellNameButtonQuit:            NewColumnPct(25, Cells[CellNameButtonQuit].GetGridWidget()),
 	}
 
 	Cells = []*Cell{
-		CellNameNodeStatus:            NewCell("NODE", CellNameNodeStatus),
-		CellNameNetworkStatus:         NewCell("NETWORK", CellNameNetworkStatus),
-		CellNameTransactionsPerSecond: NewCell("TRANSACTIONS PER SECOND", CellNameTransactionsPerSecond),
-		CellNameCheckpointsPerSecond:  NewCell("CHECKPOINTS PER SECOND", CellNameCheckpointsPerSecond),
-		CellNameTotalTransactions:     NewCell("TOTAL TRANSACTIONS", CellNameTotalTransactions),
-		CellNameLatestCheckpoint:      NewCell("LATEST CHECKPOINT", CellNameLatestCheckpoint),
-		CellNameHighestCheckpoint:     NewCell("HIGHEST SYNCED CHECKPOINT", CellNameHighestCheckpoint),
-		CellNameConnectedPeers:        NewCell("CONNECTED PEERS", CellNameConnectedPeers),
-		CellNameTXSyncProgress:        NewCell("SYNC TRANSACTIONS STATUS", CellNameTXSyncProgress),
-		CellNameCheckSyncProgress:     NewCell("SYNC CHECKPOINTS STATUS", CellNameCheckSyncProgress),
-		CellNameUptime:                NewCell("UPTIME", CellNameUptime),
-		CellNameVersion:               NewCell("VERSION", CellNameVersion),
-		CellNameCommit:                NewCell("COMMIT", CellNameCommit),
-		CellNameCurrentEpoch:          NewCell("CURRENT EPOCH", CellNameCurrentEpoch),
-		CellNameEpochProgress:         NewCell("EPOCH PROGRESS", CellNameEpochProgress),
-		CellNameEpochEnd:              NewCell("TIME TILL THE END OF EPOCH", CellNameEpochEnd),
-		CellNameDiskUsage:             NewCell("DISK USAGE", CellNameDiskUsage),
-		CellNameDatabaseSize:          NewCell("DATABASE SIZE", CellNameDatabaseSize),
-		CellNameBytesSent:             NewCell("NETWORK BYTES SENT", CellNameBytesSent),
-		CellNameBytesReceived:         NewCell("NETWORK BYTES RECEIVED", CellNameBytesReceived),
-		CellNameMemoryUsage:           NewCell("MEMORY USAGE", CellNameMemoryUsage),
-		CellNameCpuUsage:              NewCell("CPU USAGE", CellNameCpuUsage),
-		CellNameNodeLogs:              NewCell("NODE LOGS", CellNameNodeLogs),
+		CellNameNodeStatus:            NewCell(CellNameNodeStatus),
+		CellNameNetworkStatus:         NewCell(CellNameNetworkStatus),
+		CellNameTransactionsPerSecond: NewCell(CellNameTransactionsPerSecond),
+		CellNameCheckpointsPerSecond:  NewCell(CellNameCheckpointsPerSecond),
+		CellNameTotalTransactions:     NewCell(CellNameTotalTransactions),
+		CellNameLatestCheckpoint:      NewCell(CellNameLatestCheckpoint),
+		CellNameHighestCheckpoint:     NewCell(CellNameHighestCheckpoint),
+		CellNameConnectedPeers:        NewCell(CellNameConnectedPeers),
+		CellNameTXSyncProgress:        NewCell(CellNameTXSyncProgress),
+		CellNameCheckSyncProgress:     NewCell(CellNameCheckSyncProgress),
+		CellNameUptime:                NewCell(CellNameUptime),
+		CellNameVersion:               NewCell(CellNameVersion),
+		CellNameCommit:                NewCell(CellNameCommit),
+		CellNameCurrentEpoch:          NewCell(CellNameCurrentEpoch),
+		CellNameEpochProgress:         NewCell(CellNameEpochProgress),
+		CellNameEpochEnd:              NewCell(CellNameEpochEnd),
+		CellNameDiskUsage:             NewCell(CellNameDiskUsage),
+		CellNameDatabaseSize:          NewCell(CellNameDatabaseSize),
+		CellNameBytesSent:             NewCell(CellNameBytesSent),
+		CellNameBytesReceived:         NewCell(CellNameBytesReceived),
+		CellNameMemoryUsage:           NewCell(CellNameMemoryUsage),
+		CellNameCpuUsage:              NewCell(CellNameCpuUsage),
+		CellNameNodeLogs:              NewCell(CellNameNodeLogs),
+		CellNameButtonQuit:            NewCell(CellNameButtonQuit),
 	}
 )
 
@@ -162,14 +165,14 @@ func (Column) isElement() {}
 
 func (Cell) isElement() {}
 
-func NewCell(title string, name CellName) *Cell {
+func NewCell(name CellName) *Cell {
 	return &Cell{
 		Name:   name,
 		Widget: newWidgetByCellName(name),
 		Options: []container.Option{
 			container.FocusedColor(cell.ColorGreen),
 			container.Border(linestyle.Light),
-			container.BorderTitle(title),
+			container.BorderTitle(name.CellNameString()),
 			container.BorderColor(cell.ColorRed),
 			container.AlignVertical(align.VerticalMiddle),
 			container.AlignHorizontal(align.HorizontalCenter),
@@ -299,13 +302,6 @@ func newDonutWidget(color cell.Color) (*donut.Donut, error) {
 			cell.FgColor(color),
 			cell.Bold(),
 		),
-	)
-}
-
-func newButtonWidget(text string, color cell.Color, action func() error) (*button.Button, error) {
-	return button.New(text, action,
-		button.WidthFor("Submit"),
-		button.FillColor(cell.ColorNumber(196)),
 	)
 }
 

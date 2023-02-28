@@ -135,6 +135,7 @@ func (logger *Logger) StreamFromScreen(sessionName string, stream chan string) e
 		err    error
 	)
 
+	// attach screen for the logs piping
 	cmd = exec.Command("script", "-q", "-c", "screen -r "+sessionName, "/dev/null")
 
 	if stdout, err = cmd.StdoutPipe(); err != nil {
@@ -155,6 +156,12 @@ func (logger *Logger) StreamFromScreen(sessionName string, stream chan string) e
 	}
 
 	if err = cmd.Wait(); err != nil {
+		return err
+	}
+
+	// detach screen back
+	cmd = exec.Command("script", "-q", "-c", "screen -d "+sessionName, "/dev/null")
+	if err = cmd.Run(); err != nil {
 		return err
 	}
 
