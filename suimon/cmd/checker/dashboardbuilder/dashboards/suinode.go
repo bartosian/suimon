@@ -23,7 +23,7 @@ import (
 
 const (
 	dashboardName     = "💧 SUIMON: PRESS Q or ESC TO QUIT"
-	logsWidgetMessage = "Please note that logs for sui-node can only be automatically captured from systemd services or Docker containers. If sui-node is run through other methods, such as manual start-up, logs may not be automatically captured and will need to be checked manually.\n\n"
+	logsWidgetMessage = "Looking for the sui-node process to stream the logs.\n\n"
 )
 
 var (

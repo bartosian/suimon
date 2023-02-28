@@ -4,15 +4,17 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/mum4k/termdash/linestyle"
-	"github.com/mum4k/termdash/widgets/gauge"
-	"github.com/mum4k/termdash/widgets/segmentdisplay"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/mum4k/termdash/cell"
+	"github.com/mum4k/termdash/linestyle"
+	"github.com/mum4k/termdash/widgets/gauge"
+	"github.com/mum4k/termdash/widgets/segmentdisplay"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
@@ -359,6 +361,16 @@ func getDirectorySize(dirPath string) []string {
 		unit      string
 		err       error
 	)
+
+	if dirPath == "suidb" {
+		var homeDir string
+
+		if homeDir, err = os.UserHomeDir(); err != nil {
+			return nil
+		}
+
+		dirPath = filepath.Join(homeDir, "sui", dirPath)
+	}
 
 	var processSize = func() {
 		formatString := "%.02f"
