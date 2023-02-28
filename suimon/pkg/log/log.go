@@ -39,26 +39,19 @@ func colorPrint(color enums.Color, messages ...any) {
 	fmt.Println(color, messages, enums.ColorReset)
 }
 
-func (logger *Logger) StreamFromService(serviceName string, command string, stream chan string) error {
+func (logger *Logger) StreamFromService(serviceName string, stream chan string) error {
 	var (
-		cmdUnitLogs    = "sudo journalctl -f -u %s -o cat"
-		cmdProcessLogs = "sudo journalctl -f _PID=%s -o cat"
-		stdout         io.ReadCloser
-		cmd            *exec.Cmd
-		err            error
+		cmdUnitLogs = "sudo journalctl -f -u %s -o cat"
+		stdout      io.ReadCloser
+		cmd         *exec.Cmd
+		err         error
 	)
 
-	if serviceExists(serviceName) {
-		cmd = exec.Command("bash", "-c", fmt.Sprintf(cmdUnitLogs, serviceName))
-	} else {
-		var pid string
-
-		if pid, err = getPID(command); err != nil {
-			return err
-		}
-
-		cmd = exec.Command("bash", "-c", fmt.Sprintf(cmdProcessLogs, pid))
+	if !serviceExists(serviceName) {
+		return fmt.Errorf("service %s not found", serviceName)
 	}
+
+	cmd = exec.Command("bash", "-c", fmt.Sprintf(cmdUnitLogs, serviceName))
 
 	if stdout, err = cmd.StdoutPipe(); err != nil {
 		return err
@@ -130,6 +123,39 @@ func (logger *Logger) StreamFromContainer(imageName string, stream chan string) 
 
 			break
 		}
+	}
+
+	return fmt.Errorf("container with the image %s not found", imageName)
+}
+
+func (logger *Logger) StreamFromScreen(sessionName string, stream chan string) error {
+	var (
+		stdout io.ReadCloser
+		cmd    *exec.Cmd
+		err    error
+	)
+
+	cmd = exec.Command("script", "-q", "-c", "screen -r "+sessionName, "/dev/null")
+
+	if stdout, err = cmd.StdoutPipe(); err != nil {
+		return err
+	}
+
+	if err = cmd.Start(); err != nil {
+		return err
+	}
+
+	scanner := bufio.NewScanner(stdout)
+	for scanner.Scan() {
+		select {
+		case stream <- scanner.Text():
+		case <-stream:
+			break
+		}
+	}
+
+	if err = cmd.Wait(); err != nil {
+		return err
 	}
 
 	return nil

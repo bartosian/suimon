@@ -132,9 +132,11 @@ func (checker *Checker) DrawDashboards() {
 		go func() {
 			var err error
 
-			if err = checker.logger.StreamFromService("suid", "sui-node", logsCH); err != nil {
+			if err = checker.logger.StreamFromService("suid", logsCH); err != nil {
 				if err = checker.logger.StreamFromContainer("sui-node", logsCH); err != nil {
-					return
+					if err = checker.logger.StreamFromScreen("sui", logsCH); err != nil {
+						return
+					}
 				}
 			}
 		}()
