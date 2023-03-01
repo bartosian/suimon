@@ -28,6 +28,8 @@ const (
 	CellNameCpuUsage
 	CellNameNodeLogs
 	CellNameButtonQuit
+	CellNameTPSTracker
+	CellNameCPSTracker
 )
 
 var cellNameStringValues = [...]string{
@@ -55,6 +57,8 @@ var cellNameStringValues = [...]string{
 	"CPU USAGE",
 	"NODE LOGS",
 	"QUIT",
+	"TRANSACTIONS PER SECOND TRACKER",
+	"CHECKPOINTS PER SECOND TRACKER",
 }
 
 func (i CellName) CellNameString() string {

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"github.com/mum4k/termdash/widgets/sparkline"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -242,9 +243,9 @@ func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) 
 		return node.Status.DashboardStatus()
 	case dashboards.CellNameNetworkStatus:
 		return rpc.Status.DashboardStatus()
-	case dashboards.CellNameTransactionsPerSecond:
+	case dashboards.CellNameTransactionsPerSecond, dashboards.CellNameTPSTracker:
 		return node.Metrics.TransactionsPerSecond
-	case dashboards.CellNameCheckpointsPerSecond:
+	case dashboards.CellNameCheckpointsPerSecond, dashboards.CellNameCPSTracker:
 		return node.Metrics.CheckpointsPerSecond
 	case dashboards.CellNameTotalTransactions:
 		return node.Metrics.TotalTransactionNumber
@@ -581,6 +582,30 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
 	case dashboards.CellNameNodeLogs:
 		options = append(options, cell.FgColor(cell.ColorWhite), cell.Bold())
+	case dashboards.CellNameTPSTracker:
+		var (
+			tpsNode = node.Metrics.TransactionsPerSecond
+			tpsRpc  = rpc.Metrics.TransactionsPerSecond
+			color   = cell.ColorGreen
+		)
+
+		if tpsNode < tpsRpc-transactionsPerSecondLag {
+			color = cell.ColorYellow
+		}
+
+		return []sparkline.Option{sparkline.Color(color)}
+	case dashboards.CellNameCPSTracker:
+		var (
+			checkNode = node.Metrics.CheckpointsPerSecond
+			checkRpc  = rpc.Metrics.CheckpointsPerSecond
+			color     = cell.ColorBlue
+		)
+
+		if checkNode < checkRpc-checkpointsPerSecondLag {
+			color = cell.ColorYellow
+		}
+
+		return []sparkline.Option{sparkline.Color(color)}
 	default:
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite))}
 	}
