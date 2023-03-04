@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/mum4k/termdash/widgets/sparkline"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -16,6 +15,7 @@ import (
 	"github.com/mum4k/termdash/linestyle"
 	"github.com/mum4k/termdash/widgets/gauge"
 	"github.com/mum4k/termdash/widgets/segmentdisplay"
+	"github.com/mum4k/termdash/widgets/sparkline"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
@@ -341,7 +341,7 @@ func getNetworkUsageMetric(networkMetric dashboards.CellName) []string {
 		}
 
 		if metric >= 100 {
-			metric = metric / 100
+			metric = metric / 1024
 			unit = "TB"
 
 			if metric >= 100 {
@@ -378,7 +378,7 @@ func getDirectorySize(dirPath string) []string {
 		unit = "GB"
 
 		if dirSize >= 100 {
-			dirSize = dirSize / 100
+			dirSize = dirSize / 1024
 			unit = "TB"
 
 			if dirSize >= 100 {

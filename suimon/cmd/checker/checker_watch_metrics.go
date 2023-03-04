@@ -3,7 +3,7 @@ package checker
 import (
 	"sync"
 	"time"
-	
+
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
