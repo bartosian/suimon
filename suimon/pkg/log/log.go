@@ -130,19 +130,20 @@ func (logger *Logger) StreamFromContainer(imageName string, stream chan string) 
 
 func (logger *Logger) StreamFromScreen(sessionName string, stream chan string) error {
 	var (
-		stdout io.ReadCloser
-		cmd    *exec.Cmd
-		err    error
+		stdout    io.ReadCloser
+		cmdAttach *exec.Cmd
+		cmdDetach *exec.Cmd
+		err       error
 	)
 
 	// attach screen for the logs piping
-	cmd = exec.Command("script", "-q", "-c", "screen -r "+sessionName, "/dev/null")
+	cmdAttach = exec.Command("script", "-q", "-c", "screen -r "+sessionName, "/dev/null")
 
-	if stdout, err = cmd.StdoutPipe(); err != nil {
+	if stdout, err = cmdAttach.StdoutPipe(); err != nil {
 		return err
 	}
 
-	if err = cmd.Start(); err != nil {
+	if err = cmdAttach.Start(); err != nil {
 		return err
 	}
 
@@ -155,13 +156,13 @@ func (logger *Logger) StreamFromScreen(sessionName string, stream chan string) e
 		}
 	}
 
-	if err = cmd.Wait(); err != nil {
+	// detach screen back
+	cmdDetach = exec.Command("script", "-q", "-c", "screen -d "+sessionName, "/dev/null")
+	if err = cmdDetach.Run(); err != nil {
 		return err
 	}
 
-	// detach screen back
-	cmd = exec.Command("script", "-q", "-c", "screen -d "+sessionName, "/dev/null")
-	if err = cmd.Run(); err != nil {
+	if err = cmdAttach.Wait(); err != nil {
 		return err
 	}
 
