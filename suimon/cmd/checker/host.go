@@ -75,30 +75,27 @@ func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) {
 }
 
 func (host *Host) SetStatus(rpc Host) {
-	status := enums.StatusGreen
 	metricsHost := host.Metrics
 	metricsRPC := rpc.Metrics
 
-	switch metricsHost.Updated {
-	case false:
-		status = enums.StatusRed
-	case true:
-		if metricsHost.TotalTransactionNumber == 0 && metricsRPC.TotalTransactionNumber != 0 ||
-			metricsHost.LatestCheckpoint == 0 && metricsRPC.LatestCheckpoint != 0 ||
-			metricsHost.TransactionsPerSecond == 0 && metricsRPC.TransactionsPerSecond != 0 ||
-			metricsHost.TxSyncPercentage > 100 || metricsHost.CheckSyncPercentage > 100 ||
-			metricsHost.TxSyncPercentage == 0 && metricsRPC.TxSyncPercentage != 0 {
-			status = enums.StatusRed
+	if !metricsHost.Updated || metricsHost.TotalTransactionNumber == 0 || metricsHost.LatestCheckpoint == 0 ||
+		metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == transactionsPerSecondTimeout ||
+		metricsHost.TxSyncPercentage == 0 {
 
-			break
-		}
+		host.Status = enums.StatusRed
 
-		if metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) ||
-			metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionsNumber, metricsRPC.TotalTransactionNumber) ||
-			metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
-			status = enums.StatusYellow
-		}
+		return
 	}
 
-	host.Status = status
+	if metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) ||
+		metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionsNumber, metricsRPC.TotalTransactionNumber) ||
+		metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
+		host.Status = enums.StatusYellow
+
+		return
+	}
+
+	host.Status = enums.StatusGreen
+
+	return
 }

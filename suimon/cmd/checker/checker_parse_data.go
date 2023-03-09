@@ -163,7 +163,7 @@ func (checker *Checker) Init() error {
 		return err
 	}
 
-	var rpc = checker.rpc
+	rpc := checker.rpc
 
 	if len(rpc) > 1 {
 		sort.Slice(rpc, func(left, right int) bool {
@@ -188,12 +188,10 @@ func (checker *Checker) Init() error {
 		}
 	}
 
+	setStatus(enums.TableTypeRPC)
+
 	if monitorsConfig.NodeTable.Display {
 		setStatus(enums.TableTypeNode)
-	}
-
-	if monitorsConfig.RPCTable.Display {
-		setStatus(enums.TableTypeRPC)
 	}
 
 	if monitorsConfig.PeersTable.Display {
