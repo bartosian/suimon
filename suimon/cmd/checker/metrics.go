@@ -21,7 +21,7 @@ const (
 	highestSyncedCheckpointLag      = 30
 	totalTransactionsSyncPercentage = 99
 	totalCheckpointsSyncPercentage  = 99
-	epochLength                     = 24 * time.Hour
+	epochLength                     = 1 * time.Hour
 )
 
 type SuiSystemState struct {
