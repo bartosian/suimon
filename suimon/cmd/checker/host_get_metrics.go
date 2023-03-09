@@ -508,11 +508,13 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		)
 
 		switch {
-		case tpsNode == 0 && len(txHistoryNode) == transactionsPerSecondTimeout:
+		case len(txHistoryNode) != transactionsPerSecondTimeout:
+		case tpsNode == 0:
 			color = cell.ColorRed
 		case tpsNode < tpsRpc-transactionsPerSecondLag:
 			color = cell.ColorYellow
 		}
+
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
 	case dashboards.CellNameCheckpointsPerSecond:
 		var (
@@ -523,7 +525,8 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		)
 
 		switch {
-		case checkNode == 0 && len(checkHistoryNode) == checkpointsPerSecondTimeout:
+		case len(checkHistoryNode) != checkpointsPerSecondTimeout:
+		case checkNode == 0:
 			color = cell.ColorRed
 		case checkNode < checkRpc-checkpointsPerSecondLag:
 			color = cell.ColorYellow
@@ -569,6 +572,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		)
 
 		switch {
+		case uptime == "":
 		case uptime == "0.0":
 			color = cell.ColorRed
 		case uptime < "1.0":
