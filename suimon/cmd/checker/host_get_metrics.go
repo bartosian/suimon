@@ -243,9 +243,21 @@ func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) 
 		return node.Status.DashboardStatus()
 	case dashboards.CellNameNetworkStatus:
 		return rpc.Status.DashboardStatus()
-	case dashboards.CellNameTransactionsPerSecond, dashboards.CellNameTPSTracker:
+	case dashboards.CellNameTransactionsPerSecond:
+		if len(node.Metrics.TransactionsHistory) < transactionsPerSecondTimeout {
+			return dashboards.DashboardLoadingBlinkValue()
+		}
+
+		fallthrough
+	case dashboards.CellNameTPSTracker:
 		return node.Metrics.TransactionsPerSecond
-	case dashboards.CellNameCheckpointsPerSecond, dashboards.CellNameCPSTracker:
+	case dashboards.CellNameCheckpointsPerSecond:
+		if len(node.Metrics.CheckpointsHistory) < checkpointsPerSecondTimeout {
+			return dashboards.DashboardLoadingBlinkValue()
+		}
+
+		fallthrough
+	case dashboards.CellNameCPSTracker:
 		return node.Metrics.CheckpointsPerSecond
 	case dashboards.CellNameTotalTransactions:
 		return node.Metrics.TotalTransactionNumber
@@ -451,9 +463,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		switch {
 		case transactionsNode == 0:
 			color = cell.ColorRed
-		case txSyncPercentageNode < totalTransactionsSyncPercentage:
-			color = cell.ColorYellow
-		case transactionsNode < transactionsRpc-totalTransactionsLag:
+		case txSyncPercentageNode < totalTransactionsSyncPercentage || transactionsNode < transactionsRpc-totalTransactionsLag:
 			color = cell.ColorYellow
 		}
 
@@ -484,36 +494,39 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		switch {
 		case highestCheckpointNode == 0:
 			color = cell.ColorRed
-		case highestCheckpointNode < highestCheckpointRpc-highestSyncedCheckpointLag:
-			color = cell.ColorYellow
-		case highestCheckpointNode < latestCheckpointRpc-latestCheckpointLag:
+		case highestCheckpointNode < highestCheckpointRpc-highestSyncedCheckpointLag || highestCheckpointNode < latestCheckpointRpc-latestCheckpointLag:
 			color = cell.ColorYellow
 		}
 
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
 	case dashboards.CellNameTransactionsPerSecond:
 		var (
-			tpsNode = node.Metrics.TransactionsPerSecond
-			tpsRpc  = rpc.Metrics.TransactionsPerSecond
-			color   = cell.ColorWhite
+			tpsNode       = node.Metrics.TransactionsPerSecond
+			txHistoryNode = node.Metrics.TransactionsHistory
+			tpsRpc        = rpc.Metrics.TransactionsPerSecond
+			color         = cell.ColorWhite
 		)
 
 		switch {
-		case tpsNode == 0 && tpsRpc != 0:
+		case len(txHistoryNode) != transactionsPerSecondTimeout:
+		case tpsNode == 0:
 			color = cell.ColorRed
 		case tpsNode < tpsRpc-transactionsPerSecondLag:
 			color = cell.ColorYellow
 		}
+
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
 	case dashboards.CellNameCheckpointsPerSecond:
 		var (
-			checkNode = node.Metrics.CheckpointsPerSecond
-			checkRpc  = rpc.Metrics.CheckpointsPerSecond
-			color     = cell.ColorWhite
+			checkNode        = node.Metrics.CheckpointsPerSecond
+			checkHistoryNode = node.Metrics.CheckpointsHistory
+			checkRpc         = rpc.Metrics.CheckpointsPerSecond
+			color            = cell.ColorWhite
 		)
 
 		switch {
-		case checkNode == 0 && checkRpc != 0:
+		case len(checkHistoryNode) != checkpointsPerSecondTimeout:
+		case checkNode == 0:
 			color = cell.ColorRed
 		case checkNode < checkRpc-checkpointsPerSecondLag:
 			color = cell.ColorYellow
@@ -559,6 +572,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		)
 
 		switch {
+		case uptime == "":
 		case uptime == "0.0":
 			color = cell.ColorRed
 		case uptime < "1.0":

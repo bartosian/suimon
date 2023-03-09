@@ -88,13 +88,13 @@ var (
 		CellNameNetworkStatus:         NewColumnPct(5, Cells[CellNameNetworkStatus].GetGridWidget()),
 		CellNameTransactionsPerSecond: NewColumnPct(16, Cells[CellNameTransactionsPerSecond].GetGridWidget()),
 		CellNameCheckpointsPerSecond:  NewColumnPct(15, Cells[CellNameCheckpointsPerSecond].GetGridWidget()),
-		CellNameTotalTransactions:     NewColumnPct(30, Cells[CellNameTotalTransactions].GetGridWidget()),
-		CellNameLatestCheckpoint:      NewColumnPct(30, Cells[CellNameLatestCheckpoint].GetGridWidget()),
-		CellNameHighestCheckpoint:     NewColumnPct(30, Cells[CellNameHighestCheckpoint].GetGridWidget()),
+		CellNameTotalTransactions:     NewColumnPct(28, Cells[CellNameTotalTransactions].GetGridWidget()),
+		CellNameLatestCheckpoint:      NewColumnPct(28, Cells[CellNameLatestCheckpoint].GetGridWidget()),
+		CellNameHighestCheckpoint:     NewColumnPct(28, Cells[CellNameHighestCheckpoint].GetGridWidget()),
 		CellNameConnectedPeers:        NewColumnPct(10, Cells[CellNameConnectedPeers].GetGridWidget()),
 		CellNameTXSyncProgress:        NewColumnPct(50, Cells[CellNameTXSyncProgress].GetGridWidget()),
 		CellNameCheckSyncProgress:     NewColumnPct(50, Cells[CellNameCheckSyncProgress].GetGridWidget()),
-		CellNameUptime:                NewColumnPct(10, Cells[CellNameUptime].GetGridWidget()),
+		CellNameUptime:                NewColumnPct(16, Cells[CellNameUptime].GetGridWidget()),
 		CellNameVersion:               NewColumnPct(21, Cells[CellNameVersion].GetGridWidget()),
 		CellNameCommit:                NewColumnPct(10, Cells[CellNameCommit].GetGridWidget()),
 		CellNameCurrentEpoch:          NewColumnPct(10, Cells[CellNameCurrentEpoch].GetGridWidget()),
@@ -215,17 +215,15 @@ func (c *Cell) Write(value any, options any) {
 	switch v := c.Widget.(type) {
 	case *text.Text:
 		valueString := value.(string)
+		textOptions := options.([]cell.Option)
 
-		valueString = log.RemoveNonPrintableChars(valueString)
-		if len(valueString) == 0 {
+		if valueString = log.RemoveNonPrintableChars(valueString); len(valueString) == 0 {
 			return
 		}
 
 		if c.Name != CellNameNodeLogs {
 			v.Reset()
 		}
-
-		textOptions := options.([]cell.Option)
 
 		v.Write(valueString, text.WriteCellOpts(textOptions...))
 	case *gauge.Gauge:
@@ -241,21 +239,18 @@ func (c *Cell) Write(value any, options any) {
 		switch v := value.(type) {
 		case int:
 			chunk := strconv.Itoa(v)
-			if chunk == "0" {
-				chunk = dashboardLoadingBlinkValue()
-			}
 
 			segments = append(segments, segmentdisplay.NewChunk(chunk, segmentOptions...))
 		case string:
 			if v == "" {
-				v = dashboardLoadingBlinkValue()
+				v = DashboardLoadingBlinkValue()
 			}
 
 			segments = append(segments, segmentdisplay.NewChunk(v, segmentOptions...))
 		case []string:
 			for idx, chunk := range v {
 				if chunk == "" {
-					chunk = dashboardLoadingBlinkValue()
+					chunk = DashboardLoadingBlinkValue()
 				}
 
 				segments = append(segments, segmentdisplay.NewChunk(chunk, segmentOptions[idx]))
@@ -336,11 +331,7 @@ func newDisplayWidget() (*segmentdisplay.SegmentDisplay, error) {
 	)
 }
 
-func dashboardLoadingValue() string {
-	return strings.Repeat("-", 50)
-}
-
-func dashboardLoadingBlinkValue() string {
+func DashboardLoadingBlinkValue() string {
 	inProgress := strings.Repeat("-", 50)
 	second := time.Now().Second() % 10
 
@@ -422,7 +413,7 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 
 		if widget, err = newDisplayWidget(); err == nil {
 			widget.Write([]*segmentdisplay.TextChunk{
-				segmentdisplay.NewChunk(dashboardLoadingValue(), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite))),
+				segmentdisplay.NewChunk(DashboardLoadingBlinkValue(), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite))),
 			})
 
 			return widget

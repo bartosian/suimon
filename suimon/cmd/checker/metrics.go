@@ -148,6 +148,8 @@ func (metrics *Metrics) CalculateCPS() {
 }
 
 func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
+	metrics.Updated = true
+
 	switch metric {
 	case enums.MetricTypeUptime:
 		valueString := value.(string)
@@ -211,8 +213,6 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 			metrics.TimeTillNextEpochMs = metrics.GetTimeTillNextEpoch()
 		}
 	}
-
-	metrics.Updated = true
 }
 
 func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
