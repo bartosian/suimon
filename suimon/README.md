@@ -1,9 +1,8 @@
 ## 💧 SUIMON In-Terminal SUI Monitor
 
-<div style="text-align:center;">
+<div style="width:500px; margin:auto;">
   <img src="./assets/suimon.png" alt="Image Description" width="500"/>
 </div>
-
 
 ``SUIMON`` is an in-terminal tool designed to provide dashboard for monitoring SUI node and the network. It enables users to monitor real-time performance metrics, such as CPU usage, memory usage, network traffic, checkpoints, transactions, uptime, network status, peers, remote RPC, and more. ``SUIMON`` is a user-friendly tool that can be easily installed and configured using a YAML configuration file. The tool provides different dashboards to monitor various aspects of the SUI node and network, such as the node's CPU and memory usage, network latency, and the number of active connections to the network. With its user-friendly interface and real-time performance monitoring capabilities, ``SUIMON`` is a valuable tool for SUI node operators and network administrators.
 
