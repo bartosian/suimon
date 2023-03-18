@@ -1,6 +1,8 @@
 package checker
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/address"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 	"net/http"
 	"regexp"
 	"time"
@@ -10,8 +12,6 @@ import (
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/pkg/address"
-	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
 type requestType int

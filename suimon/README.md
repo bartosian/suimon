@@ -1,7 +1,7 @@
 ## 💧 SUIMON In-Terminal SUI Monitor
 
 <p align="center">
-  <img src="./assets/suimon.png" alt="Image Description" width="500"/>
+  <img src="static/images/suimon.png" alt="Image Description" width="500"/>
 </p>
 
 ``SUIMON`` is an in-terminal tool designed to provide dashboard for monitoring SUI node and the network. It enables users to monitor real-time performance metrics, such as CPU usage, memory usage, network traffic, checkpoints, transactions, uptime, network status, peers, remote RPC, and more. ``SUIMON`` is a user-friendly tool that can be easily installed and configured using a YAML configuration file. The tool provides different dashboards to monitor various aspects of the SUI node and network, such as the node's CPU and memory usage, network latency, and the number of active connections to the network. With its user-friendly interface and real-time performance monitoring capabilities, ``SUIMON`` is a valuable tool for SUI node operators and network administrators.
@@ -237,17 +237,17 @@ Depending on the emojis and colors support by your terminal you can enable/disab
 
 ### White / Dark Mode
 
-![Terminal Screenshot](./assets/screenshot_02.png "Screenshot Application")
+![Terminal Screenshot](static/images/screenshot_02.png "Screenshot Application")
 
 ### Color Mode
 
-![Terminal Screenshot](./assets/screenshot_01.png "Screenshot Application")
+![Terminal Screenshot](static/images/screenshot_01.png "Screenshot Application")
 
 ### Watching Mode
 
 ``-w`` flag enables dynamic dashboard to monitor node and system metrics in real-time
 
-![Terminal Screenshot](./assets/screenshot_03.png "Screenshot Application")
+![Terminal Screenshot](static/images/screenshot_03.png "Screenshot Application")
 
 ## Run In Development
 

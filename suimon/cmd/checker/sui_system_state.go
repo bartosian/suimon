@@ -1,20 +1,7 @@
 package checker
 
-type SuiSystemState struct {
-	Epoch                          int   `json:"epoch"`
-	ProtocolVersion                int   `json:"protocolVersion"`
-	SystemStateVersion             int   `json:"systemStateVersion"`
-	StorageFund                    int   `json:"storageFund"`
-	ReferenceGasPrice              int   `json:"referenceGasPrice"`
-	SafeMode                       bool  `json:"safeMode"`
-	EpochStartTimestampMs          int   `json:"epochStartTimestampMs"`
-	GovernanceStartEpoch           int   `json:"governanceStartEpoch"`
-	EpochDurationMs                int   `json:"epochDurationMs"`
-	StakeSubsidyEpochCounter       int   `json:"stakeSubsidyEpochCounter"`
-	StakeSubsidyBalance            int64 `json:"stakeSubsidyBalance"`
-	StakeSubsidyCurrentEpochAmount int64 `json:"stakeSubsidyCurrentEpochAmount"`
-	TotalStake                     int64 `json:"totalStake"`
-	ActiveValidators               []struct {
+type (
+	Validator struct {
 		SuiAddress                   string      `json:"suiAddress"`
 		ProtocolPubkeyBytes          string      `json:"protocolPubkeyBytes"`
 		NetworkPubkeyBytes           string      `json:"networkPubkeyBytes"`
@@ -54,16 +41,33 @@ type SuiSystemState struct {
 		PendingPoolTokenWithdraw     int         `json:"pendingPoolTokenWithdraw"`
 		ExchangeRatesID              string      `json:"exchangeRatesId"`
 		ExchangeRatesSize            int         `json:"exchangeRatesSize"`
-	} `json:"activeValidators"`
-	PendingActiveValidatorsID   string        `json:"pendingActiveValidatorsId"`
-	PendingActiveValidatorsSize int           `json:"pendingActiveValidatorsSize"`
-	PendingRemovals             []interface{} `json:"pendingRemovals"`
-	StakingPoolMappingsID       string        `json:"stakingPoolMappingsId"`
-	StakingPoolMappingsSize     int           `json:"stakingPoolMappingsSize"`
-	InactivePoolsID             string        `json:"inactivePoolsId"`
-	InactivePoolsSize           int           `json:"inactivePoolsSize"`
-	ValidatorCandidatesID       string        `json:"validatorCandidatesId"`
-	ValidatorCandidatesSize     int           `json:"validatorCandidatesSize"`
-	AtRiskValidators            []interface{} `json:"atRiskValidators"`
-	ValidatorReportRecords      []interface{} `json:"validatorReportRecords"`
-}
+	}
+
+	SuiSystemState struct {
+		Epoch                          int           `json:"epoch"`
+		ProtocolVersion                int           `json:"protocolVersion"`
+		SystemStateVersion             int           `json:"systemStateVersion"`
+		StorageFund                    int           `json:"storageFund"`
+		ReferenceGasPrice              int           `json:"referenceGasPrice"`
+		SafeMode                       bool          `json:"safeMode"`
+		EpochStartTimestampMs          int           `json:"epochStartTimestampMs"`
+		GovernanceStartEpoch           int           `json:"governanceStartEpoch"`
+		EpochDurationMs                int           `json:"epochDurationMs"`
+		StakeSubsidyEpochCounter       int           `json:"stakeSubsidyEpochCounter"`
+		StakeSubsidyBalance            int64         `json:"stakeSubsidyBalance"`
+		StakeSubsidyCurrentEpochAmount int64         `json:"stakeSubsidyCurrentEpochAmount"`
+		TotalStake                     int64         `json:"totalStake"`
+		ActiveValidators               []Validator   `json:"activeValidators"`
+		PendingActiveValidatorsID      string        `json:"pendingActiveValidatorsId"`
+		PendingActiveValidatorsSize    int           `json:"pendingActiveValidatorsSize"`
+		PendingRemovals                []interface{} `json:"pendingRemovals"`
+		StakingPoolMappingsID          string        `json:"stakingPoolMappingsId"`
+		StakingPoolMappingsSize        int           `json:"stakingPoolMappingsSize"`
+		InactivePoolsID                string        `json:"inactivePoolsId"`
+		InactivePoolsSize              int           `json:"inactivePoolsSize"`
+		ValidatorCandidatesID          string        `json:"validatorCandidatesId"`
+		ValidatorCandidatesSize        int           `json:"validatorCandidatesSize"`
+		AtRiskValidators               []interface{} `json:"atRiskValidators"`
+		ValidatorReportRecords         []interface{} `json:"validatorReportRecords"`
+	}
+)

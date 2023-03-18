@@ -1,6 +1,7 @@
 package checker
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 	"net/http"
 	"sync"
 	"time"
@@ -12,10 +13,8 @@ import (
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
-	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
 const ipInfoCacheExp = 5 * time.Minute
@@ -186,7 +185,7 @@ func (checker *Checker) DrawDashboards() {
 				for _, host := range hosts {
 					go func(host Host) {
 						for idx, dashCell := range dashCells {
-							cellName := dashboards.CellName(idx)
+							cellName := enums.CellName(idx)
 
 							metric := checker.getMetricForDashboardCell(cellName)
 							options := checker.getOptionsForDashboardCell(cellName)
@@ -202,8 +201,8 @@ func (checker *Checker) DrawDashboards() {
 					<-doneCH
 				}
 			case log := <-logsCH:
-				dashCell := dashCells[dashboards.CellNameNodeLogs]
-				options := checker.getOptionsForDashboardCell(dashboards.CellNameNodeLogs)
+				dashCell := dashCells[enums.CellNameNodeLogs]
+				options := checker.getOptionsForDashboardCell(enums.CellNameNodeLogs)
 
 				dashCell.Write(log+"\n", options)
 			case <-dashboardBuilder.Ctx.Done():

@@ -16,10 +16,10 @@ import (
 	"flag"
 	"os"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker"
+	checkerBuilder "github.com/bartosian/sui_helpers/suimon/cmd/checker"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/pkg/log"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 var (
@@ -36,7 +36,7 @@ func main() {
 
 	var (
 		logger        = log.NewLogger()
-		check         *checker.Checker
+		checker       *checkerBuilder.Checker
 		suimonConfig  *config.SuimonConfig
 		nodeConfig    *config.NodeConfig
 		networkConfig enums.NetworkType
@@ -59,38 +59,37 @@ func main() {
 	}
 
 	// create checker instance
-	if check, err = checker.NewChecker(*suimonConfig, *nodeConfig, networkConfig); err != nil {
+	if checker, err = checkerBuilder.NewChecker(*suimonConfig, *nodeConfig, networkConfig); err != nil {
 		logger.Error("failed to create suimon instance: ", err)
 
 		return
 	}
 
 	// initialize checker instance with seed data
-	if err = check.Init(); err != nil {
+	if err = checker.Init(); err != nil {
 		logger.Error("failed to init suimon instance: ", err)
 
 		return
 	}
 
-	switch *watch {
-	case true:
+	if *watch {
 		// initialize realtime dashboard with styles
-		check.InitDashboard()
+		checker.InitDashboard()
 
 		// draw initialized dashboard to the terminal
-		check.DrawDashboards()
-	default:
+		checker.DrawDashboards()
+	} else {
 		// initialize tables with the styles
-		check.InitTables()
+		checker.InitTables()
 
 		// draw initialized tables to the terminal
-		check.DrawTables()
+		checker.DrawTables()
 	}
 
 	defer func() {
 		if err := recover(); err != nil {
-			check.DashboardBuilder.Terminal.Close()
-			check.DashboardBuilder.Ctx.Done()
+			checker.DashboardBuilder.Terminal.Close()
+			checker.DashboardBuilder.Ctx.Done()
 
 			logger.Error("failed to execute suimon, please check an issue: ", err)
 

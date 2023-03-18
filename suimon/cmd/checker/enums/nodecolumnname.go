@@ -1,10 +1,10 @@
-package tables
+package enums
 
-//go:generate go run github.com/dmarkham/enumer -type=ColumnName -json -transform=snake-upper -output=./columnname.gen.go
-type ColumnName int
+//go:generate go run github.com/dmarkham/enumer -type=NodeColumnName -json -transform=snake-upper -output=./nodecolumnname.gen.go
+type NodeColumnName int
 
 const (
-	ColumnNameStatus ColumnName = iota
+	ColumnNameStatus NodeColumnName = iota
 	ColumnNameAddress
 	ColumnNamePortRPC
 	ColumnNameTotalTransactions

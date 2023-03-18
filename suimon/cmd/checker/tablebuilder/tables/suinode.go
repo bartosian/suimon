@@ -1,6 +1,7 @@
 package tables
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
@@ -14,7 +15,7 @@ var (
 		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
 	}
 	ColumnConfigSUI = [...]table.ColumnConfig{
-		ColumnNameStatus: {
+		enums.ColumnNameStatus: {
 			Name:         "STATUS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -22,7 +23,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameAddress: {
+		enums.ColumnNameAddress: {
 			Name:         "ADDRESS",
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
@@ -30,7 +31,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNamePortRPC: {
+		enums.ColumnNamePortRPC: {
 			Name:         "RPC",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -38,7 +39,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameTotalTransactions: {
+		enums.ColumnNameTotalTransactions: {
 			Name:         "TOTAL\nTRANSACTIONS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -46,7 +47,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameLatestCheckpoint: {
+		enums.ColumnNameLatestCheckpoint: {
 			Name:         "LATEST\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -54,7 +55,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameHighestCheckpoint: {
+		enums.ColumnNameHighestCheckpoint: {
 			Name:         "SYNCED\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -62,7 +63,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameTXSyncProgress: {
+		enums.ColumnNameTXSyncProgress: {
 			Name:         "TRANSACTIONS\nSYNC PROGRESS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -70,7 +71,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameCheckSyncProgress: {
+		enums.ColumnNameCheckSyncProgress: {
 			Name:         "CHECKPOINTS\nSYNC PROGRESS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -78,7 +79,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameConnectedPeers: {
+		enums.ColumnNameConnectedPeers: {
 			Name:         "CONNECTED\nPEERS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -86,7 +87,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameUptime: {
+		enums.ColumnNameUptime: {
 			Name:         "UPTIME",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -94,7 +95,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameVersion: {
+		enums.ColumnNameVersion: {
 			Name:         "VERSION",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -102,7 +103,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameCommit: {
+		enums.ColumnNameCommit: {
 			Name:         "COMMIT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -110,7 +111,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameCompany: {
+		enums.ColumnNameCompany: {
 			Name:         "PROVIDER",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -118,7 +119,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		ColumnNameCountry: {
+		enums.ColumnNameCountry: {
 			Name:         "COUNTRY",
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,

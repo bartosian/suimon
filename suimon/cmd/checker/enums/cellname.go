@@ -1,4 +1,4 @@
-package dashboards
+package enums
 
 //go:generate go run github.com/dmarkham/enumer -type=CellName -json -transform=snake-upper -output=./cellname.gen.go
 type CellName int

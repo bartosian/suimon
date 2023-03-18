@@ -6,6 +6,8 @@ monitors-config:
     display: true
   peers-table:
     display: true
+  validators-table:
+    display: true
 
 # update this section to add/remove rpc endpoints
 rpc-config:

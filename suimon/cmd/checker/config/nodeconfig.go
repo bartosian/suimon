@@ -2,12 +2,11 @@ package config
 
 import (
 	"fmt"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/env"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 	"os"
 
 	"gopkg.in/yaml.v3"
-
-	"github.com/bartosian/sui_helpers/suimon/pkg/env"
-	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
 const (

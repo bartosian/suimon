@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 	"net/url"
 	"strconv"
 	"strings"
@@ -18,7 +19,6 @@ import (
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/pkg/utility"
 )
 
 // GetMetrics returns a "Metrics" object representing the current state of network checks for the "Host" object
@@ -271,81 +271,81 @@ func (host *Host) getUrl(request requestType, secure bool) string {
 // getMetricForDashboardCell retrieves the current metric data for the specified dashboard cell.
 // Parameters: cellName: a dashboards.CellName representing the name of the dashboard cell for which to retrieve data.
 // Returns: a value of any type representing the current metric data for the specified dashboard cell.
-func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) any {
+func (checker *Checker) getMetricForDashboardCell(cellName enums.CellName) any {
 	var (
 		node = checker.node[0]
 		rpc  = checker.rpc[0]
 	)
 
 	switch cellName {
-	case dashboards.CellNameNodeStatus:
+	case enums.CellNameNodeStatus:
 		return node.Status.DashboardStatus()
-	case dashboards.CellNameNetworkStatus:
+	case enums.CellNameNetworkStatus:
 		return rpc.Status.DashboardStatus()
-	case dashboards.CellNameTransactionsPerSecond:
+	case enums.CellNameTransactionsPerSecond:
 		if len(node.Metrics.TransactionsHistory) < transactionsPerSecondTimeout {
 			return dashboards.DashboardLoadingBlinkValue()
 		}
 
 		fallthrough
-	case dashboards.CellNameTPSTracker:
+	case enums.CellNameTPSTracker:
 		return node.Metrics.TransactionsPerSecond
-	case dashboards.CellNameCheckpointsPerSecond:
+	case enums.CellNameCheckpointsPerSecond:
 		if len(node.Metrics.CheckpointsHistory) < checkpointsPerSecondTimeout {
 			return dashboards.DashboardLoadingBlinkValue()
 		}
 
 		fallthrough
-	case dashboards.CellNameCPSTracker:
+	case enums.CellNameCPSTracker:
 		return node.Metrics.CheckpointsPerSecond
-	case dashboards.CellNameTotalTransactions:
+	case enums.CellNameTotalTransactions:
 		return node.Metrics.TotalTransactionNumber
-	case dashboards.CellNameLatestCheckpoint:
+	case enums.CellNameLatestCheckpoint:
 		return node.Metrics.LatestCheckpoint
-	case dashboards.CellNameHighestCheckpoint:
+	case enums.CellNameHighestCheckpoint:
 		return node.Metrics.HighestSyncedCheckpoint
-	case dashboards.CellNameConnectedPeers:
+	case enums.CellNameConnectedPeers:
 		return node.Metrics.SuiNetworkPeers
-	case dashboards.CellNameTXSyncProgress:
+	case enums.CellNameTXSyncProgress:
 		return node.Metrics.TxSyncPercentage
-	case dashboards.CellNameCheckSyncProgress:
+	case enums.CellNameCheckSyncProgress:
 		return node.Metrics.CheckSyncPercentage
-	case dashboards.CellNameUptime:
+	case enums.CellNameUptime:
 		return []string{strings.Split(node.Metrics.Uptime, " ")[0], "D"}
-	case dashboards.CellNameVersion:
+	case enums.CellNameVersion:
 		return node.Metrics.Version
-	case dashboards.CellNameCommit:
+	case enums.CellNameCommit:
 		return node.Metrics.Commit
-	case dashboards.CellNameEpochProgress:
+	case enums.CellNameEpochProgress:
 		epochLabel := rpc.Metrics.GetEpochLabel()
 		epochPercentage := rpc.Metrics.GetEpochProgress()
 
 		return dashboards.NewDonutInput(epochLabel, epochPercentage)
-	case dashboards.CellNameCurrentEpoch:
+	case enums.CellNameCurrentEpoch:
 		return rpc.Metrics.SystemState.Epoch
-	case dashboards.CellNameEpochEnd:
+	case enums.CellNameEpochEnd:
 		return rpc.Metrics.GetEpochTimer()
-	case dashboards.CellNameDiskUsage:
+	case enums.CellNameDiskUsage:
 		usageLabel, usagePercentage := getDonutUsageMetric("GB", utility.GetDiskUsage)
 
 		return dashboards.NewDonutInput(usageLabel, usagePercentage)
-	case dashboards.CellNameDatabaseSize:
+	case enums.CellNameDatabaseSize:
 		dbSize := getDirectorySize(checker.nodeConfig.DbPath)
 
 		return dbSize
-	case dashboards.CellNameBytesSent:
-		bytesSent := getNetworkUsageMetric(dashboards.CellNameBytesSent)
+	case enums.CellNameBytesSent:
+		bytesSent := getNetworkUsageMetric(enums.CellNameBytesSent)
 
 		return bytesSent
-	case dashboards.CellNameBytesReceived:
-		bytesReceived := getNetworkUsageMetric(dashboards.CellNameBytesReceived)
+	case enums.CellNameBytesReceived:
+		bytesReceived := getNetworkUsageMetric(enums.CellNameBytesReceived)
 
 		return bytesReceived
-	case dashboards.CellNameMemoryUsage:
+	case enums.CellNameMemoryUsage:
 		usageLabel, usagePercentage := getDonutUsageMetric("%", utility.GetMemoryUsage)
 
 		return dashboards.NewDonutInput(usageLabel, usagePercentage)
-	case dashboards.CellNameCpuUsage:
+	case enums.CellNameCpuUsage:
 		usageLabel, usagePercentage := getDonutUsageMetric("%", utility.GetCPUUsage)
 
 		return dashboards.NewDonutInput(usageLabel, usagePercentage)
@@ -357,7 +357,7 @@ func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) 
 // getOptionsForDashboardCell retrieves the options data for a specific dashboard cell and returns it in the appropriate format for display in the dashboard.
 // Parameters: cellName: a dashboards.CellName representing the name of the dashboard cell for which to retrieve options data.
 // Returns: the options data for the specified dashboard cell in the appropriate format for display in the dashboard.
-func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName) any {
+func (checker *Checker) getOptionsForDashboardCell(cellName enums.CellName) any {
 	var (
 		node    = checker.node[0]
 		rpc     = checker.rpc[0]
@@ -365,7 +365,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 	)
 
 	switch cellName {
-	case dashboards.CellNameNodeStatus:
+	case enums.CellNameNodeStatus:
 		var (
 			status = node.Status
 			color  = cell.ColorGreen
@@ -379,7 +379,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		options = append(options, cell.BgColor(color), cell.FgColor(color))
-	case dashboards.CellNameNetworkStatus:
+	case enums.CellNameNetworkStatus:
 		var (
 			status = rpc.Status
 			color  = cell.ColorGreen
@@ -393,7 +393,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		options = append(options, cell.BgColor(color), cell.FgColor(color))
-	case dashboards.CellNameTotalTransactions:
+	case enums.CellNameTotalTransactions:
 		var (
 			transactionsNode     = node.Metrics.TotalTransactionNumber
 			txSyncPercentageNode = node.Metrics.TxSyncPercentage
@@ -409,7 +409,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
-	case dashboards.CellNameLatestCheckpoint:
+	case enums.CellNameLatestCheckpoint:
 		var (
 			latestCheckpointNode = node.Metrics.LatestCheckpoint
 			latestCheckpointRpc  = rpc.Metrics.LatestCheckpoint
@@ -424,7 +424,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
-	case dashboards.CellNameHighestCheckpoint:
+	case enums.CellNameHighestCheckpoint:
 		var (
 			highestCheckpointNode = node.Metrics.HighestSyncedCheckpoint
 			highestCheckpointRpc  = rpc.Metrics.HighestSyncedCheckpoint
@@ -440,7 +440,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
-	case dashboards.CellNameTransactionsPerSecond:
+	case enums.CellNameTransactionsPerSecond:
 		var (
 			tpsNode       = node.Metrics.TransactionsPerSecond
 			txHistoryNode = node.Metrics.TransactionsHistory
@@ -457,7 +457,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
-	case dashboards.CellNameCheckpointsPerSecond:
+	case enums.CellNameCheckpointsPerSecond:
 		var (
 			checkNode        = node.Metrics.CheckpointsPerSecond
 			checkHistoryNode = node.Metrics.CheckpointsHistory
@@ -474,7 +474,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
-	case dashboards.CellNameTXSyncProgress:
+	case enums.CellNameTXSyncProgress:
 		var (
 			syncProgress = node.Metrics.TxSyncPercentage
 			color        = cell.ColorGreen
@@ -488,7 +488,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		return []gauge.Option{gauge.Color(color), gauge.Border(linestyle.Light, cell.FgColor(color))}
-	case dashboards.CellNameCheckSyncProgress:
+	case enums.CellNameCheckSyncProgress:
 		var (
 			syncProgress = node.Metrics.CheckSyncPercentage
 			color        = cell.ColorGreen
@@ -502,11 +502,11 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		return []gauge.Option{gauge.Color(color), gauge.Border(linestyle.Light, cell.FgColor(color))}
-	case dashboards.CellNameEpochProgress, dashboards.CellNameDiskUsage, dashboards.CellNameCpuUsage, dashboards.CellNameMemoryUsage:
+	case enums.CellNameEpochProgress, enums.CellNameDiskUsage, enums.CellNameCpuUsage, enums.CellNameMemoryUsage:
 		options = append(options, cell.Bold())
-	case dashboards.CellNameEpochEnd, dashboards.CellNameDatabaseSize, dashboards.CellNameBytesReceived, dashboards.CellNameBytesSent:
+	case enums.CellNameEpochEnd, enums.CellNameDatabaseSize, enums.CellNameBytesReceived, enums.CellNameBytesSent:
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite)), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorGreen))}
-	case dashboards.CellNameUptime:
+	case enums.CellNameUptime:
 		var (
 			uptime = node.Metrics.Uptime
 			color  = cell.ColorWhite
@@ -521,7 +521,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color)), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorGreen))}
-	case dashboards.CellNameConnectedPeers:
+	case enums.CellNameConnectedPeers:
 		var (
 			peers = node.Metrics.SuiNetworkPeers
 			color = cell.ColorWhite
@@ -535,9 +535,9 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
-	case dashboards.CellNameNodeLogs:
+	case enums.CellNameNodeLogs:
 		options = append(options, cell.FgColor(cell.ColorWhite), cell.Bold())
-	case dashboards.CellNameTPSTracker:
+	case enums.CellNameTPSTracker:
 		var (
 			tpsNode = node.Metrics.TransactionsPerSecond
 			tpsRpc  = rpc.Metrics.TransactionsPerSecond
@@ -549,7 +549,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName)
 		}
 
 		return []sparkline.Option{sparkline.Color(color)}
-	case dashboards.CellNameCPSTracker:
+	case enums.CellNameCPSTracker:
 		var (
 			checkNode = node.Metrics.CheckpointsPerSecond
 			checkRpc  = rpc.Metrics.CheckpointsPerSecond

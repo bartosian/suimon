@@ -2,11 +2,10 @@ package checker
 
 import (
 	"fmt"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 	"os"
 	"path/filepath"
-
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
-	"github.com/bartosian/sui_helpers/suimon/pkg/utility"
 )
 
 // getDonutUsageMetric retrieves the usage data for a specific unit and returns it as a formatted string and a percentage value for display in a donut chart.
@@ -39,7 +38,7 @@ func getDonutUsageMetric(unit string, option func() (*utility.UsageData, error))
 // getNetworkUsageMetric retrieves the usage data for a specific network metric and returns it as an array of formatted strings for display in a table.
 // Parameters: networkMetric: a dashboards.CellName representing the name of the network metric for which to retrieve usage data.
 // Returns: an array of strings representing the formatted usage data for display in a table.
-func getNetworkUsageMetric(networkMetric dashboards.CellName) []string {
+func getNetworkUsageMetric(networkMetric enums.CellName) []string {
 	var (
 		usageData    = ""
 		networkUsage *utility.NetworkUsage
@@ -52,7 +51,7 @@ func getNetworkUsageMetric(networkMetric dashboards.CellName) []string {
 		formatString := "%.02f"
 		unit = "GB"
 
-		if networkMetric == dashboards.CellNameBytesReceived {
+		if networkMetric == enums.CellNameBytesReceived {
 			metric = networkUsage.Recv
 		}
 

@@ -2,13 +2,12 @@ package address
 
 import (
 	"fmt"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/validation"
 	"net"
 	"net/url"
 	"strings"
 
 	externalIP "github.com/glendc/go-external-ip"
-
-	"github.com/bartosian/sui_helpers/suimon/pkg/validation"
 )
 
 type HostPort struct {

@@ -2,12 +2,12 @@ package config
 
 import (
 	"fmt"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/env"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 	"gopkg.in/yaml.v3"
 	"os"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/pkg/env"
-	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
 const (
@@ -38,6 +38,9 @@ type (
 			PeersTable struct {
 				Display bool `yaml:"display"`
 			} `yaml:"peers-table"`
+			ValidatorsTable struct {
+				Display bool `yaml:"display"`
+			} `yaml:"validators-table"`
 		} `yaml:"monitors-config"`
 		RPCConfig struct {
 			Testnet []string `yaml:"testnet"`

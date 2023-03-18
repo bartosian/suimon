@@ -1,6 +1,7 @@
 package dashboards
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 	"strconv"
 	"strings"
 	"time"
@@ -18,7 +19,6 @@ import (
 	"github.com/mum4k/termdash/widgets/text"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/pkg/log"
 )
 
 const (
@@ -39,106 +39,106 @@ var (
 
 	Rows = []grid.Element{
 		0: NewRowPct(12,
-			Columns[CellNameNodeStatus],
-			Columns[CellNameNetworkStatus],
-			Columns[CellNameCurrentEpoch],
-			Columns[CellNameEpochEnd],
-			Columns[CellNameConnectedPeers],
-			Columns[CellNameVersion],
-			Columns[CellNameCommit],
+			Columns[enums.CellNameNodeStatus],
+			Columns[enums.CellNameNetworkStatus],
+			Columns[enums.CellNameCurrentEpoch],
+			Columns[enums.CellNameEpochEnd],
+			Columns[enums.CellNameConnectedPeers],
+			Columns[enums.CellNameVersion],
+			Columns[enums.CellNameCommit],
 		),
 		1: NewRowPct(12,
-			Columns[CellNameUptime],
-			Columns[CellNameTotalTransactions],
-			Columns[CellNameLatestCheckpoint],
-			Columns[CellNameHighestCheckpoint],
+			Columns[enums.CellNameUptime],
+			Columns[enums.CellNameTotalTransactions],
+			Columns[enums.CellNameLatestCheckpoint],
+			Columns[enums.CellNameHighestCheckpoint],
 		),
 		2: NewRowPct(12,
-			Columns[CellNameBytesSent],
-			Columns[CellNameBytesReceived],
-			Columns[CellNameTransactionsPerSecond],
-			Columns[CellNameCheckpointsPerSecond],
-			Columns[CellNameDatabaseSize],
+			Columns[enums.CellNameBytesSent],
+			Columns[enums.CellNameBytesReceived],
+			Columns[enums.CellNameTransactionsPerSecond],
+			Columns[enums.CellNameCheckpointsPerSecond],
+			Columns[enums.CellNameDatabaseSize],
 		),
 		3: NewRowPct(50,
 			NewColumnPct(40,
 				NewRowPct(50,
-					Columns[CellNameEpochProgress],
-					Columns[CellNameDiskUsage],
+					Columns[enums.CellNameEpochProgress],
+					Columns[enums.CellNameDiskUsage],
 				),
 				NewRowPct(50,
-					Columns[CellNameCpuUsage],
-					Columns[CellNameMemoryUsage],
+					Columns[enums.CellNameCpuUsage],
+					Columns[enums.CellNameMemoryUsage],
 				),
 			),
 			NewColumnPct(60,
 				NewRowPct(15,
-					Columns[CellNameTXSyncProgress],
-					Columns[CellNameCheckSyncProgress],
+					Columns[enums.CellNameTXSyncProgress],
+					Columns[enums.CellNameCheckSyncProgress],
 				),
-				NewRowPct(20, Columns[CellNameTPSTracker]),
-				NewRowPct(20, Columns[CellNameCPSTracker]),
-				NewRowPct(45, Columns[CellNameNodeLogs]),
+				NewRowPct(20, Columns[enums.CellNameTPSTracker]),
+				NewRowPct(20, Columns[enums.CellNameCPSTracker]),
+				NewRowPct(45, Columns[enums.CellNameNodeLogs]),
 			),
 		),
 	}
 
 	Columns = []grid.Element{
-		CellNameNodeStatus:            NewColumnPct(5, Cells[CellNameNodeStatus].GetGridWidget()),
-		CellNameNetworkStatus:         NewColumnPct(5, Cells[CellNameNetworkStatus].GetGridWidget()),
-		CellNameTransactionsPerSecond: NewColumnPct(16, Cells[CellNameTransactionsPerSecond].GetGridWidget()),
-		CellNameCheckpointsPerSecond:  NewColumnPct(15, Cells[CellNameCheckpointsPerSecond].GetGridWidget()),
-		CellNameTotalTransactions:     NewColumnPct(28, Cells[CellNameTotalTransactions].GetGridWidget()),
-		CellNameLatestCheckpoint:      NewColumnPct(28, Cells[CellNameLatestCheckpoint].GetGridWidget()),
-		CellNameHighestCheckpoint:     NewColumnPct(28, Cells[CellNameHighestCheckpoint].GetGridWidget()),
-		CellNameConnectedPeers:        NewColumnPct(10, Cells[CellNameConnectedPeers].GetGridWidget()),
-		CellNameTXSyncProgress:        NewColumnPct(50, Cells[CellNameTXSyncProgress].GetGridWidget()),
-		CellNameCheckSyncProgress:     NewColumnPct(50, Cells[CellNameCheckSyncProgress].GetGridWidget()),
-		CellNameUptime:                NewColumnPct(16, Cells[CellNameUptime].GetGridWidget()),
-		CellNameVersion:               NewColumnPct(21, Cells[CellNameVersion].GetGridWidget()),
-		CellNameCommit:                NewColumnPct(10, Cells[CellNameCommit].GetGridWidget()),
-		CellNameCurrentEpoch:          NewColumnPct(10, Cells[CellNameCurrentEpoch].GetGridWidget()),
-		CellNameEpochProgress:         NewColumnPct(50, Cells[CellNameEpochProgress].GetGridWidget()),
-		CellNameEpochEnd:              NewColumnPct(20, Cells[CellNameEpochEnd].GetGridWidget()),
-		CellNameDiskUsage:             NewColumnPct(50, Cells[CellNameDiskUsage].GetGridWidget()),
-		CellNameDatabaseSize:          NewColumnPct(20, Cells[CellNameDatabaseSize].GetGridWidget()),
-		CellNameBytesSent:             NewColumnPct(20, Cells[CellNameBytesSent].GetGridWidget()),
-		CellNameBytesReceived:         NewColumnPct(20, Cells[CellNameBytesReceived].GetGridWidget()),
-		CellNameMemoryUsage:           NewColumnPct(50, Cells[CellNameMemoryUsage].GetGridWidget()),
-		CellNameCpuUsage:              NewColumnPct(50, Cells[CellNameCpuUsage].GetGridWidget()),
-		CellNameNodeLogs:              NewColumnPct(50, Cells[CellNameNodeLogs].GetGridWidget()),
-		CellNameButtonQuit:            NewColumnPct(25, Cells[CellNameButtonQuit].GetGridWidget()),
-		CellNameTPSTracker:            NewColumnPct(99, Cells[CellNameTPSTracker].GetGridWidget()),
-		CellNameCPSTracker:            NewColumnPct(99, Cells[CellNameCPSTracker].GetGridWidget()),
+		enums.CellNameNodeStatus:            NewColumnPct(5, Cells[enums.CellNameNodeStatus].GetGridWidget()),
+		enums.CellNameNetworkStatus:         NewColumnPct(5, Cells[enums.CellNameNetworkStatus].GetGridWidget()),
+		enums.CellNameTransactionsPerSecond: NewColumnPct(16, Cells[enums.CellNameTransactionsPerSecond].GetGridWidget()),
+		enums.CellNameCheckpointsPerSecond:  NewColumnPct(15, Cells[enums.CellNameCheckpointsPerSecond].GetGridWidget()),
+		enums.CellNameTotalTransactions:     NewColumnPct(28, Cells[enums.CellNameTotalTransactions].GetGridWidget()),
+		enums.CellNameLatestCheckpoint:      NewColumnPct(28, Cells[enums.CellNameLatestCheckpoint].GetGridWidget()),
+		enums.CellNameHighestCheckpoint:     NewColumnPct(28, Cells[enums.CellNameHighestCheckpoint].GetGridWidget()),
+		enums.CellNameConnectedPeers:        NewColumnPct(10, Cells[enums.CellNameConnectedPeers].GetGridWidget()),
+		enums.CellNameTXSyncProgress:        NewColumnPct(50, Cells[enums.CellNameTXSyncProgress].GetGridWidget()),
+		enums.CellNameCheckSyncProgress:     NewColumnPct(50, Cells[enums.CellNameCheckSyncProgress].GetGridWidget()),
+		enums.CellNameUptime:                NewColumnPct(16, Cells[enums.CellNameUptime].GetGridWidget()),
+		enums.CellNameVersion:               NewColumnPct(21, Cells[enums.CellNameVersion].GetGridWidget()),
+		enums.CellNameCommit:                NewColumnPct(10, Cells[enums.CellNameCommit].GetGridWidget()),
+		enums.CellNameCurrentEpoch:          NewColumnPct(10, Cells[enums.CellNameCurrentEpoch].GetGridWidget()),
+		enums.CellNameEpochProgress:         NewColumnPct(50, Cells[enums.CellNameEpochProgress].GetGridWidget()),
+		enums.CellNameEpochEnd:              NewColumnPct(20, Cells[enums.CellNameEpochEnd].GetGridWidget()),
+		enums.CellNameDiskUsage:             NewColumnPct(50, Cells[enums.CellNameDiskUsage].GetGridWidget()),
+		enums.CellNameDatabaseSize:          NewColumnPct(20, Cells[enums.CellNameDatabaseSize].GetGridWidget()),
+		enums.CellNameBytesSent:             NewColumnPct(20, Cells[enums.CellNameBytesSent].GetGridWidget()),
+		enums.CellNameBytesReceived:         NewColumnPct(20, Cells[enums.CellNameBytesReceived].GetGridWidget()),
+		enums.CellNameMemoryUsage:           NewColumnPct(50, Cells[enums.CellNameMemoryUsage].GetGridWidget()),
+		enums.CellNameCpuUsage:              NewColumnPct(50, Cells[enums.CellNameCpuUsage].GetGridWidget()),
+		enums.CellNameNodeLogs:              NewColumnPct(50, Cells[enums.CellNameNodeLogs].GetGridWidget()),
+		enums.CellNameButtonQuit:            NewColumnPct(25, Cells[enums.CellNameButtonQuit].GetGridWidget()),
+		enums.CellNameTPSTracker:            NewColumnPct(99, Cells[enums.CellNameTPSTracker].GetGridWidget()),
+		enums.CellNameCPSTracker:            NewColumnPct(99, Cells[enums.CellNameCPSTracker].GetGridWidget()),
 	}
 
 	Cells = []*Cell{
-		CellNameNodeStatus:            NewCell(CellNameNodeStatus),
-		CellNameNetworkStatus:         NewCell(CellNameNetworkStatus),
-		CellNameTransactionsPerSecond: NewCell(CellNameTransactionsPerSecond),
-		CellNameCheckpointsPerSecond:  NewCell(CellNameCheckpointsPerSecond),
-		CellNameTotalTransactions:     NewCell(CellNameTotalTransactions),
-		CellNameLatestCheckpoint:      NewCell(CellNameLatestCheckpoint),
-		CellNameHighestCheckpoint:     NewCell(CellNameHighestCheckpoint),
-		CellNameConnectedPeers:        NewCell(CellNameConnectedPeers),
-		CellNameTXSyncProgress:        NewCell(CellNameTXSyncProgress),
-		CellNameCheckSyncProgress:     NewCell(CellNameCheckSyncProgress),
-		CellNameUptime:                NewCell(CellNameUptime),
-		CellNameVersion:               NewCell(CellNameVersion),
-		CellNameCommit:                NewCell(CellNameCommit),
-		CellNameCurrentEpoch:          NewCell(CellNameCurrentEpoch),
-		CellNameEpochProgress:         NewCell(CellNameEpochProgress),
-		CellNameEpochEnd:              NewCell(CellNameEpochEnd),
-		CellNameDiskUsage:             NewCell(CellNameDiskUsage),
-		CellNameDatabaseSize:          NewCell(CellNameDatabaseSize),
-		CellNameBytesSent:             NewCell(CellNameBytesSent),
-		CellNameBytesReceived:         NewCell(CellNameBytesReceived),
-		CellNameMemoryUsage:           NewCell(CellNameMemoryUsage),
-		CellNameCpuUsage:              NewCell(CellNameCpuUsage),
-		CellNameNodeLogs:              NewCell(CellNameNodeLogs),
-		CellNameButtonQuit:            NewCell(CellNameButtonQuit),
-		CellNameTPSTracker:            NewCell(CellNameTPSTracker),
-		CellNameCPSTracker:            NewCell(CellNameCPSTracker),
+		enums.CellNameNodeStatus:            NewCell(enums.CellNameNodeStatus),
+		enums.CellNameNetworkStatus:         NewCell(enums.CellNameNetworkStatus),
+		enums.CellNameTransactionsPerSecond: NewCell(enums.CellNameTransactionsPerSecond),
+		enums.CellNameCheckpointsPerSecond:  NewCell(enums.CellNameCheckpointsPerSecond),
+		enums.CellNameTotalTransactions:     NewCell(enums.CellNameTotalTransactions),
+		enums.CellNameLatestCheckpoint:      NewCell(enums.CellNameLatestCheckpoint),
+		enums.CellNameHighestCheckpoint:     NewCell(enums.CellNameHighestCheckpoint),
+		enums.CellNameConnectedPeers:        NewCell(enums.CellNameConnectedPeers),
+		enums.CellNameTXSyncProgress:        NewCell(enums.CellNameTXSyncProgress),
+		enums.CellNameCheckSyncProgress:     NewCell(enums.CellNameCheckSyncProgress),
+		enums.CellNameUptime:                NewCell(enums.CellNameUptime),
+		enums.CellNameVersion:               NewCell(enums.CellNameVersion),
+		enums.CellNameCommit:                NewCell(enums.CellNameCommit),
+		enums.CellNameCurrentEpoch:          NewCell(enums.CellNameCurrentEpoch),
+		enums.CellNameEpochProgress:         NewCell(enums.CellNameEpochProgress),
+		enums.CellNameEpochEnd:              NewCell(enums.CellNameEpochEnd),
+		enums.CellNameDiskUsage:             NewCell(enums.CellNameDiskUsage),
+		enums.CellNameDatabaseSize:          NewCell(enums.CellNameDatabaseSize),
+		enums.CellNameBytesSent:             NewCell(enums.CellNameBytesSent),
+		enums.CellNameBytesReceived:         NewCell(enums.CellNameBytesReceived),
+		enums.CellNameMemoryUsage:           NewCell(enums.CellNameMemoryUsage),
+		enums.CellNameCpuUsage:              NewCell(enums.CellNameCpuUsage),
+		enums.CellNameNodeLogs:              NewCell(enums.CellNameNodeLogs),
+		enums.CellNameButtonQuit:            NewCell(enums.CellNameButtonQuit),
+		enums.CellNameTPSTracker:            NewCell(enums.CellNameTPSTracker),
+		enums.CellNameCPSTracker:            NewCell(enums.CellNameCPSTracker),
 	}
 )
 
@@ -158,7 +158,7 @@ type (
 	}
 
 	Cell struct {
-		Name    CellName
+		Name    enums.CellName
 		Widget  widgetapi.Widget
 		Options []container.Option
 	}
@@ -170,7 +170,7 @@ func (Column) isElement() {}
 
 func (Cell) isElement() {}
 
-func NewCell(name CellName) *Cell {
+func NewCell(name enums.CellName) *Cell {
 	return &Cell{
 		Name:   name,
 		Widget: newWidgetByCellName(name),
@@ -221,7 +221,7 @@ func (c *Cell) Write(value any, options any) {
 			return
 		}
 
-		if c.Name != CellNameNodeLogs {
+		if c.Name != enums.CellNameNodeLogs {
 			v.Reset()
 		}
 
@@ -342,11 +342,11 @@ func DashboardLoadingBlinkValue() string {
 	return inProgress
 }
 
-func newWidgetByCellName(name CellName) widgetapi.Widget {
+func newWidgetByCellName(name enums.CellName) widgetapi.Widget {
 	var err error
 
 	switch name {
-	case CellNameCheckSyncProgress, CellNameTXSyncProgress:
+	case enums.CellNameCheckSyncProgress, enums.CellNameTXSyncProgress:
 		var widget *gauge.Gauge
 
 		if widget, err = newProgressWidget(); err == nil {
@@ -354,7 +354,7 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 
 			return widget
 		}
-	case CellNameNodeStatus, CellNameNetworkStatus:
+	case enums.CellNameNodeStatus, enums.CellNameNetworkStatus:
 		var widget *text.Text
 
 		if widget, err = newTextNoScrollWidget(); err == nil {
@@ -362,7 +362,7 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 
 			return widget
 		}
-	case CellNameNodeLogs:
+	case enums.CellNameNodeLogs:
 		var widget *text.Text
 
 		if widget, err = newTextWidget(); err == nil {
@@ -370,20 +370,20 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 
 			return widget
 		}
-	case CellNameEpochProgress, CellNameDiskUsage, CellNameMemoryUsage, CellNameCpuUsage:
+	case enums.CellNameEpochProgress, enums.CellNameDiskUsage, enums.CellNameMemoryUsage, enums.CellNameCpuUsage:
 		var (
 			widget *donut.Donut
 			color  cell.Color
 		)
 
 		switch name {
-		case CellNameEpochProgress:
+		case enums.CellNameEpochProgress:
 			color = cell.ColorGreen
-		case CellNameDiskUsage:
+		case enums.CellNameDiskUsage:
 			color = cell.ColorBlue
-		case CellNameCpuUsage:
+		case enums.CellNameCpuUsage:
 			color = cell.ColorYellow
-		case CellNameMemoryUsage:
+		case enums.CellNameMemoryUsage:
 			color = cell.ColorRed
 		}
 
@@ -392,16 +392,16 @@ func newWidgetByCellName(name CellName) widgetapi.Widget {
 
 			return widget
 		}
-	case CellNameTPSTracker, CellNameCPSTracker:
+	case enums.CellNameTPSTracker, enums.CellNameCPSTracker:
 		var (
 			widget *sparkline.SparkLine
 			color  cell.Color
 		)
 
 		switch name {
-		case CellNameTPSTracker:
+		case enums.CellNameTPSTracker:
 			color = cell.ColorGreen
-		case CellNameCPSTracker:
+		case enums.CellNameCPSTracker:
 			color = cell.ColorBlue
 		}
 
