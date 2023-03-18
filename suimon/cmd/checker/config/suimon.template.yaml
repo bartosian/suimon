@@ -24,7 +24,6 @@ node-config-path: "/root/.suimon/fullnode.yaml"
 # update this section to modify the settings related to the network
 network:
   name: "testnet"
-  epoch-length-seconds: 86400
 
 # provider and country information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
 # which is free and gives you 50k requests per month, which is sufficient for individual usage.
@@ -42,6 +41,9 @@ monitors-visual:
 # update this section to include details regarding the launch type of the Sui-Node process for the logs to be shown
 # fill in only one appropriate value
 process-launch-type:
-  service-name: "suid"
-  docker-image-name: "mysten/sui-node"
-  screen-session-name: "sui"
+  # name os systemd service, example "suid"
+  service-name: ""
+  # name of docker image, example "mysten/sui-node"
+  docker-image-name: ""
+  # name of screen session, example "sui"
+  screen-session-name: ""

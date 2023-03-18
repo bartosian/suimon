@@ -23,15 +23,10 @@ const (
 	totalCheckpointsSyncPercentage  = 99
 )
 
-type SuiSystemState struct {
-	Epoch                 int `json:"epoch"`
-	EpochStartTimestampMs int `json:"epoch_start_timestamp_ms"`
-}
-
 // GetTimeTillNextEpoch returns the time remaining until the next epoch in milliseconds.
 // Returns: an integer representing the time remaining until the next epoch in seconds.
 func (metrics *Metrics) GetTimeTillNextEpoch() int {
-	nextEpochStartMs := metrics.SystemState.EpochStartTimestampMs + metrics.EpochLength
+	nextEpochStartMs := metrics.SystemState.EpochStartTimestampMs + metrics.SystemState.EpochDurationMs
 	currentTimeMs := int(time.Now().UnixNano() / 1000000)
 
 	return nextEpochStartMs - currentTimeMs
@@ -66,9 +61,9 @@ func (metrics *Metrics) GetEpochLabel() string {
 // GetEpochProgress returns an integer representing the current epoch progress.
 // Returns: an integer representing the current epoch progress.
 func (metrics *Metrics) GetEpochProgress() int {
-	epochCurrentLength := metrics.EpochLength - metrics.TimeTillNextEpochMs
+	epochCurrentLength := metrics.SystemState.EpochDurationMs - metrics.TimeTillNextEpochMs
 
-	return int(percent.PercentOf(epochCurrentLength, metrics.EpochLength))
+	return int(percent.PercentOf(epochCurrentLength, metrics.SystemState.EpochDurationMs))
 }
 
 type Metrics struct {
@@ -78,7 +73,6 @@ type Metrics struct {
 
 	TxSyncPercentage        int
 	EpochPercentage         int
-	EpochLength             int
 	TimeTillNextEpochMs     int
 	CheckSyncPercentage     int
 	TransactionsPerSecond   int
@@ -94,12 +88,10 @@ type Metrics struct {
 	Commit                  string
 }
 
-// NewMetrics creates and returns a new instance of the Metrics struct, with the epoch length set to the given value.
-// Parameters: epochLength: an integer representing the length of each epoch, in seconds.
+// NewMetrics creates and returns a new instance of the Metrics struct.
 // Returns: a new instance of the Metrics struct.
-func NewMetrics(epochLength int) Metrics {
+func NewMetrics() Metrics {
 	return Metrics{
-		EpochLength:         epochLength * 1000,
 		TransactionsHistory: make([]int, 0, transactionsPerSecondTimeout),
 	}
 }
@@ -226,7 +218,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 		valueInt := value.(int)
 
 		metrics.LatestCheckpoint = valueInt
-	case enums.MetricTypeCurrentEpoch:
+	case enums.MetricTypeSuiSystemState:
 		if valueSystemState, ok := value.(SuiSystemState); ok {
 			metrics.SystemState = valueSystemState
 			metrics.TimeTillNextEpochMs = metrics.GetTimeTillNextEpoch()

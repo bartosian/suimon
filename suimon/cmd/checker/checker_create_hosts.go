@@ -33,7 +33,7 @@ func (checker *Checker) createHosts(addresses []AddressInfo) ([]Host, error) {
 		go func(addressInfo AddressInfo) {
 			defer wg.Done()
 
-			host := newHost(addressInfo, checker.suimonConfig.Network.EpochLengthSeconds, checker.ipClient, checker.httpClient)
+			host := newHost(addressInfo, checker.ipClient, checker.httpClient)
 
 			if checker.suimonConfig.IPLookup.AccessToken != "" {
 				host.SetLocation()

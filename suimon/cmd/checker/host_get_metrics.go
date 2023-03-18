@@ -118,12 +118,12 @@ func (host *Host) GetLatestCheckpoint() {
 	host.Metrics.SetValue(enums.MetricTypeLatestCheckpoint, result)
 }
 
-// GetSUISystemState returns a "SUISystemState" object representing the current system state for the "Host"
+// GetLatestSuiSystemState returns a "SUISystemState" object representing the current system state for the "Host"
 // object passed as a pointer receiver. This object contains information about the status of various components
 // of the SUISystem software running on the host.
 // Parameters: None.
 // Returns: a "SUISystemState" object representing the current system state for the "Host" object.
-func (host *Host) GetSUISystemState() {
+func (host *Host) GetLatestSuiSystemState() {
 	var result any
 
 	if result = getFromRPC(host.rpcHttpClient, enums.RPCMethodGetSuiSystemState); result == nil {
@@ -132,7 +132,7 @@ func (host *Host) GetSUISystemState() {
 		}
 	}
 
-	host.Metrics.SetValue(enums.MetricTypeCurrentEpoch, result)
+	host.Metrics.SetValue(enums.MetricTypeSuiSystemState, result)
 }
 
 // getFromRPC makes a JSON-RPC call to the specified method using the provided RPC client, and returns
@@ -196,7 +196,7 @@ func (host *Host) GetData() {
 	}()
 
 	go func() {
-		host.GetSUISystemState()
+		host.GetLatestSuiSystemState()
 
 		doneCH <- struct{}{}
 	}()

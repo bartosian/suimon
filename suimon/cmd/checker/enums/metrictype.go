@@ -22,6 +22,7 @@ const (
 	MetricTypeCurrentEpoch            MetricType = "CURRENT_EPOCH"
 	MetricTypeTimeTillNextEpoch       MetricType = "TIME_TILL_NEXT_EPOCH"
 	MetricTypeCheckpointsPerSecond    MetricType = "CHECKPOINTS_PER_SECOND"
+	MetricTypeSuiSystemState          MetricType = "SYSTEM_STATE"
 )
 
 func (e MetricType) ToString() string {
@@ -50,6 +51,7 @@ func MetricTypeFromString(value string) (MetricType, error) {
 		"CURRENT_EPOCH":             MetricTypeCurrentEpoch,
 		"TIME_TILL_NEXT_EPOCH":      MetricTypeTimeTillNextEpoch,
 		"CHECKPOINTS_PER_SECOND":    MetricTypeCheckpointsPerSecond,
+		"SYSTEM_STATE":              MetricTypeSuiSystemState,
 	}[value]
 
 	if ok {

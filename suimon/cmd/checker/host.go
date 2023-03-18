@@ -55,12 +55,12 @@ type (
 // - ipClient: a pointer to an "ipinfo.Client" instance for retrieving additional information about the host's IP.
 // - httpClient: a pointer to an "http.Client" instance for performing HTTP requests to the host.
 // Returns: a pointer to the newly created "Host" object.
-func newHost(addressInfo AddressInfo, epochLength int, ipClient *ipinfo.Client, httpClient *http.Client) *Host {
+func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.Client) *Host {
 	host := &Host{
 		AddressInfo: addressInfo,
 		ipClient:    ipClient,
 		httpClient:  httpClient,
-		Metrics:     NewMetrics(epochLength),
+		Metrics:     NewMetrics(),
 		logger:      log.NewLogger(),
 	}
 

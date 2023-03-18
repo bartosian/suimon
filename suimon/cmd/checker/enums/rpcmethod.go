@@ -4,7 +4,7 @@ type RPCMethod string
 
 const (
 	RPCMethodGetTotalTransactionNumber         RPCMethod = "sui_getTotalTransactionNumber"
-	RPCMethodGetSuiSystemState                 RPCMethod = "sui_getSuiSystemState"
+	RPCMethodGetSuiSystemState                 RPCMethod = "sui_getLatestSuiSystemState"
 	RPCMethodGetLatestCheckpointSequenceNumber RPCMethod = "sui_getLatestCheckpointSequenceNumber"
 	RPCMethodGetCheckpointSummary              RPCMethod = "sui_getCheckpointSummary"
 )

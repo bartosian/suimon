@@ -15,8 +15,6 @@ const (
 	defaultImageName   = "sui-node"
 	defaultScreenName  = "sui"
 
-	defaultEpochLength = 86400
-
 	suimonConfigPath     = "%s/.suimon/suimon.yaml"
 	configSuimonNotFound = "provide path to the suimon.yaml file by using -s option or by setting SUIMON_CONFIG_PATH env variable or put suimon.yaml in $HOME/.suimon/suimon.yaml"
 	configSuimonInvalid  = "make sure suimon.yaml file has correct syntax and properties"
@@ -47,9 +45,8 @@ type (
 		} `yaml:"rpc-config"`
 		NodeConfigPath string `yaml:"node-config-path"`
 		Network        struct {
-			Name               string `yaml:"name"`
-			NetworkType        enums.NetworkType
-			EpochLengthSeconds int `yaml:"epoch-length-seconds"`
+			Name        string `yaml:"name"`
+			NetworkType enums.NetworkType
 		} `yaml:"network"`
 		IPLookup struct {
 			AccessToken string `yaml:"access-token"`
@@ -115,11 +112,6 @@ func (sconfig *SuimonConfig) SetProcessLaunchType() {
 func (sconfig *SuimonConfig) SetNetworkConfig(networkType enums.NetworkType) {
 	sconfig.Network.NetworkType = networkType
 	sconfig.Network.Name = networkType.String()
-	epochLengthConfig := sconfig.Network.EpochLengthSeconds
-
-	if epochLengthConfig == 0 {
-		epochLengthConfig = defaultEpochLength
-	}
 }
 
 // GetRPCByNetwork returns a list of RPC endpoint strings for the network configured in the SuimonConfig struct.
