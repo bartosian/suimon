@@ -21,6 +21,8 @@ type DashboardBuilder struct {
 	Quitter   func(k *terminalapi.Keyboard)
 }
 
+// NewDashboardBuilder returns a new instance of a DashboardBuilder, which can be used to construct suimon dashboards.
+// Returns: a pointer to the new DashboardBuilder instance, and any error encountered during the construction process.
 func NewDashboardBuilder() (*DashboardBuilder, error) {
 	var (
 		terminal  *termbox.Terminal
@@ -53,6 +55,9 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 	}, nil
 }
 
+// initDashboard initializes the dashboard UI by setting up the container and initializing the top-level views.
+// Parameters: a `terminal` object as a parameter, which is used to display the UI in the terminal.
+// Returns: a pointer to a `container.Container` object and an error if there was an issue initializing the dashboard.
 func initDashboard(terminal *termbox.Terminal) (*container.Container, error) {
 	var (
 		builder   = grid.New()

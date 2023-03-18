@@ -2,9 +2,8 @@ package config
 
 import (
 	"fmt"
-	"os"
-
 	"gopkg.in/yaml.v3"
+	"os"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/pkg/env"
@@ -12,39 +11,61 @@ import (
 )
 
 const (
+	defaultServiceName = "suid"
+	defaultImageName   = "sui-node"
+	defaultScreenName  = "sui"
+
+	defaultEpochLength = 86400
+
 	suimonConfigPath     = "%s/.suimon/suimon.yaml"
 	configSuimonNotFound = "provide path to the suimon.yaml file by using -s option or by setting SUIMON_CONFIG_PATH env variable or put suimon.yaml in $HOME/.suimon/suimon.yaml"
 	configSuimonInvalid  = "make sure suimon.yaml file has correct syntax and properties"
 )
 
-type SuimonConfig struct {
-	MonitorsConfig struct {
-		RPCTable struct {
-			Display bool `yaml:"display"`
-		} `yaml:"rpc-table"`
-		NodeTable struct {
-			Display bool `yaml:"display"`
-		} `yaml:"node-table"`
-		PeersTable struct {
-			Display bool `yaml:"display"`
-		} `yaml:"peers-table"`
-	} `yaml:"monitors-config"`
-	RPCConfig struct {
-		Testnet []string `yaml:"testnet"`
-		Devnet  []string `yaml:"devnet"`
-	} `yaml:"rpc-config"`
-	NodeConfigPath string `yaml:"node-config-path"`
-	Network        string `yaml:"network"`
-	NetworkType    enums.NetworkType
-	IPLookup       struct {
-		AccessToken string `yaml:"access-token"`
-	} `yaml:"ip-lookup"`
-	MonitorsVisual struct {
-		ColorScheme  string `yaml:"color-scheme"`
-		EnableEmojis bool   `yaml:"enable-emojis"`
-	} `yaml:"monitors-visual"`
-}
+type (
+	ProcessLaunchType struct {
+		ServiceName       string `yaml:"service-name"`
+		DockerImageName   string `yaml:"docker-image-name"`
+		ScreenSessionName string `yaml:"screen-session-name"`
+	}
 
+	SuimonConfig struct {
+		MonitorsConfig struct {
+			RPCTable struct {
+				Display bool `yaml:"display"`
+			} `yaml:"rpc-table"`
+			NodeTable struct {
+				Display bool `yaml:"display"`
+			} `yaml:"node-table"`
+			PeersTable struct {
+				Display bool `yaml:"display"`
+			} `yaml:"peers-table"`
+		} `yaml:"monitors-config"`
+		RPCConfig struct {
+			Testnet []string `yaml:"testnet"`
+			Devnet  []string `yaml:"devnet"`
+		} `yaml:"rpc-config"`
+		NodeConfigPath string `yaml:"node-config-path"`
+		Network        struct {
+			Name               string `yaml:"name"`
+			NetworkType        enums.NetworkType
+			EpochLengthSeconds int `yaml:"epoch-length-seconds"`
+		} `yaml:"network"`
+		IPLookup struct {
+			AccessToken string `yaml:"access-token"`
+		} `yaml:"ip-lookup"`
+		MonitorsVisual struct {
+			ColorScheme  string `yaml:"color-scheme"`
+			EnableEmojis bool   `yaml:"enable-emojis"`
+		} `yaml:"monitors-visual"`
+		ProcessLaunchType ProcessLaunchType `yaml:"process-launch-type"`
+	}
+)
+
+// ParseSuimonConfig decodes the Suimon configuration file at the given path and returns a pointer to a populated SuimonConfig struct.
+// This function accepts the following parameter:
+// - path: a pointer to a string representing the file path of the Suimon configuration file to be parsed.
+// The function returns a pointer to a SuimonConfig struct containing the parsed configuration data, and an error if there was an issue parsing the configuration file.
 func ParseSuimonConfig(path *string) (*SuimonConfig, error) {
 	logger := log.NewLogger()
 	configPath := *path
@@ -69,16 +90,45 @@ func ParseSuimonConfig(path *string) (*SuimonConfig, error) {
 		return nil, err
 	}
 
+	result.SetProcessLaunchType()
+
 	return &result, nil
 }
 
-func (sconfig *SuimonConfig) SetNetworkConfig(network enums.NetworkType) {
-	sconfig.NetworkType = network
-	sconfig.Network = network.String()
+// SetProcessLaunchType sets the launch type for the SuiNode process based on the value specified in the configuration.
+// The launch type can be specified as one of the following: "service", "docker", or "screen".
+func (sconfig *SuimonConfig) SetProcessLaunchType() {
+	processLaunchType := sconfig.ProcessLaunchType
+	if processLaunchType.ServiceName == "" && processLaunchType.DockerImageName == "" && processLaunchType.ScreenSessionName == "" {
+		sconfig.ProcessLaunchType = ProcessLaunchType{
+			ServiceName:       defaultServiceName,
+			DockerImageName:   defaultImageName,
+			ScreenSessionName: defaultScreenName,
+		}
+	}
 }
 
+// SetNetworkConfig sets the network configuration for the SuimonConfig struct to the given network type.
+// This function accepts the following parameter:
+// - networkType: an enums.NetworkType representing the type of network to configure the SuimonConfig struct for.
+// This function does not return anything.
+func (sconfig *SuimonConfig) SetNetworkConfig(networkType enums.NetworkType) {
+	sconfig.Network.NetworkType = networkType
+	sconfig.Network.Name = networkType.String()
+	epochLengthConfig := sconfig.Network.EpochLengthSeconds
+
+	if epochLengthConfig == 0 {
+		epochLengthConfig = defaultEpochLength
+	}
+}
+
+// GetRPCByNetwork returns a list of RPC endpoint strings for the network configured in the SuimonConfig struct.
+// This function does not accept any parameters.
+// The function returns a slice of strings representing the RPC endpoints for the configured network.
 func (sconfig *SuimonConfig) GetRPCByNetwork() []string {
-	switch sconfig.NetworkType {
+	networkType := sconfig.Network.NetworkType
+
+	switch networkType {
 	case enums.NetworkTypeDevnet:
 		return sconfig.RPCConfig.Devnet
 	case enums.NetworkTypeTestnet:

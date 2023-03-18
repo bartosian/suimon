@@ -17,6 +17,13 @@ const (
 	httpClientTimeout = 3 * time.Second
 )
 
+// getAddressInfoByTableType returns a slice of "AddressInfo" values for a specific table of the "Checker"
+// struct instance passed as a pointer receiver, based on the provided "TableType".
+// Parameters:
+// - tableType: an enums.TableType representing the type of table to retrieve the address information for.
+// Returns:
+// - a slice of "AddressInfo" values for the specified table.
+// - an error, if any occurred during retrieval of the address information.
 func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]AddressInfo, error) {
 	var addresses []AddressInfo
 
@@ -100,6 +107,9 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 	return addresses, nil
 }
 
+// Init initializes the "Checker" struct instance passed as a pointer receiver.
+// Parameters: None.
+// Returns: an error, if any occurred during initialization.
 func (checker *Checker) Init() error {
 	var (
 		wg             sync.WaitGroup

@@ -41,6 +41,8 @@ var tbColorsValues = map[enums.ColorTable]TableColors{
 	enums.ColorTableColor: {Title: text.FgHiBlue, Header: text.FgHiRed, Row: text.FgHiWhite, Footer: text.FgHiBlue, Index: text.FgHiRed},
 }
 
+// GetTableColorsFromString converts a color string to a TableColors struct.
+// Returns: If the color string is invalid, GetTableColorsFromString returns the default colors.
 func GetTableColorsFromString(color string) TableColors {
 	colorTable := enums.ColorTableFromString(color)
 

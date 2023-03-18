@@ -7,24 +7,31 @@ import (
 )
 
 const (
-	networkConfig              = "devnet"
+	networkNameDefault         = "devnet"
 	invalidNetworkTypeProvided = "provide valid network type by using -n option or set it in suimon.yaml"
 )
 
-func ParseNetworkConfig(suimonConfig *SuimonConfig, network *string) (enums.NetworkType, error) {
+// ParseNetworkConfig decodes the network configuration for the given network name and maps the decoded data into a SuimonConfig struct.
+// This function accepts the following parameters:
+// - suimonConfig: a pointer to a SuimonConfig struct that will be populated with the network configuration data.
+// - networkName: a pointer to a string representing the name of the network to be configured.
+// The function returns an enums.NetworkType representing the type of the network, and an error if there was an issue parsing the configuration data.
+func ParseNetworkConfig(suimonConfig *SuimonConfig, networkName *string) (enums.NetworkType, error) {
 	logger := log.NewLogger()
 
-	if *network == "" && suimonConfig.Network == "" {
-		envValue := env.GetEnvWithDefault("SUIMON_NETWORK", networkConfig)
+	networkConfig := suimonConfig.Network
 
-		network = &envValue
+	if *networkName == "" && networkConfig.Name == "" {
+		envValue := env.GetEnvWithDefault("SUIMON_NETWORK", networkNameDefault)
+
+		networkName = &envValue
 	}
 
-	if *network == "" && suimonConfig.Network != "" {
-		network = &suimonConfig.Network
+	if *networkName == "" && networkConfig.Name != "" {
+		networkName = &networkConfig.Name
 	}
 
-	result, err := enums.NetworkTypeFromString(*network)
+	result, err := enums.NetworkTypeFromString(*networkName)
 	if err != nil {
 		logger.Error(invalidNetworkTypeProvided)
 	}

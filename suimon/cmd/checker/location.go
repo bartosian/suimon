@@ -21,6 +21,8 @@ func newLocation(countryCode, countryName, flag, company string) *Location {
 	}
 }
 
+// String returns the string representation of the Location struct.
+// Returns: a string representation of the Location struct.
 func (loc *Location) String() string {
 	if loc == nil {
 		return ""
@@ -29,6 +31,8 @@ func (loc *Location) String() string {
 	return fmt.Sprintf("%s  %s", loc.Flag, loc.CountryName)
 }
 
+// SetLocation sets the location data for the Host struct by querying an IP address database.
+// This method does not accept any parameters and does not return anything.
 func (host *Host) SetLocation() {
 	var parseLocation = func(ip net.IP) {
 		record, err := host.ipClient.GetIPInfo(ip)

@@ -8,6 +8,9 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder/tables"
 )
 
+// InitTables initializes the tables of the "Checker" struct instance passed as a pointer receiver.
+// Parameters: None.
+// Returns: None.
 func (checker *Checker) InitTables() {
 	displayConfig := checker.suimonConfig.MonitorsConfig
 
@@ -24,12 +27,16 @@ func (checker *Checker) InitTables() {
 	}
 }
 
+// InitTable initializes a specific table of the "Checker" struct instance passed as a pointer receiver,
+// based on the provided "TableType".
+// Parameters: tableType: an enums.TableType representing the type of table to initialize.
+// Returns: None.
 func (checker *Checker) InitTable(tableType enums.TableType) {
 	hosts := checker.getHostsByTableType(tableType)
 	suimonConfig := checker.suimonConfig
 
 	tableConfig := tablebuilder.TableConfig{
-		Name:       tables.GetTableTitleSUI(suimonConfig.NetworkType, tableType, suimonConfig.MonitorsVisual.EnableEmojis),
+		Name:       tables.GetTableTitleSUI(suimonConfig.Network.NetworkType, tableType, suimonConfig.MonitorsVisual.EnableEmojis),
 		Colors:     tablebuilder.GetTableColorsFromString(suimonConfig.MonitorsVisual.ColorScheme),
 		Tag:        tables.TableTagSUI,
 		Style:      tables.TableStyleSUI,
@@ -107,5 +114,5 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 
 	tableConfig.Columns = columns
 
-	checker.setTableBuilderTableType(tableType, tableConfig)
+	checker.setBuilderTableType(tableType, tableConfig)
 }

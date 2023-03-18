@@ -49,6 +49,8 @@ else
   exit 1
 fi
 
+source $HOME/.bash_profile
+
 echo "Suimon has been installed and configured successfully."
 echo
 suimon --help

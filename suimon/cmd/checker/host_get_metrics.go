@@ -5,8 +5,6 @@ import (
 	"context"
 	"fmt"
 	"net/url"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -23,6 +21,12 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/pkg/utility"
 )
 
+// GetMetrics returns a "Metrics" object representing the current state of network checks for the "Host" object
+// passed as a pointer receiver. This object contains the results of each metric check performed on the host,
+// including the number of successful checks, the total number of checks performed, and the percentage progress
+// for each metric.
+// Parameters: None.
+// Returns: - a "Metrics" object representing the current state of network checks for the "Host" object.
 func (host *Host) GetMetrics() {
 	metricsURL := host.getUrl(requestTypeMetrics, false)
 
@@ -80,6 +84,11 @@ func (host *Host) GetMetrics() {
 	}
 }
 
+// GetTotalTransactionNumber returns the total number of transactions performed on the "Host" object passed
+// as a pointer receiver. This method retrieves the "Metrics" object for the host and calculates the total
+// number of transactions performed across all metric types.
+// Parameters: None.
+// Returns: an integer representing the total number of transactions performed on the "Host" object.
 func (host *Host) GetTotalTransactionNumber() {
 	var result any
 
@@ -92,6 +101,11 @@ func (host *Host) GetTotalTransactionNumber() {
 	host.Metrics.SetValue(enums.MetricTypeTotalTransactionsNumber, result)
 }
 
+// GetLatestCheckpoint returns a "Checkpoint" object representing the most recent checkpoint for the "Host"
+// object passed as a pointer receiver. This object contains information about the time and status of the
+// most recent checkpoint performed on the host.
+// Parameters: None.
+// Returns: a "Checkpoint" object representing the most recent checkpoint for the "Host" object.
 func (host *Host) GetLatestCheckpoint() {
 	var result any
 
@@ -104,6 +118,11 @@ func (host *Host) GetLatestCheckpoint() {
 	host.Metrics.SetValue(enums.MetricTypeLatestCheckpoint, result)
 }
 
+// GetSUISystemState returns a "SUISystemState" object representing the current system state for the "Host"
+// object passed as a pointer receiver. This object contains information about the status of various components
+// of the SUISystem software running on the host.
+// Parameters: None.
+// Returns: a "SUISystemState" object representing the current system state for the "Host" object.
 func (host *Host) GetSUISystemState() {
 	var result any
 
@@ -116,6 +135,14 @@ func (host *Host) GetSUISystemState() {
 	host.Metrics.SetValue(enums.MetricTypeCurrentEpoch, result)
 }
 
+// getFromRPC makes a JSON-RPC call to the specified method using the provided RPC client, and returns
+// the result of the call. The returned type will depend on the specific method called and its response.
+// Parameters:
+// - rpcClient: a jsonrpc.RPCClient representing the client to use for the JSON-RPC call.
+// - method: an enums.RPCMethod representing the name of the JSON-RPC method to call.
+// Returns:
+//   - the result of the JSON-RPC call. The specific type of the returned value will depend on the method called
+//     and its response.
 func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) any {
 	var (
 		respChan = make(chan any)
@@ -153,6 +180,10 @@ func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) any {
 	}
 }
 
+// GetData returns a "HostData" object representing the current data for the "Host" object passed as a pointer receiver.
+// This object contains various metrics and status information about the host.
+// Parameters: None.
+// Returns: a "HostData" object representing the current data for the "Host" object.
 func (host *Host) GetData() {
 	doneCH := make(chan struct{})
 
@@ -187,6 +218,11 @@ func (host *Host) GetData() {
 	}
 }
 
+// getUrl returns the URL for a given request type and security setting.
+// Parameters:
+// - request: a requestType indicating the type of request for which to generate a URL.
+// - secure: a boolean indicating whether the generated URL should use HTTPS (true) or HTTP (false).
+// Returns: a string representing the URL for the specified request type and security setting.
 func (host *Host) getUrl(request requestType, secure bool) string {
 	var (
 		protocol = "http"
@@ -232,6 +268,9 @@ func (host *Host) getUrl(request requestType, secure bool) string {
 	return hostUrl.String()
 }
 
+// getMetricForDashboardCell retrieves the current metric data for the specified dashboard cell.
+// Parameters: cellName: a dashboards.CellName representing the name of the dashboard cell for which to retrieve data.
+// Returns: a value of any type representing the current metric data for the specified dashboard cell.
 func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) any {
 	var (
 		node = checker.node[0]
@@ -315,107 +354,9 @@ func (checker *Checker) getMetricForDashboardCell(cellName dashboards.CellName) 
 	}
 }
 
-func getDonutUsageMetric(unit string, option func() (*utility.UsageData, error)) (string, int) {
-	var (
-		usageLabel      = "LOADING..."
-		usagePercentage = 1
-		usageData       *utility.UsageData
-		err             error
-	)
-
-	if usageData, err = option(); err == nil {
-		usageLabel = fmt.Sprintf("TOTAL/USED: %d/%d%s", usageData.Total, usageData.Used, unit)
-		usagePercentage = usageData.PercentageUsed
-
-		if usagePercentage == 0 {
-			usagePercentage = 1
-		}
-	}
-
-	return usageLabel, usagePercentage
-}
-
-func getNetworkUsageMetric(networkMetric dashboards.CellName) []string {
-	var (
-		usageData    = ""
-		networkUsage *utility.NetworkUsage
-		unit         string
-		err          error
-	)
-
-	if networkUsage, err = utility.GetNetworkUsage(); err == nil {
-		metric := networkUsage.Sent
-		formatString := "%.02f"
-		unit = "GB"
-
-		if networkMetric == dashboards.CellNameBytesReceived {
-			metric = networkUsage.Recv
-		}
-
-		if metric >= 100 {
-			metric = metric / 1024
-			unit = "TB"
-
-			if metric >= 100 {
-				formatString = "%.01f"
-			}
-		}
-
-		usageData = fmt.Sprintf(formatString, metric)
-	}
-
-	return []string{usageData, unit}
-}
-
-func getDirectorySize(dirPath string) []string {
-	var (
-		usageData = ""
-		dirSize   float64
-		unit      string
-		err       error
-	)
-
-	if dirPath == "suidb" {
-		var homeDir string
-
-		if homeDir, err = os.UserHomeDir(); err != nil {
-			return nil
-		}
-
-		dirPath = filepath.Join(homeDir, "sui", dirPath)
-	}
-
-	var processSize = func() {
-		formatString := "%.02f"
-		unit = "GB"
-
-		if dirSize >= 100 {
-			dirSize = dirSize / 1024
-			unit = "TB"
-
-			if dirSize >= 100 {
-				formatString = "%.01f"
-			}
-		}
-
-		if usageData = fmt.Sprintf(formatString, dirSize); usageData == "0.00" {
-			usageData = ""
-		}
-	}
-
-	if dirSize, err = utility.GetDirSize(dirPath); err == nil {
-		processSize()
-
-		return []string{usageData, unit}
-	}
-
-	if dirSize, err = utility.GetVolumeSize("suidb"); err == nil {
-		processSize()
-	}
-
-	return []string{usageData, unit}
-}
-
+// getOptionsForDashboardCell retrieves the options data for a specific dashboard cell and returns it in the appropriate format for display in the dashboard.
+// Parameters: cellName: a dashboards.CellName representing the name of the dashboard cell for which to retrieve options data.
+// Returns: the options data for the specified dashboard cell in the appropriate format for display in the dashboard.
 func (checker *Checker) getOptionsForDashboardCell(cellName dashboards.CellName) any {
 	var (
 		node    = checker.node[0]

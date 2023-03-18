@@ -49,12 +49,18 @@ type (
 	}
 )
 
-func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.Client) *Host {
+// newHost creates and returns a new "Host" object, based on the provided "AddressInfo" value.
+// Parameters:
+// - addressInfo: an "AddressInfo" value representing the address information for the new host.
+// - ipClient: a pointer to an "ipinfo.Client" instance for retrieving additional information about the host's IP.
+// - httpClient: a pointer to an "http.Client" instance for performing HTTP requests to the host.
+// Returns: a pointer to the newly created "Host" object.
+func newHost(addressInfo AddressInfo, epochLength int, ipClient *ipinfo.Client, httpClient *http.Client) *Host {
 	host := &Host{
 		AddressInfo: addressInfo,
 		ipClient:    ipClient,
 		httpClient:  httpClient,
-		Metrics:     NewMetrics(),
+		Metrics:     NewMetrics(epochLength),
 		logger:      log.NewLogger(),
 	}
 
@@ -64,6 +70,14 @@ func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.
 	return host
 }
 
+// SetPctProgress sets the percentage progress for the specified "MetricType" on the "Host" object passed
+// as a pointer receiver. It calculates the progress percentage based on the number of successful checks
+// and the total number of checks performed for that metric, and updates the corresponding progress value
+// on the "Host" object.
+// Parameters:
+// - metricType: an enums.MetricType representing the metric type to set the percentage progress for.
+// - rpc: a "Host" object representing the RPC host to update with the new progress percentage.
+// Returns: None.
 func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) {
 	hostMetric := host.Metrics.GetValue(metricType, false)
 	rpcMetric := rpc.Metrics.GetValue(metricType, true)
@@ -74,6 +88,11 @@ func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) {
 	host.Metrics.SetValue(metricType, percentage)
 }
 
+// SetStatus updates the status of the "Host" object passed as a pointer receiver, based on the results of
+// the most recent network checks performed on the host. It sets the "Status" field of the "Host" object
+// to reflect whether the host is up or down, and updates the corresponding status value on the "rpc" host.
+// Parameters: rpc: a "Host" object representing the RPC host to update with the new status.
+// Returns: None.
 func (host *Host) SetStatus(rpc Host) {
 	metricsHost := host.Metrics
 	metricsRPC := rpc.Metrics

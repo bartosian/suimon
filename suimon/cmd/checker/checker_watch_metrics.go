@@ -11,6 +11,11 @@ const (
 	watchHostsTimeout = 1 * time.Second
 )
 
+// WatchHosts begins monitoring the "Host" objects in the "Checker" struct instance passed as a pointer
+// receiver, continuously checking their status and updating the dashboard and tables accordingly. This
+// method runs indefinitely until the program is terminated, and does not return anything.
+// Parameters: None.
+// Returns: None.
 func (checker *Checker) WatchHosts() {
 	var (
 		monitorsConfig = checker.suimonConfig.MonitorsConfig

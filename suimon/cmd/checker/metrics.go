@@ -21,7 +21,6 @@ const (
 	highestSyncedCheckpointLag      = 30
 	totalTransactionsSyncPercentage = 99
 	totalCheckpointsSyncPercentage  = 99
-	epochLength                     = 1 * time.Hour
 )
 
 type SuiSystemState struct {
@@ -29,13 +28,17 @@ type SuiSystemState struct {
 	EpochStartTimestampMs int `json:"epoch_start_timestamp_ms"`
 }
 
+// GetTimeTillNextEpoch returns the time remaining until the next epoch in milliseconds.
+// Returns: an integer representing the time remaining until the next epoch in seconds.
 func (metrics *Metrics) GetTimeTillNextEpoch() int {
-	nextEpochStartMs := metrics.SystemState.EpochStartTimestampMs + int(epochLength.Milliseconds())
+	nextEpochStartMs := metrics.SystemState.EpochStartTimestampMs + metrics.EpochLength
 	currentTimeMs := int(time.Now().UnixNano() / 1000000)
 
 	return nextEpochStartMs - currentTimeMs
 }
 
+// GetEpochTimer returns an array of strings representing the epoch timer data.
+// Returns: an array of strings representing the epoch timer data.
 func (metrics *Metrics) GetEpochTimer() []string {
 	duration := time.Duration(metrics.TimeTillNextEpochMs) * time.Millisecond
 	hours := int(duration.Hours())
@@ -54,15 +57,18 @@ func (metrics *Metrics) GetEpochTimer() []string {
 	return []string{fmt.Sprintf("%02d%s%02d", hours, spacer, minutes), "H"}
 }
 
+// GetEpochLabel returns a string representing the epoch label.
+// Returns: a string representing the epoch label.
 func (metrics *Metrics) GetEpochLabel() string {
 	return fmt.Sprintf("EPOCH %d", metrics.SystemState.Epoch)
 }
 
+// GetEpochProgress returns an integer representing the current epoch progress.
+// Returns: an integer representing the current epoch progress.
 func (metrics *Metrics) GetEpochProgress() int {
-	epochLength := int(epochLength.Milliseconds())
-	epochCurrentLength := epochLength - metrics.TimeTillNextEpochMs
+	epochCurrentLength := metrics.EpochLength - metrics.TimeTillNextEpochMs
 
-	return int(percent.PercentOf(epochCurrentLength, epochLength))
+	return int(percent.PercentOf(epochCurrentLength, metrics.EpochLength))
 }
 
 type Metrics struct {
@@ -72,6 +78,7 @@ type Metrics struct {
 
 	TxSyncPercentage        int
 	EpochPercentage         int
+	EpochLength             int
 	TimeTillNextEpochMs     int
 	CheckSyncPercentage     int
 	TransactionsPerSecond   int
@@ -87,12 +94,18 @@ type Metrics struct {
 	Commit                  string
 }
 
-func NewMetrics() Metrics {
+// NewMetrics creates and returns a new instance of the Metrics struct, with the epoch length set to the given value.
+// Parameters: epochLength: an integer representing the length of each epoch, in seconds.
+// Returns: a new instance of the Metrics struct.
+func NewMetrics(epochLength int) Metrics {
 	return Metrics{
+		EpochLength:         epochLength * 1000,
 		TransactionsHistory: make([]int, 0, transactionsPerSecondTimeout),
 	}
 }
 
+// CalculateTPS calculates the current transaction per second (TPS) based on the number of transactions processed
+// within the current period. The TPS value is then stored in the Metrics struct.
 func (metrics *Metrics) CalculateTPS() {
 	var (
 		transactionsHistory = metrics.TransactionsHistory
@@ -120,6 +133,8 @@ func (metrics *Metrics) CalculateTPS() {
 	metrics.TransactionsPerSecond = tps
 }
 
+// CalculateCPS calculates the current checkpoints per second (CPS) based on the number of checkpoints generated
+// within the current period. The CPS value is then stored in the Metrics struct.
 func (metrics *Metrics) CalculateCPS() {
 	var (
 		checkpointsHistory = metrics.CheckpointsHistory
@@ -147,6 +162,10 @@ func (metrics *Metrics) CalculateCPS() {
 	metrics.CheckpointsPerSecond = cps
 }
 
+// SetValue sets the value of a given metric type.
+// Parameters:
+// - metric: an enums.MetricType representing the metric type to set.
+// - value: a value of any type representing the value to set for the given metric type.
 func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 	metrics.Updated = true
 
@@ -215,6 +234,11 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 	}
 }
 
+// GetValue returns the current value of the specified metric.
+// Parameters:
+// - metric: an enums.MetricType representing the metric whose value to retrieve.
+// - rpc: a boolean indicating whether to retrieve the value for RPC host.
+// Returns: the current value of the specified metric, which can be of any type.
 func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
 	switch metric {
 	case enums.MetricTypeUptime:
@@ -248,6 +272,16 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
 	}
 }
 
+// IsHealthy checks if a given metric is healthy based on its current value.
+// It returns a boolean value indicating whether the metric is healthy or not.
+// A metric is considered healthy if it meets a certain condition or threshold,
+// otherwise, it is considered unhealthy.
+// Parameters:
+//   - metric: the metric to check for healthiness.
+//   - valueRPC: the current value of the metric, retrieved via an RPC call.
+//
+// Returns:
+//   - a boolean value indicating whether the metric is healthy or not.
 func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC any) bool {
 	switch metric {
 	case enums.MetricTypeTotalTransactionsNumber:

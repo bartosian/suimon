@@ -44,10 +44,16 @@ type (
 	}
 )
 
-func NewChecker(suimonConfig config.SuimonConfig, nodeConfig config.NodeConfig, networkConfig enums.NetworkType) (*Checker, error) {
-	suimonConfig.SetNetworkConfig(networkConfig)
+// NewChecker creates a new Checker object for the given Suimon and node configurations and network type.
+// This function accepts the following parameters:
+// - suimonConfig: a config.SuimonConfig struct containing the Suimon configuration data.
+// - nodeConfig: a config.NodeConfig struct containing the node configuration data.
+// - networkType: an enums.NetworkType representing the type of network to configure the Checker object for.
+// The function returns a pointer to a Checker struct, and an error if there was an issue creating the Checker object.
+func NewChecker(suimonConfig config.SuimonConfig, nodeConfig config.NodeConfig, networkType enums.NetworkType) (*Checker, error) {
+	suimonConfig.SetNetworkConfig(networkType)
 
-	rpcClient := jsonrpc.NewClient(suimonConfig.NetworkType.ToRPC())
+	rpcClient := jsonrpc.NewClient(suimonConfig.Network.NetworkType.ToRPC())
 	httpClient := &http.Client{Timeout: httpClientTimeout}
 	ipClient := ipinfo.NewClient(httpClient, ipinfo.NewCache(cache.NewInMemory().WithExpiration(ipInfoCacheExp)), suimonConfig.IPLookup.AccessToken)
 
@@ -61,6 +67,10 @@ func NewChecker(suimonConfig config.SuimonConfig, nodeConfig config.NodeConfig, 
 	}, nil
 }
 
+// getHostsByTableType returns a list of Host objects associated with the given table type in the Checker struct.
+// This function accepts the following parameter:
+// - tableType: an enums.TableType representing the type of table to retrieve hosts for.
+// The function returns a slice of Host objects representing the hosts associated with the given table type.
 func (checker *Checker) getHostsByTableType(tableType enums.TableType) []Host {
 	var hosts []Host
 
@@ -76,6 +86,11 @@ func (checker *Checker) getHostsByTableType(tableType enums.TableType) []Host {
 	return hosts
 }
 
+// setHostsByTableType sets the list of Host objects associated with the given table type in the Checker struct.
+// This function accepts the following parameters:
+// - tableType: an enums.TableType representing the type of table to set hosts for.
+// - hosts: a slice of Host objects representing the hosts to associate with the given table type.
+// This function does not return anything.
 func (checker *Checker) setHostsByTableType(tableType enums.TableType, hosts []Host) {
 	switch tableType {
 	case enums.TableTypeNode:
@@ -87,8 +102,13 @@ func (checker *Checker) setHostsByTableType(tableType enums.TableType, hosts []H
 	}
 }
 
-func (checker *Checker) setTableBuilderTableType(tableType enums.TableType, tc tablebuilder.TableConfig) {
-	tableBuilder := tablebuilder.NewTableBuilder(tc)
+// setBuilderTableType sets the table configuration for the given table type in the Checker struct using the provided TableConfig.
+// This function accepts the following parameters:
+// - tableType: an enums.TableType representing the type of table to set the configuration for.
+// - tableConfig: a tablebuilder.TableConfig struct containing the configuration data for the table.
+// This function does not return anything.
+func (checker *Checker) setBuilderTableType(tableType enums.TableType, tableConfig tablebuilder.TableConfig) {
+	tableBuilder := tablebuilder.NewTableBuilder(tableConfig)
 
 	switch tableType {
 	case enums.TableTypeNode:
@@ -100,6 +120,9 @@ func (checker *Checker) setTableBuilderTableType(tableType enums.TableType, tc t
 	}
 }
 
+// DrawTables draws tables for each type of table in the Checker struct.
+// This function does not accept any parameters.
+// This function does not return anything.
 func (checker *Checker) DrawTables() {
 	if checker.suimonConfig.MonitorsConfig.RPCTable.Display && len(checker.rpc) > 0 {
 		checker.tableBuilderRPC.Build()
@@ -112,14 +135,18 @@ func (checker *Checker) DrawTables() {
 	}
 }
 
+// DrawDashboards draws dashboards for each type of table in the Checker struct.
+// This function does not accept any parameters.
+// This function does not return anything.
 func (checker *Checker) DrawDashboards() {
 	var (
-		monitorsConfig   = checker.suimonConfig.MonitorsConfig
-		dashboardBuilder = checker.DashboardBuilder
-		dashCells        = dashboardBuilder.Cells
-		ticker           = time.NewTicker(watchHostsTimeout)
-		logsCH           = make(chan string)
-		wg               sync.WaitGroup
+		monitorsConfig    = checker.suimonConfig.MonitorsConfig
+		processLaunchType = checker.suimonConfig.ProcessLaunchType
+		dashboardBuilder  = checker.DashboardBuilder
+		dashCells         = dashboardBuilder.Cells
+		ticker            = time.NewTicker(watchHostsTimeout)
+		logsCH            = make(chan string)
+		wg                sync.WaitGroup
 	)
 
 	defer ticker.Stop()
@@ -127,11 +154,23 @@ func (checker *Checker) DrawDashboards() {
 	var stream = func() {
 		defer wg.Done()
 
-		if err := checker.logger.StreamFromService("suid", logsCH); err != nil {
-			if err := checker.logger.StreamFromContainer("sui-node", logsCH); err != nil {
-				if err := checker.logger.StreamFromScreen("sui", logsCH); err != nil {
-					return
-				}
+		var err error
+
+		if processLaunchType.ServiceName != "" {
+			if err = checker.logger.StreamFromService(processLaunchType.ServiceName, logsCH); err == nil {
+				return
+			}
+		}
+
+		if processLaunchType.DockerImageName != "" {
+			if err = checker.logger.StreamFromContainer(processLaunchType.DockerImageName, logsCH); err == nil {
+				return
+			}
+		}
+
+		if processLaunchType.ScreenSessionName != "" {
+			if err = checker.logger.StreamFromScreen(processLaunchType.ScreenSessionName, logsCH); err == nil {
+				return
 			}
 		}
 	}

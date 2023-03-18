@@ -48,12 +48,12 @@ func main() {
 		return
 	}
 
-	// parse fullnode/validator.yaml config file
+	// parse fullnode.yaml or validator.yaml config files
 	if nodeConfig, err = config.ParseNodeConfig(nodeConfigPath, suimonConfig.NodeConfigPath); err != nil {
 		return
 	}
 
-	// parse network flag
+	// parse network config
 	if networkConfig, err = config.ParseNetworkConfig(suimonConfig, network); err != nil {
 		return
 	}
