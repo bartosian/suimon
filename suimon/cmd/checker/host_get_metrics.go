@@ -1,12 +1,9 @@
 package checker
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
@@ -15,11 +12,65 @@ import (
 	"github.com/mum4k/termdash/widgets/gauge"
 	"github.com/mum4k/termdash/widgets/segmentdisplay"
 	"github.com/mum4k/termdash/widgets/sparkline"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/metricsparser"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 )
+
+var prometheusMetrics = map[enums.PrometheusMetricName]metricsparser.MetricConfig{
+	enums.PrometheusMetricNameTotalTransactionCertificates: {
+		MetricType: enums.PrometheusMetricTypeCounter,
+	},
+	enums.PrometheusMetricNameTotalTransactionEffects: {
+		MetricType: enums.PrometheusMetricTypeCounter,
+	},
+	enums.PrometheusMetricNameHighestKnownCheckpoint: {
+		MetricType: enums.PrometheusMetricTypeGauge,
+	},
+	enums.PrometheusMetricNameHighestSyncedCheckpoint: {
+		MetricType: enums.PrometheusMetricTypeGauge,
+	},
+	enums.PrometheusMetricNameCurrentEpoch: {
+		MetricType: enums.PrometheusMetricTypeGauge,
+	},
+	enums.PrometheusMetricNameEpochTotalDuration: {
+		MetricType: enums.PrometheusMetricTypeGauge,
+	},
+	enums.PrometheusMetricNameCurrentRound: {
+		MetricType: enums.PrometheusMetricTypeGauge,
+	},
+	enums.PrometheusMetricNameHighestProcessedRound: {
+		MetricType: enums.PrometheusMetricTypeGauge,
+		Labels: prometheus.Labels{
+			"source": "own",
+		},
+	},
+	enums.PrometheusMetricNameLastCommittedRound: {
+		MetricType: enums.PrometheusMetricTypeGauge,
+	},
+	enums.PrometheusMetricNamePrimaryNetworkPeers: {
+		MetricType: enums.PrometheusMetricTypeGauge,
+	},
+	enums.PrometheusMetricNameWorkerNetworkPeers: {
+		MetricType: enums.PrometheusMetricTypeGauge,
+	},
+	enums.PrometheusMetricNameSuiNetworkPeers: {
+		MetricType: enums.PrometheusMetricTypeGauge,
+	},
+	enums.PrometheusMetricNameSkippedConsensusTransactions: {
+		MetricType: enums.PrometheusMetricTypeCounter,
+	},
+	enums.PrometheusMetricNameTotalSignatureErrors: {
+		MetricType: enums.PrometheusMetricTypeCounter,
+	},
+	enums.PrometheusMetricNameUptime: {
+		MetricType: enums.PrometheusMetricTypeCounter,
+	},
+}
 
 // GetMetrics returns a "Metrics" object representing the current state of network checks for the "Host" object
 // passed as a pointer receiver. This object contains the results of each metric check performed on the host,
@@ -29,60 +80,72 @@ import (
 // Returns: - a "Metrics" object representing the current state of network checks for the "Host" object.
 func (host *Host) GetMetrics() {
 	metricsURL := host.getUrl(requestTypeMetrics, false)
+	parser := metricsparser.NewPrometheusMetricParser(host.httpClient, metricsURL, prometheusMetrics)
 
-	result, err := host.httpClient.Get(metricsURL)
+	result, err := parser.GetMetrics()
 	if err != nil {
 		return
 	}
 
-	defer result.Body.Close()
-
-	reader := bufio.NewReader(result.Body)
-	for {
-		line, err := reader.ReadString('\n')
-		if len(line) == 0 && err != nil {
-			break
-		}
-
-		if strings.HasPrefix(line, "#") {
-			continue
-		}
-
-		metric := strings.Split(line, " ")
-		if len(metric) != 2 {
-			continue
-		}
-
-		key, value := strings.TrimSpace(metric[0]), strings.TrimSpace(metric[1])
-
-		metricName, err := enums.MetricTypeFromString(key)
-		if err != nil {
-			continue
-		}
-
-		if metricName == enums.MetricTypeUptime {
-			versionMetric := versionRegex.FindStringSubmatch(key)
-			version := strings.Split(versionMetric[1], "=")
-
-			uptimeSeconds, err := strconv.Atoi(value)
-			if err != nil {
-				continue
-			}
-
-			value = fmt.Sprintf("%.1f days", float64(uptimeSeconds)/(60*60*24))
-
-			versionInfo := strings.Split(version[1], "-")
-			if len(versionInfo) != 2 {
-				continue
-			}
-
-			host.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0])
-			host.Metrics.SetValue(enums.MetricTypeCommit, versionInfo[1])
-		}
-
-		host.Metrics.SetValue(metricName, value)
-	}
+	fmt.Printf("%+v\n", result)
 }
+
+//func (host *Host) GetMetrics() {
+//	metricsURL := host.getUrl(requestTypeMetrics, false)
+//
+//	result, err := host.httpClient.Get(metricsURL)
+//	if err != nil {
+//		return
+//	}
+//
+//	defer result.Body.Close()
+//
+//	reader := bufio.NewReader(result.Body)
+//	for {
+//		line, err := reader.ReadString('\n')
+//		if len(line) == 0 && err != nil {
+//			break
+//		}
+//
+//		if strings.HasPrefix(line, "#") {
+//			continue
+//		}
+//
+//		metric := strings.Split(line, " ")
+//		if len(metric) != 2 {
+//			continue
+//		}
+//
+//		key, value := strings.TrimSpace(metric[0]), strings.TrimSpace(metric[1])
+//
+//		metricName, err := enums.MetricTypeFromString(key)
+//		if err != nil {
+//			continue
+//		}
+//
+//		if metricName == enums.MetricTypeUptime {
+//			versionMetric := versionRegex.FindStringSubmatch(key)
+//			version := strings.Split(versionMetric[1], "=")
+//
+//			uptimeSeconds, err := strconv.Atoi(value)
+//			if err != nil {
+//				continue
+//			}
+//
+//			value = fmt.Sprintf("%.1f days", float64(uptimeSeconds)/(60*60*24))
+//
+//			versionInfo := strings.Split(version[1], "-")
+//			if len(versionInfo) != 2 {
+//				continue
+//			}
+//
+//			host.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0])
+//			host.Metrics.SetValue(enums.MetricTypeCommit, versionInfo[1])
+//		}
+//
+//		host.Metrics.SetValue(metricName, value)
+//	}
+//}
 
 // GetTotalTransactionNumber returns the total number of transactions performed on the "Host" object passed
 // as a pointer receiver. This method retrieves the "Metrics" object for the host and calculates the total

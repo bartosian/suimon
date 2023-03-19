@@ -1,7 +1,6 @@
 package dashboards
 
 import (
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 	"strconv"
 	"strings"
 	"time"
@@ -19,6 +18,7 @@ import (
 	"github.com/mum4k/termdash/widgets/text"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 const (
