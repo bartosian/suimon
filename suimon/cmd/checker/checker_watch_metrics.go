@@ -39,8 +39,8 @@ func (checker *Checker) WatchHosts() {
 					go func(idx int) {
 						hosts[idx].GetData()
 
-						hosts[idx].SetPctProgress(enums.MetricTypeTxSyncProgress, comparatorRPC)
-						hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncProgress, comparatorRPC)
+						hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, comparatorRPC)
+						hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, comparatorRPC)
 						hosts[idx].SetStatus(comparatorRPC)
 
 						doneCH <- struct{}{}

@@ -78,7 +78,10 @@ type Metrics struct {
 	LatestCheckpoint             int
 	HighestKnownCheckpoint       int
 	HighestSyncedCheckpoint      int
+	LastExecutedCheckpoint       int
 	CheckpointsPerSecond         int
+	CheckpointExecBacklog        int
+	CheckpointSyncBacklog        int
 	CheckpointsHistory           []int
 	CurrentEpoch                 int
 	EpochTotalDuration           int
@@ -211,6 +214,18 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 		metrics.HighestSyncedCheckpoint = convFToI(valueFloat)
 
 		metrics.CalculateCPS()
+	case enums.MetricTypeLastExecutedCheckpoint:
+		valueFloat := value.(float64)
+
+		metrics.LastExecutedCheckpoint = convFToI(valueFloat)
+	case enums.MetricTypeCheckpointExecBacklog:
+		valueInt := value.(int)
+
+		metrics.CheckpointExecBacklog = valueInt
+	case enums.MetricTypeCheckpointSyncBacklog:
+		valueInt := value.(int)
+
+		metrics.CheckpointSyncBacklog = valueInt
 	case enums.MetricTypeCurrentEpoch:
 		valueFloat := value.(float64)
 
@@ -263,11 +278,11 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 		valueFloat := value.(float64)
 
 		metrics.TotalSignatureErrors = convFToI(valueFloat)
-	case enums.MetricTypeTxSyncProgress:
+	case enums.MetricTypeTxSyncPercentage:
 		valueInt := value.(int)
 
 		metrics.TxSyncPercentage = valueInt
-	case enums.MetricTypeCheckSyncProgress:
+	case enums.MetricTypeCheckSyncPercentage:
 		valueInt := value.(int)
 
 		metrics.CheckSyncPercentage = valueInt
@@ -297,9 +312,9 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
 		return metrics.TransactionsPerSecond
 	case enums.MetricTypeCheckpointsPerSecond:
 		return metrics.CheckpointsPerSecond
-	case enums.MetricTypeTxSyncProgress:
+	case enums.MetricTypeTxSyncPercentage:
 		return metrics.TotalTransactions
-	case enums.MetricTypeCheckSyncProgress:
+	case enums.MetricTypeCheckSyncPercentage:
 		if rpc {
 			return metrics.LatestCheckpoint
 		}

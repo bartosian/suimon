@@ -7,6 +7,7 @@ const (
 	PrometheusMetricNameTotalTransactionEffects      PrometheusMetricName = "total_transaction_effects"
 	PrometheusMetricNameHighestKnownCheckpoint       PrometheusMetricName = "highest_known_checkpoint"
 	PrometheusMetricNameHighestSyncedCheckpoint      PrometheusMetricName = "highest_synced_checkpoint"
+	PrometheusMetricNameLastExecutedCheckpoint       PrometheusMetricName = "last_executed_checkpoint"
 	PrometheusMetricNameCurrentEpoch                 PrometheusMetricName = "current_epoch"
 	PrometheusMetricNameEpochTotalDuration           PrometheusMetricName = "epoch_total_duration"
 	PrometheusMetricNameCurrentRound                 PrometheusMetricName = "current_round"

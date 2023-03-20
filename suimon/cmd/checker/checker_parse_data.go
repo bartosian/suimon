@@ -192,8 +192,15 @@ func (checker *Checker) Init() error {
 		comparatorRPC := rpc[0]
 
 		for idx := range hosts {
-			hosts[idx].SetPctProgress(enums.MetricTypeTxSyncProgress, comparatorRPC)
-			hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncProgress, comparatorRPC)
+			metrics := hosts[idx].Metrics
+			checkpointExecBacklog := metrics.HighestKnownCheckpoint - metrics.LastExecutedCheckpoint
+			checkpointSyncBacklog := metrics.HighestKnownCheckpoint - metrics.HighestSyncedCheckpoint
+
+			hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, comparatorRPC)
+			hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, comparatorRPC)
+			hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointExecBacklog, checkpointExecBacklog)
+			hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointSyncBacklog, checkpointSyncBacklog)
+
 			hosts[idx].SetStatus(comparatorRPC)
 		}
 	}

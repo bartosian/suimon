@@ -8,14 +8,14 @@ import (
 )
 
 var (
-	TableStyleNode      = table.StyleLight
-	TableTagNode        = ""
-	TableSortConfigNode = []table.SortBy{
+	TableStylePeer      = table.StyleLight
+	TableTagPeer        = ""
+	TableSortConfigPeer = []table.SortBy{
 		{Name: "HEALTH", Mode: table.Dsc},
 		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
 		{Name: "LATEST\nCHECKPOINT", Mode: table.Dsc},
 	}
-	ColumnConfigNode = []table.ColumnConfig{
+	ColumnConfigPeer = []table.ColumnConfig{
 		enums.ColumnNameHealth: {
 			Name:         "HEALTH",
 			Align:        text.AlignCenter,

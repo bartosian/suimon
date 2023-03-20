@@ -33,6 +33,9 @@ var prometheusMetrics = map[enums.PrometheusMetricName]metricsparser.MetricConfi
 	enums.PrometheusMetricNameHighestSyncedCheckpoint: {
 		MetricType: enums.PrometheusMetricTypeGauge,
 	},
+	enums.PrometheusMetricNameLastExecutedCheckpoint: {
+		MetricType: enums.PrometheusMetricTypeGauge,
+	},
 	enums.PrometheusMetricNameCurrentEpoch: {
 		MetricType: enums.PrometheusMetricTypeGauge,
 	},
@@ -96,6 +99,8 @@ func (host *Host) GetPrometheusMetrics() {
 			host.Metrics.SetValue(enums.MetricTypeHighestKnownCheckpoint, metricValue.Value)
 		case enums.PrometheusMetricNameHighestSyncedCheckpoint:
 			host.Metrics.SetValue(enums.MetricTypeHighestSyncedCheckpoint, metricValue.Value)
+		case enums.PrometheusMetricNameLastExecutedCheckpoint:
+			host.Metrics.SetValue(enums.MetricTypeLastExecutedCheckpoint, metricValue.Value)
 		case enums.PrometheusMetricNameCurrentEpoch:
 			host.Metrics.SetValue(enums.MetricTypeCurrentEpoch, metricValue.Value)
 		case enums.PrometheusMetricNameEpochTotalDuration:
@@ -244,12 +249,6 @@ func (host *Host) GetData() {
 	}()
 
 	go func() {
-		host.GetLatestSuiSystemState()
-
-		doneCH <- struct{}{}
-	}()
-
-	go func() {
 		host.GetLatestCheckpoint()
 
 		doneCH <- struct{}{}
@@ -261,7 +260,7 @@ func (host *Host) GetData() {
 		doneCH <- struct{}{}
 	}()
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < 3; i++ {
 		<-doneCH
 	}
 }

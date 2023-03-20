@@ -126,9 +126,11 @@ func (checker *Checker) DrawTables() {
 	if checker.suimonConfig.MonitorsConfig.RPCTable.Display && len(checker.rpc) > 0 {
 		checker.tableBuilderRPC.Build()
 	}
+
 	if checker.suimonConfig.MonitorsConfig.NodeTable.Display && len(checker.node) > 0 {
 		checker.tableBuilderNode.Build()
 	}
+
 	if checker.suimonConfig.MonitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
 		checker.tableBuilderPeer.Build()
 	}
