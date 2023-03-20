@@ -2,8 +2,6 @@ package checker
 
 import (
 	"errors"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/address"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/progress"
 	"sort"
 	"sync"
 	"time"
@@ -11,6 +9,8 @@ import (
 	"github.com/hashicorp/go-multierror"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/address"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/progress"
 )
 
 const (
@@ -177,7 +177,7 @@ func (checker *Checker) Init() error {
 
 	if len(rpc) > 1 {
 		sort.Slice(rpc, func(left, right int) bool {
-			return rpc[left].Metrics.TotalTransactionNumber > rpc[right].Metrics.TotalTransactionNumber
+			return rpc[left].Metrics.TotalTransactions > rpc[right].Metrics.TotalTransactions
 		})
 
 		sort.SliceStable(rpc, func(left, right int) bool {

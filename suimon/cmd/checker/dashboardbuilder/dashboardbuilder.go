@@ -61,7 +61,7 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 func initDashboard(terminal *termbox.Terminal) (*container.Container, error) {
 	var (
 		builder   = grid.New()
-		dashboard = dashboards.DashboardConfigSUI
+		dashboard = dashboards.DashboardConfigNode
 		rows      = dashboards.Rows
 		config    []container.Option
 		err       error

@@ -2,8 +2,7 @@ package checker
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
+	"math"
 	"time"
 
 	"github.com/dariubs/percent"
@@ -12,8 +11,8 @@ import (
 )
 
 const (
-	transactionsPerSecondTimeout    = 10
-	checkpointsPerSecondTimeout     = 10
+	transactionsPerSecondWindow     = 10
+	checkpointsPerSecondWindow      = 10
 	transactionsPerSecondLag        = 5
 	totalTransactionsLag            = 100
 	checkpointsPerSecondLag         = 10
@@ -71,28 +70,41 @@ type Metrics struct {
 
 	SystemState SuiSystemState
 
-	TxSyncPercentage        int
-	EpochPercentage         int
-	TimeTillNextEpochMs     int
-	CheckSyncPercentage     int
-	TransactionsPerSecond   int
-	TransactionsHistory     []int
-	TotalTransactionNumber  int
-	LatestCheckpoint        int
-	CheckpointsPerSecond    int
-	CheckpointsHistory      []int
-	HighestSyncedCheckpoint int
-	SuiNetworkPeers         int
-	Uptime                  string
-	Version                 string
-	Commit                  string
+	TotalTransactions            int
+	TotalTransactionCertificates int
+	TotalTransactionEffects      int
+	TransactionsPerSecond        int
+	TransactionsHistory          []int
+	LatestCheckpoint             int
+	HighestKnownCheckpoint       int
+	HighestSyncedCheckpoint      int
+	CheckpointsPerSecond         int
+	CheckpointsHistory           []int
+	CurrentEpoch                 int
+	EpochTotalDuration           int
+	EpochPercentage              int
+	TimeTillNextEpochMs          int
+	TxSyncPercentage             int
+	CheckSyncPercentage          int
+	NetworkPeers                 int
+	Uptime                       string
+	Version                      string
+	Commit                       string
+	CurrentRound                 int
+	HighestProcessedRound        int
+	LastCommittedRound           int
+	PrimaryNetworkPeers          int
+	WorkerNetworkPeers           int
+	SkippedConsensusTransactions int
+	TotalSignatureErrors         int
 }
 
 // NewMetrics creates and returns a new instance of the Metrics struct.
 // Returns: a new instance of the Metrics struct.
 func NewMetrics() Metrics {
 	return Metrics{
-		TransactionsHistory: make([]int, 0, transactionsPerSecondTimeout),
+		TransactionsHistory: make([]int, 0, transactionsPerSecondWindow),
+		CheckpointsHistory:  make([]int, 0, checkpointsPerSecondWindow),
 	}
 }
 
@@ -106,20 +118,20 @@ func (metrics *Metrics) CalculateTPS() {
 		tps                 int
 	)
 
-	transactionsHistory = append(transactionsHistory, metrics.TotalTransactionNumber)
-	if len(transactionsHistory) < transactionsPerSecondTimeout {
+	transactionsHistory = append(transactionsHistory, metrics.TotalTransactions)
+	if len(transactionsHistory) < transactionsPerSecondWindow {
 		metrics.TransactionsHistory = transactionsHistory
 
 		return
 	}
 
-	if len(transactionsHistory) > transactionsPerSecondTimeout {
+	if len(transactionsHistory) > transactionsPerSecondWindow {
 		transactionsHistory = transactionsHistory[1:]
 	}
 
 	transactionsStart = transactionsHistory[0]
-	transactionsEnd = transactionsHistory[transactionsPerSecondTimeout-1]
-	tps = (transactionsEnd - transactionsStart) / transactionsPerSecondTimeout
+	transactionsEnd = transactionsHistory[transactionsPerSecondWindow-1]
+	tps = (transactionsEnd - transactionsStart) / transactionsPerSecondWindow
 
 	metrics.TransactionsHistory = transactionsHistory
 	metrics.TransactionsPerSecond = tps
@@ -136,19 +148,19 @@ func (metrics *Metrics) CalculateCPS() {
 	)
 
 	checkpointsHistory = append(checkpointsHistory, metrics.HighestSyncedCheckpoint)
-	if len(checkpointsHistory) < checkpointsPerSecondTimeout {
+	if len(checkpointsHistory) < checkpointsPerSecondWindow {
 		metrics.CheckpointsHistory = checkpointsHistory
 
 		return
 	}
 
-	if len(checkpointsHistory) > checkpointsPerSecondTimeout {
+	if len(checkpointsHistory) > checkpointsPerSecondWindow {
 		checkpointsHistory = checkpointsHistory[1:]
 	}
 
 	checkpointsStart = checkpointsHistory[0]
-	checkpointsEnd = checkpointsHistory[checkpointsPerSecondTimeout-1]
-	cps = (checkpointsEnd - checkpointsStart) / checkpointsPerSecondTimeout
+	checkpointsEnd = checkpointsHistory[checkpointsPerSecondWindow-1]
+	cps = (checkpointsEnd - checkpointsStart) / checkpointsPerSecondWindow
 
 	metrics.CheckpointsHistory = checkpointsHistory
 	metrics.CheckpointsPerSecond = cps
@@ -161,51 +173,96 @@ func (metrics *Metrics) CalculateCPS() {
 func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 	metrics.Updated = true
 
-	switch metric {
-	case enums.MetricTypeUptime:
-		valueString := value.(string)
+	var convFToI = func(input float64) int {
+		return int(math.Round(input))
+	}
 
-		metrics.Uptime = valueString
+	switch metric {
+	case enums.MetricTypeSuiSystemState:
+		if valueSystemState, ok := value.(SuiSystemState); ok {
+			metrics.SystemState = valueSystemState
+			metrics.TimeTillNextEpochMs = metrics.GetTimeTillNextEpoch()
+		}
+	case enums.MetricTypeTotalTransactions:
+		valueInt := value.(int)
+
+		metrics.TotalTransactions = valueInt
+
+		metrics.CalculateTPS()
+	case enums.MetricTypeTotalTransactionCertificates:
+		valueFloat := value.(float64)
+
+		metrics.TotalTransactionCertificates = convFToI(valueFloat)
+	case enums.MetricTypeTotalTransactionEffects:
+		valueFloat := value.(float64)
+
+		metrics.TotalTransactionEffects = convFToI(valueFloat)
+	case enums.MetricTypeLatestCheckpoint:
+		valueInt := value.(int)
+
+		metrics.LatestCheckpoint = valueInt
+	case enums.MetricTypeHighestKnownCheckpoint:
+		valueFloat := value.(float64)
+
+		metrics.HighestKnownCheckpoint = convFToI(valueFloat)
+	case enums.MetricTypeHighestSyncedCheckpoint:
+		valueFloat := value.(float64)
+
+		metrics.HighestSyncedCheckpoint = convFToI(valueFloat)
+
+		metrics.CalculateCPS()
+	case enums.MetricTypeCurrentEpoch:
+		valueFloat := value.(float64)
+
+		metrics.CurrentEpoch = convFToI(valueFloat)
+	case enums.MetricTypeEpochTotalDuration:
+		valueFloat := value.(float64)
+
+		metrics.EpochTotalDuration = convFToI(valueFloat)
+	case enums.MetricTypeSuiNetworkPeers:
+		valueFloat := value.(float64)
+
+		metrics.NetworkPeers = convFToI(valueFloat)
+	case enums.MetricTypeUptime:
+		valueFloat := value.(float64)
+
+		metrics.Uptime = fmt.Sprintf("%.2f", valueFloat)
 	case enums.MetricTypeVersion:
 		valueString := value.(string)
 
-		metrics.Version = strings.Trim(valueString, "\"")
+		metrics.Version = valueString
 	case enums.MetricTypeCommit:
 		valueString := value.(string)
 
-		metrics.Commit = strings.Trim(valueString, "\"")
-	case enums.MetricTypeHighestSyncedCheckpoint:
-		var (
-			valueString = value.(string)
-			valueInt    int
-			err         error
-		)
+		metrics.Commit = valueString
+	case enums.MetricTypeCurrentRound:
+		valueFloat := value.(float64)
 
-		if valueInt, err = strconv.Atoi(valueString); err != nil {
-			return
-		}
+		metrics.CurrentRound = convFToI(valueFloat)
+	case enums.MetricTypeHighestProcessedRound:
+		valueFloat := value.(float64)
 
-		metrics.HighestSyncedCheckpoint = valueInt
+		metrics.HighestProcessedRound = convFToI(valueFloat)
+	case enums.MetricTypeLastCommittedRound:
+		valueFloat := value.(float64)
 
-		metrics.CalculateCPS()
-	case enums.MetricTypeSuiNetworkPeers:
-		var (
-			valueString = value.(string)
-			valueInt    int
-			err         error
-		)
+		metrics.LastCommittedRound = convFToI(valueFloat)
+	case enums.MetricTypePrimaryNetworkPeers:
+		valueFloat := value.(float64)
 
-		if valueInt, err = strconv.Atoi(valueString); err != nil {
-			return
-		}
+		metrics.PrimaryNetworkPeers = convFToI(valueFloat)
+	case enums.MetricTypeWorkerNetworkPeers:
+		valueFloat := value.(float64)
 
-		metrics.SuiNetworkPeers = valueInt
-	case enums.MetricTypeTotalTransactionsNumber:
-		valueInt := value.(int)
+		metrics.WorkerNetworkPeers = convFToI(valueFloat)
+	case enums.MetricTypeSkippedConsensusTransactions:
+		valueFloat := value.(float64)
 
-		metrics.TotalTransactionNumber = valueInt
+		metrics.SkippedConsensusTransactions = convFToI(valueFloat)
+	case enums.MetricTypeTotalSignatureErrors:
+		valueFloat := value.(float64)
 
-		metrics.CalculateTPS()
+		metrics.TotalSignatureErrors = convFToI(valueFloat)
 	case enums.MetricTypeTxSyncProgress:
 		valueInt := value.(int)
 
@@ -214,15 +271,6 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 		valueInt := value.(int)
 
 		metrics.CheckSyncPercentage = valueInt
-	case enums.MetricTypeLatestCheckpoint:
-		valueInt := value.(int)
-
-		metrics.LatestCheckpoint = valueInt
-	case enums.MetricTypeSuiSystemState:
-		if valueSystemState, ok := value.(SuiSystemState); ok {
-			metrics.SystemState = valueSystemState
-			metrics.TimeTillNextEpochMs = metrics.GetTimeTillNextEpoch()
-		}
 	}
 }
 
@@ -242,15 +290,15 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
 	case enums.MetricTypeHighestSyncedCheckpoint:
 		return metrics.HighestSyncedCheckpoint
 	case enums.MetricTypeSuiNetworkPeers:
-		return metrics.SuiNetworkPeers
-	case enums.MetricTypeTotalTransactionsNumber:
-		return metrics.TotalTransactionNumber
+		return metrics.NetworkPeers
+	case enums.MetricTypeTotalTransactions:
+		return metrics.TotalTransactions
 	case enums.MetricTypeTransactionsPerSecond:
 		return metrics.TransactionsPerSecond
 	case enums.MetricTypeCheckpointsPerSecond:
 		return metrics.CheckpointsPerSecond
 	case enums.MetricTypeTxSyncProgress:
-		return metrics.TotalTransactionNumber
+		return metrics.TotalTransactions
 	case enums.MetricTypeCheckSyncProgress:
 		if rpc {
 			return metrics.LatestCheckpoint
@@ -276,7 +324,7 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
 //   - a boolean value indicating whether the metric is healthy or not.
 func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC any) bool {
 	switch metric {
-	case enums.MetricTypeTotalTransactionsNumber:
+	case enums.MetricTypeTotalTransactions:
 		return metrics.TxSyncPercentage >= totalTransactionsSyncPercentage
 	case enums.MetricTypeTransactionsPerSecond:
 		valueRPCInt := valueRPC.(int)

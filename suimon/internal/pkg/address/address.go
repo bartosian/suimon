@@ -2,12 +2,13 @@ package address
 
 import (
 	"fmt"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/validation"
 	"net"
 	"net/url"
 	"strings"
 
 	externalIP "github.com/glendc/go-external-ip"
+
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/validation"
 )
 
 type HostPort struct {
@@ -88,16 +89,15 @@ func ParseURL(address string) (*HostPort, error) {
 		return nil, err
 	}
 
-	hostPort := &HostPort{
-		Address: address,
-	}
-
-	hostName, port, path := u.Hostname(), u.Port(), u.Path
+	scheme, hostName, port, path := u.Scheme, u.Hostname(), u.Port(), u.Path
 	if hostName == "" {
 		return nil, fmt.Errorf("invalid url provided: %s", address)
 	}
 
-	hostPort.Host = &hostName
+	hostPort := &HostPort{
+		Address: fmt.Sprintf("%s://%s%s", scheme, hostName, path),
+		Host:    &hostName,
+	}
 
 	if port != "" {
 		if validation.IsInvalidPort(port) {

@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	DashboardConfigSUI = []container.Option{
+	DashboardConfigNode = []container.Option{
 		container.Border(linestyle.Light),
 		container.BorderColor(cell.ColorGreen),
 		container.FocusedColor(cell.ColorGreen),

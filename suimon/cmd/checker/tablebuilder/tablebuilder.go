@@ -85,7 +85,7 @@ func (tb *TableBuilder) SetRows() {
 	footer[0] = fmt.Sprintf("%s%s%s", enums.ColorRed, tb.config.Tag, enums.ColorReset)
 
 	for i := 0; i < tb.config.RowsCount; i++ {
-		rowValues := make([]any, 0, len(tables.ColumnConfigSUI))
+		rowValues := make([]any, 0, len(tables.ColumnConfigNode))
 
 		for _, column := range tb.config.Columns {
 			rowValues = append(rowValues, column.Values[i])

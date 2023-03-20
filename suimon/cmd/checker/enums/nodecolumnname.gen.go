@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _NodeColumnNameName = "COLUMN_NAME_STATUSCOLUMN_NAME_ADDRESSCOLUMN_NAME_PORT_RPCCOLUMN_NAME_TOTAL_TRANSACTIONSCOLUMN_NAME_LATEST_CHECKPOINTCOLUMN_NAME_HIGHEST_CHECKPOINTCOLUMN_NAME_TX_SYNC_PROGRESSCOLUMN_NAME_CHECK_SYNC_PROGRESSCOLUMN_NAME_CONNECTED_PEERSCOLUMN_NAME_UPTIMECOLUMN_NAME_VERSIONCOLUMN_NAME_COMMITCOLUMN_NAME_COMPANYCOLUMN_NAME_COUNTRY"
+const _NodeColumnNameName = "COLUMN_NAME_HEALTHCOLUMN_NAME_ADDRESSCOLUMN_NAME_PORT_RPCCOLUMN_NAME_TOTAL_TRANSACTIONSCOLUMN_NAME_TOTAL_TRANSACTION_CERTIFICATESCOLUMN_NAME_TOTAL_TRANSACTION_EFFECTSCOLUMN_NAME_LATEST_CHECKPOINTCOLUMN_NAME_HIGHEST_KNOWN_CHECKPOINTCOLUMN_NAME_HIGHEST_SYNCED_CHECKPOINTCOLUMN_NAME_CURRENT_EPOCHCOLUMN_NAME_TX_SYNC_PROGRESSCOLUMN_NAME_CHECK_SYNC_PROGRESSCOLUMN_NAME_NETWORK_PEERSCOLUMN_NAME_UPTIMECOLUMN_NAME_VERSIONCOLUMN_NAME_COMMITCOLUMN_NAME_COMPANYCOLUMN_NAME_COUNTRY"
 
-var _NodeColumnNameIndex = [...]uint16{0, 18, 37, 57, 87, 116, 146, 174, 205, 232, 250, 269, 287, 306, 325}
+var _NodeColumnNameIndex = [...]uint16{0, 18, 37, 57, 87, 129, 166, 195, 231, 268, 293, 321, 352, 377, 395, 414, 432, 451, 470}
 
-const _NodeColumnNameLowerName = "column_name_statuscolumn_name_addresscolumn_name_port_rpccolumn_name_total_transactionscolumn_name_latest_checkpointcolumn_name_highest_checkpointcolumn_name_tx_sync_progresscolumn_name_check_sync_progresscolumn_name_connected_peerscolumn_name_uptimecolumn_name_versioncolumn_name_commitcolumn_name_companycolumn_name_country"
+const _NodeColumnNameLowerName = "column_name_healthcolumn_name_addresscolumn_name_port_rpccolumn_name_total_transactionscolumn_name_total_transaction_certificatescolumn_name_total_transaction_effectscolumn_name_latest_checkpointcolumn_name_highest_known_checkpointcolumn_name_highest_synced_checkpointcolumn_name_current_epochcolumn_name_tx_sync_progresscolumn_name_check_sync_progresscolumn_name_network_peerscolumn_name_uptimecolumn_name_versioncolumn_name_commitcolumn_name_companycolumn_name_country"
 
 func (i NodeColumnName) String() string {
 	if i < 0 || i >= NodeColumnName(len(_NodeColumnNameIndex)-1) {
@@ -25,53 +25,65 @@ func (i NodeColumnName) String() string {
 // Re-run the stringer command to generate them again.
 func _NodeColumnNameNoOp() {
 	var x [1]struct{}
-	_ = x[ColumnNameStatus-(0)]
+	_ = x[ColumnNameHealth-(0)]
 	_ = x[ColumnNameAddress-(1)]
 	_ = x[ColumnNamePortRPC-(2)]
 	_ = x[ColumnNameTotalTransactions-(3)]
-	_ = x[ColumnNameLatestCheckpoint-(4)]
-	_ = x[ColumnNameHighestCheckpoint-(5)]
-	_ = x[ColumnNameTXSyncProgress-(6)]
-	_ = x[ColumnNameCheckSyncProgress-(7)]
-	_ = x[ColumnNameConnectedPeers-(8)]
-	_ = x[ColumnNameUptime-(9)]
-	_ = x[ColumnNameVersion-(10)]
-	_ = x[ColumnNameCommit-(11)]
-	_ = x[ColumnNameCompany-(12)]
-	_ = x[ColumnNameCountry-(13)]
+	_ = x[ColumnNameTotalTransactionCertificates-(4)]
+	_ = x[ColumnNameTotalTransactionEffects-(5)]
+	_ = x[ColumnNameLatestCheckpoint-(6)]
+	_ = x[ColumnNameHighestKnownCheckpoint-(7)]
+	_ = x[ColumnNameHighestSyncedCheckpoint-(8)]
+	_ = x[ColumnNameCurrentEpoch-(9)]
+	_ = x[ColumnNameTXSyncProgress-(10)]
+	_ = x[ColumnNameCheckSyncProgress-(11)]
+	_ = x[ColumnNameNetworkPeers-(12)]
+	_ = x[ColumnNameUptime-(13)]
+	_ = x[ColumnNameVersion-(14)]
+	_ = x[ColumnNameCommit-(15)]
+	_ = x[ColumnNameCompany-(16)]
+	_ = x[ColumnNameCountry-(17)]
 }
 
-var _NodeColumnNameValues = []NodeColumnName{ColumnNameStatus, ColumnNameAddress, ColumnNamePortRPC, ColumnNameTotalTransactions, ColumnNameLatestCheckpoint, ColumnNameHighestCheckpoint, ColumnNameTXSyncProgress, ColumnNameCheckSyncProgress, ColumnNameConnectedPeers, ColumnNameUptime, ColumnNameVersion, ColumnNameCommit, ColumnNameCompany, ColumnNameCountry}
+var _NodeColumnNameValues = []NodeColumnName{ColumnNameHealth, ColumnNameAddress, ColumnNamePortRPC, ColumnNameTotalTransactions, ColumnNameTotalTransactionCertificates, ColumnNameTotalTransactionEffects, ColumnNameLatestCheckpoint, ColumnNameHighestKnownCheckpoint, ColumnNameHighestSyncedCheckpoint, ColumnNameCurrentEpoch, ColumnNameTXSyncProgress, ColumnNameCheckSyncProgress, ColumnNameNetworkPeers, ColumnNameUptime, ColumnNameVersion, ColumnNameCommit, ColumnNameCompany, ColumnNameCountry}
 
 var _NodeColumnNameNameToValueMap = map[string]NodeColumnName{
-	_NodeColumnNameName[0:18]:         ColumnNameStatus,
-	_NodeColumnNameLowerName[0:18]:    ColumnNameStatus,
+	_NodeColumnNameName[0:18]:         ColumnNameHealth,
+	_NodeColumnNameLowerName[0:18]:    ColumnNameHealth,
 	_NodeColumnNameName[18:37]:        ColumnNameAddress,
 	_NodeColumnNameLowerName[18:37]:   ColumnNameAddress,
 	_NodeColumnNameName[37:57]:        ColumnNamePortRPC,
 	_NodeColumnNameLowerName[37:57]:   ColumnNamePortRPC,
 	_NodeColumnNameName[57:87]:        ColumnNameTotalTransactions,
 	_NodeColumnNameLowerName[57:87]:   ColumnNameTotalTransactions,
-	_NodeColumnNameName[87:116]:       ColumnNameLatestCheckpoint,
-	_NodeColumnNameLowerName[87:116]:  ColumnNameLatestCheckpoint,
-	_NodeColumnNameName[116:146]:      ColumnNameHighestCheckpoint,
-	_NodeColumnNameLowerName[116:146]: ColumnNameHighestCheckpoint,
-	_NodeColumnNameName[146:174]:      ColumnNameTXSyncProgress,
-	_NodeColumnNameLowerName[146:174]: ColumnNameTXSyncProgress,
-	_NodeColumnNameName[174:205]:      ColumnNameCheckSyncProgress,
-	_NodeColumnNameLowerName[174:205]: ColumnNameCheckSyncProgress,
-	_NodeColumnNameName[205:232]:      ColumnNameConnectedPeers,
-	_NodeColumnNameLowerName[205:232]: ColumnNameConnectedPeers,
-	_NodeColumnNameName[232:250]:      ColumnNameUptime,
-	_NodeColumnNameLowerName[232:250]: ColumnNameUptime,
-	_NodeColumnNameName[250:269]:      ColumnNameVersion,
-	_NodeColumnNameLowerName[250:269]: ColumnNameVersion,
-	_NodeColumnNameName[269:287]:      ColumnNameCommit,
-	_NodeColumnNameLowerName[269:287]: ColumnNameCommit,
-	_NodeColumnNameName[287:306]:      ColumnNameCompany,
-	_NodeColumnNameLowerName[287:306]: ColumnNameCompany,
-	_NodeColumnNameName[306:325]:      ColumnNameCountry,
-	_NodeColumnNameLowerName[306:325]: ColumnNameCountry,
+	_NodeColumnNameName[87:129]:       ColumnNameTotalTransactionCertificates,
+	_NodeColumnNameLowerName[87:129]:  ColumnNameTotalTransactionCertificates,
+	_NodeColumnNameName[129:166]:      ColumnNameTotalTransactionEffects,
+	_NodeColumnNameLowerName[129:166]: ColumnNameTotalTransactionEffects,
+	_NodeColumnNameName[166:195]:      ColumnNameLatestCheckpoint,
+	_NodeColumnNameLowerName[166:195]: ColumnNameLatestCheckpoint,
+	_NodeColumnNameName[195:231]:      ColumnNameHighestKnownCheckpoint,
+	_NodeColumnNameLowerName[195:231]: ColumnNameHighestKnownCheckpoint,
+	_NodeColumnNameName[231:268]:      ColumnNameHighestSyncedCheckpoint,
+	_NodeColumnNameLowerName[231:268]: ColumnNameHighestSyncedCheckpoint,
+	_NodeColumnNameName[268:293]:      ColumnNameCurrentEpoch,
+	_NodeColumnNameLowerName[268:293]: ColumnNameCurrentEpoch,
+	_NodeColumnNameName[293:321]:      ColumnNameTXSyncProgress,
+	_NodeColumnNameLowerName[293:321]: ColumnNameTXSyncProgress,
+	_NodeColumnNameName[321:352]:      ColumnNameCheckSyncProgress,
+	_NodeColumnNameLowerName[321:352]: ColumnNameCheckSyncProgress,
+	_NodeColumnNameName[352:377]:      ColumnNameNetworkPeers,
+	_NodeColumnNameLowerName[352:377]: ColumnNameNetworkPeers,
+	_NodeColumnNameName[377:395]:      ColumnNameUptime,
+	_NodeColumnNameLowerName[377:395]: ColumnNameUptime,
+	_NodeColumnNameName[395:414]:      ColumnNameVersion,
+	_NodeColumnNameLowerName[395:414]: ColumnNameVersion,
+	_NodeColumnNameName[414:432]:      ColumnNameCommit,
+	_NodeColumnNameLowerName[414:432]: ColumnNameCommit,
+	_NodeColumnNameName[432:451]:      ColumnNameCompany,
+	_NodeColumnNameLowerName[432:451]: ColumnNameCompany,
+	_NodeColumnNameName[451:470]:      ColumnNameCountry,
+	_NodeColumnNameLowerName[451:470]: ColumnNameCountry,
 }
 
 var _NodeColumnNameNames = []string{
@@ -79,16 +91,20 @@ var _NodeColumnNameNames = []string{
 	_NodeColumnNameName[18:37],
 	_NodeColumnNameName[37:57],
 	_NodeColumnNameName[57:87],
-	_NodeColumnNameName[87:116],
-	_NodeColumnNameName[116:146],
-	_NodeColumnNameName[146:174],
-	_NodeColumnNameName[174:205],
-	_NodeColumnNameName[205:232],
-	_NodeColumnNameName[232:250],
-	_NodeColumnNameName[250:269],
-	_NodeColumnNameName[269:287],
-	_NodeColumnNameName[287:306],
-	_NodeColumnNameName[306:325],
+	_NodeColumnNameName[87:129],
+	_NodeColumnNameName[129:166],
+	_NodeColumnNameName[166:195],
+	_NodeColumnNameName[195:231],
+	_NodeColumnNameName[231:268],
+	_NodeColumnNameName[268:293],
+	_NodeColumnNameName[293:321],
+	_NodeColumnNameName[321:352],
+	_NodeColumnNameName[352:377],
+	_NodeColumnNameName[377:395],
+	_NodeColumnNameName[395:414],
+	_NodeColumnNameName[414:432],
+	_NodeColumnNameName[432:451],
+	_NodeColumnNameName[451:470],
 }
 
 // NodeColumnNameString retrieves an enum value from the enum constants string name.

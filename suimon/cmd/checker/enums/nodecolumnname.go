@@ -4,15 +4,19 @@ package enums
 type NodeColumnName int
 
 const (
-	ColumnNameStatus NodeColumnName = iota
+	ColumnNameHealth NodeColumnName = iota
 	ColumnNameAddress
 	ColumnNamePortRPC
 	ColumnNameTotalTransactions
+	ColumnNameTotalTransactionCertificates
+	ColumnNameTotalTransactionEffects
 	ColumnNameLatestCheckpoint
-	ColumnNameHighestCheckpoint
+	ColumnNameHighestKnownCheckpoint
+	ColumnNameHighestSyncedCheckpoint
+	ColumnNameCurrentEpoch
 	ColumnNameTXSyncProgress
 	ColumnNameCheckSyncProgress
-	ColumnNameConnectedPeers
+	ColumnNameNetworkPeers
 	ColumnNameUptime
 	ColumnNameVersion
 	ColumnNameCommit

@@ -1,8 +1,6 @@
 package checker
 
 import (
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/address"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 	"net/http"
 	"regexp"
 	"time"
@@ -12,6 +10,8 @@ import (
 	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/address"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 type requestType int
@@ -97,8 +97,8 @@ func (host *Host) SetStatus(rpc Host) {
 	metricsHost := host.Metrics
 	metricsRPC := rpc.Metrics
 
-	if !metricsHost.Updated || metricsHost.TotalTransactionNumber == 0 || metricsHost.LatestCheckpoint == 0 ||
-		metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == transactionsPerSecondTimeout ||
+	if !metricsHost.Updated || metricsHost.TotalTransactions == 0 || metricsHost.LatestCheckpoint == 0 ||
+		metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == transactionsPerSecondWindow ||
 		metricsHost.TxSyncPercentage == 0 {
 
 		host.Status = enums.StatusRed
@@ -107,7 +107,7 @@ func (host *Host) SetStatus(rpc Host) {
 	}
 
 	if metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) ||
-		metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionsNumber, metricsRPC.TotalTransactionNumber) ||
+		metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactions, metricsRPC.TotalTransactions) ||
 		metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
 		host.Status = enums.StatusYellow
 

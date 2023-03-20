@@ -2,7 +2,6 @@ package checker
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -72,13 +71,13 @@ var prometheusMetrics = map[enums.PrometheusMetricName]metricsparser.MetricConfi
 	},
 }
 
-// GetMetrics returns a "Metrics" object representing the current state of network checks for the "Host" object
+// GetPrometheusMetrics returns a "Metrics" object representing the current state of network checks for the "Host" object
 // passed as a pointer receiver. This object contains the results of each metric check performed on the host,
 // including the number of successful checks, the total number of checks performed, and the percentage progress
 // for each metric.
 // Parameters: None.
 // Returns: - a "Metrics" object representing the current state of network checks for the "Host" object.
-func (host *Host) GetMetrics() {
+func (host *Host) GetPrometheusMetrics() {
 	metricsURL := host.getUrl(requestTypeMetrics, false)
 	parser := metricsparser.NewPrometheusMetricParser(host.httpClient, metricsURL, prometheusMetrics)
 
@@ -87,65 +86,51 @@ func (host *Host) GetMetrics() {
 		return
 	}
 
-	fmt.Printf("%+v\n", result)
-}
+	for metricName, metricValue := range result {
+		switch metricName {
+		case enums.PrometheusMetricNameTotalTransactionCertificates:
+			host.Metrics.SetValue(enums.MetricTypeTotalTransactionCertificates, metricValue.Value)
+		case enums.PrometheusMetricNameTotalTransactionEffects:
+			host.Metrics.SetValue(enums.MetricTypeTotalTransactionEffects, metricValue.Value)
+		case enums.PrometheusMetricNameHighestKnownCheckpoint:
+			host.Metrics.SetValue(enums.MetricTypeHighestKnownCheckpoint, metricValue.Value)
+		case enums.PrometheusMetricNameHighestSyncedCheckpoint:
+			host.Metrics.SetValue(enums.MetricTypeHighestSyncedCheckpoint, metricValue.Value)
+		case enums.PrometheusMetricNameCurrentEpoch:
+			host.Metrics.SetValue(enums.MetricTypeCurrentEpoch, metricValue.Value)
+		case enums.PrometheusMetricNameEpochTotalDuration:
+			host.Metrics.SetValue(enums.MetricTypeEpochTotalDuration, metricValue.Value)
+		case enums.PrometheusMetricNameCurrentRound:
+			host.Metrics.SetValue(enums.MetricTypeCurrentRound, metricValue.Value)
+		case enums.PrometheusMetricNameHighestProcessedRound:
+			host.Metrics.SetValue(enums.MetricTypeHighestProcessedRound, metricValue.Value)
+		case enums.PrometheusMetricNameLastCommittedRound:
+			host.Metrics.SetValue(enums.MetricTypeLastCommittedRound, metricValue.Value)
+		case enums.PrometheusMetricNamePrimaryNetworkPeers:
+			host.Metrics.SetValue(enums.MetricTypePrimaryNetworkPeers, metricValue.Value)
+		case enums.PrometheusMetricNameWorkerNetworkPeers:
+			host.Metrics.SetValue(enums.MetricTypeWorkerNetworkPeers, metricValue.Value)
+		case enums.PrometheusMetricNameSuiNetworkPeers:
+			host.Metrics.SetValue(enums.MetricTypeSuiNetworkPeers, metricValue.Value)
+		case enums.PrometheusMetricNameSkippedConsensusTransactions:
+			host.Metrics.SetValue(enums.MetricTypeSkippedConsensusTransactions, metricValue.Value)
+		case enums.PrometheusMetricNameTotalSignatureErrors:
+			host.Metrics.SetValue(enums.MetricTypeTotalSignatureErrors, metricValue.Value)
+		case enums.PrometheusMetricNameUptime:
+			host.Metrics.SetValue(enums.MetricTypeUptime, metricValue.Value)
 
-//func (host *Host) GetMetrics() {
-//	metricsURL := host.getUrl(requestTypeMetrics, false)
-//
-//	result, err := host.httpClient.Get(metricsURL)
-//	if err != nil {
-//		return
-//	}
-//
-//	defer result.Body.Close()
-//
-//	reader := bufio.NewReader(result.Body)
-//	for {
-//		line, err := reader.ReadString('\n')
-//		if len(line) == 0 && err != nil {
-//			break
-//		}
-//
-//		if strings.HasPrefix(line, "#") {
-//			continue
-//		}
-//
-//		metric := strings.Split(line, " ")
-//		if len(metric) != 2 {
-//			continue
-//		}
-//
-//		key, value := strings.TrimSpace(metric[0]), strings.TrimSpace(metric[1])
-//
-//		metricName, err := enums.MetricTypeFromString(key)
-//		if err != nil {
-//			continue
-//		}
-//
-//		if metricName == enums.MetricTypeUptime {
-//			versionMetric := versionRegex.FindStringSubmatch(key)
-//			version := strings.Split(versionMetric[1], "=")
-//
-//			uptimeSeconds, err := strconv.Atoi(value)
-//			if err != nil {
-//				continue
-//			}
-//
-//			value = fmt.Sprintf("%.1f days", float64(uptimeSeconds)/(60*60*24))
-//
-//			versionInfo := strings.Split(version[1], "-")
-//			if len(versionInfo) != 2 {
-//				continue
-//			}
-//
-//			host.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0])
-//			host.Metrics.SetValue(enums.MetricTypeCommit, versionInfo[1])
-//		}
-//
-//		host.Metrics.SetValue(metricName, value)
-//	}
-//}
+			if value, ok := metricValue.Labels["version"]; ok {
+				versionInfo := strings.Split(value, "-")
+
+				host.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0])
+
+				if len(versionInfo) == 2 {
+					host.Metrics.SetValue(enums.MetricTypeCommit, versionInfo[1])
+				}
+			}
+		}
+	}
+}
 
 // GetTotalTransactionNumber returns the total number of transactions performed on the "Host" object passed
 // as a pointer receiver. This method retrieves the "Metrics" object for the host and calculates the total
@@ -161,7 +146,7 @@ func (host *Host) GetTotalTransactionNumber() {
 		}
 	}
 
-	host.Metrics.SetValue(enums.MetricTypeTotalTransactionsNumber, result)
+	host.Metrics.SetValue(enums.MetricTypeTotalTransactions, result)
 }
 
 // GetLatestCheckpoint returns a "Checkpoint" object representing the most recent checkpoint for the "Host"
@@ -271,7 +256,7 @@ func (host *Host) GetData() {
 	}()
 
 	go func() {
-		host.GetMetrics()
+		host.GetPrometheusMetrics()
 
 		doneCH <- struct{}{}
 	}()
@@ -346,7 +331,7 @@ func (checker *Checker) getMetricForDashboardCell(cellName enums.CellName) any {
 	case enums.CellNameNetworkStatus:
 		return rpc.Status.DashboardStatus()
 	case enums.CellNameTransactionsPerSecond:
-		if len(node.Metrics.TransactionsHistory) < transactionsPerSecondTimeout {
+		if len(node.Metrics.TransactionsHistory) < transactionsPerSecondWindow {
 			return dashboards.DashboardLoadingBlinkValue()
 		}
 
@@ -354,7 +339,7 @@ func (checker *Checker) getMetricForDashboardCell(cellName enums.CellName) any {
 	case enums.CellNameTPSTracker:
 		return node.Metrics.TransactionsPerSecond
 	case enums.CellNameCheckpointsPerSecond:
-		if len(node.Metrics.CheckpointsHistory) < checkpointsPerSecondTimeout {
+		if len(node.Metrics.CheckpointsHistory) < checkpointsPerSecondWindow {
 			return dashboards.DashboardLoadingBlinkValue()
 		}
 
@@ -362,13 +347,13 @@ func (checker *Checker) getMetricForDashboardCell(cellName enums.CellName) any {
 	case enums.CellNameCPSTracker:
 		return node.Metrics.CheckpointsPerSecond
 	case enums.CellNameTotalTransactions:
-		return node.Metrics.TotalTransactionNumber
+		return node.Metrics.TotalTransactions
 	case enums.CellNameLatestCheckpoint:
 		return node.Metrics.LatestCheckpoint
 	case enums.CellNameHighestCheckpoint:
 		return node.Metrics.HighestSyncedCheckpoint
 	case enums.CellNameConnectedPeers:
-		return node.Metrics.SuiNetworkPeers
+		return node.Metrics.NetworkPeers
 	case enums.CellNameTXSyncProgress:
 		return node.Metrics.TxSyncPercentage
 	case enums.CellNameCheckSyncProgress:
@@ -458,9 +443,9 @@ func (checker *Checker) getOptionsForDashboardCell(cellName enums.CellName) any 
 		options = append(options, cell.BgColor(color), cell.FgColor(color))
 	case enums.CellNameTotalTransactions:
 		var (
-			transactionsNode     = node.Metrics.TotalTransactionNumber
+			transactionsNode     = node.Metrics.TotalTransactions
 			txSyncPercentageNode = node.Metrics.TxSyncPercentage
-			transactionsRpc      = rpc.Metrics.TotalTransactionNumber
+			transactionsRpc      = rpc.Metrics.TotalTransactions
 			color                = cell.ColorWhite
 		)
 
@@ -512,7 +497,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName enums.CellName) any 
 		)
 
 		switch {
-		case len(txHistoryNode) != transactionsPerSecondTimeout:
+		case len(txHistoryNode) != transactionsPerSecondWindow:
 		case tpsNode == 0:
 			color = cell.ColorRed
 		case tpsNode < tpsRpc-transactionsPerSecondLag:
@@ -529,7 +514,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName enums.CellName) any 
 		)
 
 		switch {
-		case len(checkHistoryNode) != checkpointsPerSecondTimeout:
+		case len(checkHistoryNode) != checkpointsPerSecondWindow:
 		case checkNode == 0:
 			color = cell.ColorRed
 		case checkNode < checkRpc-checkpointsPerSecondLag:
@@ -586,7 +571,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName enums.CellName) any 
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color)), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorGreen))}
 	case enums.CellNameConnectedPeers:
 		var (
-			peers = node.Metrics.SuiNetworkPeers
+			peers = node.Metrics.NetworkPeers
 			color = cell.ColorWhite
 		)
 
