@@ -22,7 +22,7 @@ var (
 		},
 		enums.SystemColumnNameReferenceGasPrice: {
 			Name:         "REFERENCE GAS\nPRICE",
-			Align:        text.AlignLeft,
+			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
@@ -37,7 +37,7 @@ var (
 			Hidden:       false,
 		},
 		enums.SystemColumnNameStakeSubsidyCounter: {
-			Name:         "STAKE SUBSIDY COUNTER",
+			Name:         "STAKE SUBSIDY\nCOUNTER",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -62,6 +62,22 @@ var (
 		},
 		enums.SystemColumnNameTotalStake: {
 			Name:         "TOTAL STAKE",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.SystemColumnNameValidatorsCount: {
+			Name:         "VALIDATORS\nCOUNT",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.SystemColumnNameValidatorsAtRiskCount: {
+			Name:         "VALIDATORS AT RISK\nCOUNT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,

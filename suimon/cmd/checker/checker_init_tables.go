@@ -252,7 +252,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 
 		tableConfig = tablebuilder.TableConfig{
-			Name:       tables.GetTableTitle(networkType, enums.TableTypeRPC, enabledEmojis),
+			Name:       tables.GetTableTitle(networkType, enums.TableTypeSystemState, enabledEmojis),
 			Colors:     tablebuilder.GetTableColorsFromString(colorScheme),
 			Tag:        tables.TableTagSystem,
 			Style:      tables.TableStyleSystem,
@@ -268,25 +268,17 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 
 			tableConfig.RowsCount++
 
-			var (
-				status  any = host.Status
-				port        = host.Ports[enums.PortTypeRPC]
-				address     = host.HostPort.Address
-			)
+			systemState := host.Metrics.SystemState
 
-			if !enabledEmojis {
-				status = host.Status.StatusToPlaceholder()
-			}
-
-			if port == "" {
-				port = rpcPortDefault
-			}
-
-			columns[enums.NodeColumnNameHealth].SetValue(status)
-			columns[enums.NodeColumnNameAddress].SetValue(address)
-			columns[enums.NodeColumnNamePortRPC].SetValue(port)
-			columns[enums.NodeColumnNameTotalTransactions].SetValue(host.Metrics.TotalTransactions)
-			columns[enums.NodeColumnNameLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
+			columns[enums.SystemColumnNameStorageFund].SetValue(systemState.StorageFund)
+			columns[enums.SystemColumnNameReferenceGasPrice].SetValue(systemState.ReferenceGasPrice)
+			columns[enums.SystemColumnNameEpochDurationMs].SetValue(systemState.EpochDurationMs)
+			columns[enums.SystemColumnNameStakeSubsidyCounter].SetValue(systemState.StakeSubsidyEpochCounter)
+			columns[enums.SystemColumnNameStakeSubsidyBalance].SetValue(systemState.StakeSubsidyBalance)
+			columns[enums.SystemColumnNameStakeSubsidyCurrentEpochAmount].SetValue(systemState.StakeSubsidyCurrentEpochAmount)
+			columns[enums.SystemColumnNameTotalStake].SetValue(systemState.TotalStake)
+			columns[enums.SystemColumnNameValidatorsCount].SetValue(len(systemState.ActiveValidators))
+			columns[enums.SystemColumnNameValidatorsAtRiskCount].SetValue(len(systemState.AtRiskValidators))
 		}
 	}
 

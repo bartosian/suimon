@@ -32,10 +32,11 @@ type (
 		httpClient *http.Client
 		ipClient   *ipinfo.Client
 
-		tableBuilderPeer *tablebuilder.TableBuilder
-		tableBuilderNode *tablebuilder.TableBuilder
-		tableBuilderRPC  *tablebuilder.TableBuilder
-		tableConfig      tablebuilder.TableConfig
+		tableBuilderPeer   *tablebuilder.TableBuilder
+		tableBuilderNode   *tablebuilder.TableBuilder
+		tableBuilderRPC    *tablebuilder.TableBuilder
+		tableBuilderSystem *tablebuilder.TableBuilder
+		tableConfig        tablebuilder.TableConfig
 
 		DashboardBuilder *dashboardbuilder.DashboardBuilder
 
@@ -74,7 +75,7 @@ func (checker *Checker) getHostsByTableType(tableType enums.TableType) []Host {
 	var hosts []Host
 
 	switch tableType {
-	case enums.TableTypeNode:
+	case enums.TableTypeNode, enums.TableTypeValidators:
 		hosts = checker.node
 	case enums.TableTypePeers:
 		hosts = checker.peers
@@ -116,6 +117,8 @@ func (checker *Checker) setBuilderTableType(tableType enums.TableType, tableConf
 		checker.tableBuilderPeer = tableBuilder
 	case enums.TableTypeRPC:
 		checker.tableBuilderRPC = tableBuilder
+	case enums.TableTypeValidators:
+		checker.tableBuilderSystem = tableBuilder
 	}
 }
 
@@ -125,6 +128,10 @@ func (checker *Checker) setBuilderTableType(tableType enums.TableType, tableConf
 func (checker *Checker) DrawTables() {
 	if checker.suimonConfig.MonitorsConfig.RPCTable.Display && len(checker.rpc) > 0 {
 		checker.tableBuilderRPC.Build()
+	}
+
+	if checker.suimonConfig.MonitorsConfig.ValidatorsTable.Display && len(checker.node) > 0 {
+		checker.tableBuilderSystem.Build()
 	}
 
 	if checker.suimonConfig.MonitorsConfig.NodeTable.Display && len(checker.node) > 0 {

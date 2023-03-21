@@ -11,4 +11,6 @@ const (
 	SystemColumnNameStakeSubsidyBalance
 	SystemColumnNameStakeSubsidyCurrentEpochAmount
 	SystemColumnNameTotalStake
+	SystemColumnNameValidatorsCount
+	SystemColumnNameValidatorsAtRiskCount
 )
