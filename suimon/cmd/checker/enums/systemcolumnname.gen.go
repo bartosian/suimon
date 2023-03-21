@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _SystemColumnNameName = "SYSTEM_COLUMN_NAME_STORAGE_FUNDSYSTEM_COLUMN_NAME_REFERENCE_GAS_PRICESYSTEM_COLUMN_NAME_EPOCH_DURATION_MSSYSTEM_COLUMN_NAME_STAKE_SUBSIDY_COUNTERSYSTEM_COLUMN_NAME_STAKE_SUBSIDY_BALANCESYSTEM_COLUMN_NAME_STAKE_SUBSIDY_CURRENT_EPOCH_AMOUNTSYSTEM_COLUMN_NAME_TOTAL_STAKE"
+const _SystemColumnNameName = "SYSTEM_COLUMN_NAME_STORAGE_FUNDSYSTEM_COLUMN_NAME_REFERENCE_GAS_PRICESYSTEM_COLUMN_NAME_EPOCH_DURATION_MSSYSTEM_COLUMN_NAME_STAKE_SUBSIDY_COUNTERSYSTEM_COLUMN_NAME_STAKE_SUBSIDY_BALANCESYSTEM_COLUMN_NAME_STAKE_SUBSIDY_CURRENT_EPOCH_AMOUNTSYSTEM_COLUMN_NAME_TOTAL_STAKESYSTEM_COLUMN_NAME_VALIDATORS_COUNTSYSTEM_COLUMN_NAME_VALIDATORS_AT_RISK_COUNT"
 
-var _SystemColumnNameIndex = [...]uint16{0, 31, 69, 105, 145, 185, 238, 268}
+var _SystemColumnNameIndex = [...]uint16{0, 31, 69, 105, 145, 185, 238, 268, 303, 346}
 
-const _SystemColumnNameLowerName = "system_column_name_storage_fundsystem_column_name_reference_gas_pricesystem_column_name_epoch_duration_mssystem_column_name_stake_subsidy_countersystem_column_name_stake_subsidy_balancesystem_column_name_stake_subsidy_current_epoch_amountsystem_column_name_total_stake"
+const _SystemColumnNameLowerName = "system_column_name_storage_fundsystem_column_name_reference_gas_pricesystem_column_name_epoch_duration_mssystem_column_name_stake_subsidy_countersystem_column_name_stake_subsidy_balancesystem_column_name_stake_subsidy_current_epoch_amountsystem_column_name_total_stakesystem_column_name_validators_countsystem_column_name_validators_at_risk_count"
 
 func (i SystemColumnName) String() string {
 	if i < 0 || i >= SystemColumnName(len(_SystemColumnNameIndex)-1) {
@@ -32,9 +32,11 @@ func _SystemColumnNameNoOp() {
 	_ = x[SystemColumnNameStakeSubsidyBalance-(4)]
 	_ = x[SystemColumnNameStakeSubsidyCurrentEpochAmount-(5)]
 	_ = x[SystemColumnNameTotalStake-(6)]
+	_ = x[SystemColumnNameValidatorsCount-(7)]
+	_ = x[SystemColumnNameValidatorsAtRiskCount-(8)]
 }
 
-var _SystemColumnNameValues = []SystemColumnName{SystemColumnNameStorageFund, SystemColumnNameReferenceGasPrice, SystemColumnNameEpochDurationMs, SystemColumnNameStakeSubsidyCounter, SystemColumnNameStakeSubsidyBalance, SystemColumnNameStakeSubsidyCurrentEpochAmount, SystemColumnNameTotalStake}
+var _SystemColumnNameValues = []SystemColumnName{SystemColumnNameStorageFund, SystemColumnNameReferenceGasPrice, SystemColumnNameEpochDurationMs, SystemColumnNameStakeSubsidyCounter, SystemColumnNameStakeSubsidyBalance, SystemColumnNameStakeSubsidyCurrentEpochAmount, SystemColumnNameTotalStake, SystemColumnNameValidatorsCount, SystemColumnNameValidatorsAtRiskCount}
 
 var _SystemColumnNameNameToValueMap = map[string]SystemColumnName{
 	_SystemColumnNameName[0:31]:         SystemColumnNameStorageFund,
@@ -51,6 +53,10 @@ var _SystemColumnNameNameToValueMap = map[string]SystemColumnName{
 	_SystemColumnNameLowerName[185:238]: SystemColumnNameStakeSubsidyCurrentEpochAmount,
 	_SystemColumnNameName[238:268]:      SystemColumnNameTotalStake,
 	_SystemColumnNameLowerName[238:268]: SystemColumnNameTotalStake,
+	_SystemColumnNameName[268:303]:      SystemColumnNameValidatorsCount,
+	_SystemColumnNameLowerName[268:303]: SystemColumnNameValidatorsCount,
+	_SystemColumnNameName[303:346]:      SystemColumnNameValidatorsAtRiskCount,
+	_SystemColumnNameLowerName[303:346]: SystemColumnNameValidatorsAtRiskCount,
 }
 
 var _SystemColumnNameNames = []string{
@@ -61,6 +67,8 @@ var _SystemColumnNameNames = []string{
 	_SystemColumnNameName[145:185],
 	_SystemColumnNameName[185:238],
 	_SystemColumnNameName[238:268],
+	_SystemColumnNameName[268:303],
+	_SystemColumnNameName[303:346],
 }
 
 // SystemColumnNameString retrieves an enum value from the enum constants string name.

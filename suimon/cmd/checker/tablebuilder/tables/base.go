@@ -22,10 +22,10 @@ func GetTableTitle(network enums.NetworkType, table enums.TableType, emojisEnabl
 
 	switch network {
 	case enums.NetworkTypeTestnet:
-		return fmt.Sprintf("%sSUIMON %sv0.1.0%s %s[ %s %s ]%s", emoji, enums.ColorGreen, enums.ColorReset, enums.ColorRed, table, network, enums.ColorReset)
+		return fmt.Sprintf("%s%sSUIMON%s %s[ %s %s ]%s", emoji, enums.ColorGreen, enums.ColorReset, enums.ColorRed, table, network, enums.ColorReset)
 	case enums.NetworkTypeDevnet:
 		fallthrough
 	default:
-		return fmt.Sprintf("%sSUIMON %sv0.1.0%s %s[ %s %s ]%s", emoji, enums.ColorGreen, enums.ColorReset, enums.ColorRed, table, network, enums.ColorReset)
+		return fmt.Sprintf("%s%sSUIMON%s %s[ %s %s ]%s", emoji, enums.ColorGreen, enums.ColorReset, enums.ColorRed, table, network, enums.ColorReset)
 	}
 }

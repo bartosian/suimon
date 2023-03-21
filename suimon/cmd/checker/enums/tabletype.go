@@ -7,5 +7,5 @@ const (
 	TableTypeNode        TableType = "YOUR NODE"
 	TableTypePeers       TableType = "PEERS"
 	TableTypeSystemState TableType = "SYSTEM STATE"
-	TableTypeValidators  TableType = "VALIDATORS"
+	TableTypeValidators  TableType = "ACTIVE VALIDATORS"
 )

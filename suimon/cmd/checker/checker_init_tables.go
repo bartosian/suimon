@@ -29,6 +29,7 @@ func (checker *Checker) InitTables() {
 	}
 
 	if displayConfig.ValidatorsTable.Display {
+		checker.InitTable(enums.TableTypeSystemState)
 		checker.InitTable(enums.TableTypeValidators)
 	}
 }
@@ -242,8 +243,8 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 			columns[enums.NodeColumnNameTotalTransactions].SetValue(host.Metrics.TotalTransactions)
 			columns[enums.NodeColumnNameLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
 		}
-	case enums.TableTypeValidators:
-		hosts = checker.getHostsByTableType(enums.TableTypeValidators)
+	case enums.TableTypeSystemState:
+		hosts = checker.getHostsByTableType(enums.TableTypeSystemState)
 		columnConfig = tables.ColumnConfigSystem
 		columns = make(tablebuilder.Columns, len(columnConfig))
 
@@ -279,6 +280,43 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 			columns[enums.SystemColumnNameTotalStake].SetValue(systemState.TotalStake)
 			columns[enums.SystemColumnNameValidatorsCount].SetValue(len(systemState.ActiveValidators))
 			columns[enums.SystemColumnNameValidatorsAtRiskCount].SetValue(len(systemState.AtRiskValidators))
+		}
+	case enums.TableTypeValidators:
+		hosts = checker.getHostsByTableType(enums.TableTypeValidators)
+		columnConfig = tables.ColumnConfigActiveValidator
+		columns = make(tablebuilder.Columns, len(columnConfig))
+
+		for i := 0; i < len(columnConfig); i++ {
+			columns[i].Config = columnConfig[i]
+		}
+
+		tableConfig = tablebuilder.TableConfig{
+			Name:       tables.GetTableTitle(networkType, enums.TableTypeValidators, enabledEmojis),
+			Colors:     tablebuilder.GetTableColorsFromString(colorScheme),
+			Tag:        tables.TableTagActiveValidator,
+			Style:      tables.TableStyleActiveValidator,
+			RowsCount:  0,
+			Columns:    columns,
+			SortConfig: tables.TableSortConfigActiveValidator,
+		}
+
+		activeValidators := hosts[0].Metrics.SystemState.ActiveValidators
+
+		for _, validator := range activeValidators {
+			tableConfig.RowsCount++
+
+			columns[enums.ActiveValidatorColumnNameName].SetValue(validator.Name)
+			columns[enums.ActiveValidatorColumnNameNetAddress].SetValue(validator.NetAddress)
+			columns[enums.ActiveValidatorColumnNameVotingPower].SetValue(validator.VotingPower)
+			columns[enums.ActiveValidatorColumnNameGasPrice].SetValue(validator.GasPrice)
+			columns[enums.ActiveValidatorColumnNameCommissionRate].SetValue(validator.CommissionRate)
+			columns[enums.ActiveValidatorColumnNameNextEpochStake].SetValue(validator.NextEpochStake)
+			columns[enums.ActiveValidatorColumnNameNextEpochGasPrice].SetValue(validator.NextEpochGasPrice)
+			columns[enums.ActiveValidatorColumnNameNextEpochCommissionRate].SetValue(validator.NextEpochCommissionRate)
+			columns[enums.ActiveValidatorColumnNameStakingPoolSuiBalance].SetValue(validator.StakingPoolSuiBalance)
+			columns[enums.ActiveValidatorColumnNameRewardsPool].SetValue(validator.RewardsPool)
+			columns[enums.ActiveValidatorColumnNamePoolTokenBalance].SetValue(validator.PoolTokenBalance)
+			columns[enums.ActiveValidatorColumnNamePendingStake].SetValue(validator.PendingStake)
 		}
 	}
 

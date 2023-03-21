@@ -32,8 +32,6 @@ var (
 func main() {
 	flag.Parse()
 
-	log.PrintLogo("SUIMON", "banner3", "red")
-
 	var (
 		logger        = log.NewLogger()
 		checker       *checkerBuilder.Checker
