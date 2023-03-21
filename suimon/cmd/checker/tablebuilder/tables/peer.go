@@ -145,7 +145,7 @@ var (
 			Hidden:       false,
 		},
 		enums.NodeColumnNameUptime: {
-			Name:         "UPTIME",
+			Name:         "UPTIME\nDAYS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,

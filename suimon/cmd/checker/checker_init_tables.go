@@ -28,8 +28,11 @@ func (checker *Checker) InitTables() {
 		checker.InitTable(enums.TableTypePeers)
 	}
 
-	if displayConfig.ValidatorsTable.Display {
+	if displayConfig.SystemTable.Display {
 		checker.InitTable(enums.TableTypeSystemState)
+	}
+
+	if displayConfig.ValidatorsTable.Display {
 		checker.InitTable(enums.TableTypeValidators)
 	}
 }

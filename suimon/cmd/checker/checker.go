@@ -145,8 +145,17 @@ func (checker *Checker) DrawTables() {
 		checker.tableBuilderPeer.Build()
 	}
 
-	if checker.suimonConfig.MonitorsConfig.ValidatorsTable.Display && len(checker.node) > 0 {
+	if checker.suimonConfig.MonitorsConfig.SystemTable.Display && len(checker.node) > 0 {
 		checker.tableBuilderSystem.Build()
+	}
+
+	if checker.suimonConfig.MonitorsConfig.ValidatorsTable.Display && len(checker.node) > 0 {
+		systemState := checker.node[0].Metrics.SystemState
+
+		if len(systemState.ActiveValidators) == 0 {
+			return
+		}
+
 		checker.tableBuilderValidators.Build()
 	}
 }

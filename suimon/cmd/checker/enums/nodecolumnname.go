@@ -24,4 +24,11 @@ const (
 	NodeColumnNameVersion
 	NodeColumnNameCommit
 	NodeColumnNameCountry
+	NodeColumnNameCurrentRound
+	NodeColumnNameHighestProcessedRound
+	NodeColumnNameLastCommittedRound
+	NodeColumnNamePrimaryNetworkPeers
+	NodeColumnNameWorkerNetworkPeers
+	NodeColumnNameSkippedConsensusTransactions
+	NodeColumnNameTotalSignatureErrors
 )

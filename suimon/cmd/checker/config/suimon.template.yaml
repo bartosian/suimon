@@ -6,11 +6,13 @@ monitors-config:
     display: true
   peers-table:
     display: true
+  system-table:
+    display: true
   validators-table:
     display: true
 
 # update this section to add/remove rpc endpoints
-rpc-config:
+public-rpc:
   testnet:
     - "https://wave3-rpc.testnet.sui.io:443"
     - "https://rpc-ws-testnet-w3.suiscan.xyz:443"
@@ -21,7 +23,7 @@ rpc-config:
     - "https://fullnode.devnet.vincagame.com"
 
 # update this section to indicate the location of the configuration file, which can be either fullnode.yaml or validator.yaml
-node-config-path: "/root/.suimon/fullnode.yaml"
+config-path: "/root/.suimon/fullnode.yaml"
 
 # update this section to modify the settings related to the network
 network:

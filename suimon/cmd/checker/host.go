@@ -99,7 +99,7 @@ func (host *Host) SetStatus(rpc Host) {
 
 	if !metricsHost.Updated || metricsHost.TotalTransactions == 0 || metricsHost.LatestCheckpoint == 0 ||
 		metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == transactionsPerSecondWindow ||
-		metricsHost.TxSyncPercentage == 0 {
+		metricsHost.TxSyncPercentage == 0 || metricsHost.Version != metricsRPC.Version {
 
 		host.Status = enums.StatusRed
 

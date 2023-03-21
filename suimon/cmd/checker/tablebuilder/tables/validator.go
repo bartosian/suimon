@@ -8,14 +8,14 @@ import (
 )
 
 var (
-	TableStyleNode      = table.StyleLight
-	TableTagNode        = ""
-	TableSortConfigNode = []table.SortBy{
+	TableStyleValidator      = table.StyleLight
+	TableTagValidator        = ""
+	TableSortConfigValidator = []table.SortBy{
 		{Name: "HEALTH", Mode: table.Dsc},
 		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
 		{Name: "LATEST\nCHECKPOINT", Mode: table.Dsc},
 	}
-	ColumnConfigNode = []table.ColumnConfig{
+	ColumnConfigValidator = []table.ColumnConfig{
 		enums.NodeColumnNameHealth: {
 			Name:         "HEALTH",
 			Align:        text.AlignCenter,
@@ -171,6 +171,62 @@ var (
 		enums.NodeColumnNameCountry: {
 			Name:         "COUNTRY",
 			Align:        text.AlignLeft,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.NodeColumnNameCurrentRound: {
+			Name:         "CURRENT ROUND",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.NodeColumnNameHighestProcessedRound: {
+			Name:         "HIGHEST\nPROCESSED ROUND",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.NodeColumnNameLastCommittedRound: {
+			Name:         "LAST\nCOMMITTED ROUND",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.NodeColumnNamePrimaryNetworkPeers: {
+			Name:         "PRIMARY\nNETWORK PEERS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.NodeColumnNameWorkerNetworkPeers: {
+			Name:         "WORKER\nNETWORK PEERS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.NodeColumnNameSkippedConsensusTransactions: {
+			Name:         "SKIPPED CONSENSUS\nTRANSACTIONS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.NodeColumnNameTotalSignatureErrors: {
+			Name:         "TOTAL\nSIGNATURE ERRORS",
+			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,

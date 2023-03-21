@@ -241,7 +241,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 	case enums.MetricTypeUptime:
 		valueFloat := value.(float64)
 
-		metrics.Uptime = fmt.Sprintf("%.2f", valueFloat)
+		metrics.Uptime = fmt.Sprintf("%.2f", valueFloat/86400)
 	case enums.MetricTypeVersion:
 		valueString := value.(string)
 

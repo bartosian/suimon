@@ -182,7 +182,7 @@ func (checker *Checker) getHostsData(tableType enums.TableType, progressColor pr
 		parseHosts()
 
 		fallthrough
-	case enums.TableTypeValidators:
+	case enums.TableTypeSystemState, enums.TableTypeValidators:
 		if monitorsConfig.ValidatorsTable.Display != true {
 			return
 		}

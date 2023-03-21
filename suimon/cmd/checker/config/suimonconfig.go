@@ -2,12 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/env"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 	"gopkg.in/yaml.v3"
 	"os"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/env"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 const (
@@ -38,14 +38,17 @@ type (
 			PeersTable struct {
 				Display bool `yaml:"display"`
 			} `yaml:"peers-table"`
+			SystemTable struct {
+				Display bool `yaml:"display"`
+			} `yaml:"system-table"`
 			ValidatorsTable struct {
 				Display bool `yaml:"display"`
 			} `yaml:"validators-table"`
 		} `yaml:"monitors-config"`
-		RPCConfig struct {
+		PublicRPC struct {
 			Testnet []string `yaml:"testnet"`
 			Devnet  []string `yaml:"devnet"`
-		} `yaml:"rpc-config"`
+		} `yaml:"public-rpc"`
 		NodeConfigPath string `yaml:"node-config-path"`
 		Network        struct {
 			Name        string `yaml:"name"`
@@ -125,9 +128,9 @@ func (sconfig *SuimonConfig) GetRPCByNetwork() []string {
 
 	switch networkType {
 	case enums.NetworkTypeDevnet:
-		return sconfig.RPCConfig.Devnet
+		return sconfig.PublicRPC.Devnet
 	case enums.NetworkTypeTestnet:
-		return sconfig.RPCConfig.Testnet
+		return sconfig.PublicRPC.Testnet
 	}
 
 	return nil
