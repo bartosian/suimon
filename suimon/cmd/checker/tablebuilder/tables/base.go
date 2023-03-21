@@ -14,7 +14,7 @@ var nameTransformer = text.Transformer(func(val interface{}) string {
 	return text.Bold.Sprint(val)
 })
 
-func GetTableTitleSUI(network enums.NetworkType, table enums.TableType, emojisEnabled bool) string {
+func GetTableTitle(network enums.NetworkType, table enums.TableType, emojisEnabled bool) string {
 	var emoji string
 	if emojisEnabled {
 		emoji = suiEmoji

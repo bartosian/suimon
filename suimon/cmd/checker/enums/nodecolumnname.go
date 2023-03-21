@@ -1,0 +1,27 @@
+package enums
+
+//go:generate go run github.com/dmarkham/enumer -type=NodeColumnName -json -transform=snake-upper -output=./nodecolumnname.gen.go
+type NodeColumnName int
+
+const (
+	NodeColumnNameHealth NodeColumnName = iota
+	NodeColumnNameAddress
+	NodeColumnNamePortRPC
+	NodeColumnNameTotalTransactions
+	NodeColumnNameLatestCheckpoint
+	NodeColumnNameTotalTransactionCertificates
+	NodeColumnNameTotalTransactionEffects
+	NodeColumnNameHighestKnownCheckpoint
+	NodeColumnNameLastExecutedCheckpoint
+	NodeColumnNameCheckpointExecBacklog
+	NodeColumnNameHighestSyncedCheckpoint
+	NodeColumnNameCheckpointSyncBacklog
+	NodeColumnNameCurrentEpoch
+	NodeColumnNameTXSyncPercentage
+	NodeColumnNameCheckSyncPercentage
+	NodeColumnNameNetworkPeers
+	NodeColumnNameUptime
+	NodeColumnNameVersion
+	NodeColumnNameCommit
+	NodeColumnNameCountry
+)

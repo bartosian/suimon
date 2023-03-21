@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _ValidatorColumnNameName = "VALIDATOR_COLUMN_NAME_NAMEVALIDATOR_COLUMN_NAME_ADDRESSVALIDATOR_COLUMN_NAME_VOTING_POWERVALIDATOR_COLUMN_NAME_GAS_PRICEVALIDATOR_COLUMN_NAME_STAKING_POOL_SUI_BALANCEVALIDATOR_COLUMN_NAME_COMMISSION_RATEVALIDATOR_COLUMN_NAME_NEXT_EPOCH_GAS_PRICEVALIDATOR_COLUMN_NAME_NEXT_EPOCH_STAKEVALIDATOR_COLUMN_NAME_NEXT_EPOCH_COMMISSION_RATE"
+const _ValidatorColumnNameName = "VALIDATOR_COLUMN_NAME_HEALTHVALIDATOR_COLUMN_NAME_ADDRESSVALIDATOR_COLUMN_NAME_TOTAL_TRANSACTION_CERTIFICATESVALIDATOR_COLUMN_NAME_TOTAL_TRANSACTION_EFFECTSVALIDATOR_COLUMN_NAME_HIGHEST_KNOWN_CHECKPOINTVALIDATOR_COLUMN_NAME_LAST_EXECUTED_CHECKPOINTVALIDATOR_COLUMN_NAME_CHECKPOINT_EXEC_BACKLOGVALIDATOR_COLUMN_NAME_HIGHEST_SYNCED_CHECKPOINTVALIDATOR_COLUMN_NAME_CHECKPOINT_SYNC_BACKLOGVALIDATOR_COLUMN_NAME_CURRENT_EPOCHVALIDATOR_COLUMN_NAME_UPTIMEVALIDATOR_COLUMN_NAME_VERSIONVALIDATOR_COLUMN_NAME_COMMITVALIDATOR_COLUMN_NAME_COUNTRYVALIDATOR_COLUMN_NAME_CURRENT_ROUNDVALIDATOR_COLUMN_NAME_HIGHEST_PROCESSED_ROUNDVALIDATOR_COLUMN_NAME_LAST_COMMITTED_ROUNDVALIDATOR_COLUMN_NAME_PRIMARY_NETWORK_PEERSVALIDATOR_COLUMN_NAME_WORKER_NETWORK_PEERSVALIDATOR_COLUMN_NAME_SKIPPED_CONSENSUS_TRANSACTIONSVALIDATOR_COLUMN_NAME_TOTAL_SIGNATURE_ERRORS"
 
-var _ValidatorColumnNameIndex = [...]uint16{0, 26, 55, 89, 120, 166, 203, 245, 283, 331}
+var _ValidatorColumnNameIndex = [...]uint16{0, 28, 57, 109, 156, 202, 248, 293, 340, 385, 420, 448, 477, 505, 534, 569, 614, 656, 699, 741, 793, 837}
 
-const _ValidatorColumnNameLowerName = "validator_column_name_namevalidator_column_name_addressvalidator_column_name_voting_powervalidator_column_name_gas_pricevalidator_column_name_staking_pool_sui_balancevalidator_column_name_commission_ratevalidator_column_name_next_epoch_gas_pricevalidator_column_name_next_epoch_stakevalidator_column_name_next_epoch_commission_rate"
+const _ValidatorColumnNameLowerName = "validator_column_name_healthvalidator_column_name_addressvalidator_column_name_total_transaction_certificatesvalidator_column_name_total_transaction_effectsvalidator_column_name_highest_known_checkpointvalidator_column_name_last_executed_checkpointvalidator_column_name_checkpoint_exec_backlogvalidator_column_name_highest_synced_checkpointvalidator_column_name_checkpoint_sync_backlogvalidator_column_name_current_epochvalidator_column_name_uptimevalidator_column_name_versionvalidator_column_name_commitvalidator_column_name_countryvalidator_column_name_current_roundvalidator_column_name_highest_processed_roundvalidator_column_name_last_committed_roundvalidator_column_name_primary_network_peersvalidator_column_name_worker_network_peersvalidator_column_name_skipped_consensus_transactionsvalidator_column_name_total_signature_errors"
 
 func (i ValidatorColumnName) String() string {
 	if i < 0 || i >= ValidatorColumnName(len(_ValidatorColumnNameIndex)-1) {
@@ -25,50 +25,98 @@ func (i ValidatorColumnName) String() string {
 // Re-run the stringer command to generate them again.
 func _ValidatorColumnNameNoOp() {
 	var x [1]struct{}
-	_ = x[ValidatorColumnNameName-(0)]
+	_ = x[ValidatorColumnNameHealth-(0)]
 	_ = x[ValidatorColumnNameAddress-(1)]
-	_ = x[ValidatorColumnNameVotingPower-(2)]
-	_ = x[ValidatorColumnNameGasPrice-(3)]
-	_ = x[ValidatorColumnNameStakingPoolSuiBalance-(4)]
-	_ = x[ValidatorColumnNameCommissionRate-(5)]
-	_ = x[ValidatorColumnNameNextEpochGasPrice-(6)]
-	_ = x[ValidatorColumnNameNextEpochStake-(7)]
-	_ = x[ValidatorColumnNameNextEpochCommissionRate-(8)]
+	_ = x[ValidatorColumnNameTotalTransactionCertificates-(2)]
+	_ = x[ValidatorColumnNameTotalTransactionEffects-(3)]
+	_ = x[ValidatorColumnNameHighestKnownCheckpoint-(4)]
+	_ = x[ValidatorColumnNameLastExecutedCheckpoint-(5)]
+	_ = x[ValidatorColumnNameCheckpointExecBacklog-(6)]
+	_ = x[ValidatorColumnNameHighestSyncedCheckpoint-(7)]
+	_ = x[ValidatorColumnNameCheckpointSyncBacklog-(8)]
+	_ = x[ValidatorColumnNameCurrentEpoch-(9)]
+	_ = x[ValidatorColumnNameUptime-(10)]
+	_ = x[ValidatorColumnNameVersion-(11)]
+	_ = x[ValidatorColumnNameCommit-(12)]
+	_ = x[ValidatorColumnNameCountry-(13)]
+	_ = x[ValidatorColumnNameCurrentRound-(14)]
+	_ = x[ValidatorColumnNameHighestProcessedRound-(15)]
+	_ = x[ValidatorColumnNameLastCommittedRound-(16)]
+	_ = x[ValidatorColumnNamePrimaryNetworkPeers-(17)]
+	_ = x[ValidatorColumnNameWorkerNetworkPeers-(18)]
+	_ = x[ValidatorColumnNameSkippedConsensusTransactions-(19)]
+	_ = x[ValidatorColumnNameTotalSignatureErrors-(20)]
 }
 
-var _ValidatorColumnNameValues = []ValidatorColumnName{ValidatorColumnNameName, ValidatorColumnNameAddress, ValidatorColumnNameVotingPower, ValidatorColumnNameGasPrice, ValidatorColumnNameStakingPoolSuiBalance, ValidatorColumnNameCommissionRate, ValidatorColumnNameNextEpochGasPrice, ValidatorColumnNameNextEpochStake, ValidatorColumnNameNextEpochCommissionRate}
+var _ValidatorColumnNameValues = []ValidatorColumnName{ValidatorColumnNameHealth, ValidatorColumnNameAddress, ValidatorColumnNameTotalTransactionCertificates, ValidatorColumnNameTotalTransactionEffects, ValidatorColumnNameHighestKnownCheckpoint, ValidatorColumnNameLastExecutedCheckpoint, ValidatorColumnNameCheckpointExecBacklog, ValidatorColumnNameHighestSyncedCheckpoint, ValidatorColumnNameCheckpointSyncBacklog, ValidatorColumnNameCurrentEpoch, ValidatorColumnNameUptime, ValidatorColumnNameVersion, ValidatorColumnNameCommit, ValidatorColumnNameCountry, ValidatorColumnNameCurrentRound, ValidatorColumnNameHighestProcessedRound, ValidatorColumnNameLastCommittedRound, ValidatorColumnNamePrimaryNetworkPeers, ValidatorColumnNameWorkerNetworkPeers, ValidatorColumnNameSkippedConsensusTransactions, ValidatorColumnNameTotalSignatureErrors}
 
 var _ValidatorColumnNameNameToValueMap = map[string]ValidatorColumnName{
-	_ValidatorColumnNameName[0:26]:         ValidatorColumnNameName,
-	_ValidatorColumnNameLowerName[0:26]:    ValidatorColumnNameName,
-	_ValidatorColumnNameName[26:55]:        ValidatorColumnNameAddress,
-	_ValidatorColumnNameLowerName[26:55]:   ValidatorColumnNameAddress,
-	_ValidatorColumnNameName[55:89]:        ValidatorColumnNameVotingPower,
-	_ValidatorColumnNameLowerName[55:89]:   ValidatorColumnNameVotingPower,
-	_ValidatorColumnNameName[89:120]:       ValidatorColumnNameGasPrice,
-	_ValidatorColumnNameLowerName[89:120]:  ValidatorColumnNameGasPrice,
-	_ValidatorColumnNameName[120:166]:      ValidatorColumnNameStakingPoolSuiBalance,
-	_ValidatorColumnNameLowerName[120:166]: ValidatorColumnNameStakingPoolSuiBalance,
-	_ValidatorColumnNameName[166:203]:      ValidatorColumnNameCommissionRate,
-	_ValidatorColumnNameLowerName[166:203]: ValidatorColumnNameCommissionRate,
-	_ValidatorColumnNameName[203:245]:      ValidatorColumnNameNextEpochGasPrice,
-	_ValidatorColumnNameLowerName[203:245]: ValidatorColumnNameNextEpochGasPrice,
-	_ValidatorColumnNameName[245:283]:      ValidatorColumnNameNextEpochStake,
-	_ValidatorColumnNameLowerName[245:283]: ValidatorColumnNameNextEpochStake,
-	_ValidatorColumnNameName[283:331]:      ValidatorColumnNameNextEpochCommissionRate,
-	_ValidatorColumnNameLowerName[283:331]: ValidatorColumnNameNextEpochCommissionRate,
+	_ValidatorColumnNameName[0:28]:         ValidatorColumnNameHealth,
+	_ValidatorColumnNameLowerName[0:28]:    ValidatorColumnNameHealth,
+	_ValidatorColumnNameName[28:57]:        ValidatorColumnNameAddress,
+	_ValidatorColumnNameLowerName[28:57]:   ValidatorColumnNameAddress,
+	_ValidatorColumnNameName[57:109]:       ValidatorColumnNameTotalTransactionCertificates,
+	_ValidatorColumnNameLowerName[57:109]:  ValidatorColumnNameTotalTransactionCertificates,
+	_ValidatorColumnNameName[109:156]:      ValidatorColumnNameTotalTransactionEffects,
+	_ValidatorColumnNameLowerName[109:156]: ValidatorColumnNameTotalTransactionEffects,
+	_ValidatorColumnNameName[156:202]:      ValidatorColumnNameHighestKnownCheckpoint,
+	_ValidatorColumnNameLowerName[156:202]: ValidatorColumnNameHighestKnownCheckpoint,
+	_ValidatorColumnNameName[202:248]:      ValidatorColumnNameLastExecutedCheckpoint,
+	_ValidatorColumnNameLowerName[202:248]: ValidatorColumnNameLastExecutedCheckpoint,
+	_ValidatorColumnNameName[248:293]:      ValidatorColumnNameCheckpointExecBacklog,
+	_ValidatorColumnNameLowerName[248:293]: ValidatorColumnNameCheckpointExecBacklog,
+	_ValidatorColumnNameName[293:340]:      ValidatorColumnNameHighestSyncedCheckpoint,
+	_ValidatorColumnNameLowerName[293:340]: ValidatorColumnNameHighestSyncedCheckpoint,
+	_ValidatorColumnNameName[340:385]:      ValidatorColumnNameCheckpointSyncBacklog,
+	_ValidatorColumnNameLowerName[340:385]: ValidatorColumnNameCheckpointSyncBacklog,
+	_ValidatorColumnNameName[385:420]:      ValidatorColumnNameCurrentEpoch,
+	_ValidatorColumnNameLowerName[385:420]: ValidatorColumnNameCurrentEpoch,
+	_ValidatorColumnNameName[420:448]:      ValidatorColumnNameUptime,
+	_ValidatorColumnNameLowerName[420:448]: ValidatorColumnNameUptime,
+	_ValidatorColumnNameName[448:477]:      ValidatorColumnNameVersion,
+	_ValidatorColumnNameLowerName[448:477]: ValidatorColumnNameVersion,
+	_ValidatorColumnNameName[477:505]:      ValidatorColumnNameCommit,
+	_ValidatorColumnNameLowerName[477:505]: ValidatorColumnNameCommit,
+	_ValidatorColumnNameName[505:534]:      ValidatorColumnNameCountry,
+	_ValidatorColumnNameLowerName[505:534]: ValidatorColumnNameCountry,
+	_ValidatorColumnNameName[534:569]:      ValidatorColumnNameCurrentRound,
+	_ValidatorColumnNameLowerName[534:569]: ValidatorColumnNameCurrentRound,
+	_ValidatorColumnNameName[569:614]:      ValidatorColumnNameHighestProcessedRound,
+	_ValidatorColumnNameLowerName[569:614]: ValidatorColumnNameHighestProcessedRound,
+	_ValidatorColumnNameName[614:656]:      ValidatorColumnNameLastCommittedRound,
+	_ValidatorColumnNameLowerName[614:656]: ValidatorColumnNameLastCommittedRound,
+	_ValidatorColumnNameName[656:699]:      ValidatorColumnNamePrimaryNetworkPeers,
+	_ValidatorColumnNameLowerName[656:699]: ValidatorColumnNamePrimaryNetworkPeers,
+	_ValidatorColumnNameName[699:741]:      ValidatorColumnNameWorkerNetworkPeers,
+	_ValidatorColumnNameLowerName[699:741]: ValidatorColumnNameWorkerNetworkPeers,
+	_ValidatorColumnNameName[741:793]:      ValidatorColumnNameSkippedConsensusTransactions,
+	_ValidatorColumnNameLowerName[741:793]: ValidatorColumnNameSkippedConsensusTransactions,
+	_ValidatorColumnNameName[793:837]:      ValidatorColumnNameTotalSignatureErrors,
+	_ValidatorColumnNameLowerName[793:837]: ValidatorColumnNameTotalSignatureErrors,
 }
 
 var _ValidatorColumnNameNames = []string{
-	_ValidatorColumnNameName[0:26],
-	_ValidatorColumnNameName[26:55],
-	_ValidatorColumnNameName[55:89],
-	_ValidatorColumnNameName[89:120],
-	_ValidatorColumnNameName[120:166],
-	_ValidatorColumnNameName[166:203],
-	_ValidatorColumnNameName[203:245],
-	_ValidatorColumnNameName[245:283],
-	_ValidatorColumnNameName[283:331],
+	_ValidatorColumnNameName[0:28],
+	_ValidatorColumnNameName[28:57],
+	_ValidatorColumnNameName[57:109],
+	_ValidatorColumnNameName[109:156],
+	_ValidatorColumnNameName[156:202],
+	_ValidatorColumnNameName[202:248],
+	_ValidatorColumnNameName[248:293],
+	_ValidatorColumnNameName[293:340],
+	_ValidatorColumnNameName[340:385],
+	_ValidatorColumnNameName[385:420],
+	_ValidatorColumnNameName[420:448],
+	_ValidatorColumnNameName[448:477],
+	_ValidatorColumnNameName[477:505],
+	_ValidatorColumnNameName[505:534],
+	_ValidatorColumnNameName[534:569],
+	_ValidatorColumnNameName[569:614],
+	_ValidatorColumnNameName[614:656],
+	_ValidatorColumnNameName[656:699],
+	_ValidatorColumnNameName[699:741],
+	_ValidatorColumnNameName[741:793],
+	_ValidatorColumnNameName[793:837],
 }
 
 // ValidatorColumnNameString retrieves an enum value from the enum constants string name.

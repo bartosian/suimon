@@ -3,10 +3,7 @@ package checker
 import (
 	"errors"
 	"sort"
-	"sync"
 	"time"
-
-	"github.com/hashicorp/go-multierror"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/address"
@@ -111,109 +108,120 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 // Parameters: None.
 // Returns: an error, if any occurred during initialization.
 func (checker *Checker) Init() error {
+	var errChan = make(chan error, 3)
+
+	defer close(errChan)
+
+	// parse data for the RPC servers
+	go checker.getHostsData(enums.TableTypeRPC, progress.ColorBlue, errChan)
+
+	// parse data for the user servers
+	go checker.getHostsData(enums.TableTypeNode, progress.ColorRed, errChan)
+
+	// parse data for the peers servers
+	go checker.getHostsData(enums.TableTypePeers, progress.ColorGreen, errChan)
+
+	for i := 0; i < cap(errChan); i++ {
+		if err := <-errChan; err != nil {
+			return err
+		}
+	}
+
+	checker.sortHosts(enums.TableTypeRPC)
+	checker.setHostsHealth(enums.TableTypeRPC)
+	checker.setHostsHealth(enums.TableTypeNode)
+	checker.setHostsHealth(enums.TableTypePeers)
+
+	return nil
+}
+
+func (checker *Checker) getHostsData(tableType enums.TableType, progressColor progress.Color, errChan chan<- error) {
 	var (
-		wg             sync.WaitGroup
-		errChan        = make(chan error, 3)
-		suimonConfig   = checker.suimonConfig
-		monitorsConfig = suimonConfig.MonitorsConfig
+		progressChan   = progress.NewProgressBar("PARSING DATA FOR "+string(tableType), progressColor)
+		monitorsConfig = checker.suimonConfig.MonitorsConfig
+		addresses      []AddressInfo
+		hosts          []Host
+		err            error
 	)
 
-	var getData = func(tableType enums.TableType, progressColor progress.Color) {
-		var (
-			progressChan = progress.NewProgressBar("PARSING DATA FOR "+string(tableType), progressColor)
-			addresses    []AddressInfo
-			hosts        []Host
-			err          error
-		)
+	defer func() {
+		progressChan <- struct{}{}
+		errChan <- err
+	}()
 
-		defer wg.Done()
-
+	var parseHosts = func() {
 		if addresses, err = checker.getAddressInfoByTableType(tableType); err != nil {
-			errChan <- err
+			return
 		}
 
 		if hosts, err = checker.createHosts(addresses); err != nil {
-			errChan <- err
+			return
 		}
 
 		checker.setHostsByTableType(tableType, hosts)
-
-		progressChan <- struct{}{}
 	}
 
-	// parse data for the RPC servers
-	wg.Add(1)
-
-	go getData(enums.TableTypeRPC, progress.ColorBlue)
-
-	// parse data for the user servers
-	if monitorsConfig.NodeTable.Display {
-		wg.Add(1)
-
-		go getData(enums.TableTypeNode, progress.ColorRed)
-	}
-
-	// parse data for the peers servers
-	if monitorsConfig.PeersTable.Display {
-		wg.Add(1)
-
-		go getData(enums.TableTypePeers, progress.ColorGreen)
-	}
-
-	wg.Wait()
-	close(errChan)
-
-	if len(checker.rpc) == 0 || len(checker.peers) == 0 && len(checker.node) == 0 {
-		var err error
-
-		for parseErr := range errChan {
-			err = multierror.Append(err, parseErr)
+	switch tableType {
+	case enums.TableTypeRPC:
+		if monitorsConfig.RPCTable.Display != true {
+			return
 		}
 
-		return err
+		parseHosts()
+	case enums.TableTypePeers:
+		if monitorsConfig.NodeTable.Display != true {
+			return
+		}
+
+		parseHosts()
+	case enums.TableTypeNode:
+		if monitorsConfig.NodeTable.Display != true {
+			return
+		}
+
+		parseHosts()
+
+		fallthrough
+	case enums.TableTypeValidators:
+		if monitorsConfig.ValidatorsTable.Display != true {
+			return
+		}
+
+		checker.node[0].GetLatestSuiSystemState()
 	}
+}
 
-	rpc := checker.rpc
+func (checker *Checker) sortHosts(tableType enums.TableType) {
+	hosts := checker.getHostsByTableType(tableType)
 
-	if len(rpc) > 1 {
-		sort.Slice(rpc, func(left, right int) bool {
-			return rpc[left].Metrics.TotalTransactions > rpc[right].Metrics.TotalTransactions
+	if len(hosts) > 1 {
+		sort.Slice(hosts, func(left, right int) bool {
+			return hosts[left].Metrics.TotalTransactions > hosts[right].Metrics.TotalTransactions
 		})
 
-		sort.SliceStable(rpc, func(left, right int) bool {
-			return rpc[left].Metrics.LatestCheckpoint > rpc[right].Metrics.LatestCheckpoint
+		sort.SliceStable(hosts, func(left, right int) bool {
+			return hosts[left].Metrics.LatestCheckpoint > hosts[right].Metrics.LatestCheckpoint
 		})
 	}
 
-	checker.rpc = rpc
+	checker.setHostsByTableType(tableType, hosts)
+}
 
-	var setStatus = func(tableType enums.TableType) {
-		hosts := checker.getHostsByTableType(tableType)
-		comparatorRPC := rpc[0]
+func (checker *Checker) setHostsHealth(tableType enums.TableType) {
+	hosts := checker.getHostsByTableType(tableType)
+	primaryRPC := checker.rpc[0]
 
-		for idx := range hosts {
-			metrics := hosts[idx].Metrics
-			checkpointExecBacklog := metrics.HighestKnownCheckpoint - metrics.LastExecutedCheckpoint
-			checkpointSyncBacklog := metrics.HighestKnownCheckpoint - metrics.HighestSyncedCheckpoint
+	for idx := range hosts {
+		metrics := hosts[idx].Metrics
 
-			hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, comparatorRPC)
-			hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, comparatorRPC)
-			hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointExecBacklog, checkpointExecBacklog)
-			hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointSyncBacklog, checkpointSyncBacklog)
+		checkpointExecBacklog := metrics.HighestKnownCheckpoint - metrics.LastExecutedCheckpoint
+		checkpointSyncBacklog := metrics.HighestKnownCheckpoint - metrics.HighestSyncedCheckpoint
 
-			hosts[idx].SetStatus(comparatorRPC)
-		}
+		hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, primaryRPC)
+		hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, primaryRPC)
+		hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointExecBacklog, checkpointExecBacklog)
+		hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointSyncBacklog, checkpointSyncBacklog)
+
+		hosts[idx].SetStatus(primaryRPC)
 	}
-
-	setStatus(enums.TableTypeRPC)
-
-	if monitorsConfig.NodeTable.Display {
-		setStatus(enums.TableTypeNode)
-	}
-
-	if monitorsConfig.PeersTable.Display {
-		setStatus(enums.TableTypePeers)
-	}
-
-	return nil
 }

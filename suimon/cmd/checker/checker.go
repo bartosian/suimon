@@ -1,7 +1,6 @@
 package checker
 
 import (
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 	"net/http"
 	"sync"
 	"time"
@@ -15,6 +14,7 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 const ipInfoCacheExp = 5 * time.Minute
