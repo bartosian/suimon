@@ -18,14 +18,11 @@ import (
 
 	checkerBuilder "github.com/bartosian/sui_helpers/suimon/cmd/checker"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 var (
 	suimonConfigPath = flag.String("s", "", "(optional) path to the suimon config file, can use SUIMON_CONFIG_PATH env variable instead")
-	nodeConfigPath   = flag.String("f", "", "(optional) path to the node config file, can use SUIMON_NODE_CONFIG_PATH variable instead")
-	network          = flag.String("n", "", "(optional) network name, possible values: testnet, devnet")
 	watch            = flag.Bool("w", false, "(optional) flag to enable a dynamic dashboard to monitor node metrics in real-time")
 )
 
@@ -33,12 +30,10 @@ func main() {
 	flag.Parse()
 
 	var (
-		logger        = log.NewLogger()
-		checker       *checkerBuilder.Checker
-		suimonConfig  *config.SuimonConfig
-		nodeConfig    *config.NodeConfig
-		networkConfig enums.NetworkType
-		err           error
+		logger       = log.NewLogger()
+		checker      *checkerBuilder.Checker
+		suimonConfig *config.SuimonConfig
+		err          error
 	)
 
 	// parse suimon.yaml config file
@@ -46,18 +41,8 @@ func main() {
 		return
 	}
 
-	// parse fullnode.yaml or validator.yaml config files
-	if nodeConfig, err = config.ParseNodeConfig(nodeConfigPath, suimonConfig.NodeConfigPath); err != nil {
-		return
-	}
-
-	// parse network config
-	if networkConfig, err = config.ParseNetworkConfig(suimonConfig, network); err != nil {
-		return
-	}
-
 	// create checker instance
-	if checker, err = checkerBuilder.NewChecker(*suimonConfig, *nodeConfig, networkConfig); err != nil {
+	if checker, err = checkerBuilder.NewChecker(*suimonConfig); err != nil {
 		logger.Error("failed to create suimon instance: ", err)
 
 		return

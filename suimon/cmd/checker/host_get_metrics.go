@@ -377,7 +377,7 @@ func (checker *Checker) getMetricForDashboardCell(cellName enums.CellName) any {
 
 		return dashboards.NewDonutInput(usageLabel, usagePercentage)
 	case enums.CellNameDatabaseSize:
-		dbSize := getDirectorySize(checker.nodeConfig.DbPath)
+		dbSize := getDirectorySize(checker.suimonConfig.DbPath)
 
 		return dbSize
 	case enums.CellNameBytesSent:

@@ -22,22 +22,23 @@ const ipInfoCacheExp = 5 * time.Minute
 type (
 	Checker struct {
 		suimonConfig config.SuimonConfig
-		nodeConfig   config.NodeConfig
 
-		rpc   []Host
-		node  []Host
-		peers []Host
+		rpc       []Host
+		node      []Host
+		validator []Host
+		peers     []Host
 
 		rpcClient  jsonrpc.RPCClient
 		httpClient *http.Client
 		ipClient   *ipinfo.Client
 
-		tableBuilderPeer       *tablebuilder.TableBuilder
-		tableBuilderNode       *tablebuilder.TableBuilder
-		tableBuilderRPC        *tablebuilder.TableBuilder
-		tableBuilderSystem     *tablebuilder.TableBuilder
-		tableBuilderValidators *tablebuilder.TableBuilder
-		tableConfig            tablebuilder.TableConfig
+		tableBuilderPeer             *tablebuilder.TableBuilder
+		tableBuilderNode             *tablebuilder.TableBuilder
+		tableBuilderValidator        *tablebuilder.TableBuilder
+		tableBuilderRPC              *tablebuilder.TableBuilder
+		tableBuilderSystem           *tablebuilder.TableBuilder
+		tableBuilderActiveValidators *tablebuilder.TableBuilder
+		tableConfig                  tablebuilder.TableConfig
 
 		DashboardBuilder *dashboardbuilder.DashboardBuilder
 
@@ -51,10 +52,8 @@ type (
 // - nodeConfig: a config.NodeConfig struct containing the node configuration data.
 // - networkType: an enums.NetworkType representing the type of network to configure the Checker object for.
 // The function returns a pointer to a Checker struct, and an error if there was an issue creating the Checker object.
-func NewChecker(suimonConfig config.SuimonConfig, nodeConfig config.NodeConfig, networkType enums.NetworkType) (*Checker, error) {
-	suimonConfig.SetNetworkConfig(networkType)
-
-	rpcClient := jsonrpc.NewClient(suimonConfig.Network.NetworkType.ToRPC())
+func NewChecker(suimonConfig config.SuimonConfig) (*Checker, error) {
+	rpcClient := jsonrpc.NewClient(suimonConfig.PublicRPC[0])
 	httpClient := &http.Client{Timeout: httpClientTimeout}
 	ipClient := ipinfo.NewClient(httpClient, ipinfo.NewCache(cache.NewInMemory().WithExpiration(ipInfoCacheExp)), suimonConfig.IPLookup.AccessToken)
 
@@ -63,7 +62,6 @@ func NewChecker(suimonConfig config.SuimonConfig, nodeConfig config.NodeConfig, 
 		httpClient:   httpClient,
 		ipClient:     ipClient,
 		suimonConfig: suimonConfig,
-		nodeConfig:   nodeConfig,
 		logger:       log.NewLogger(),
 	}, nil
 }
@@ -78,7 +76,9 @@ func (checker *Checker) getHostsByTableType(tableType enums.TableType) []Host {
 	switch tableType {
 	case enums.TableTypeNode:
 		hosts = checker.node
-	case enums.TableTypeValidators:
+	case enums.TableTypeValidator:
+		hosts = checker.validator
+	case enums.TableTypeActiveValidators:
 		hosts = checker.node
 	case enums.TableTypeSystemState:
 		hosts = checker.node
@@ -100,6 +100,8 @@ func (checker *Checker) setHostsByTableType(tableType enums.TableType, hosts []H
 	switch tableType {
 	case enums.TableTypeNode:
 		checker.node = hosts
+	case enums.TableTypeValidator:
+		checker.validator = hosts
 	case enums.TableTypePeers:
 		checker.peers = hosts
 	case enums.TableTypeRPC:
@@ -118,14 +120,16 @@ func (checker *Checker) setBuilderTableType(tableType enums.TableType, tableConf
 	switch tableType {
 	case enums.TableTypeNode:
 		checker.tableBuilderNode = tableBuilder
+	case enums.TableTypeValidator:
+		checker.tableBuilderValidator = tableBuilder
 	case enums.TableTypePeers:
 		checker.tableBuilderPeer = tableBuilder
 	case enums.TableTypeRPC:
 		checker.tableBuilderRPC = tableBuilder
 	case enums.TableTypeSystemState:
 		checker.tableBuilderSystem = tableBuilder
-	case enums.TableTypeValidators:
-		checker.tableBuilderValidators = tableBuilder
+	case enums.TableTypeActiveValidators:
+		checker.tableBuilderActiveValidators = tableBuilder
 	}
 }
 
@@ -141,6 +145,10 @@ func (checker *Checker) DrawTables() {
 		checker.tableBuilderNode.Build()
 	}
 
+	if checker.suimonConfig.MonitorsConfig.ValidatorTable.Display && len(checker.validator) > 0 {
+		checker.tableBuilderValidator.Build()
+	}
+
 	if checker.suimonConfig.MonitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
 		checker.tableBuilderPeer.Build()
 	}
@@ -149,14 +157,14 @@ func (checker *Checker) DrawTables() {
 		checker.tableBuilderSystem.Build()
 	}
 
-	if checker.suimonConfig.MonitorsConfig.ValidatorsTable.Display && len(checker.node) > 0 {
+	if checker.suimonConfig.MonitorsConfig.ActiveValidatorsTable.Display && len(checker.node) > 0 {
 		systemState := checker.node[0].Metrics.SystemState
 
 		if len(systemState.ActiveValidators) == 0 {
 			return
 		}
 
-		checker.tableBuilderValidators.Build()
+		checker.tableBuilderActiveValidators.Build()
 	}
 }
 

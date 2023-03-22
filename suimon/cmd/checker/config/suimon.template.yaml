@@ -4,37 +4,38 @@ monitors-config:
     display: true
   node-table:
     display: true
+  validator-table:
+    display: true
   peers-table:
     display: true
   system-table:
     display: true
-  validators-table:
+  active-validators-table:
     display: true
 
 # update this section to add/remove rpc endpoints
 public-rpc:
-  testnet:
-    - "https://wave3-rpc.testnet.sui.io:443"
-    - "https://rpc-ws-testnet-w3.suiscan.xyz:443"
-    - "https://sui-api.rpcpool.com:443"
-    - "https://wave3-rpc.synergynodes.com:443"
-  devnet:
-    - "https://fullnode.devnet.sui.io"
-    - "https://fullnode.devnet.vincagame.com"
+  - "https://wave3-rpc.testnet.sui.io:443"
+  - "https://rpc-ws-testnet-w3.suiscan.xyz:443"
+  - "https://sui-api.rpcpool.com:443"
+  - "https://wave3-rpc.synergynodes.com:443"
 
-# update this section to indicate the location of the configuration file, which can be either fullnode.yaml or validator.yaml
-config-path: "/root/.suimon/fullnode.yaml"
-
+# if you wish to monitor the node, update this section with the node information
 full-node:
   json-rpc-address: 0.0.0.0:9000
   metrics-address: 0.0.0.0:9184
 
+# if you wish to monitor the validator, update this section with the validator information
 validator:
   metrics-address: 0.0.0.0:9184
 
-# update this section to modify the settings related to the network
-network:
-  name: "testnet"
+# if you wish to monitor peers, update this section with the peers information
+seed-peers:
+  - "/ip4/178.18.250.62/udp/8080"
+  - "/ip4/213.239.215.119/udp/8084"
+  - "/ip4/65.109.32.171/udp/8084"
+  - "/ip4/65.108.44.149/udp/8084"
+  - "/ip4/95.214.54.28/udp/8080"
 
 # provider and country information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
 # which is free and gives you 50k requests per month, which is sufficient for individual usage.
@@ -48,6 +49,8 @@ monitors-visual:
 
   # update this section if you want to enable/disable emojis in tables
   enable-emojis: false
+
+db-path: "/opt/sui/db"
 
 # update this section to include details regarding the launch type of the Sui-Node process for the logs to be shown
 # fill in only one appropriate value

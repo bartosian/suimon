@@ -2,10 +2,10 @@ package config
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"os"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"gopkg.in/yaml.v3"
+
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/env"
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
@@ -35,39 +35,36 @@ type (
 			NodeTable struct {
 				Display bool `yaml:"display"`
 			} `yaml:"node-table"`
+			ValidatorTable struct {
+				Display bool `yaml:"display"`
+			} `yaml:"validator-table"`
 			PeersTable struct {
 				Display bool `yaml:"display"`
 			} `yaml:"peers-table"`
 			SystemTable struct {
 				Display bool `yaml:"display"`
 			} `yaml:"system-table"`
-			ValidatorsTable struct {
+			ActiveValidatorsTable struct {
 				Display bool `yaml:"display"`
-			} `yaml:"validators-table"`
+			} `yaml:"active-validators-table"`
 		} `yaml:"monitors-config"`
-		PublicRPC struct {
-			Testnet []string `yaml:"testnet"`
-			Devnet  []string `yaml:"devnet"`
-		} `yaml:"public-rpc"`
-		FullNode struct {
+		PublicRPC []string `yaml:"public-rpc"`
+		FullNode  struct {
 			JSONRPCAddress string `yaml:"json-rpc-address"`
 			MetricsAddress string `yaml:"metrics-address"`
 		} `yaml:"full-node"`
 		Validator struct {
 			MetricsAddress string `yaml:"metrics-address"`
 		} `yaml:"validator"`
-		NodeConfigPath string `yaml:"node-config-path"`
-		Network        struct {
-			Name        string `yaml:"name"`
-			NetworkType enums.NetworkType
-		} `yaml:"network"`
-		IPLookup struct {
+		SeedPeers []string `yaml:"seed-peers"`
+		IPLookup  struct {
 			AccessToken string `yaml:"access-token"`
 		} `yaml:"ip-lookup"`
 		MonitorsVisual struct {
 			ColorScheme  string `yaml:"color-scheme"`
 			EnableEmojis bool   `yaml:"enable-emojis"`
 		} `yaml:"monitors-visual"`
+		DbPath            string            `yaml:"db-path"`
 		ProcessLaunchType ProcessLaunchType `yaml:"process-launch-type"`
 	}
 )
@@ -116,29 +113,4 @@ func (sconfig *SuimonConfig) SetProcessLaunchType() {
 			ScreenSessionName: defaultScreenName,
 		}
 	}
-}
-
-// SetNetworkConfig sets the network configuration for the SuimonConfig struct to the given network type.
-// This function accepts the following parameter:
-// - networkType: an enums.NetworkType representing the type of network to configure the SuimonConfig struct for.
-// This function does not return anything.
-func (sconfig *SuimonConfig) SetNetworkConfig(networkType enums.NetworkType) {
-	sconfig.Network.NetworkType = networkType
-	sconfig.Network.Name = networkType.String()
-}
-
-// GetRPCByNetwork returns a list of RPC endpoint strings for the network configured in the SuimonConfig struct.
-// This function does not accept any parameters.
-// The function returns a slice of strings representing the RPC endpoints for the configured network.
-func (sconfig *SuimonConfig) GetRPCByNetwork() []string {
-	networkType := sconfig.Network.NetworkType
-
-	switch networkType {
-	case enums.NetworkTypeDevnet:
-		return sconfig.PublicRPC.Devnet
-	case enums.NetworkTypeTestnet:
-		return sconfig.PublicRPC.Testnet
-	}
-
-	return nil
 }

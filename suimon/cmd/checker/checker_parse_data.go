@@ -2,6 +2,7 @@ package checker
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 	"time"
 
@@ -26,7 +27,12 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 
 	switch tableType {
 	case enums.TableTypeNode:
-		addressRPC, addressMetrics := checker.nodeConfig.JSONRPCAddress, checker.nodeConfig.MetricsAddress
+		nodeConfig := checker.suimonConfig.FullNode
+		addressRPC, addressMetrics := nodeConfig.JSONRPCAddress, nodeConfig.MetricsAddress
+
+		if addressRPC == "" && addressMetrics == "" {
+			return nil, errors.New("node config not found in suimon.yaml")
+		}
 
 		var (
 			hostPortRPC     *address.HostPort
@@ -61,16 +67,36 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 		}
 
 		addresses = append(addresses, addressInfo)
-	case enums.TableTypePeers:
-		peers := checker.nodeConfig.P2PConfig.SeedPeers
-		if len(peers) == 0 {
-			return nil, errors.New("peers not found in fullnode.yaml")
+	case enums.TableTypeValidator:
+		validatorConfig := checker.suimonConfig.Validator
+		addressMetrics := validatorConfig.MetricsAddress
+
+		if addressMetrics == "" {
+			return nil, errors.New("validator config not found in suimon.yaml")
 		}
 
-		for _, peer := range peers {
-			hostPort, err := address.ParsePeer(peer.Address)
+		hostPortMetrics, err := address.ParseIpPort(addressMetrics)
+		if err != nil {
+			return nil, errors.New("invalid metrics-address in fullnode.yaml")
+		}
+
+		addressInfo := AddressInfo{HostPort: *hostPortMetrics, Ports: make(map[enums.PortType]string)}
+
+		if hostPortMetrics.Port != nil {
+			addressInfo.Ports[enums.PortTypeMetrics] = *hostPortMetrics.Port
+		}
+
+		addresses = append(addresses, addressInfo)
+	case enums.TableTypePeers:
+		peersConfig := checker.suimonConfig.SeedPeers
+		if len(peersConfig) == 0 {
+			return nil, errors.New("peers config not found in suimon.yaml")
+		}
+
+		for _, peer := range peersConfig {
+			hostPort, err := address.ParsePeer(peer)
 			if err != nil {
-				return nil, errors.New("invalid peer in fullnode.yaml")
+				return nil, fmt.Errorf("invalid peer in suimon.yaml: %s", peer)
 			}
 
 			addressInfo := AddressInfo{HostPort: *hostPort, Ports: make(map[enums.PortType]string)}
@@ -81,15 +107,15 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 			addresses = append(addresses, addressInfo)
 		}
 	case enums.TableTypeRPC:
-		rpc := checker.suimonConfig.GetRPCByNetwork()
-		if len(rpc) == 0 {
-			return nil, errors.New("rpc not found in suimon.yaml")
+		rpcConfig := checker.suimonConfig.PublicRPC
+		if len(rpcConfig) == 0 {
+			return nil, errors.New("rpc config not found in suimon.yaml")
 		}
 
-		for _, url := range rpc {
-			hostPort, err := address.ParseURL(url)
+		for _, rpc := range rpcConfig {
+			hostPort, err := address.ParseURL(rpc)
 			if err != nil {
-				return nil, errors.New("invalid rpc url in suimon.yaml")
+				return nil, fmt.Errorf("invalid rpc url in suimon.yaml: %s", rpc)
 			}
 
 			addressInfo := AddressInfo{HostPort: *hostPort, Ports: make(map[enums.PortType]string)}
@@ -108,15 +134,18 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 // Parameters: None.
 // Returns: an error, if any occurred during initialization.
 func (checker *Checker) Init() error {
-	var errChan = make(chan error, 3)
+	var errChan = make(chan error, 4)
 
 	defer close(errChan)
 
 	// parse data for the RPC servers
 	go checker.getHostsData(enums.TableTypeRPC, progress.ColorBlue, errChan)
 
-	// parse data for the user servers
+	// parse data for the full node
 	go checker.getHostsData(enums.TableTypeNode, progress.ColorRed, errChan)
+
+	// parse data for the validator
+	go checker.getHostsData(enums.TableTypeValidator, progress.ColorRed, errChan)
 
 	// parse data for the peers servers
 	go checker.getHostsData(enums.TableTypePeers, progress.ColorGreen, errChan)
@@ -131,6 +160,7 @@ func (checker *Checker) Init() error {
 
 	checker.setHostsHealth(enums.TableTypeRPC)
 	checker.setHostsHealth(enums.TableTypeNode)
+	checker.setHostsHealth(enums.TableTypeValidator)
 	checker.setHostsHealth(enums.TableTypePeers)
 
 	return nil
@@ -164,31 +194,25 @@ func (checker *Checker) getHostsData(tableType enums.TableType, progressColor pr
 
 	switch tableType {
 	case enums.TableTypeRPC:
-		if monitorsConfig.RPCTable.Display != true {
-			return
+		if monitorsConfig.RPCTable.Display {
+			parseHosts()
 		}
-
-		parseHosts()
 	case enums.TableTypePeers:
-		if monitorsConfig.NodeTable.Display != true {
-			return
+		if monitorsConfig.NodeTable.Display {
+			parseHosts()
 		}
-
-		parseHosts()
+	case enums.TableTypeValidator:
+		if monitorsConfig.ValidatorTable.Display {
+			parseHosts()
+		}
 	case enums.TableTypeNode:
-		if monitorsConfig.NodeTable.Display != true {
-			return
+		if monitorsConfig.NodeTable.Display {
+			parseHosts()
 		}
 
-		parseHosts()
-
-		fallthrough
-	case enums.TableTypeSystemState, enums.TableTypeValidators:
-		if monitorsConfig.ValidatorsTable.Display != true {
-			return
+		if monitorsConfig.ActiveValidatorsTable.Display || monitorsConfig.SystemTable.Display {
+			checker.node[0].GetLatestSuiSystemState()
 		}
-
-		checker.node[0].GetLatestSuiSystemState()
 	}
 }
 
