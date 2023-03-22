@@ -1,10 +1,9 @@
 package tables
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums/columnnames"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
 var (
@@ -12,7 +11,7 @@ var (
 	TableTagSystem        = ""
 	TableSortConfigSystem = make([]table.SortBy, 0)
 	ColumnConfigSystem    = []table.ColumnConfig{
-		enums.SystemColumnNameStorageFund: {
+		columnnames.SystemColumnNameStorageFund: {
 			Name:         "STORAGE FUND",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -20,7 +19,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.SystemColumnNameReferenceGasPrice: {
+		columnnames.SystemColumnNameReferenceGasPrice: {
 			Name:         "REFERENCE GAS\nPRICE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -28,7 +27,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.SystemColumnNameEpochDurationMs: {
+		columnnames.SystemColumnNameEpochDurationMs: {
 			Name:         "EPOCH DURATION",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -36,7 +35,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.SystemColumnNameStakeSubsidyCounter: {
+		columnnames.SystemColumnNameStakeSubsidyCounter: {
 			Name:         "STAKE SUBSIDY\nCOUNTER",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -44,7 +43,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.SystemColumnNameStakeSubsidyBalance: {
+		columnnames.SystemColumnNameStakeSubsidyBalance: {
 			Name:         "STAKE SUBSIDY BALANCE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -52,7 +51,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.SystemColumnNameStakeSubsidyCurrentEpochAmount: {
+		columnnames.SystemColumnNameStakeSubsidyCurrentEpochAmount: {
 			Name:         "STAKE SUBSIDY\nCURRENT EPOCH AMOUNT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -60,7 +59,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.SystemColumnNameTotalStake: {
+		columnnames.SystemColumnNameTotalStake: {
 			Name:         "TOTAL STAKE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -68,7 +67,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.SystemColumnNameValidatorsCount: {
+		columnnames.SystemColumnNameValidatorsCount: {
 			Name:         "VALIDATORS\nCOUNT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -76,7 +75,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.SystemColumnNameValidatorsAtRiskCount: {
+		columnnames.SystemColumnNameValidatorsAtRiskCount: {
 			Name:         "VALIDATORS AT RISK\nCOUNT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,

@@ -1,10 +1,9 @@
 package tables
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums/columnnames"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
 var (
@@ -16,7 +15,7 @@ var (
 		{Name: "LATEST\nCHECKPOINT", Mode: table.Dsc},
 	}
 	ColumnConfigPeer = []table.ColumnConfig{
-		enums.NodeColumnNameHealth: {
+		columnnames.NodeColumnNameHealth: {
 			Name:         "HEALTH",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -24,7 +23,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameAddress: {
+		columnnames.NodeColumnNameAddress: {
 			Name:         "ADDRESS",
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
@@ -32,7 +31,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNamePortRPC: {
+		columnnames.NodeColumnNamePortRPC: {
 			Name:         "RPC",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -40,7 +39,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameTotalTransactions: {
+		columnnames.NodeColumnNameTotalTransactions: {
 			Name:         "TOTAL\nTRANSACTIONS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -48,7 +47,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameLatestCheckpoint: {
+		columnnames.NodeColumnNameLatestCheckpoint: {
 			Name:         "LATEST\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -56,7 +55,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameTotalTransactionCertificates: {
+		columnnames.NodeColumnNameTotalTransactionCertificates: {
 			Name:         "TOTAL TRANSACTION\nCERTIFICATES",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -64,7 +63,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameTotalTransactionEffects: {
+		columnnames.NodeColumnNameTotalTransactionEffects: {
 			Name:         "TOTAL TRANSACTION\nEFFECTS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -72,7 +71,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameHighestKnownCheckpoint: {
+		columnnames.NodeColumnNameHighestKnownCheckpoint: {
 			Name:         "HIGHEST KNOWN\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -80,7 +79,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameHighestSyncedCheckpoint: {
+		columnnames.NodeColumnNameHighestSyncedCheckpoint: {
 			Name:         "HIGHEST SYNCED\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -88,7 +87,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameLastExecutedCheckpoint: {
+		columnnames.NodeColumnNameLastExecutedCheckpoint: {
 			Name:         "LAST EXECUTED\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -96,7 +95,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameCheckpointExecBacklog: {
+		columnnames.NodeColumnNameCheckpointExecBacklog: {
 			Name:         "CHECKPOINT EXEC\nBACKLOG",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -104,7 +103,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameCheckpointSyncBacklog: {
+		columnnames.NodeColumnNameCheckpointSyncBacklog: {
 			Name:         "CHECKPOINT SYNC\nBACKLOG",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -112,7 +111,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameCurrentEpoch: {
+		columnnames.NodeColumnNameCurrentEpoch: {
 			Name:         "CURRENT\nEPOCH",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -120,7 +119,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameTXSyncPercentage: {
+		columnnames.NodeColumnNameTXSyncPercentage: {
 			Name:         "TRANSACTIONS\nSYNC PERCENTAGE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -128,7 +127,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameCheckSyncPercentage: {
+		columnnames.NodeColumnNameCheckSyncPercentage: {
 			Name:         "CHECKPOINTS\nSYNC PERCENTAGE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -136,7 +135,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameNetworkPeers: {
+		columnnames.NodeColumnNameNetworkPeers: {
 			Name:         "NETWORK\nPEERS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -144,7 +143,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameUptime: {
+		columnnames.NodeColumnNameUptime: {
 			Name:         "UPTIME\nDAYS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -152,7 +151,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameVersion: {
+		columnnames.NodeColumnNameVersion: {
 			Name:         "VERSION",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -160,7 +159,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameCommit: {
+		columnnames.NodeColumnNameCommit: {
 			Name:         "COMMIT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -168,7 +167,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.NodeColumnNameCountry: {
+		columnnames.NodeColumnNameCountry: {
 			Name:         "COUNTRY",
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,

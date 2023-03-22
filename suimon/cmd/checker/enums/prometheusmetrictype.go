@@ -3,8 +3,7 @@ package enums
 type PrometheusMetricType int
 
 const (
-	PrometheusMetricTypeUntyped PrometheusMetricType = iota
-	PrometheusMetricTypeCounter
+	PrometheusMetricTypeCounter PrometheusMetricType = iota
 	PrometheusMetricTypeGauge
 	PrometheusMetricTypeHistogram
 	PrometheusMetricTypeSummary

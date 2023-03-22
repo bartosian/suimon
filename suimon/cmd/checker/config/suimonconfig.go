@@ -49,6 +49,13 @@ type (
 			Testnet []string `yaml:"testnet"`
 			Devnet  []string `yaml:"devnet"`
 		} `yaml:"public-rpc"`
+		FullNode struct {
+			JSONRPCAddress string `yaml:"json-rpc-address"`
+			MetricsAddress string `yaml:"metrics-address"`
+		} `yaml:"full-node"`
+		Validator struct {
+			MetricsAddress string `yaml:"metrics-address"`
+		} `yaml:"validator"`
 		NodeConfigPath string `yaml:"node-config-path"`
 		Network        struct {
 			Name        string `yaml:"name"`

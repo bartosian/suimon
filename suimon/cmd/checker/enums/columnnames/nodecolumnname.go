@@ -1,4 +1,4 @@
-package enums
+package columnnames
 
 //go:generate go run github.com/dmarkham/enumer -type=NodeColumnName -json -transform=snake-upper -output=./nodecolumnname.gen.go
 type NodeColumnName int

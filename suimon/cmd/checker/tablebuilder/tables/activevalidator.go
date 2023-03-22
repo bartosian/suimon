@@ -1,10 +1,9 @@
 package tables
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums/columnnames"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
 var (
@@ -15,7 +14,7 @@ var (
 		{Name: "NEXT EPOCH\nGAS PRICE", Mode: table.Dsc},
 	}
 	ColumnConfigActiveValidator = []table.ColumnConfig{
-		enums.ActiveValidatorColumnNameName: {
+		columnnames.ActiveValidatorColumnNameName: {
 			Name:         "NAME",
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
@@ -23,7 +22,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ActiveValidatorColumnNameNetAddress: {
+		columnnames.ActiveValidatorColumnNameNetAddress: {
 			Name:         "NET ADDRESS",
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
@@ -31,7 +30,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ActiveValidatorColumnNameVotingPower: {
+		columnnames.ActiveValidatorColumnNameVotingPower: {
 			Name:         "VOTING POWER",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -39,7 +38,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ActiveValidatorColumnNameGasPrice: {
+		columnnames.ActiveValidatorColumnNameGasPrice: {
 			Name:         "GAS PRIZE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -47,7 +46,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ActiveValidatorColumnNameCommissionRate: {
+		columnnames.ActiveValidatorColumnNameCommissionRate: {
 			Name:         "COMMISSION RATE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -55,7 +54,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ActiveValidatorColumnNameNextEpochStake: {
+		columnnames.ActiveValidatorColumnNameNextEpochStake: {
 			Name:         "NEXT EPOCH STAKE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -63,7 +62,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ActiveValidatorColumnNameNextEpochGasPrice: {
+		columnnames.ActiveValidatorColumnNameNextEpochGasPrice: {
 			Name:         "NEXT EPOCH\nGAS PRICE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -71,7 +70,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ActiveValidatorColumnNameNextEpochCommissionRate: {
+		columnnames.ActiveValidatorColumnNameNextEpochCommissionRate: {
 			Name:         "NEXT EPOCH\nCOMMISSION RATE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -79,7 +78,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ActiveValidatorColumnNameStakingPoolSuiBalance: {
+		columnnames.ActiveValidatorColumnNameStakingPoolSuiBalance: {
 			Name:         "STAKING POOL\nSUI BALANCE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -87,7 +86,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ActiveValidatorColumnNameRewardsPool: {
+		columnnames.ActiveValidatorColumnNameRewardsPool: {
 			Name:         "REWARDS POOL",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -95,7 +94,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ActiveValidatorColumnNamePoolTokenBalance: {
+		columnnames.ActiveValidatorColumnNamePoolTokenBalance: {
 			Name:         "POOL TOKEN BALANCE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -103,7 +102,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ActiveValidatorColumnNamePendingStake: {
+		columnnames.ActiveValidatorColumnNamePendingStake: {
 			Name:         "POOL PENDING STAKE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,

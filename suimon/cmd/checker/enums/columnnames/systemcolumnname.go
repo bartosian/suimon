@@ -1,4 +1,4 @@
-package enums
+package columnnames
 
 //go:generate go run github.com/dmarkham/enumer -type=SystemColumnName -json -transform=snake-upper -output=./systemcolumnname.gen.go
 type SystemColumnName int

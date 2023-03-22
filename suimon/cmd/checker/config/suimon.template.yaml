@@ -25,6 +25,13 @@ public-rpc:
 # update this section to indicate the location of the configuration file, which can be either fullnode.yaml or validator.yaml
 config-path: "/root/.suimon/fullnode.yaml"
 
+full-node:
+  json-rpc-address: 0.0.0.0:9000
+  metrics-address: 0.0.0.0:9184
+
+validator:
+  metrics-address: 0.0.0.0:9184
+
 # update this section to modify the settings related to the network
 network:
   name: "testnet"

@@ -128,6 +128,7 @@ func (checker *Checker) Init() error {
 	}
 
 	checker.sortHosts(enums.TableTypeRPC)
+
 	checker.setHostsHealth(enums.TableTypeRPC)
 	checker.setHostsHealth(enums.TableTypeNode)
 	checker.setHostsHealth(enums.TableTypePeers)

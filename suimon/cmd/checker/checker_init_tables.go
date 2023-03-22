@@ -6,6 +6,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums/columnnames"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder/tables"
 )
@@ -56,7 +57,13 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 	switch tableType {
 	case enums.TableTypeNode:
 		hosts = checker.getHostsByTableType(enums.TableTypeNode)
-		columnConfig = tables.ColumnConfigNode
+		nodeConfig := checker.nodeConfig
+
+		columnConfig = tables.ColumnConfigNode[:columnnames.NodeColumnNameCurrentRound]
+		if nodeConfig.ConsensusConfig != nil {
+			columnConfig = tables.ColumnConfigNode
+		}
+
 		columns = make(tablebuilder.Columns, len(columnConfig))
 
 		for i := 0; i < len(columnConfig); i++ {
@@ -95,28 +102,28 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 				port = rpcPortDefault
 			}
 
-			columns[enums.NodeColumnNameHealth].SetValue(status)
-			columns[enums.NodeColumnNameAddress].SetValue(address)
-			columns[enums.NodeColumnNamePortRPC].SetValue(port)
-			columns[enums.NodeColumnNameTotalTransactions].SetValue(host.Metrics.TotalTransactions)
-			columns[enums.NodeColumnNameTotalTransactionCertificates].SetValue(host.Metrics.TotalTransactionCertificates)
-			columns[enums.NodeColumnNameTotalTransactionEffects].SetValue(host.Metrics.TotalTransactionEffects)
-			columns[enums.NodeColumnNameLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
-			columns[enums.NodeColumnNameHighestKnownCheckpoint].SetValue(host.Metrics.HighestKnownCheckpoint)
-			columns[enums.NodeColumnNameHighestSyncedCheckpoint].SetValue(host.Metrics.HighestSyncedCheckpoint)
-			columns[enums.NodeColumnNameLastExecutedCheckpoint].SetValue(host.Metrics.LastExecutedCheckpoint)
-			columns[enums.NodeColumnNameCheckpointExecBacklog].SetValue(host.Metrics.CheckpointExecBacklog)
-			columns[enums.NodeColumnNameCheckpointSyncBacklog].SetValue(host.Metrics.CheckpointSyncBacklog)
-			columns[enums.NodeColumnNameCurrentEpoch].SetValue(host.Metrics.CurrentEpoch)
-			columns[enums.NodeColumnNameTXSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.TxSyncPercentage))
-			columns[enums.NodeColumnNameCheckSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage))
-			columns[enums.NodeColumnNameNetworkPeers].SetValue(host.Metrics.NetworkPeers)
-			columns[enums.NodeColumnNameUptime].SetValue(host.Metrics.Uptime)
-			columns[enums.NodeColumnNameVersion].SetValue(host.Metrics.Version)
-			columns[enums.NodeColumnNameCommit].SetValue(host.Metrics.Commit)
+			columns[columnnames.NodeColumnNameHealth].SetValue(status)
+			columns[columnnames.NodeColumnNameAddress].SetValue(address)
+			columns[columnnames.NodeColumnNamePortRPC].SetValue(port)
+			columns[columnnames.NodeColumnNameTotalTransactions].SetValue(host.Metrics.TotalTransactions)
+			columns[columnnames.NodeColumnNameTotalTransactionCertificates].SetValue(host.Metrics.TotalTransactionCertificates)
+			columns[columnnames.NodeColumnNameTotalTransactionEffects].SetValue(host.Metrics.TotalTransactionEffects)
+			columns[columnnames.NodeColumnNameLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
+			columns[columnnames.NodeColumnNameHighestKnownCheckpoint].SetValue(host.Metrics.HighestKnownCheckpoint)
+			columns[columnnames.NodeColumnNameHighestSyncedCheckpoint].SetValue(host.Metrics.HighestSyncedCheckpoint)
+			columns[columnnames.NodeColumnNameLastExecutedCheckpoint].SetValue(host.Metrics.LastExecutedCheckpoint)
+			columns[columnnames.NodeColumnNameCheckpointExecBacklog].SetValue(host.Metrics.CheckpointExecBacklog)
+			columns[columnnames.NodeColumnNameCheckpointSyncBacklog].SetValue(host.Metrics.CheckpointSyncBacklog)
+			columns[columnnames.NodeColumnNameCurrentEpoch].SetValue(host.Metrics.CurrentEpoch)
+			columns[columnnames.NodeColumnNameTXSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.TxSyncPercentage))
+			columns[columnnames.NodeColumnNameCheckSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage))
+			columns[columnnames.NodeColumnNameNetworkPeers].SetValue(host.Metrics.NetworkPeers)
+			columns[columnnames.NodeColumnNameUptime].SetValue(host.Metrics.Uptime)
+			columns[columnnames.NodeColumnNameVersion].SetValue(host.Metrics.Version)
+			columns[columnnames.NodeColumnNameCommit].SetValue(host.Metrics.Commit)
 
 			if host.Location == nil {
-				columns[enums.NodeColumnNameCountry].SetValue(nil)
+				columns[columnnames.NodeColumnNameCountry].SetValue(nil)
 
 				continue
 			}
@@ -125,7 +132,17 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 				country = host.Location.CountryName
 			}
 
-			columns[enums.NodeColumnNameCountry].SetValue(country)
+			columns[columnnames.NodeColumnNameCountry].SetValue(country)
+
+			if nodeConfig.ConsensusConfig != nil {
+				columns[columnnames.NodeColumnNameCurrentRound].SetValue(host.Metrics.CurrentRound)
+				columns[columnnames.NodeColumnNameHighestProcessedRound].SetValue(host.Metrics.HighestProcessedRound)
+				columns[columnnames.NodeColumnNameLastCommittedRound].SetValue(host.Metrics.LastCommittedRound)
+				columns[columnnames.NodeColumnNamePrimaryNetworkPeers].SetValue(host.Metrics.PrimaryNetworkPeers)
+				columns[columnnames.NodeColumnNameWorkerNetworkPeers].SetValue(host.Metrics.WorkerNetworkPeers)
+				columns[columnnames.NodeColumnNameSkippedConsensusTransactions].SetValue(host.Metrics.SkippedConsensusTransactions)
+				columns[columnnames.NodeColumnNameTotalSignatureErrors].SetValue(host.Metrics.TotalSignatureErrors)
+			}
 		}
 	case enums.TableTypePeers:
 		hosts = checker.getHostsByTableType(enums.TableTypePeers)
@@ -168,28 +185,28 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 				port = rpcPortDefault
 			}
 
-			columns[enums.NodeColumnNameHealth].SetValue(status)
-			columns[enums.NodeColumnNameAddress].SetValue(address)
-			columns[enums.NodeColumnNamePortRPC].SetValue(port)
-			columns[enums.NodeColumnNameTotalTransactions].SetValue(host.Metrics.TotalTransactions)
-			columns[enums.NodeColumnNameTotalTransactionCertificates].SetValue(host.Metrics.TotalTransactionCertificates)
-			columns[enums.NodeColumnNameTotalTransactionEffects].SetValue(host.Metrics.TotalTransactionEffects)
-			columns[enums.NodeColumnNameLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
-			columns[enums.NodeColumnNameHighestKnownCheckpoint].SetValue(host.Metrics.HighestKnownCheckpoint)
-			columns[enums.NodeColumnNameHighestSyncedCheckpoint].SetValue(host.Metrics.HighestSyncedCheckpoint)
-			columns[enums.NodeColumnNameLastExecutedCheckpoint].SetValue(host.Metrics.LastExecutedCheckpoint)
-			columns[enums.NodeColumnNameCheckpointExecBacklog].SetValue(host.Metrics.CheckpointExecBacklog)
-			columns[enums.NodeColumnNameCheckpointSyncBacklog].SetValue(host.Metrics.CheckpointSyncBacklog)
-			columns[enums.NodeColumnNameCurrentEpoch].SetValue(host.Metrics.CurrentEpoch)
-			columns[enums.NodeColumnNameTXSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.TxSyncPercentage))
-			columns[enums.NodeColumnNameCheckSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage))
-			columns[enums.NodeColumnNameNetworkPeers].SetValue(host.Metrics.NetworkPeers)
-			columns[enums.NodeColumnNameUptime].SetValue(host.Metrics.Uptime)
-			columns[enums.NodeColumnNameVersion].SetValue(host.Metrics.Version)
-			columns[enums.NodeColumnNameCommit].SetValue(host.Metrics.Commit)
+			columns[columnnames.NodeColumnNameHealth].SetValue(status)
+			columns[columnnames.NodeColumnNameAddress].SetValue(address)
+			columns[columnnames.NodeColumnNamePortRPC].SetValue(port)
+			columns[columnnames.NodeColumnNameTotalTransactions].SetValue(host.Metrics.TotalTransactions)
+			columns[columnnames.NodeColumnNameTotalTransactionCertificates].SetValue(host.Metrics.TotalTransactionCertificates)
+			columns[columnnames.NodeColumnNameTotalTransactionEffects].SetValue(host.Metrics.TotalTransactionEffects)
+			columns[columnnames.NodeColumnNameLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
+			columns[columnnames.NodeColumnNameHighestKnownCheckpoint].SetValue(host.Metrics.HighestKnownCheckpoint)
+			columns[columnnames.NodeColumnNameHighestSyncedCheckpoint].SetValue(host.Metrics.HighestSyncedCheckpoint)
+			columns[columnnames.NodeColumnNameLastExecutedCheckpoint].SetValue(host.Metrics.LastExecutedCheckpoint)
+			columns[columnnames.NodeColumnNameCheckpointExecBacklog].SetValue(host.Metrics.CheckpointExecBacklog)
+			columns[columnnames.NodeColumnNameCheckpointSyncBacklog].SetValue(host.Metrics.CheckpointSyncBacklog)
+			columns[columnnames.NodeColumnNameCurrentEpoch].SetValue(host.Metrics.CurrentEpoch)
+			columns[columnnames.NodeColumnNameTXSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.TxSyncPercentage))
+			columns[columnnames.NodeColumnNameCheckSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage))
+			columns[columnnames.NodeColumnNameNetworkPeers].SetValue(host.Metrics.NetworkPeers)
+			columns[columnnames.NodeColumnNameUptime].SetValue(host.Metrics.Uptime)
+			columns[columnnames.NodeColumnNameVersion].SetValue(host.Metrics.Version)
+			columns[columnnames.NodeColumnNameCommit].SetValue(host.Metrics.Commit)
 
 			if host.Location == nil {
-				columns[enums.NodeColumnNameCountry].SetValue(nil)
+				columns[columnnames.NodeColumnNameCountry].SetValue(nil)
 
 				continue
 			}
@@ -198,7 +215,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 				country = host.Location.CountryName
 			}
 
-			columns[enums.NodeColumnNameCountry].SetValue(country)
+			columns[columnnames.NodeColumnNameCountry].SetValue(country)
 		}
 	case enums.TableTypeRPC:
 		hosts = checker.getHostsByTableType(enums.TableTypeRPC)
@@ -240,11 +257,11 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 				port = rpcPortDefault
 			}
 
-			columns[enums.NodeColumnNameHealth].SetValue(status)
-			columns[enums.NodeColumnNameAddress].SetValue(address)
-			columns[enums.NodeColumnNamePortRPC].SetValue(port)
-			columns[enums.NodeColumnNameTotalTransactions].SetValue(host.Metrics.TotalTransactions)
-			columns[enums.NodeColumnNameLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
+			columns[columnnames.NodeColumnNameHealth].SetValue(status)
+			columns[columnnames.NodeColumnNameAddress].SetValue(address)
+			columns[columnnames.NodeColumnNamePortRPC].SetValue(port)
+			columns[columnnames.NodeColumnNameTotalTransactions].SetValue(host.Metrics.TotalTransactions)
+			columns[columnnames.NodeColumnNameLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
 		}
 	case enums.TableTypeSystemState:
 		hosts = checker.getHostsByTableType(enums.TableTypeSystemState)
@@ -274,15 +291,15 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 
 			systemState := host.Metrics.SystemState
 
-			columns[enums.SystemColumnNameStorageFund].SetValue(systemState.StorageFund)
-			columns[enums.SystemColumnNameReferenceGasPrice].SetValue(systemState.ReferenceGasPrice)
-			columns[enums.SystemColumnNameEpochDurationMs].SetValue(systemState.EpochDurationMs)
-			columns[enums.SystemColumnNameStakeSubsidyCounter].SetValue(systemState.StakeSubsidyEpochCounter)
-			columns[enums.SystemColumnNameStakeSubsidyBalance].SetValue(systemState.StakeSubsidyBalance)
-			columns[enums.SystemColumnNameStakeSubsidyCurrentEpochAmount].SetValue(systemState.StakeSubsidyCurrentEpochAmount)
-			columns[enums.SystemColumnNameTotalStake].SetValue(systemState.TotalStake)
-			columns[enums.SystemColumnNameValidatorsCount].SetValue(len(systemState.ActiveValidators))
-			columns[enums.SystemColumnNameValidatorsAtRiskCount].SetValue(len(systemState.AtRiskValidators))
+			columns[columnnames.SystemColumnNameStorageFund].SetValue(systemState.StorageFund)
+			columns[columnnames.SystemColumnNameReferenceGasPrice].SetValue(systemState.ReferenceGasPrice)
+			columns[columnnames.SystemColumnNameEpochDurationMs].SetValue(systemState.EpochDurationMs)
+			columns[columnnames.SystemColumnNameStakeSubsidyCounter].SetValue(systemState.StakeSubsidyEpochCounter)
+			columns[columnnames.SystemColumnNameStakeSubsidyBalance].SetValue(systemState.StakeSubsidyBalance)
+			columns[columnnames.SystemColumnNameStakeSubsidyCurrentEpochAmount].SetValue(systemState.StakeSubsidyCurrentEpochAmount)
+			columns[columnnames.SystemColumnNameTotalStake].SetValue(systemState.TotalStake)
+			columns[columnnames.SystemColumnNameValidatorsCount].SetValue(len(systemState.ActiveValidators))
+			columns[columnnames.SystemColumnNameValidatorsAtRiskCount].SetValue(len(systemState.AtRiskValidators))
 		}
 	case enums.TableTypeValidators:
 		hosts = checker.getHostsByTableType(enums.TableTypeValidators)
@@ -308,18 +325,18 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		for _, validator := range activeValidators {
 			tableConfig.RowsCount++
 
-			columns[enums.ActiveValidatorColumnNameName].SetValue(validator.Name)
-			columns[enums.ActiveValidatorColumnNameNetAddress].SetValue(validator.NetAddress)
-			columns[enums.ActiveValidatorColumnNameVotingPower].SetValue(validator.VotingPower)
-			columns[enums.ActiveValidatorColumnNameGasPrice].SetValue(validator.GasPrice)
-			columns[enums.ActiveValidatorColumnNameCommissionRate].SetValue(validator.CommissionRate)
-			columns[enums.ActiveValidatorColumnNameNextEpochStake].SetValue(validator.NextEpochStake)
-			columns[enums.ActiveValidatorColumnNameNextEpochGasPrice].SetValue(validator.NextEpochGasPrice)
-			columns[enums.ActiveValidatorColumnNameNextEpochCommissionRate].SetValue(validator.NextEpochCommissionRate)
-			columns[enums.ActiveValidatorColumnNameStakingPoolSuiBalance].SetValue(validator.StakingPoolSuiBalance)
-			columns[enums.ActiveValidatorColumnNameRewardsPool].SetValue(validator.RewardsPool)
-			columns[enums.ActiveValidatorColumnNamePoolTokenBalance].SetValue(validator.PoolTokenBalance)
-			columns[enums.ActiveValidatorColumnNamePendingStake].SetValue(validator.PendingStake)
+			columns[columnnames.ActiveValidatorColumnNameName].SetValue(validator.Name)
+			columns[columnnames.ActiveValidatorColumnNameNetAddress].SetValue(validator.NetAddress)
+			columns[columnnames.ActiveValidatorColumnNameVotingPower].SetValue(validator.VotingPower)
+			columns[columnnames.ActiveValidatorColumnNameGasPrice].SetValue(validator.GasPrice)
+			columns[columnnames.ActiveValidatorColumnNameCommissionRate].SetValue(validator.CommissionRate)
+			columns[columnnames.ActiveValidatorColumnNameNextEpochStake].SetValue(validator.NextEpochStake)
+			columns[columnnames.ActiveValidatorColumnNameNextEpochGasPrice].SetValue(validator.NextEpochGasPrice)
+			columns[columnnames.ActiveValidatorColumnNameNextEpochCommissionRate].SetValue(validator.NextEpochCommissionRate)
+			columns[columnnames.ActiveValidatorColumnNameStakingPoolSuiBalance].SetValue(validator.StakingPoolSuiBalance)
+			columns[columnnames.ActiveValidatorColumnNameRewardsPool].SetValue(validator.RewardsPool)
+			columns[columnnames.ActiveValidatorColumnNamePoolTokenBalance].SetValue(validator.PoolTokenBalance)
+			columns[columnnames.ActiveValidatorColumnNamePendingStake].SetValue(validator.PendingStake)
 		}
 	}
 

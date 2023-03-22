@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/env"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 	"os"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/env"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 const (
@@ -22,6 +23,7 @@ type NodeConfig struct {
 	JSONRPCAddress        string `yaml:"json-rpc-address"`
 	WebsocketAddress      string `yaml:"websocket-address"`
 	EnableEventProcessing bool   `yaml:"enable-event-processing"`
+	ConsensusConfig       any    `yaml:"consensus-config"`
 	Genesis               struct {
 		GenesisFileLocation string `yaml:"genesis-file-location"`
 	} `yaml:"genesis"`
