@@ -36,6 +36,8 @@ type (
 	Host struct {
 		AddressInfo
 
+		TableType enums.TableType
+
 		Status   enums.Status
 		Location *Location
 		Metrics  Metrics
@@ -55,8 +57,9 @@ type (
 // - ipClient: a pointer to an "ipinfo.Client" instance for retrieving additional information about the host's IP.
 // - httpClient: a pointer to an "http.Client" instance for performing HTTP requests to the host.
 // Returns: a pointer to the newly created "Host" object.
-func newHost(addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.Client) *Host {
+func newHost(tableType enums.TableType, addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.Client) *Host {
 	host := &Host{
+		TableType:   tableType,
 		AddressInfo: addressInfo,
 		ipClient:    ipClient,
 		httpClient:  httpClient,
@@ -97,21 +100,31 @@ func (host *Host) SetStatus(rpc Host) {
 	metricsHost := host.Metrics
 	metricsRPC := rpc.Metrics
 
-	if !metricsHost.Updated || metricsHost.TotalTransactions == 0 || metricsHost.LatestCheckpoint == 0 ||
-		metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == transactionsPerSecondWindow ||
-		metricsHost.TxSyncPercentage == 0 || metricsHost.Version != metricsRPC.Version {
+	switch host.TableType {
+	case enums.TableTypeValidator:
+		if !metricsHost.Updated || metricsHost.Uptime == "0.00" {
 
-		host.Status = enums.StatusRed
+			host.Status = enums.StatusRed
 
-		return
-	}
+			return
+		}
+	case enums.TableTypeNode, enums.TableTypeRPC, enums.TableTypePeers:
+		if !metricsHost.Updated || metricsHost.TotalTransactions == 0 || metricsHost.LatestCheckpoint == 0 ||
+			metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == transactionsPerSecondWindow ||
+			metricsHost.TxSyncPercentage == 0 || metricsHost.TxSyncPercentage > 110 || metricsHost.CheckSyncPercentage > 110 {
 
-	if metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) ||
-		metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactions, metricsRPC.TotalTransactions) ||
-		metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
-		host.Status = enums.StatusYellow
+			host.Status = enums.StatusRed
 
-		return
+			return
+		}
+
+		if metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) ||
+			metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactions, metricsRPC.TotalTransactions) ||
+			metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
+			host.Status = enums.StatusYellow
+
+			return
+		}
 	}
 
 	host.Status = enums.StatusGreen

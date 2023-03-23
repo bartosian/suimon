@@ -84,6 +84,10 @@ func ParsePeer(address string) (*HostPort, error) {
 }
 
 func ParseURL(address string) (*HostPort, error) {
+	if !strings.HasPrefix(address, "http") {
+		address = "http://" + address
+	}
+
 	u, err := url.Parse(address)
 	if err != nil {
 		return nil, err

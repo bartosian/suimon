@@ -1,6 +1,5 @@
 package columnnames
 
-//go:generate go run github.com/dmarkham/enumer -type=NodeColumnName -json -transform=snake-upper -output=./nodecolumnname.gen.go
 type NodeColumnName int
 
 const (
@@ -24,11 +23,4 @@ const (
 	NodeColumnNameVersion
 	NodeColumnNameCommit
 	NodeColumnNameCountry
-	NodeColumnNameCurrentRound
-	NodeColumnNameHighestProcessedRound
-	NodeColumnNameLastCommittedRound
-	NodeColumnNamePrimaryNetworkPeers
-	NodeColumnNameWorkerNetworkPeers
-	NodeColumnNameSkippedConsensusTransactions
-	NodeColumnNameTotalSignatureErrors
 )

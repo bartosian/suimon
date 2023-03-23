@@ -1,16 +1,19 @@
 package columnnames
 
-//go:generate go run github.com/dmarkham/enumer -type=SystemColumnName -json -transform=snake-upper -output=./systemcolumnname.gen.go
 type SystemColumnName int
 
 const (
-	SystemColumnNameStorageFund SystemColumnName = iota
-	SystemColumnNameReferenceGasPrice
+	SystemColumnNameEpoch SystemColumnName = iota
 	SystemColumnNameEpochDurationMs
+	SystemColumnNameStorageFund
+	SystemColumnNameReferenceGasPrice
 	SystemColumnNameStakeSubsidyCounter
 	SystemColumnNameStakeSubsidyBalance
 	SystemColumnNameStakeSubsidyCurrentEpochAmount
 	SystemColumnNameTotalStake
 	SystemColumnNameValidatorsCount
+	SystemColumnNamePendingActiveValidatorsSize
+	SystemColumnNamePendingRemovals
+	SystemColumnNameValidatorsCandidateSize
 	SystemColumnNameValidatorsAtRiskCount
 )

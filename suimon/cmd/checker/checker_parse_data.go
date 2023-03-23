@@ -23,7 +23,10 @@ const (
 // - a slice of "AddressInfo" values for the specified table.
 // - an error, if any occurred during retrieval of the address information.
 func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]AddressInfo, error) {
-	var addresses []AddressInfo
+	var (
+		addresses []AddressInfo
+		err       error
+	)
 
 	switch tableType {
 	case enums.TableTypeNode:
@@ -31,7 +34,7 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 		addressRPC, addressMetrics := nodeConfig.JSONRPCAddress, nodeConfig.MetricsAddress
 
 		if addressRPC == "" && addressMetrics == "" {
-			return nil, errors.New("node config not found in suimon.yaml")
+			return nil, errors.New("full-node config not found in suimon.yaml")
 		}
 
 		var (
@@ -40,21 +43,15 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 		)
 
 		if addressRPC != "" {
-			hostPort, err := address.ParseIpPort(addressRPC)
-			if err != nil {
-				return nil, errors.New("invalid json-rpc-address in fullnode.yaml")
+			if hostPortRPC, err = address.ParseURL(addressRPC); err != nil {
+				return nil, fmt.Errorf("invalid full-node json-rpc-address in fullnode.yaml: %s", err)
 			}
-
-			hostPortRPC = hostPort
 		}
 
 		if addressMetrics != "" {
-			hostPort, err := address.ParseIpPort(addressMetrics)
-			if err != nil {
-				return nil, errors.New("invalid metrics-address in fullnode.yaml")
+			if hostPortMetrics, err = address.ParseURL(addressMetrics); err != nil {
+				return nil, fmt.Errorf("invalid full-node metrics-address in fullnode.yaml: %s", err)
 			}
-
-			hostPortMetrics = hostPort
 		}
 
 		addressInfo := AddressInfo{HostPort: *hostPortRPC, Ports: make(map[enums.PortType]string)}
@@ -75,9 +72,10 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 			return nil, errors.New("validator config not found in suimon.yaml")
 		}
 
-		hostPortMetrics, err := address.ParseIpPort(addressMetrics)
-		if err != nil {
-			return nil, errors.New("invalid metrics-address in fullnode.yaml")
+		var hostPortMetrics *address.HostPort
+
+		if hostPortMetrics, err = address.ParseURL(addressMetrics); err != nil {
+			return nil, fmt.Errorf("invalid validator metrics-address in fullnode.yaml: %s", err)
 		}
 
 		addressInfo := AddressInfo{HostPort: *hostPortMetrics, Ports: make(map[enums.PortType]string)}
@@ -90,7 +88,7 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 	case enums.TableTypePeers:
 		peersConfig := checker.suimonConfig.SeedPeers
 		if len(peersConfig) == 0 {
-			return nil, errors.New("peers config not found in suimon.yaml")
+			return nil, errors.New("seed-peers config not found in suimon.yaml")
 		}
 
 		for _, peer := range peersConfig {
@@ -109,7 +107,7 @@ func (checker *Checker) getAddressInfoByTableType(tableType enums.TableType) ([]
 	case enums.TableTypeRPC:
 		rpcConfig := checker.suimonConfig.PublicRPC
 		if len(rpcConfig) == 0 {
-			return nil, errors.New("rpc config not found in suimon.yaml")
+			return nil, errors.New("public-rpc config not found in suimon.yaml")
 		}
 
 		for _, rpc := range rpcConfig {
@@ -185,7 +183,7 @@ func (checker *Checker) getHostsData(tableType enums.TableType, progressColor pr
 			return
 		}
 
-		if hosts, err = checker.createHosts(addresses); err != nil {
+		if hosts, err = checker.createHosts(tableType, addresses); err != nil {
 			return
 		}
 

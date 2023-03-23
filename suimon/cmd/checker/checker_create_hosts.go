@@ -1,7 +1,7 @@
 package checker
 
 import (
-	"sync"
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
 // createHosts creates a list of "Host" values based on the provided "AddressInfo" values
@@ -12,13 +12,14 @@ import (
 // Returns:
 // - a slice of "Host" values created from the provided "AddressInfo" values.
 // - an error, if any occurred during host creation.
-func (checker *Checker) createHosts(addresses []AddressInfo) ([]Host, error) {
+func (checker *Checker) createHosts(tableType enums.TableType, addresses []AddressInfo) ([]Host, error) {
 	var (
-		wg                 sync.WaitGroup
-		hostCH             = make(chan Host)
-		processedAddresses = make(map[string]struct{})
+		hostCH             = make(chan Host, len(addresses))
 		hosts              = make([]Host, 0, len(addresses))
+		processedAddresses = make(map[string]struct{})
 	)
+
+	defer close(hostCH)
 
 	for _, addressInfo := range addresses {
 		address := addressInfo.HostPort.Address
@@ -28,12 +29,8 @@ func (checker *Checker) createHosts(addresses []AddressInfo) ([]Host, error) {
 
 		processedAddresses[address] = struct{}{}
 
-		wg.Add(1)
-
 		go func(addressInfo AddressInfo) {
-			defer wg.Done()
-
-			host := newHost(addressInfo, checker.ipClient, checker.httpClient)
+			host := newHost(tableType, addressInfo, checker.ipClient, checker.httpClient)
 
 			if checker.suimonConfig.IPLookup.AccessToken != "" {
 				host.SetLocation()
@@ -45,13 +42,8 @@ func (checker *Checker) createHosts(addresses []AddressInfo) ([]Host, error) {
 		}(addressInfo)
 	}
 
-	go func() {
-		wg.Wait()
-		close(hostCH)
-	}()
-
-	for host := range hostCH {
-		hosts = append(hosts, host)
+	for i := 0; i < len(addresses); i++ {
+		hosts = append(hosts, <-hostCH)
 	}
 
 	return hosts, nil

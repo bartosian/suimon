@@ -1,0 +1,29 @@
+package columnnames
+
+type ValidatorColumnName int
+
+const (
+	ValidatorColumnNameHealth ValidatorColumnName = iota
+	ValidatorColumnNameAddress
+	ValidatorColumnNameTotalTransactionCertificates
+	ValidatorColumnNameTotalTransactionEffects
+	ValidatorColumnNameHighestKnownCheckpoint
+	ValidatorColumnNameLastExecutedCheckpoint
+	ValidatorColumnNameCheckpointExecBacklog
+	ValidatorColumnNameHighestSyncedCheckpoint
+	ValidatorColumnNameCheckpointSyncBacklog
+	ValidatorColumnNameCurrentEpoch
+	ValidatorColumnNameCheckSyncPercentage
+	ValidatorColumnNameNetworkPeers
+	ValidatorColumnNameUptime
+	ValidatorColumnNameVersion
+	ValidatorColumnNameCommit
+	ValidatorColumnNameCountry
+	ValidatorColumnNameCurrentRound
+	ValidatorColumnNameHighestProcessedRound
+	ValidatorColumnNameLastCommittedRound
+	ValidatorColumnNamePrimaryNetworkPeers
+	ValidatorColumnNameWorkerNetworkPeers
+	ValidatorColumnNameSkippedConsensusTransactions
+	ValidatorColumnNameTotalSignatureErrors
+)

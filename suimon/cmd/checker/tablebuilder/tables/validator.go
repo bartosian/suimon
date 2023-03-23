@@ -7,15 +7,15 @@ import (
 )
 
 var (
-	TableStyleNode      = table.StyleLight
-	TableTagNode        = ""
-	TableSortConfigNode = []table.SortBy{
+	TableStyleValidator      = table.StyleLight
+	TableTagValidator        = ""
+	TableSortConfigValidator = []table.SortBy{
 		{Name: "HEALTH", Mode: table.Dsc},
 		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
 		{Name: "LATEST\nCHECKPOINT", Mode: table.Dsc},
 	}
-	ColumnConfigNode = []table.ColumnConfig{
-		columnnames.NodeColumnNameHealth: {
+	ColumnConfigValidator = []table.ColumnConfig{
+		columnnames.ValidatorColumnNameHealth: {
 			Name:         "HEALTH",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -23,7 +23,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameAddress: {
+		columnnames.ValidatorColumnNameAddress: {
 			Name:         "ADDRESS",
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
@@ -31,31 +31,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNamePortRPC: {
-			Name:         "RPC",
-			Align:        text.AlignCenter,
-			AlignHeader:  text.AlignCenter,
-			VAlign:       text.VAlignMiddle,
-			VAlignHeader: text.VAlignMiddle,
-			Hidden:       false,
-		},
-		columnnames.NodeColumnNameTotalTransactions: {
-			Name:         "TOTAL\nTRANSACTIONS",
-			Align:        text.AlignCenter,
-			AlignHeader:  text.AlignCenter,
-			VAlign:       text.VAlignMiddle,
-			VAlignHeader: text.VAlignMiddle,
-			Hidden:       false,
-		},
-		columnnames.NodeColumnNameLatestCheckpoint: {
-			Name:         "LATEST\nCHECKPOINT",
-			Align:        text.AlignCenter,
-			AlignHeader:  text.AlignCenter,
-			VAlign:       text.VAlignMiddle,
-			VAlignHeader: text.VAlignMiddle,
-			Hidden:       false,
-		},
-		columnnames.NodeColumnNameTotalTransactionCertificates: {
+		columnnames.ValidatorColumnNameTotalTransactionCertificates: {
 			Name:         "TOTAL TRANSACTION\nCERTIFICATES",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -63,7 +39,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameTotalTransactionEffects: {
+		columnnames.ValidatorColumnNameTotalTransactionEffects: {
 			Name:         "TOTAL TRANSACTION\nEFFECTS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -71,7 +47,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameHighestKnownCheckpoint: {
+		columnnames.ValidatorColumnNameHighestKnownCheckpoint: {
 			Name:         "HIGHEST KNOWN\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -79,7 +55,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameHighestSyncedCheckpoint: {
+		columnnames.ValidatorColumnNameHighestSyncedCheckpoint: {
 			Name:         "HIGHEST SYNCED\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -87,7 +63,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameLastExecutedCheckpoint: {
+		columnnames.ValidatorColumnNameLastExecutedCheckpoint: {
 			Name:         "LAST EXECUTED\nCHECKPOINT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -95,7 +71,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameCheckpointExecBacklog: {
+		columnnames.ValidatorColumnNameCheckpointExecBacklog: {
 			Name:         "CHECKPOINT EXEC\nBACKLOG",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -103,7 +79,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameCheckpointSyncBacklog: {
+		columnnames.ValidatorColumnNameCheckpointSyncBacklog: {
 			Name:         "CHECKPOINT SYNC\nBACKLOG",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -111,7 +87,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameCurrentEpoch: {
+		columnnames.ValidatorColumnNameCurrentEpoch: {
 			Name:         "CURRENT\nEPOCH",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -119,15 +95,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameTXSyncPercentage: {
-			Name:         "TRANSACTIONS\nSYNC PERCENTAGE",
-			Align:        text.AlignCenter,
-			AlignHeader:  text.AlignCenter,
-			VAlign:       text.VAlignMiddle,
-			VAlignHeader: text.VAlignMiddle,
-			Hidden:       false,
-		},
-		columnnames.NodeColumnNameCheckSyncPercentage: {
+		columnnames.ValidatorColumnNameCheckSyncPercentage: {
 			Name:         "CHECKPOINTS\nSYNC PERCENTAGE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -135,7 +103,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameNetworkPeers: {
+		columnnames.ValidatorColumnNameNetworkPeers: {
 			Name:         "NETWORK\nPEERS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -143,7 +111,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameUptime: {
+		columnnames.ValidatorColumnNameUptime: {
 			Name:         "UPTIME\nDAYS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -151,7 +119,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameVersion: {
+		columnnames.ValidatorColumnNameVersion: {
 			Name:         "VERSION",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -159,7 +127,7 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameCommit: {
+		columnnames.ValidatorColumnNameCommit: {
 			Name:         "COMMIT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
@@ -167,9 +135,65 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameCountry: {
+		columnnames.ValidatorColumnNameCountry: {
 			Name:         "COUNTRY",
 			Align:        text.AlignLeft,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		columnnames.ValidatorColumnNameCurrentRound: {
+			Name:         "CURRENT ROUND",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		columnnames.ValidatorColumnNameHighestProcessedRound: {
+			Name:         "HIGHEST\nPROCESSED ROUND",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		columnnames.ValidatorColumnNameLastCommittedRound: {
+			Name:         "LAST\nCOMMITTED ROUND",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		columnnames.ValidatorColumnNamePrimaryNetworkPeers: {
+			Name:         "PRIMARY\nNETWORK PEERS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		columnnames.ValidatorColumnNameWorkerNetworkPeers: {
+			Name:         "WORKER\nNETWORK PEERS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		columnnames.ValidatorColumnNameSkippedConsensusTransactions: {
+			Name:         "SKIPPED CONSENSUS\nTRANSACTIONS",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		columnnames.ValidatorColumnNameTotalSignatureErrors: {
+			Name:         "TOTAL\nSIGNATURE ERRORS",
+			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,

@@ -1,6 +1,5 @@
 package columnnames
 
-//go:generate go run github.com/dmarkham/enumer -type=ActiveValidatorColumnName -json -transform=snake-upper -output=./activevalidatorcolumnname.gen.go
 type ActiveValidatorColumnName int
 
 const (
