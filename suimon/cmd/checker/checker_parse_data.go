@@ -136,6 +136,11 @@ func (checker *Checker) Init() error {
 
 	defer close(errChan)
 
+	if monitorsConfig := checker.suimonConfig.MonitorsConfig; !monitorsConfig.PeersTable.Display && !monitorsConfig.RPCTable.Display &&
+		!monitorsConfig.NodeTable.Display && !monitorsConfig.ActiveValidatorsTable.Display && !monitorsConfig.ValidatorTable.Display {
+		return errors.New("all tables disabled in suimon.yaml")
+	}
+
 	// parse data for the RPC servers
 	go checker.getHostsData(enums.TableTypeRPC, progress.ColorBlue, errChan)
 
@@ -153,8 +158,6 @@ func (checker *Checker) Init() error {
 			return err
 		}
 	}
-
-	checker.sortHosts(enums.TableTypeRPC)
 
 	checker.setHostsHealth(enums.TableTypeRPC)
 	checker.setHostsHealth(enums.TableTypeNode)
@@ -192,11 +195,15 @@ func (checker *Checker) getHostsData(tableType enums.TableType, progressColor pr
 
 	switch tableType {
 	case enums.TableTypeRPC:
-		if monitorsConfig.RPCTable.Display {
-			parseHosts()
+		parseHosts()
+
+		checker.sortHosts(enums.TableTypeRPC)
+
+		if monitorsConfig.ActiveValidatorsTable.Display || monitorsConfig.SystemTable.Display {
+			checker.rpc[0].GetLatestSuiSystemState()
 		}
 	case enums.TableTypePeers:
-		if monitorsConfig.NodeTable.Display {
+		if monitorsConfig.PeersTable.Display {
 			parseHosts()
 		}
 	case enums.TableTypeValidator:
@@ -206,10 +213,6 @@ func (checker *Checker) getHostsData(tableType enums.TableType, progressColor pr
 	case enums.TableTypeNode:
 		if monitorsConfig.NodeTable.Display {
 			parseHosts()
-		}
-
-		if monitorsConfig.ActiveValidatorsTable.Display || monitorsConfig.SystemTable.Display {
-			checker.node[0].GetLatestSuiSystemState()
 		}
 	}
 }

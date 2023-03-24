@@ -297,12 +297,10 @@ func (host *Host) getUrl(request requestType, secure bool) string {
 	case requestTypeRPC:
 		if port, ok := host.Ports[enums.PortTypeRPC]; ok {
 			hostUrl.Host = hostUrl.Hostname() + ":" + port
-		} else if hostPort.Host == nil {
+		} else {
 			hostUrl.Host = hostUrl.Hostname() + ":" + rpcPortDefault
 		}
 	case requestTypeMetrics:
-		fallthrough
-	default:
 		hostUrl.Path = "/metrics"
 
 		if port, ok := host.Ports[enums.PortTypeMetrics]; ok {

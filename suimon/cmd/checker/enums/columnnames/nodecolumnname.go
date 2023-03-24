@@ -3,7 +3,8 @@ package columnnames
 type NodeColumnName int
 
 const (
-	NodeColumnNameHealth NodeColumnName = iota
+	NodeColumnNameIndex NodeColumnName = iota
+	NodeColumnNameHealth
 	NodeColumnNameAddress
 	NodeColumnNamePortRPC
 	NodeColumnNameTotalTransactions

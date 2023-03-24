@@ -8,17 +8,12 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 )
 
-const suiEmoji = "💧 "
+const suiEmoji = "💧"
 
 var nameTransformer = text.Transformer(func(val interface{}) string {
 	return text.Bold.Sprint(val)
 })
 
-func GetTableTitle(table enums.TableType, emojisEnabled bool) string {
-	var emoji string
-	if emojisEnabled {
-		emoji = suiEmoji
-	}
-
-	return fmt.Sprintf("%s%sSUIMON%s %s[ %s ]%s", emoji, enums.ColorGreen, enums.ColorReset, enums.ColorRed, table, enums.ColorReset)
+func GetTableTitle(table enums.TableType) string {
+	return fmt.Sprintf("%s [ %s ]", suiEmoji, table)
 }

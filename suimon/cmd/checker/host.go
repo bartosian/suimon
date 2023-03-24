@@ -102,8 +102,7 @@ func (host *Host) SetStatus(rpc Host) {
 
 	switch host.TableType {
 	case enums.TableTypeValidator:
-		if !metricsHost.Updated || metricsHost.Uptime == "0.00" {
-
+		if !metricsHost.Updated || metricsHost.Uptime == "" {
 			host.Status = enums.StatusRed
 
 			return
@@ -121,6 +120,7 @@ func (host *Host) SetStatus(rpc Host) {
 		if metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) ||
 			metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactions, metricsRPC.TotalTransactions) ||
 			metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
+
 			host.Status = enums.StatusYellow
 
 			return

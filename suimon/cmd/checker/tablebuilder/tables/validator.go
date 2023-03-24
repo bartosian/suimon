@@ -1,9 +1,10 @@
 package tables
 
 import (
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums/columnnames"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
+
+	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums/columnnames"
 )
 
 var (
@@ -14,7 +15,15 @@ var (
 		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
 		{Name: "LATEST\nCHECKPOINT", Mode: table.Dsc},
 	}
-	ColumnConfigValidator = []table.ColumnConfig{
+	ColumnsConfigValidator = []table.ColumnConfig{
+		columnnames.ValidatorColumnNameIndex: {
+			Name:         "IDX",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
 		columnnames.ValidatorColumnNameHealth: {
 			Name:         "HEALTH",
 			Align:        text.AlignCenter,
@@ -25,7 +34,7 @@ var (
 		},
 		columnnames.ValidatorColumnNameAddress: {
 			Name:         "ADDRESS",
-			Align:        text.AlignLeft,
+			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
@@ -112,7 +121,7 @@ var (
 			Hidden:       false,
 		},
 		columnnames.ValidatorColumnNameUptime: {
-			Name:         "UPTIME\nDAYS",
+			Name:         "UPTIME DAYS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -198,6 +207,36 @@ var (
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
+		},
+	}
+	RowsValidator = [][]int{
+		0: {
+			int(columnnames.ValidatorColumnNameIndex),
+			int(columnnames.ValidatorColumnNameHealth),
+			int(columnnames.ValidatorColumnNameAddress),
+			int(columnnames.ValidatorColumnNameCurrentEpoch),
+			int(columnnames.ValidatorColumnNameTotalTransactionCertificates),
+			int(columnnames.ValidatorColumnNameTotalTransactionEffects),
+			int(columnnames.ValidatorColumnNameHighestKnownCheckpoint),
+			int(columnnames.ValidatorColumnNameLastExecutedCheckpoint),
+			int(columnnames.ValidatorColumnNameCheckpointExecBacklog),
+			int(columnnames.ValidatorColumnNameHighestSyncedCheckpoint),
+			int(columnnames.ValidatorColumnNameCheckpointSyncBacklog),
+			int(columnnames.ValidatorColumnNameCheckSyncPercentage),
+			int(columnnames.ValidatorColumnNameNetworkPeers),
+		},
+		1: {
+			int(columnnames.ValidatorColumnNameUptime),
+			int(columnnames.ValidatorColumnNameVersion),
+			int(columnnames.ValidatorColumnNameCommit),
+			int(columnnames.ValidatorColumnNameCountry),
+			int(columnnames.ValidatorColumnNameCurrentRound),
+			int(columnnames.ValidatorColumnNameHighestProcessedRound),
+			int(columnnames.ValidatorColumnNameLastCommittedRound),
+			int(columnnames.ValidatorColumnNamePrimaryNetworkPeers),
+			int(columnnames.ValidatorColumnNameWorkerNetworkPeers),
+			int(columnnames.ValidatorColumnNameSkippedConsensusTransactions),
+			int(columnnames.ValidatorColumnNameTotalSignatureErrors),
 		},
 	}
 )

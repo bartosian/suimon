@@ -14,6 +14,14 @@ var (
 		{Name: "NEXT EPOCH\nGAS PRICE", Mode: table.Dsc},
 	}
 	ColumnConfigActiveValidator = []table.ColumnConfig{
+		columnnames.ActiveValidatorColumnNameIndex: {
+			Name:         "IDX",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
 		columnnames.ActiveValidatorColumnNameName: {
 			Name:         "NAME",
 			Align:        text.AlignLeft,
@@ -109,6 +117,25 @@ var (
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
+		},
+	}
+	RowsActiveValidator = [][]int{
+		0: {
+			int(columnnames.ActiveValidatorColumnNameIndex),
+			int(columnnames.ActiveValidatorColumnNameName),
+			int(columnnames.ActiveValidatorColumnNameNetAddress),
+			int(columnnames.ActiveValidatorColumnNameVotingPower),
+			int(columnnames.ActiveValidatorColumnNameGasPrice),
+			int(columnnames.ActiveValidatorColumnNameCommissionRate),
+			int(columnnames.ActiveValidatorColumnNameNextEpochStake),
+			int(columnnames.ActiveValidatorColumnNameNextEpochGasPrice),
+			int(columnnames.ActiveValidatorColumnNameNextEpochCommissionRate),
+		},
+		1: {
+			int(columnnames.ActiveValidatorColumnNameStakingPoolSuiBalance),
+			int(columnnames.ActiveValidatorColumnNameRewardsPool),
+			int(columnnames.ActiveValidatorColumnNamePoolTokenBalance),
+			int(columnnames.ActiveValidatorColumnNamePendingStake),
 		},
 	}
 )

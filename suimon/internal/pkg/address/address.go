@@ -58,12 +58,17 @@ func ParseIpPort(address string) (*HostPort, error) {
 func ParsePeer(address string) (*HostPort, error) {
 	components := strings.Split(address, "/")
 
-	if len(components) != 5 || components[3] != "udp" ||
-		components[0] != "" || (components[1] != "ip4" && components[1] != "dns") {
-		return nil, fmt.Errorf("invalid peer provided: %s", address)
-	}
+	validLength := len(components) == 5
+	validProtocol := components[3] == "udp"
+
+	validFirstComponent := components[0] == ""
+	validSecondComponent := components[1] == "ip4" || components[1] == "dns"
 
 	host, port := components[2], components[4]
+
+	if !validLength || !validProtocol || !validFirstComponent || !validSecondComponent {
+		return nil, fmt.Errorf("invalid peer provided: %s", address)
+	}
 
 	if validation.IsInvalidPort(port) {
 		return nil, fmt.Errorf("invalid port provided: %s", address)

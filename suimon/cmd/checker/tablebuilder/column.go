@@ -1,7 +1,6 @@
 package tablebuilder
 
 import (
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
@@ -18,7 +17,7 @@ type (
 
 func (col *Column) SetValue(value any) {
 	if value == nil || value == "" {
-		value = enums.ColorYellow + tableNoData + enums.ColorReset
+		value = tableNoData
 	}
 
 	col.Values = append(col.Values, value)

@@ -44,9 +44,6 @@ ip-lookup:
 
 # update this section to change the visual appearance of the widgets
 monitors-visual:
-  # set different color schemes for monitor depending on your terminal. Possible values: dark, white, color
-  color-scheme: "white"
-
   # update this section if you want to enable/disable emojis in tables
   enable-emojis: false
 

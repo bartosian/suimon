@@ -61,8 +61,7 @@ type (
 			AccessToken string `yaml:"access-token"`
 		} `yaml:"ip-lookup"`
 		MonitorsVisual struct {
-			ColorScheme  string `yaml:"color-scheme"`
-			EnableEmojis bool   `yaml:"enable-emojis"`
+			EnableEmojis bool `yaml:"enable-emojis"`
 		} `yaml:"monitors-visual"`
 		DbPath            string            `yaml:"db-path"`
 		ProcessLaunchType ProcessLaunchType `yaml:"process-launch-type"`

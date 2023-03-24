@@ -3,7 +3,8 @@ package columnnames
 type SystemColumnName int
 
 const (
-	SystemColumnNameEpoch SystemColumnName = iota
+	SystemColumnNameIndex SystemColumnName = iota
+	SystemColumnNameEpoch
 	SystemColumnNameEpochDurationMs
 	SystemColumnNameStorageFund
 	SystemColumnNameReferenceGasPrice

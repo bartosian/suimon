@@ -79,9 +79,9 @@ func (checker *Checker) getHostsByTableType(tableType enums.TableType) []Host {
 	case enums.TableTypeValidator:
 		hosts = checker.validator
 	case enums.TableTypeActiveValidators:
-		hosts = checker.node
+		hosts = checker.rpc[:1]
 	case enums.TableTypeSystemState:
-		hosts = checker.node
+		hosts = checker.rpc[:1]
 	case enums.TableTypePeers:
 		hosts = checker.peers
 	case enums.TableTypeRPC:
@@ -149,16 +149,16 @@ func (checker *Checker) DrawTables() {
 		checker.tableBuilderValidator.Build()
 	}
 
+	if checker.suimonConfig.MonitorsConfig.SystemTable.Display && len(checker.rpc) > 0 {
+		checker.tableBuilderSystem.Build()
+	}
+
 	if checker.suimonConfig.MonitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
 		checker.tableBuilderPeer.Build()
 	}
 
-	if checker.suimonConfig.MonitorsConfig.SystemTable.Display && len(checker.node) > 0 {
-		checker.tableBuilderSystem.Build()
-	}
-
-	if checker.suimonConfig.MonitorsConfig.ActiveValidatorsTable.Display && len(checker.node) > 0 {
-		systemState := checker.node[0].Metrics.SystemState
+	if checker.suimonConfig.MonitorsConfig.ActiveValidatorsTable.Display && len(checker.rpc) > 0 {
+		systemState := checker.rpc[0].Metrics.SystemState
 
 		if len(systemState.ActiveValidators) == 0 {
 			return

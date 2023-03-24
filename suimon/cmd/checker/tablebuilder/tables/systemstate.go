@@ -11,7 +11,15 @@ var (
 	TableStyleSystem      = table.StyleLight
 	TableTagSystem        = ""
 	TableSortConfigSystem = make([]table.SortBy, 0)
-	ColumnConfigSystem    = []table.ColumnConfig{
+	ColumnsConfigSystem   = []table.ColumnConfig{
+		columnnames.SystemColumnNameIndex: {
+			Name:         "IDX",
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
 		columnnames.SystemColumnNameEpoch: {
 			Name:         "EPOCH",
 			Align:        text.AlignCenter,
@@ -37,7 +45,7 @@ var (
 			Hidden:       false,
 		},
 		columnnames.SystemColumnNameReferenceGasPrice: {
-			Name:         "REFERENCE GAS\nPRICE",
+			Name:         "REFERENCE\nGAS PRICE",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -85,7 +93,7 @@ var (
 			Hidden:       false,
 		},
 		columnnames.SystemColumnNamePendingActiveValidatorsSize: {
-			Name:         "PENDING VALIDATORS\nCOUNT",
+			Name:         "PENDING\nVALIDATORS COUNT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -101,7 +109,7 @@ var (
 			Hidden:       false,
 		},
 		columnnames.SystemColumnNameValidatorsCandidateSize: {
-			Name:         "VALIDATORS CANDIDATE\nCOUNT",
+			Name:         "VALIDATORS\nCANDIDATE COUNT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -109,12 +117,30 @@ var (
 			Hidden:       false,
 		},
 		columnnames.SystemColumnNameValidatorsAtRiskCount: {
-			Name:         "VALIDATORS AT RISK\nCOUNT",
+			Name:         "VALIDATORS\nAT RISK COUNT",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
+		},
+	}
+	RowsSystemState = [][]int{
+		0: {
+			int(columnnames.SystemColumnNameIndex),
+			int(columnnames.SystemColumnNameEpoch),
+			int(columnnames.SystemColumnNameEpochDurationMs),
+			int(columnnames.SystemColumnNameStorageFund),
+			int(columnnames.SystemColumnNameReferenceGasPrice),
+			int(columnnames.SystemColumnNameStakeSubsidyCounter),
+			int(columnnames.SystemColumnNameStakeSubsidyBalance),
+			int(columnnames.SystemColumnNameStakeSubsidyCurrentEpochAmount),
+			int(columnnames.SystemColumnNameTotalStake),
+			int(columnnames.SystemColumnNameValidatorsCount),
+			int(columnnames.SystemColumnNamePendingActiveValidatorsSize),
+			int(columnnames.SystemColumnNamePendingRemovals),
+			int(columnnames.SystemColumnNameValidatorsCandidateSize),
+			int(columnnames.SystemColumnNameValidatorsAtRiskCount),
 		},
 	}
 )

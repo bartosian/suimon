@@ -3,8 +3,10 @@ package columnnames
 type ValidatorColumnName int
 
 const (
-	ValidatorColumnNameHealth ValidatorColumnName = iota
+	ValidatorColumnNameIndex ValidatorColumnName = iota
+	ValidatorColumnNameHealth
 	ValidatorColumnNameAddress
+	ValidatorColumnNameCurrentEpoch
 	ValidatorColumnNameTotalTransactionCertificates
 	ValidatorColumnNameTotalTransactionEffects
 	ValidatorColumnNameHighestKnownCheckpoint
@@ -12,7 +14,6 @@ const (
 	ValidatorColumnNameCheckpointExecBacklog
 	ValidatorColumnNameHighestSyncedCheckpoint
 	ValidatorColumnNameCheckpointSyncBacklog
-	ValidatorColumnNameCurrentEpoch
 	ValidatorColumnNameCheckSyncPercentage
 	ValidatorColumnNameNetworkPeers
 	ValidatorColumnNameUptime

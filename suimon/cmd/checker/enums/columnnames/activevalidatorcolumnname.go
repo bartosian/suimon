@@ -3,7 +3,8 @@ package columnnames
 type ActiveValidatorColumnName int
 
 const (
-	ActiveValidatorColumnNameName ActiveValidatorColumnName = iota
+	ActiveValidatorColumnNameIndex ActiveValidatorColumnName = iota
+	ActiveValidatorColumnNameName
 	ActiveValidatorColumnNameNetAddress
 	ActiveValidatorColumnNameVotingPower
 	ActiveValidatorColumnNameGasPrice

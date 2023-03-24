@@ -1,53 +1,30 @@
 package tablebuilder
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder/tables"
 )
+
+const emptyValue = ""
 
 type (
 	TableBuilder struct {
 		builder table.Writer
 		config  TableConfig
 	}
-	TableColors struct {
-		Title  text.Color
-		Header text.Color
-		Row    text.Color
-		Footer text.Color
-		Index  text.Color
-	}
 	TableConfig struct {
 		Name         string
 		Tag          string
-		Colors       TableColors
 		Style        table.Style
 		Columns      []Column
-		SortConfig   []table.SortBy
-		RowsCount    int
 		ColumnsCount int
+		Rows         [][]int
+		RowsCount    int
+		SortConfig   []table.SortBy
 	}
 )
-
-var tbColorsValues = map[enums.ColorTable]TableColors{
-	enums.ColorTableWhite: {Title: text.FgHiWhite, Header: text.FgHiWhite, Row: text.FgHiWhite, Footer: text.FgHiWhite, Index: text.FgHiWhite},
-	enums.ColorTableDark:  {Title: text.FgBlack, Header: text.FgBlack, Row: text.FgBlack, Footer: text.FgBlack, Index: text.FgBlack},
-	enums.ColorTableColor: {Title: text.FgHiBlue, Header: text.FgHiRed, Row: text.FgHiWhite, Footer: text.FgHiBlue, Index: text.FgHiRed},
-}
-
-// GetTableColorsFromString converts a color string to a TableColors struct.
-// Returns: If the color string is invalid, GetTableColorsFromString returns the default colors.
-func GetTableColorsFromString(color string) TableColors {
-	colorTable := enums.ColorTableFromString(color)
-
-	return tbColorsValues[colorTable]
-}
 
 func NewTableBuilder(config TableConfig) *TableBuilder {
 	tableWR := table.NewWriter()
@@ -70,55 +47,100 @@ func (tb *TableBuilder) SetColumns() {
 }
 
 func (tb *TableBuilder) SetRows() {
-	rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
+	rowsConfig, columnsConfig := tb.config.Rows, tb.config.Columns
+	rowsCount := tb.config.RowsCount
 
-	var (
-		header table.Row
-		footer table.Row
-	)
+	for i := 0; i < rowsCount; i++ {
+		colsPerRow := len(rowsConfig[0])
 
-	for _, column := range tb.config.Columns {
-		header = append(header, column.Config.Name)
-		footer = append(footer, "")
-	}
+		for j, columns := range rowsConfig {
+			header := NewRow(true, colsPerRow)
+			footer := NewRow(false, colsPerRow)
+			row := NewRow(false, colsPerRow)
 
-	footer[0] = fmt.Sprintf("%s%s%s", enums.ColorRed, tb.config.Tag, enums.ColorReset)
+			var (
+				columnIdx  int
+				columnName int
+			)
 
-	for i := 0; i < tb.config.RowsCount; i++ {
-		rowValues := make([]any, 0, len(tables.ColumnConfigNode))
+			for columnIdx, columnName = range columns {
+				columnConfig := columnsConfig[columnName]
+				columnValue := columnConfig.Values[i]
 
-		for _, column := range tb.config.Columns {
-			rowValues = append(rowValues, column.Values[i])
+				header.SetValue(columnConfig.Config.Name)
+				footer.SetValue(emptyValue)
+				row.SetValue(columnValue)
+			}
+
+			columnIdx++
+
+			for columnIdx < colsPerRow {
+				header.SetValue(emptyValue)
+				footer.SetValue(emptyValue)
+				row.SetValue(emptyValue)
+
+				columnIdx++
+			}
+
+			if i == 0 && j == 0 {
+				tb.builder.AppendHeader(header.Values, header.Config)
+				tb.builder.AppendFooter(footer.Values, footer.Config)
+			} else if j%2 == 1 || i > 0 && len(rowsConfig) > 1 && j%2 == 0 {
+				tb.builder.AppendRow(header.Values, header.Config)
+			}
+
+			tb.builder.AppendRow(row.Values, row.Config)
+			tb.builder.AppendSeparator()
 		}
-
-		tb.builder.AppendRow(rowValues, rowConfigAutoMerge)
-		tb.builder.AppendSeparator()
 	}
-
-	tb.builder.AppendHeader(header, rowConfigAutoMerge)
-	tb.builder.AppendFooter(footer, rowConfigAutoMerge)
-	tb.builder.SortBy(tb.config.SortConfig)
 }
 
 func (tb *TableBuilder) SetStyle() {
 	tb.builder.SetTitle(tb.config.Name)
 	tb.builder.SetStyle(tb.config.Style)
 	tb.builder.Style().Title.Align = text.AlignLeft
-	tb.builder.Style().Box.RightSeparator = ""
-	tb.builder.SetAutoIndex(true)
+	tb.builder.Style().Box.RightSeparator = emptyValue
+	tb.builder.Style().Options.DrawBorder = true
+	tb.builder.Style().Options.SeparateRows = true
+	tb.builder.Style().Options.DoNotColorBordersAndSeparators = true
+
 	tb.SetColors()
 }
 
 func (tb *TableBuilder) SetColors() {
-	colors := tb.config.Colors
-
-	tb.builder.Style().Title.Colors = text.Colors{colors.Title}
+	tb.builder.Style().Title.Colors = text.Colors{text.BgHiGreen, text.FgBlack}
 	tb.builder.Style().Color = table.ColorOptions{
-		Header: text.Colors{colors.Header},
-		Row:    text.Colors{colors.Row},
-		Footer: text.Colors{colors.Footer},
+		Header: text.Colors{text.FgBlack, text.BgWhite},
+		Row:    text.Colors{text.BgWhite},
+		Footer: text.Colors{text.BgHiGreen, text.FgBlack},
 	}
-	tb.builder.Style().Color.IndexColumn = text.Colors{colors.Index}
+
+	var f = func() func(row table.Row) text.Colors {
+		bgColor := []text.Color{text.BgWhite, text.BgHiBlue, text.BgHiBlue, text.BgWhite}
+		currentColor := 0
+
+		var handler = func(row table.Row) text.Colors {
+			for _, column := range row {
+				if _, ok := column.(int); ok {
+					return text.Colors{text.FgWhite}
+				}
+			}
+
+			colors := text.Colors{text.FgBlack, bgColor[currentColor]}
+
+			currentColor++
+			if currentColor > 3 {
+				currentColor = 0
+			}
+
+			return colors
+		}
+
+		return handler
+	}()
+
+	tb.builder.SuppressEmptyColumns()
+	tb.builder.SetRowPainter(f)
 }
 
 func (tb *TableBuilder) Build() {

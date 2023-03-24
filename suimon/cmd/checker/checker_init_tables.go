@@ -48,7 +48,6 @@ func (checker *Checker) InitTables() {
 // Returns: None.
 func (checker *Checker) InitTable(tableType enums.TableType) {
 	enabledEmojis := checker.suimonConfig.MonitorsVisual.EnableEmojis
-	colorScheme := checker.suimonConfig.MonitorsVisual.ColorScheme
 
 	var (
 		hosts        []Host
@@ -60,7 +59,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 	switch tableType {
 	case enums.TableTypeNode:
 		hosts = checker.getHostsByTableType(enums.TableTypeNode)
-		columnConfig = tables.ColumnConfigNode
+		columnConfig = tables.ColumnsConfigNode
 		columns = make(tablebuilder.Columns, len(columnConfig))
 
 		for i := 0; i < len(columnConfig); i++ {
@@ -68,16 +67,17 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 
 		tableConfig = tablebuilder.TableConfig{
-			Name:       tables.GetTableTitle(enums.TableTypeNode, enabledEmojis),
-			Colors:     tablebuilder.GetTableColorsFromString(colorScheme),
-			Tag:        tables.TableTagNode,
-			Style:      tables.TableStyleNode,
-			RowsCount:  0,
-			Columns:    columns,
-			SortConfig: tables.TableSortConfigNode,
+			Name:         tables.GetTableTitle(enums.TableTypeNode),
+			Tag:          tables.TableTagNode,
+			Style:        tables.TableStyleNode,
+			Columns:      columns,
+			ColumnsCount: len(columns),
+			Rows:         tables.RowsNode,
+			RowsCount:    0,
+			SortConfig:   tables.TableSortConfigNode,
 		}
 
-		for _, host := range hosts {
+		for idx, host := range hosts {
 			if !host.Metrics.Updated {
 				continue
 			}
@@ -99,6 +99,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 				port = rpcPortDefault
 			}
 
+			columns[columnnames.NodeColumnNameIndex].SetValue(idx + 1)
 			columns[columnnames.NodeColumnNameHealth].SetValue(status)
 			columns[columnnames.NodeColumnNameAddress].SetValue(address)
 			columns[columnnames.NodeColumnNamePortRPC].SetValue(port)
@@ -133,7 +134,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 	case enums.TableTypeValidator:
 		hosts = checker.getHostsByTableType(enums.TableTypeValidator)
-		columnConfig = tables.ColumnConfigValidator
+		columnConfig = tables.ColumnsConfigValidator
 		columns = make(tablebuilder.Columns, len(columnConfig))
 
 		for i := 0; i < len(columnConfig); i++ {
@@ -141,16 +142,17 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 
 		tableConfig = tablebuilder.TableConfig{
-			Name:       tables.GetTableTitle(enums.TableTypeValidator, enabledEmojis),
-			Colors:     tablebuilder.GetTableColorsFromString(colorScheme),
-			Tag:        tables.TableTagValidator,
-			Style:      tables.TableStyleValidator,
-			RowsCount:  0,
-			Columns:    columns,
-			SortConfig: tables.TableSortConfigValidator,
+			Name:         tables.GetTableTitle(enums.TableTypeValidator),
+			Tag:          tables.TableTagValidator,
+			Style:        tables.TableStyleValidator,
+			Columns:      columns,
+			ColumnsCount: len(columns),
+			Rows:         tables.RowsValidator,
+			RowsCount:    0,
+			SortConfig:   tables.TableSortConfigValidator,
 		}
 
-		for _, host := range hosts {
+		for idx, host := range hosts {
 			if !host.Metrics.Updated {
 				continue
 			}
@@ -172,6 +174,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 				port = rpcPortDefault
 			}
 
+			columns[columnnames.ValidatorColumnNameIndex].SetValue(idx + 1)
 			columns[columnnames.ValidatorColumnNameHealth].SetValue(status)
 			columns[columnnames.ValidatorColumnNameAddress].SetValue(address)
 			columns[columnnames.ValidatorColumnNameTotalTransactionCertificates].SetValue(host.Metrics.TotalTransactionCertificates)
@@ -210,7 +213,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 	case enums.TableTypePeers:
 		hosts = checker.getHostsByTableType(enums.TableTypePeers)
-		columnConfig = tables.ColumnConfigPeer
+		columnConfig = tables.ColumnsConfigPeer
 		columns = make(tablebuilder.Columns, len(columnConfig))
 
 		for i := 0; i < len(columnConfig); i++ {
@@ -218,16 +221,17 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 
 		tableConfig = tablebuilder.TableConfig{
-			Name:       tables.GetTableTitle(enums.TableTypePeers, enabledEmojis),
-			Colors:     tablebuilder.GetTableColorsFromString(colorScheme),
-			Tag:        tables.TableTagPeer,
-			Style:      tables.TableStylePeer,
-			RowsCount:  0,
-			Columns:    columns,
-			SortConfig: tables.TableSortConfigPeer,
+			Name:         tables.GetTableTitle(enums.TableTypePeers),
+			Tag:          tables.TableTagPeer,
+			Style:        tables.TableStylePeer,
+			Columns:      columns,
+			ColumnsCount: len(columns),
+			Rows:         tables.RowsPeer,
+			RowsCount:    0,
+			SortConfig:   tables.TableSortConfigPeer,
 		}
 
-		for _, host := range hosts {
+		for idx, host := range hosts {
 			if !host.Metrics.Updated {
 				continue
 			}
@@ -249,6 +253,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 				port = rpcPortDefault
 			}
 
+			columns[columnnames.NodeColumnNameIndex].SetValue(idx + 1)
 			columns[columnnames.NodeColumnNameHealth].SetValue(status)
 			columns[columnnames.NodeColumnNameAddress].SetValue(address)
 			columns[columnnames.NodeColumnNamePortRPC].SetValue(port)
@@ -283,7 +288,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 	case enums.TableTypeRPC:
 		hosts = checker.getHostsByTableType(enums.TableTypeRPC)
-		columnConfig = tables.ColumnConfigRPC
+		columnConfig = tables.ColumnsConfigRPC
 		columns = make(tablebuilder.Columns, len(columnConfig))
 
 		for i := 0; i < len(columnConfig); i++ {
@@ -291,16 +296,17 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 
 		tableConfig = tablebuilder.TableConfig{
-			Name:       tables.GetTableTitle(enums.TableTypeRPC, enabledEmojis),
-			Colors:     tablebuilder.GetTableColorsFromString(colorScheme),
-			Tag:        tables.TableTagRPC,
-			Style:      tables.TableStyleRPC,
-			RowsCount:  0,
-			Columns:    columns,
-			SortConfig: tables.TableSortConfigRPC,
+			Name:         tables.GetTableTitle(enums.TableTypeRPC),
+			Tag:          tables.TableTagRPC,
+			Style:        tables.TableStyleRPC,
+			Columns:      columns,
+			ColumnsCount: len(columns),
+			Rows:         tables.RowsRPC,
+			RowsCount:    0,
+			SortConfig:   tables.TableSortConfigRPC,
 		}
 
-		for _, host := range hosts {
+		for idx, host := range hosts {
 			if !host.Metrics.Updated {
 				continue
 			}
@@ -321,6 +327,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 				port = rpcPortDefault
 			}
 
+			columns[columnnames.NodeColumnNameIndex].SetValue(idx + 1)
 			columns[columnnames.NodeColumnNameHealth].SetValue(status)
 			columns[columnnames.NodeColumnNameAddress].SetValue(address)
 			columns[columnnames.NodeColumnNamePortRPC].SetValue(port)
@@ -329,7 +336,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 	case enums.TableTypeSystemState:
 		hosts = checker.getHostsByTableType(enums.TableTypeSystemState)
-		columnConfig = tables.ColumnConfigSystem
+		columnConfig = tables.ColumnsConfigSystem
 		columns = make(tablebuilder.Columns, len(columnConfig))
 
 		for i := 0; i < len(columnConfig); i++ {
@@ -337,16 +344,17 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 
 		tableConfig = tablebuilder.TableConfig{
-			Name:       tables.GetTableTitle(enums.TableTypeSystemState, enabledEmojis),
-			Colors:     tablebuilder.GetTableColorsFromString(colorScheme),
-			Tag:        tables.TableTagSystem,
-			Style:      tables.TableStyleSystem,
-			RowsCount:  0,
-			Columns:    columns,
-			SortConfig: tables.TableSortConfigSystem,
+			Name:         tables.GetTableTitle(enums.TableTypeSystemState),
+			Tag:          tables.TableTagSystem,
+			Style:        tables.TableStyleSystem,
+			Columns:      columns,
+			ColumnsCount: len(columns),
+			Rows:         tables.RowsSystemState,
+			RowsCount:    0,
+			SortConfig:   tables.TableSortConfigSystem,
 		}
 
-		for _, host := range hosts {
+		for idx, host := range hosts {
 			if !host.Metrics.Updated {
 				continue
 			}
@@ -355,6 +363,7 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 
 			systemState := host.Metrics.SystemState
 
+			columns[columnnames.ValidatorColumnNameIndex].SetValue(idx + 1)
 			columns[columnnames.SystemColumnNameEpoch].SetValue(systemState.Epoch)
 			columns[columnnames.SystemColumnNameEpochDurationMs].SetValue(systemState.EpochDurationMs)
 			columns[columnnames.SystemColumnNameStorageFund].SetValue(systemState.StorageFund)
@@ -379,20 +388,22 @@ func (checker *Checker) InitTable(tableType enums.TableType) {
 		}
 
 		tableConfig = tablebuilder.TableConfig{
-			Name:       tables.GetTableTitle(enums.TableTypeActiveValidators, enabledEmojis),
-			Colors:     tablebuilder.GetTableColorsFromString(colorScheme),
-			Tag:        tables.TableTagActiveValidator,
-			Style:      tables.TableStyleActiveValidator,
-			RowsCount:  0,
-			Columns:    columns,
-			SortConfig: tables.TableSortConfigActiveValidator,
+			Name:         tables.GetTableTitle(enums.TableTypeActiveValidators),
+			Tag:          tables.TableTagActiveValidator,
+			Style:        tables.TableStyleActiveValidator,
+			Columns:      columns,
+			ColumnsCount: len(columns),
+			Rows:         tables.RowsActiveValidator,
+			RowsCount:    0,
+			SortConfig:   tables.TableSortConfigActiveValidator,
 		}
 
 		activeValidators := hosts[0].Metrics.SystemState.ActiveValidators
 
-		for _, validator := range activeValidators {
+		for idx, validator := range activeValidators {
 			tableConfig.RowsCount++
 
+			columns[columnnames.ActiveValidatorColumnNameIndex].SetValue(idx + 1)
 			columns[columnnames.ActiveValidatorColumnNameName].SetValue(validator.Name)
 			columns[columnnames.ActiveValidatorColumnNameNetAddress].SetValue(validator.NetAddress)
 			columns[columnnames.ActiveValidatorColumnNameVotingPower].SetValue(validator.VotingPower)
