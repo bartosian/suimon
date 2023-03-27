@@ -8,13 +8,13 @@ const (
 	NodeColumnNameAddress
 	NodeColumnNamePortRPC
 	NodeColumnNameTotalTransactions
-	NodeColumnNameLatestCheckpoint
 	NodeColumnNameTotalTransactionCertificates
 	NodeColumnNameTotalTransactionEffects
+	NodeColumnNameLatestCheckpoint
 	NodeColumnNameHighestKnownCheckpoint
 	NodeColumnNameLastExecutedCheckpoint
-	NodeColumnNameCheckpointExecBacklog
 	NodeColumnNameHighestSyncedCheckpoint
+	NodeColumnNameCheckpointExecBacklog
 	NodeColumnNameCheckpointSyncBacklog
 	NodeColumnNameCurrentEpoch
 	NodeColumnNameTXSyncPercentage

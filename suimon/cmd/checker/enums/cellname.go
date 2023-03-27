@@ -3,22 +3,28 @@ package enums
 type CellName int
 
 const (
-	CellNameNodeStatus CellName = iota
-	CellNameNetworkStatus
-	CellNameTransactionsPerSecond
-	CellNameCheckpointsPerSecond
-	CellNameTotalTransactions
-	CellNameLatestCheckpoint
-	CellNameHighestCheckpoint
-	CellNameConnectedPeers
-	CellNameTXSyncProgress
-	CellNameCheckSyncProgress
+	CellNameNodeHealth CellName = iota
+	CellNameNetworkHealth
+	CellNameCurrentEpoch
+	CellNameEpochTimeTillTheEnd
 	CellNameUptime
 	CellNameVersion
 	CellNameCommit
-	CellNameCurrentEpoch
+	CellNameTotalTransactions
+	CellNameTotalTransactionCertificates
+	CellNameTotalTransactionEffects
+	CellNameLatestCheckpoint
+	CellNameHighestKnownCheckpoint
+	CellNameLastExecutedCheckpoint
+	CellNameHighestSyncedCheckpoint
+	CellNameCheckpointSyncBacklog
+	CellNameCheckpointExecBacklog
+	CellNameTransactionsPerSecond
+	CellNameCheckpointsPerSecond
+	CellNameConnectedPeers
+	CellNameTXSyncProgress
+	CellNameCheckSyncProgress
 	CellNameEpochProgress
-	CellNameEpochEnd
 	CellNameDiskUsage
 	CellNameDatabaseSize
 	CellNameBytesSent
@@ -34,20 +40,26 @@ const (
 var cellNameStringValues = [...]string{
 	"NODE",
 	"NETWORK",
+	"CURRENT EPOCH",
+	"TIME TILL THE END OF EPOCH",
+	"UPTIME DAYS",
+	"VERSION",
+	"COMMIT",
+	"TOTAL TRANSACTIONS",
+	"TOTAL TRANSACTION CERTIFICATES",
+	"TOTAL TRANSACTION EFFECTS",
+	"LATEST CHECKPOINT",
+	"HIGHEST KNOWN CHECKPOINT",
+	"LAST EXECUTED CHECKPOINT",
+	"HIGHEST SYNCED CHECKPOINT",
+	"CHECKPOINT SYNC BACKLOG",
+	"CHECKPOINT EXEC BACKLOG",
 	"TRANSACTIONS PER SECOND",
 	"CHECKPOINTS PER SECOND",
-	"TOTAL TRANSACTIONS",
-	"LATEST CHECKPOINT",
-	"HIGHEST SYNCED CHECKPOINT",
 	"CONNECTED PEERS",
 	"SYNC TRANSACTIONS STATUS",
 	"SYNC CHECKPOINTS STATUS",
-	"UPTIME",
-	"VERSION",
-	"COMMIT",
-	"CURRENT EPOCH",
 	"EPOCH PROGRESS",
-	"TIME TILL THE END OF EPOCH",
 	"DISK USAGE",
 	"DATABASE SIZE",
 	"NETWORK BYTES SENT",

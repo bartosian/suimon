@@ -323,9 +323,9 @@ func (checker *Checker) getMetricForDashboardCell(cellName enums.CellName) any {
 	)
 
 	switch cellName {
-	case enums.CellNameNodeStatus:
+	case enums.CellNameNodeHealth:
 		return node.Status.DashboardStatus()
-	case enums.CellNameNetworkStatus:
+	case enums.CellNameNetworkHealth:
 		return rpc.Status.DashboardStatus()
 	case enums.CellNameTransactionsPerSecond:
 		if len(node.Metrics.TransactionsHistory) < transactionsPerSecondWindow {
@@ -345,10 +345,22 @@ func (checker *Checker) getMetricForDashboardCell(cellName enums.CellName) any {
 		return node.Metrics.CheckpointsPerSecond
 	case enums.CellNameTotalTransactions:
 		return node.Metrics.TotalTransactions
+	case enums.CellNameTotalTransactionCertificates:
+		return node.Metrics.TotalTransactionCertificates
+	case enums.CellNameTotalTransactionEffects:
+		return node.Metrics.TotalTransactionEffects
 	case enums.CellNameLatestCheckpoint:
 		return node.Metrics.LatestCheckpoint
-	case enums.CellNameHighestCheckpoint:
+	case enums.CellNameHighestKnownCheckpoint:
+		return node.Metrics.HighestKnownCheckpoint
+	case enums.CellNameLastExecutedCheckpoint:
+		return node.Metrics.LastExecutedCheckpoint
+	case enums.CellNameHighestSyncedCheckpoint:
 		return node.Metrics.HighestSyncedCheckpoint
+	case enums.CellNameCheckpointSyncBacklog:
+		return node.Metrics.CheckpointSyncBacklog
+	case enums.CellNameCheckpointExecBacklog:
+		return node.Metrics.CheckpointExecBacklog
 	case enums.CellNameConnectedPeers:
 		return node.Metrics.NetworkPeers
 	case enums.CellNameTXSyncProgress:
@@ -356,7 +368,7 @@ func (checker *Checker) getMetricForDashboardCell(cellName enums.CellName) any {
 	case enums.CellNameCheckSyncProgress:
 		return node.Metrics.CheckSyncPercentage
 	case enums.CellNameUptime:
-		return []string{strings.Split(node.Metrics.Uptime, " ")[0], "D"}
+		return []string{strings.Split(node.Metrics.Uptime, " ")[0]}
 	case enums.CellNameVersion:
 		return node.Metrics.Version
 	case enums.CellNameCommit:
@@ -368,7 +380,7 @@ func (checker *Checker) getMetricForDashboardCell(cellName enums.CellName) any {
 		return dashboards.NewDonutInput(epochLabel, epochPercentage)
 	case enums.CellNameCurrentEpoch:
 		return rpc.Metrics.SystemState.Epoch
-	case enums.CellNameEpochEnd:
+	case enums.CellNameEpochTimeTillTheEnd:
 		return rpc.Metrics.GetEpochTimer()
 	case enums.CellNameDiskUsage:
 		usageLabel, usagePercentage := getDonutUsageMetric("GB", utility.GetDiskUsage)
@@ -410,7 +422,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName enums.CellName) any 
 	)
 
 	switch cellName {
-	case enums.CellNameNodeStatus:
+	case enums.CellNameNodeHealth:
 		var (
 			status = node.Status
 			color  = cell.ColorGreen
@@ -424,7 +436,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName enums.CellName) any 
 		}
 
 		options = append(options, cell.BgColor(color), cell.FgColor(color))
-	case enums.CellNameNetworkStatus:
+	case enums.CellNameNetworkHealth:
 		var (
 			status = rpc.Status
 			color  = cell.ColorGreen
@@ -469,7 +481,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName enums.CellName) any 
 		}
 
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(color))}
-	case enums.CellNameHighestCheckpoint:
+	case enums.CellNameHighestSyncedCheckpoint:
 		var (
 			highestCheckpointNode = node.Metrics.HighestSyncedCheckpoint
 			highestCheckpointRpc  = rpc.Metrics.HighestSyncedCheckpoint
@@ -549,7 +561,7 @@ func (checker *Checker) getOptionsForDashboardCell(cellName enums.CellName) any 
 		return []gauge.Option{gauge.Color(color), gauge.Border(linestyle.Light, cell.FgColor(color))}
 	case enums.CellNameEpochProgress, enums.CellNameDiskUsage, enums.CellNameCpuUsage, enums.CellNameMemoryUsage:
 		options = append(options, cell.Bold())
-	case enums.CellNameEpochEnd, enums.CellNameDatabaseSize, enums.CellNameBytesReceived, enums.CellNameBytesSent:
+	case enums.CellNameEpochTimeTillTheEnd, enums.CellNameDatabaseSize, enums.CellNameBytesReceived, enums.CellNameBytesSent:
 		return []segmentdisplay.WriteOption{segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite)), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorGreen))}
 	case enums.CellNameUptime:
 		var (

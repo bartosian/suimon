@@ -184,7 +184,7 @@ func (checker *Checker) DrawDashboards() {
 
 	defer ticker.Stop()
 
-	var stream = func() {
+	var streamLogs = func() {
 		defer wg.Done()
 
 		var err error
@@ -259,7 +259,7 @@ func (checker *Checker) DrawDashboards() {
 	if monitorsConfig.NodeTable.Display && len(checker.node) > 0 {
 		wg.Add(2)
 
-		go stream()
+		go streamLogs()
 		go draw(checker.node)
 	}
 
