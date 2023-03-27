@@ -1,0 +1,81 @@
+package controller
+
+import (
+	"sync"
+	"time"
+
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
+)
+
+const (
+	watchHostsTimeout = 1 * time.Second
+)
+
+// Watch begins monitoring the "Host" objects in the "Checker" struct instance passed as a pointer
+// receiver, continuously checking their status and updating the dashboard and tables accordingly. This
+// method runs indefinitely until the program is terminated, and does not return anything.
+// Parameters: None.
+// Returns: None.
+func (checker CheckerController) Watch() error {
+	var (
+		monitorsConfig = checker.suimonConfig.MonitorsConfig
+		comparatorRPC  = checker.rpc[0]
+		ticker         = time.NewTicker(watchHostsTimeout)
+		ctx            = checker.DashboardBuilder.Ctx
+		wg             sync.WaitGroup
+	)
+
+	defer ticker.Stop()
+
+	var watch = func(hosts []host.Host) {
+		defer wg.Done()
+
+		doneCH := make(chan struct{}, len(hosts))
+
+		for {
+			select {
+			case <-ticker.C:
+				for idx := range hosts {
+					go func(idx int) {
+						hosts[idx].GetData()
+
+						hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, comparatorRPC)
+						hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, comparatorRPC)
+						hosts[idx].SetStatus(comparatorRPC)
+
+						doneCH <- struct{}{}
+					}(idx)
+				}
+
+				for i := 0; i < len(hosts); i++ {
+					<-doneCH
+				}
+			case <-ctx.Done():
+				return
+			}
+		}
+	}
+
+	if monitorsConfig.RPCTable.Display && len(checker.rpc) > 0 {
+		wg.Add(1)
+
+		go watch(checker.rpc)
+	}
+
+	if monitorsConfig.NodeTable.Display && len(checker.node) > 0 {
+		wg.Add(1)
+
+		go watch(checker.node)
+	}
+
+	if monitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
+		wg.Add(1)
+
+		go watch(checker.peers)
+	}
+
+	wg.Wait()
+
+	return nil
+}

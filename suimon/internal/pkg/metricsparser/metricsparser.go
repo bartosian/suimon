@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
-	ioPrometheusClient "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	ioPrometheusClient "github.com/prometheus/client_model/go"
 )
 
 type (
