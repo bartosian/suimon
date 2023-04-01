@@ -10,8 +10,8 @@ import (
 var (
 	TableStyleSystem      = table.StyleLight
 	TableTagSystem        = ""
-	TableSortConfigSystem = make([]table.SortBy, 0)
-	ColumnsConfigSystem   = []table.ColumnConfig{
+	TableSortConfigSystem = make(tableSortConfig, 0)
+	ColumnsConfigSystem   = tableColumnConfig{
 		columnnames.SystemColumnNameIndex: {
 			Name:         "IDX",
 			Align:        text.AlignCenter,
@@ -125,7 +125,7 @@ var (
 			Hidden:       false,
 		},
 	}
-	RowsSystemState = [][]int{
+	RowsSystemState = tableRows{
 		0: {
 			int(columnnames.SystemColumnNameIndex),
 			int(columnnames.SystemColumnNameEpoch),

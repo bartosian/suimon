@@ -1,13 +1,19 @@
 package metricsparser
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/expfmt"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	ioPrometheusClient "github.com/prometheus/client_model/go"
+)
+
+const (
+	httpClientTimeout = 2 * time.Second
 )
 
 type (
@@ -45,6 +51,11 @@ func (mp *PrometheusMetricParser) GetMetrics() (MetricsResult, error) {
 		return nil, err
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), httpClientTimeout)
+	defer cancel()
+
+	req = req.WithContext(ctx)
+
 	resp, err := mp.client.Do(req)
 	if err != nil {
 		return nil, err
@@ -57,22 +68,23 @@ func (mp *PrometheusMetricParser) GetMetrics() (MetricsResult, error) {
 		return nil, err
 	}
 
-	metricsResult := make(MetricsResult, len(mp.Metrics))
+	metricsResult := make(MetricsResult)
 
 	for metricType, metricConfig := range mp.Metrics {
-		metricsResult[metricType] = getMetricValueWithLabelFiltering(metrics, metricType.ToString(), metricConfig)
+		result := getMetricValueWithLabelFiltering(metrics, metricType.ToString(), metricConfig)
+		metricsResult[metricType] = result
 	}
 
 	return metricsResult, nil
 }
 
 func getMetricValueWithLabelFiltering(metrics map[string]*ioPrometheusClient.MetricFamily, metricName string, metricConfig MetricConfig) MetricResult {
-	metricFamily := metrics[metricName]
 	metricType := metricConfig.MetricType
 	labels := metricConfig.Labels
 
 	var result MetricResult
 
+	metricFamily := metrics[metricName]
 	if metricFamily == nil {
 		return result
 	}

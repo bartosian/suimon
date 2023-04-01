@@ -10,12 +10,12 @@ import (
 var (
 	TableStylePeer      = table.StyleLight
 	TableTagPeer        = ""
-	TableSortConfigPeer = []table.SortBy{
+	TableSortConfigPeer = tableSortConfig{
 		{Name: "HEALTH", Mode: table.Dsc},
 		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
 		{Name: "LATEST\nCHECKPOINT", Mode: table.Dsc},
 	}
-	ColumnsConfigPeer = []table.ColumnConfig{
+	ColumnsConfigPeer = tableColumnConfig{
 		columnnames.NodeColumnNameIndex: {
 			Name:         "IDX",
 			Align:        text.AlignCenter,
@@ -48,8 +48,8 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameTotalTransactions: {
-			Name:         "TOTAL\nTRANSACTIONS",
+		columnnames.NodeColumnNameTotalTransactionBlocks: {
+			Name:         "TOTAL TRANSACTION\nBLOCKS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -185,13 +185,13 @@ var (
 			Hidden:       false,
 		},
 	}
-	RowsPeer = [][]int{
+	RowsPeer = tableRows{
 		0: {
 			int(columnnames.NodeColumnNameIndex),
 			int(columnnames.NodeColumnNameHealth),
 			int(columnnames.NodeColumnNameAddress),
 			int(columnnames.NodeColumnNamePortRPC),
-			int(columnnames.NodeColumnNameTotalTransactions),
+			int(columnnames.NodeColumnNameTotalTransactionBlocks),
 			int(columnnames.NodeColumnNameLatestCheckpoint),
 			int(columnnames.NodeColumnNameTotalTransactionCertificates),
 			int(columnnames.NodeColumnNameTotalTransactionEffects),

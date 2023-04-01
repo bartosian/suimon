@@ -21,7 +21,7 @@ type requestType int
 const (
 	rpcPortDefault      = "9000"
 	metricsPortDefault  = "9184"
-	rpcClientTimeout    = 3 * time.Second
+	rpcClientTimeout    = 2 * time.Second
 	metricVersionRegexp = `\{(.*?)\}`
 
 	requestTypeRPC requestType = iota
@@ -35,6 +35,14 @@ type (
 		HostPort address.HostPort
 		Ports    map[enums.PortType]string
 	}
+
+	Clients struct {
+		rpcClient    jsonrpc.RPCClient
+		rpcSSLClient jsonrpc.RPCClient
+		httpClient   *http.Client
+		ipClient     *ipinfo.Client
+	}
+
 	Host struct {
 		AddressInfo
 
@@ -44,45 +52,39 @@ type (
 		Location *location.Location
 		Metrics  metrics.Metrics
 
-		rpcHttpClient  jsonrpc.RPCClient
-		rpcHttpsClient jsonrpc.RPCClient
-		httpClient     *http.Client
-		ipClient       *ipinfo.Client
+		clients Clients
 
 		logger log.Logger
 	}
 )
 
-// NewHost creates and returns a new "Host" object, based on the provided "AddressInfo" value.
-// Parameters:
-// - addressInfo: an "AddressInfo" value representing the address information for the new host.
-// - ipClient: a pointer to an "ipinfo.Client" instance for retrieving additional information about the host's IP.
-// - httpClient: a pointer to an "http.Client" instance for performing HTTP requests to the host.
-// Returns: a pointer to the newly created "Host" object.
+// NewHost creates a new Host instance with the given table type and address information.
+// The function initializes a new Metrics instance and logger, and creates a new JSON-RPC client for both secure and non-secure connections using the Host's URL obtained from the address information.
+// The function also initializes an HTTP client and IP info client for the Host.
+// Returns a pointer to the Host instance.
 func NewHost(tableType enums.TableType, addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.Client) *Host {
 	host := &Host{
 		TableType:   tableType,
 		AddressInfo: addressInfo,
-		ipClient:    ipClient,
-		httpClient:  httpClient,
-		Metrics:     metrics.NewMetrics(),
 		logger:      log.NewLogger(),
 	}
 
-	host.rpcHttpClient = jsonrpc.NewClient(host.getUrl(requestTypeRPC, false))
-	host.rpcHttpsClient = jsonrpc.NewClient(host.getUrl(requestTypeRPC, true))
+	rpcClient := jsonrpc.NewClient(host.getUrl(requestTypeRPC, false))
+	rpcSSLClient := jsonrpc.NewClient(host.getUrl(requestTypeRPC, true))
+
+	host.clients = Clients{
+		rpcClient:    rpcClient,
+		rpcSSLClient: rpcSSLClient,
+		httpClient:   httpClient,
+		ipClient:     ipClient,
+	}
 
 	return host
 }
 
-// SetPctProgress sets the percentage progress for the specified "MetricType" on the "Host" object passed
-// as a pointer receiver. It calculates the progress percentage based on the number of successful checks
-// and the total number of checks performed for that metric, and updates the corresponding progress value
-// on the "Host" object.
-// Parameters:
-// - metricType: an enums.MetricType representing the metric type to set the percentage progress for.
-// - rpc: a "Host" object representing the RPC host to update with the new progress percentage.
-// Returns: None.
+// SetPctProgress updates the value of the specified metric type for the Host instance with a percentage that reflects the Host's progress relative to the progress of the RPC Host.
+// The function obtains the current metric value for the Host and RPC Host, calculates the percentage using the percent.PercentOf function, and sets the new percentage value for the Host's Metrics instance for the specified metric type.
+// The second argument is the RPC Host to compare the progress against.
 func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) {
 	hostMetric := host.Metrics.GetValue(metricType, false)
 	rpcMetric := rpc.Metrics.GetValue(metricType, true)
@@ -93,11 +95,6 @@ func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) {
 	host.Metrics.SetValue(metricType, percentage)
 }
 
-// SetStatus updates the status of the "Host" object passed as a pointer receiver, based on the results of
-// the most recent network checks performed on the host. It sets the "Status" field of the "Host" object
-// to reflect whether the host is up or down, and updates the corresponding status value on the "rpc" host.
-// Parameters: rpc: a "Host" object representing the RPC host to update with the new status.
-// Returns: None.
 func (host *Host) SetStatus(rpc Host) {
 	metricsHost := host.Metrics
 	metricsRPC := rpc.Metrics
@@ -110,7 +107,7 @@ func (host *Host) SetStatus(rpc Host) {
 			return
 		}
 	case enums.TableTypeNode, enums.TableTypeRPC, enums.TableTypePeers:
-		if !metricsHost.Updated || metricsHost.TotalTransactions == 0 || metricsHost.LatestCheckpoint == 0 ||
+		if !metricsHost.Updated || metricsHost.TotalTransactionsBlocks == 0 || metricsHost.LatestCheckpoint == 0 ||
 			metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == metrics.TransactionsPerSecondWindow ||
 			metricsHost.TxSyncPercentage == 0 || metricsHost.TxSyncPercentage > 110 || metricsHost.CheckSyncPercentage > 110 {
 
@@ -120,7 +117,7 @@ func (host *Host) SetStatus(rpc Host) {
 		}
 
 		if metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) ||
-			metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactions, metricsRPC.TotalTransactions) ||
+			metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionBlocks, metricsRPC.TotalTransactionsBlocks) ||
 			metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
 
 			host.Status = enums.StatusYellow

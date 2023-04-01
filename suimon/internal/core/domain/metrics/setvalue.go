@@ -3,6 +3,7 @@ package metrics
 import (
 	"fmt"
 	"math"
+	"strconv"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
@@ -11,7 +12,7 @@ import (
 // Parameters:
 // - metric: an enums.MetricType representing the metric type to set.
 // - value: a value of any type representing the value to set for the given metric type.
-func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
+func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 	metrics.Updated = true
 
 	var convFToI = func(input float64) int {
@@ -20,111 +21,196 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) {
 
 	switch metric {
 	case enums.MetricTypeSuiSystemState:
-		if valueSystemState, ok := value.(SuiSystemState); ok {
-			metrics.SystemState = valueSystemState
-			metrics.TimeTillNextEpochMs = metrics.GetTimeTillNextEpoch()
+		valueSystemState, ok := value.(SuiSystemState)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeSuiSystemState: %T", value)
 		}
-	case enums.MetricTypeTotalTransactions:
-		valueInt := value.(int)
 
-		metrics.TotalTransactions = valueInt
+		metrics.SystemState = valueSystemState
+		metrics.TimeTillNextEpochMs = metrics.GetMillisecondsTillNextEpoch()
+	case enums.MetricTypeTotalTransactionBlocks:
+		switch v := value.(type) {
+		case string:
+			valueInt, err := strconv.Atoi(v)
+			if err != nil {
+				return err
+			}
+			metrics.TotalTransactionsBlocks = valueInt
 
-		metrics.CalculateTPS()
+			metrics.CalculateTPS()
+		default:
+			return fmt.Errorf("unexpected value type for MetricTypeTotalTransactionBlocks: %T", value)
+		}
 	case enums.MetricTypeTotalTransactionCertificates:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeTotalTransactionCertificates: %T", value)
+		}
 
 		metrics.TotalTransactionCertificates = convFToI(valueFloat)
 	case enums.MetricTypeTotalTransactionEffects:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeTotalTransactionEffects: %T", value)
+		}
 
 		metrics.TotalTransactionEffects = convFToI(valueFloat)
 	case enums.MetricTypeLatestCheckpoint:
-		valueInt := value.(int)
-
-		metrics.LatestCheckpoint = valueInt
+		switch v := value.(type) {
+		case string:
+			valueInt, err := strconv.Atoi(v)
+			if err != nil {
+				return err
+			}
+			metrics.LatestCheckpoint = valueInt
+		default:
+			return fmt.Errorf("unexpected value type for MetricTypeLatestCheckpoint: %T", value)
+		}
 	case enums.MetricTypeHighestKnownCheckpoint:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeHighestKnownCheckpoint: %T", value)
+		}
 
 		metrics.HighestKnownCheckpoint = convFToI(valueFloat)
 	case enums.MetricTypeHighestSyncedCheckpoint:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeHighestSyncedCheckpoint: %T", value)
+		}
 
 		metrics.HighestSyncedCheckpoint = convFToI(valueFloat)
 
 		metrics.CalculateCPS()
 	case enums.MetricTypeLastExecutedCheckpoint:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeLastExecutedCheckpoint: %T", value)
+		}
 
 		metrics.LastExecutedCheckpoint = convFToI(valueFloat)
 	case enums.MetricTypeCheckpointExecBacklog:
-		valueInt := value.(int)
+		valueInt, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeCheckpointExecBacklog: %T", value)
+		}
 
 		metrics.CheckpointExecBacklog = valueInt
 	case enums.MetricTypeCheckpointSyncBacklog:
-		valueInt := value.(int)
+		valueInt, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeCheckpointSyncBacklog: %T", value)
+		}
 
 		metrics.CheckpointSyncBacklog = valueInt
 	case enums.MetricTypeCurrentEpoch:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeCurrentEpoch: %T", value)
+		}
 
 		metrics.CurrentEpoch = convFToI(valueFloat)
 	case enums.MetricTypeEpochTotalDuration:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeEpochTotalDuration: %T", value)
+		}
 
 		metrics.EpochTotalDuration = convFToI(valueFloat)
 	case enums.MetricTypeSuiNetworkPeers:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeSuiNetworkPeers: %T", value)
+		}
 
 		metrics.NetworkPeers = convFToI(valueFloat)
 	case enums.MetricTypeUptime:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeUptime: %T", value)
+		}
 
 		metrics.Uptime = fmt.Sprintf("%.2f", valueFloat/86400)
 	case enums.MetricTypeVersion:
-		valueString := value.(string)
+		valueString, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeVersion: %T", value)
+		}
 
 		metrics.Version = valueString
 	case enums.MetricTypeCommit:
-		valueString := value.(string)
+		valueString, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeCommit: %T", value)
+		}
 
 		metrics.Commit = valueString
 	case enums.MetricTypeCurrentRound:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeCurrentRound: %T", value)
+		}
 
 		metrics.CurrentRound = convFToI(valueFloat)
 	case enums.MetricTypeHighestProcessedRound:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeHighestProcessedRound: %T", value)
+		}
 
 		metrics.HighestProcessedRound = convFToI(valueFloat)
 	case enums.MetricTypeLastCommittedRound:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeLastCommittedRound: %T", value)
+		}
 
 		metrics.LastCommittedRound = convFToI(valueFloat)
 	case enums.MetricTypePrimaryNetworkPeers:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypePrimaryNetworkPeers: %T", value)
+		}
 
 		metrics.PrimaryNetworkPeers = convFToI(valueFloat)
 	case enums.MetricTypeWorkerNetworkPeers:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeWorkerNetworkPeers: %T", value)
+		}
 
 		metrics.WorkerNetworkPeers = convFToI(valueFloat)
 	case enums.MetricTypeSkippedConsensusTransactions:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeSkippedConsensusTransactions: %T", value)
+		}
 
 		metrics.SkippedConsensusTransactions = convFToI(valueFloat)
 	case enums.MetricTypeTotalSignatureErrors:
-		valueFloat := value.(float64)
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeTotalSignatureErrors: %T", value)
+		}
 
 		metrics.TotalSignatureErrors = convFToI(valueFloat)
 	case enums.MetricTypeTxSyncPercentage:
-		valueInt := value.(int)
+		valueInt, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeTxSyncPercentage: %T", value)
+		}
 
 		metrics.TxSyncPercentage = valueInt
 	case enums.MetricTypeCheckSyncPercentage:
-		valueInt := value.(int)
+		valueInt, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected value type for MetricTypeCheckSyncPercentage: %T", value)
+		}
 
 		metrics.CheckSyncPercentage = valueInt
 	}
+
+	return nil
 }
 
 // CalculateTPS calculates the current transaction per second (TPS) based on the number of transactions processed
@@ -137,7 +223,7 @@ func (metrics *Metrics) CalculateTPS() {
 		tps                 int
 	)
 
-	transactionsHistory = append(transactionsHistory, metrics.TotalTransactions)
+	transactionsHistory = append(transactionsHistory, metrics.TotalTransactionsBlocks)
 	if len(transactionsHistory) < TransactionsPerSecondWindow {
 		metrics.TransactionsHistory = transactionsHistory
 
@@ -197,7 +283,7 @@ func (metrics *Metrics) CalculateCPS() {
 //   - a boolean value indicating whether the metric is healthy or not.
 func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC any) bool {
 	switch metric {
-	case enums.MetricTypeTotalTransactions:
+	case enums.MetricTypeTotalTransactionBlocks:
 		return metrics.TxSyncPercentage >= TotalTransactionsSyncPercentage
 	case enums.MetricTypeTransactionsPerSecond:
 		valueRPCInt := valueRPC.(int)

@@ -3,11 +3,10 @@ package controller
 import (
 	"fmt"
 
-	"github.com/jedib0t/go-pretty/v6/table"
-
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums/columnnames"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/tablebuilder"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/tablebuilder/tables"
 )
@@ -16,415 +15,261 @@ const (
 	rpcPortDefault = "9000"
 )
 
-// InitTables initializes the tables of the "Checker" struct instance passed as a pointer receiver.
-// Parameters: None.
-// Returns: None.
+// InitTables initializes the CheckerController's internal state for the tables by creating and setting the appropriate TableConfig objects for each table type.
+// The function populates the CheckerController's internal state with information about the available hosts and their corresponding tables.
+// Returns an error if the initialization process fails for any reason.
 func (checker *CheckerController) InitTables() error {
 	displayConfig := checker.suimonConfig.MonitorsConfig
-
-	if displayConfig.RPCTable.Display {
-		checker.InitTable(enums.TableTypeRPC)
+	tableConfigMap := map[enums.TableType]bool{
+		enums.TableTypeRPC:              displayConfig.RPCTable.Display,
+		enums.TableTypeNode:             displayConfig.NodeTable.Display,
+		enums.TableTypeValidator:        displayConfig.ValidatorTable.Display,
+		enums.TableTypePeers:            displayConfig.PeersTable.Display,
+		enums.TableTypeSystemState:      displayConfig.SystemTable.Display,
+		enums.TableTypeActiveValidators: displayConfig.ActiveValidatorsTable.Display,
 	}
 
-	if displayConfig.NodeTable.Display {
-		checker.InitTable(enums.TableTypeNode)
-	}
-
-	if displayConfig.ValidatorTable.Display {
-		checker.InitTable(enums.TableTypeValidator)
-	}
-
-	if displayConfig.PeersTable.Display {
-		checker.InitTable(enums.TableTypePeers)
-	}
-
-	if displayConfig.SystemTable.Display {
-		checker.InitTable(enums.TableTypeSystemState)
-	}
-
-	if displayConfig.ActiveValidatorsTable.Display {
-		checker.InitTable(enums.TableTypeActiveValidators)
+	for tableType, shouldDisplay := range tableConfigMap {
+		if shouldDisplay {
+			checker.InitTable(tableType)
+		}
 	}
 
 	return nil
 }
 
-// InitTable initializes a specific table of the "Checker" struct instance passed as a pointer receiver,
-// based on the provided "TableType".
-// Parameters: tableType: an enums.TableType representing the type of table to initialize.
-// Returns: None.
+// InitTable initializes the CheckerController's internal state for the specified table type by creating and setting the appropriate Host objects for each host that supports that table type.
+// The function populates the CheckerController's internal state with information about the available hosts and their corresponding tables of the specified type.
+// Returns nothing.
 func (checker *CheckerController) InitTable(tableType enums.TableType) {
 	enabledEmojis := checker.suimonConfig.MonitorsVisual.EnableEmojis
+	columnConfig := tables.GetColumnConfig(tableType)
+	columns := make(tablebuilder.Columns, len(columnConfig))
+	hosts := checker.getHostsByTableType(tableType)
 
-	var (
-		hosts        []host.Host
-		tableConfig  tablebuilder.TableConfig
-		columnConfig []table.ColumnConfig
-		columns      tablebuilder.Columns
-	)
+	for i, config := range columnConfig {
+		columns[i].Config = config
+	}
 
-	switch tableType {
-	case enums.TableTypeNode:
-		hosts = checker.getHostsByTableType(enums.TableTypeNode)
-		columnConfig = tables.ColumnsConfigNode
-		columns = make(tablebuilder.Columns, len(columnConfig))
+	tableConfig := tablebuilder.TableConfig{
+		Name:         tables.GetTableTitle(tableType),
+		Tag:          tables.GetTableTag(tableType),
+		Style:        tables.GetTableStyle(tableType),
+		Rows:         tables.GetTableRows(tableType),
+		SortConfig:   tables.GetTableSortConfig(tableType),
+		Columns:      columns,
+		ColumnsCount: len(columns),
+		RowsCount:    0,
+	}
 
-		for i := 0; i < len(columnConfig); i++ {
-			columns[i].Config = columnConfig[i]
+	for idx, host := range hosts {
+		if !host.Metrics.Updated {
+			continue
 		}
 
-		tableConfig = tablebuilder.TableConfig{
-			Name:         tables.GetTableTitle(enums.TableTypeNode),
-			Tag:          tables.TableTagNode,
-			Style:        tables.TableStyleNode,
-			Columns:      columns,
-			ColumnsCount: len(columns),
-			Rows:         tables.RowsNode,
-			RowsCount:    0,
-			SortConfig:   tables.TableSortConfigNode,
+		tableConfig.RowsCount++
+
+		switch tableType {
+		case enums.TableTypeNode:
+			tables.SetColumnValues(columns, getNodeColumnValues(idx, &host, enabledEmojis))
+		case enums.TableTypeValidator:
+			tables.SetColumnValues(columns, getValidatorColumnValues(idx, &host, enabledEmojis))
+		case enums.TableTypePeers:
+			tables.SetColumnValues(columns, getNodeColumnValues(idx, &host, enabledEmojis))
+		case enums.TableTypeRPC:
+			tables.SetColumnValues(columns, getRPCColumnValues(idx, &host))
+		case enums.TableTypeSystemState:
+			tables.SetColumnValues(columns, getSystemStateColumnValues(idx, &host))
+		case enums.TableTypeActiveValidators:
+			activeValidators := hosts[0].Metrics.SystemState.ActiveValidators
+
+			for idx, validator := range activeValidators {
+				columnValues := getActiveValidatorColumnValues(idx, &validator)
+
+				tables.SetColumnValues(columns, columnValues)
+
+				tableConfig.RowsCount++
+			}
+
 		}
 
-		for idx, host := range hosts {
-			if !host.Metrics.Updated {
-				continue
-			}
-
-			tableConfig.RowsCount++
-
-			var (
-				status  any = host.Status
-				country any = host.Location.String()
-				port        = host.Ports[enums.PortTypeRPC]
-				address     = host.HostPort.Address
-			)
-
-			if !enabledEmojis {
-				status = host.Status.StatusToPlaceholder()
-			}
-
-			if port == "" {
-				port = rpcPortDefault
-			}
-
-			columns[columnnames.NodeColumnNameIndex].SetValue(idx + 1)
-			columns[columnnames.NodeColumnNameHealth].SetValue(status)
-			columns[columnnames.NodeColumnNameAddress].SetValue(address)
-			columns[columnnames.NodeColumnNamePortRPC].SetValue(port)
-			columns[columnnames.NodeColumnNameTotalTransactions].SetValue(host.Metrics.TotalTransactions)
-			columns[columnnames.NodeColumnNameTotalTransactionCertificates].SetValue(host.Metrics.TotalTransactionCertificates)
-			columns[columnnames.NodeColumnNameTotalTransactionEffects].SetValue(host.Metrics.TotalTransactionEffects)
-			columns[columnnames.NodeColumnNameLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
-			columns[columnnames.NodeColumnNameHighestKnownCheckpoint].SetValue(host.Metrics.HighestKnownCheckpoint)
-			columns[columnnames.NodeColumnNameHighestSyncedCheckpoint].SetValue(host.Metrics.HighestSyncedCheckpoint)
-			columns[columnnames.NodeColumnNameLastExecutedCheckpoint].SetValue(host.Metrics.LastExecutedCheckpoint)
-			columns[columnnames.NodeColumnNameCheckpointExecBacklog].SetValue(host.Metrics.CheckpointExecBacklog)
-			columns[columnnames.NodeColumnNameCheckpointSyncBacklog].SetValue(host.Metrics.CheckpointSyncBacklog)
-			columns[columnnames.NodeColumnNameCurrentEpoch].SetValue(host.Metrics.CurrentEpoch)
-			columns[columnnames.NodeColumnNameTXSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.TxSyncPercentage))
-			columns[columnnames.NodeColumnNameCheckSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage))
-			columns[columnnames.NodeColumnNameNetworkPeers].SetValue(host.Metrics.NetworkPeers)
-			columns[columnnames.NodeColumnNameUptime].SetValue(host.Metrics.Uptime)
-			columns[columnnames.NodeColumnNameVersion].SetValue(host.Metrics.Version)
-			columns[columnnames.NodeColumnNameCommit].SetValue(host.Metrics.Commit)
-
-			if host.Location == nil {
-				columns[columnnames.NodeColumnNameCountry].SetValue(nil)
-
-				continue
-			}
-
-			if !enabledEmojis {
-				country = host.Location.CountryName
-			}
-
-			columns[columnnames.NodeColumnNameCountry].SetValue(country)
-		}
-	case enums.TableTypeValidator:
-		hosts = checker.getHostsByTableType(enums.TableTypeValidator)
-		columnConfig = tables.ColumnsConfigValidator
-		columns = make(tablebuilder.Columns, len(columnConfig))
-
-		for i := 0; i < len(columnConfig); i++ {
-			columns[i].Config = columnConfig[i]
-		}
-
-		tableConfig = tablebuilder.TableConfig{
-			Name:         tables.GetTableTitle(enums.TableTypeValidator),
-			Tag:          tables.TableTagValidator,
-			Style:        tables.TableStyleValidator,
-			Columns:      columns,
-			ColumnsCount: len(columns),
-			Rows:         tables.RowsValidator,
-			RowsCount:    0,
-			SortConfig:   tables.TableSortConfigValidator,
-		}
-
-		for idx, host := range hosts {
-			if !host.Metrics.Updated {
-				continue
-			}
-
-			tableConfig.RowsCount++
-
-			var (
-				status  any = host.Status
-				country any = host.Location.String()
-				port        = host.Ports[enums.PortTypeRPC]
-				address     = host.HostPort.Address
-			)
-
-			if !enabledEmojis {
-				status = host.Status.StatusToPlaceholder()
-			}
-
-			if port == "" {
-				port = rpcPortDefault
-			}
-
-			columns[columnnames.ValidatorColumnNameIndex].SetValue(idx + 1)
-			columns[columnnames.ValidatorColumnNameHealth].SetValue(status)
-			columns[columnnames.ValidatorColumnNameAddress].SetValue(address)
-			columns[columnnames.ValidatorColumnNameTotalTransactionCertificates].SetValue(host.Metrics.TotalTransactionCertificates)
-			columns[columnnames.ValidatorColumnNameTotalTransactionEffects].SetValue(host.Metrics.TotalTransactionEffects)
-			columns[columnnames.ValidatorColumnNameHighestKnownCheckpoint].SetValue(host.Metrics.HighestKnownCheckpoint)
-			columns[columnnames.ValidatorColumnNameHighestSyncedCheckpoint].SetValue(host.Metrics.HighestSyncedCheckpoint)
-			columns[columnnames.ValidatorColumnNameLastExecutedCheckpoint].SetValue(host.Metrics.LastExecutedCheckpoint)
-			columns[columnnames.ValidatorColumnNameCheckpointExecBacklog].SetValue(host.Metrics.CheckpointExecBacklog)
-			columns[columnnames.ValidatorColumnNameCheckpointSyncBacklog].SetValue(host.Metrics.CheckpointSyncBacklog)
-			columns[columnnames.ValidatorColumnNameCurrentEpoch].SetValue(host.Metrics.CurrentEpoch)
-			columns[columnnames.ValidatorColumnNameCheckSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage))
-			columns[columnnames.ValidatorColumnNameNetworkPeers].SetValue(host.Metrics.NetworkPeers)
-			columns[columnnames.ValidatorColumnNameUptime].SetValue(host.Metrics.Uptime)
-			columns[columnnames.ValidatorColumnNameVersion].SetValue(host.Metrics.Version)
-			columns[columnnames.ValidatorColumnNameCommit].SetValue(host.Metrics.Commit)
-			columns[columnnames.ValidatorColumnNameCurrentRound].SetValue(host.Metrics.CurrentRound)
-			columns[columnnames.ValidatorColumnNameHighestProcessedRound].SetValue(host.Metrics.HighestProcessedRound)
-			columns[columnnames.ValidatorColumnNameLastCommittedRound].SetValue(host.Metrics.LastCommittedRound)
-			columns[columnnames.ValidatorColumnNamePrimaryNetworkPeers].SetValue(host.Metrics.PrimaryNetworkPeers)
-			columns[columnnames.ValidatorColumnNameWorkerNetworkPeers].SetValue(host.Metrics.WorkerNetworkPeers)
-			columns[columnnames.ValidatorColumnNameSkippedConsensusTransactions].SetValue(host.Metrics.SkippedConsensusTransactions)
-			columns[columnnames.ValidatorColumnNameTotalSignatureErrors].SetValue(host.Metrics.TotalSignatureErrors)
-
-			if host.Location == nil {
-				columns[columnnames.ValidatorColumnNameCountry].SetValue(nil)
-
-				continue
-			}
-
-			if !enabledEmojis {
-				country = host.Location.CountryName
-			}
-
-			columns[columnnames.ValidatorColumnNameCountry].SetValue(country)
-
-		}
-	case enums.TableTypePeers:
-		hosts = checker.getHostsByTableType(enums.TableTypePeers)
-		columnConfig = tables.ColumnsConfigPeer
-		columns = make(tablebuilder.Columns, len(columnConfig))
-
-		for i := 0; i < len(columnConfig); i++ {
-			columns[i].Config = columnConfig[i]
-		}
-
-		tableConfig = tablebuilder.TableConfig{
-			Name:         tables.GetTableTitle(enums.TableTypePeers),
-			Tag:          tables.TableTagPeer,
-			Style:        tables.TableStylePeer,
-			Columns:      columns,
-			ColumnsCount: len(columns),
-			Rows:         tables.RowsPeer,
-			RowsCount:    0,
-			SortConfig:   tables.TableSortConfigPeer,
-		}
-
-		for idx, host := range hosts {
-			if !host.Metrics.Updated {
-				continue
-			}
-
-			tableConfig.RowsCount++
-
-			var (
-				status  any = host.Status
-				country any = host.Location.String()
-				port        = host.Ports[enums.PortTypeRPC]
-				address     = host.HostPort.Address
-			)
-
-			if !enabledEmojis {
-				status = host.Status.StatusToPlaceholder()
-			}
-
-			if port == "" {
-				port = rpcPortDefault
-			}
-
-			columns[columnnames.NodeColumnNameIndex].SetValue(idx + 1)
-			columns[columnnames.NodeColumnNameHealth].SetValue(status)
-			columns[columnnames.NodeColumnNameAddress].SetValue(address)
-			columns[columnnames.NodeColumnNamePortRPC].SetValue(port)
-			columns[columnnames.NodeColumnNameTotalTransactions].SetValue(host.Metrics.TotalTransactions)
-			columns[columnnames.NodeColumnNameTotalTransactionCertificates].SetValue(host.Metrics.TotalTransactionCertificates)
-			columns[columnnames.NodeColumnNameTotalTransactionEffects].SetValue(host.Metrics.TotalTransactionEffects)
-			columns[columnnames.NodeColumnNameLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
-			columns[columnnames.NodeColumnNameHighestKnownCheckpoint].SetValue(host.Metrics.HighestKnownCheckpoint)
-			columns[columnnames.NodeColumnNameHighestSyncedCheckpoint].SetValue(host.Metrics.HighestSyncedCheckpoint)
-			columns[columnnames.NodeColumnNameLastExecutedCheckpoint].SetValue(host.Metrics.LastExecutedCheckpoint)
-			columns[columnnames.NodeColumnNameCheckpointExecBacklog].SetValue(host.Metrics.CheckpointExecBacklog)
-			columns[columnnames.NodeColumnNameCheckpointSyncBacklog].SetValue(host.Metrics.CheckpointSyncBacklog)
-			columns[columnnames.NodeColumnNameCurrentEpoch].SetValue(host.Metrics.CurrentEpoch)
-			columns[columnnames.NodeColumnNameTXSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.TxSyncPercentage))
-			columns[columnnames.NodeColumnNameCheckSyncPercentage].SetValue(fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage))
-			columns[columnnames.NodeColumnNameNetworkPeers].SetValue(host.Metrics.NetworkPeers)
-			columns[columnnames.NodeColumnNameUptime].SetValue(host.Metrics.Uptime)
-			columns[columnnames.NodeColumnNameVersion].SetValue(host.Metrics.Version)
-			columns[columnnames.NodeColumnNameCommit].SetValue(host.Metrics.Commit)
-
-			if host.Location == nil {
-				columns[columnnames.NodeColumnNameCountry].SetValue(nil)
-
-				continue
-			}
-
-			if !enabledEmojis {
-				country = host.Location.CountryName
-			}
-
-			columns[columnnames.NodeColumnNameCountry].SetValue(country)
-		}
-	case enums.TableTypeRPC:
-		hosts = checker.getHostsByTableType(enums.TableTypeRPC)
-		columnConfig = tables.ColumnsConfigRPC
-		columns = make(tablebuilder.Columns, len(columnConfig))
-
-		for i := 0; i < len(columnConfig); i++ {
-			columns[i].Config = columnConfig[i]
-		}
-
-		tableConfig = tablebuilder.TableConfig{
-			Name:         tables.GetTableTitle(enums.TableTypeRPC),
-			Tag:          tables.TableTagRPC,
-			Style:        tables.TableStyleRPC,
-			Columns:      columns,
-			ColumnsCount: len(columns),
-			Rows:         tables.RowsRPC,
-			RowsCount:    0,
-			SortConfig:   tables.TableSortConfigRPC,
-		}
-
-		for idx, host := range hosts {
-			if !host.Metrics.Updated {
-				continue
-			}
-
-			tableConfig.RowsCount++
-
-			var (
-				status  any = host.Status
-				port        = host.Ports[enums.PortTypeRPC]
-				address     = host.HostPort.Address
-			)
-
-			if !enabledEmojis {
-				status = host.Status.StatusToPlaceholder()
-			}
-
-			if port == "" {
-				port = rpcPortDefault
-			}
-
-			columns[columnnames.NodeColumnNameIndex].SetValue(idx + 1)
-			columns[columnnames.NodeColumnNameHealth].SetValue(status)
-			columns[columnnames.NodeColumnNameAddress].SetValue(address)
-			columns[columnnames.NodeColumnNamePortRPC].SetValue(port)
-			columns[columnnames.NodeColumnNameTotalTransactions].SetValue(host.Metrics.TotalTransactions)
-			columns[columnnames.NodeColumnNameLatestCheckpoint].SetValue(host.Metrics.LatestCheckpoint)
-		}
-	case enums.TableTypeSystemState:
-		hosts = checker.getHostsByTableType(enums.TableTypeSystemState)
-		columnConfig = tables.ColumnsConfigSystem
-		columns = make(tablebuilder.Columns, len(columnConfig))
-
-		for i := 0; i < len(columnConfig); i++ {
-			columns[i].Config = columnConfig[i]
-		}
-
-		tableConfig = tablebuilder.TableConfig{
-			Name:         tables.GetTableTitle(enums.TableTypeSystemState),
-			Tag:          tables.TableTagSystem,
-			Style:        tables.TableStyleSystem,
-			Columns:      columns,
-			ColumnsCount: len(columns),
-			Rows:         tables.RowsSystemState,
-			RowsCount:    0,
-			SortConfig:   tables.TableSortConfigSystem,
-		}
-
-		for idx, host := range hosts {
-			if !host.Metrics.Updated {
-				continue
-			}
-
-			tableConfig.RowsCount++
-
-			systemState := host.Metrics.SystemState
-
-			columns[columnnames.ValidatorColumnNameIndex].SetValue(idx + 1)
-			columns[columnnames.SystemColumnNameEpoch].SetValue(systemState.Epoch)
-			columns[columnnames.SystemColumnNameEpochDurationMs].SetValue(systemState.EpochDurationMs)
-			columns[columnnames.SystemColumnNameStorageFund].SetValue(systemState.StorageFund)
-			columns[columnnames.SystemColumnNameReferenceGasPrice].SetValue(systemState.ReferenceGasPrice)
-			columns[columnnames.SystemColumnNameStakeSubsidyCounter].SetValue(systemState.StakeSubsidyEpochCounter)
-			columns[columnnames.SystemColumnNameStakeSubsidyBalance].SetValue(systemState.StakeSubsidyBalance)
-			columns[columnnames.SystemColumnNameStakeSubsidyCurrentEpochAmount].SetValue(systemState.StakeSubsidyCurrentEpochAmount)
-			columns[columnnames.SystemColumnNameTotalStake].SetValue(systemState.TotalStake)
-			columns[columnnames.SystemColumnNameValidatorsCount].SetValue(len(systemState.ActiveValidators))
-			columns[columnnames.SystemColumnNamePendingActiveValidatorsSize].SetValue(systemState.PendingActiveValidatorsSize)
-			columns[columnnames.SystemColumnNamePendingRemovals].SetValue(len(systemState.PendingRemovals))
-			columns[columnnames.SystemColumnNameValidatorsCandidateSize].SetValue(systemState.ValidatorCandidatesSize)
-			columns[columnnames.SystemColumnNameValidatorsAtRiskCount].SetValue(len(systemState.AtRiskValidators))
-		}
-	case enums.TableTypeActiveValidators:
-		hosts = checker.getHostsByTableType(enums.TableTypeActiveValidators)
-		columnConfig = tables.ColumnConfigActiveValidator
-		columns = make(tablebuilder.Columns, len(columnConfig))
-
-		for i := 0; i < len(columnConfig); i++ {
-			columns[i].Config = columnConfig[i]
-		}
-
-		tableConfig = tablebuilder.TableConfig{
-			Name:         tables.GetTableTitle(enums.TableTypeActiveValidators),
-			Tag:          tables.TableTagActiveValidator,
-			Style:        tables.TableStyleActiveValidator,
-			Columns:      columns,
-			ColumnsCount: len(columns),
-			Rows:         tables.RowsActiveValidator,
-			RowsCount:    0,
-			SortConfig:   tables.TableSortConfigActiveValidator,
-		}
-
-		activeValidators := hosts[0].Metrics.SystemState.ActiveValidators
-
-		for idx, validator := range activeValidators {
-			tableConfig.RowsCount++
-
-			columns[columnnames.ActiveValidatorColumnNameIndex].SetValue(idx + 1)
-			columns[columnnames.ActiveValidatorColumnNameName].SetValue(validator.Name)
-			columns[columnnames.ActiveValidatorColumnNameNetAddress].SetValue(validator.NetAddress)
-			columns[columnnames.ActiveValidatorColumnNameVotingPower].SetValue(validator.VotingPower)
-			columns[columnnames.ActiveValidatorColumnNameGasPrice].SetValue(validator.GasPrice)
-			columns[columnnames.ActiveValidatorColumnNameCommissionRate].SetValue(validator.CommissionRate)
-			columns[columnnames.ActiveValidatorColumnNameNextEpochStake].SetValue(validator.NextEpochStake)
-			columns[columnnames.ActiveValidatorColumnNameNextEpochGasPrice].SetValue(validator.NextEpochGasPrice)
-			columns[columnnames.ActiveValidatorColumnNameNextEpochCommissionRate].SetValue(validator.NextEpochCommissionRate)
-			columns[columnnames.ActiveValidatorColumnNameStakingPoolSuiBalance].SetValue(validator.StakingPoolSuiBalance)
-			columns[columnnames.ActiveValidatorColumnNameRewardsPool].SetValue(validator.RewardsPool)
-			columns[columnnames.ActiveValidatorColumnNamePoolTokenBalance].SetValue(validator.PoolTokenBalance)
-			columns[columnnames.ActiveValidatorColumnNamePendingStake].SetValue(validator.PendingStake)
-		}
 	}
 
 	checker.setBuilderTableType(tableType, tableConfig)
+}
+
+// getNodeColumnValues returns a map of NodeColumnName values to corresponding values for a node at the specified index on the specified host.
+// The function retrieves information about the node from the host's internal state and formats it into a map of NodeColumnName keys and corresponding values.
+// The function also includes emoji values in the map if the specified flag is true.
+// Returns a map of NodeColumnName keys to corresponding values.
+func getNodeColumnValues(idx int, host *host.Host, enabledEmojis bool) map[columnnames.NodeColumnName]any {
+	var (
+		status  any = host.Status
+		country any = host.Location.String()
+		port        = host.Ports[enums.PortTypeRPC]
+		address     = host.HostPort.Address
+	)
+
+	if !enabledEmojis {
+		status = host.Status.StatusToPlaceholder()
+	}
+
+	if port == "" {
+		port = rpcPortDefault
+	}
+
+	columnValues := map[columnnames.NodeColumnName]any{
+		columnnames.NodeColumnNameIndex:                        idx + 1,
+		columnnames.NodeColumnNameHealth:                       status,
+		columnnames.NodeColumnNameAddress:                      address,
+		columnnames.NodeColumnNamePortRPC:                      port,
+		columnnames.NodeColumnNameTotalTransactionBlocks:       host.Metrics.TotalTransactionsBlocks,
+		columnnames.NodeColumnNameTotalTransactionCertificates: host.Metrics.TotalTransactionCertificates,
+		columnnames.NodeColumnNameTotalTransactionEffects:      host.Metrics.TotalTransactionEffects,
+		columnnames.NodeColumnNameLatestCheckpoint:             host.Metrics.LatestCheckpoint,
+		columnnames.NodeColumnNameHighestKnownCheckpoint:       host.Metrics.HighestKnownCheckpoint,
+		columnnames.NodeColumnNameHighestSyncedCheckpoint:      host.Metrics.HighestSyncedCheckpoint,
+		columnnames.NodeColumnNameLastExecutedCheckpoint:       host.Metrics.LastExecutedCheckpoint,
+		columnnames.NodeColumnNameCheckpointExecBacklog:        host.Metrics.CheckpointExecBacklog,
+		columnnames.NodeColumnNameCheckpointSyncBacklog:        host.Metrics.CheckpointSyncBacklog,
+		columnnames.NodeColumnNameCurrentEpoch:                 host.Metrics.CurrentEpoch,
+		columnnames.NodeColumnNameTXSyncPercentage:             fmt.Sprintf("%v%%", host.Metrics.TxSyncPercentage),
+		columnnames.NodeColumnNameCheckSyncPercentage:          fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage),
+		columnnames.NodeColumnNameNetworkPeers:                 host.Metrics.NetworkPeers,
+		columnnames.NodeColumnNameUptime:                       host.Metrics.Uptime,
+		columnnames.NodeColumnNameVersion:                      host.Metrics.Version,
+		columnnames.NodeColumnNameCommit:                       host.Metrics.Commit,
+		columnnames.NodeColumnNameCountry:                      nil,
+	}
+
+	if host.Location != nil {
+		if !enabledEmojis {
+			country = host.Location.CountryName
+		}
+
+		columnValues[columnnames.NodeColumnNameCountry] = country
+	}
+
+	return columnValues
+}
+
+// getValidatorColumnValues returns a map of ValidatorColumnName values to corresponding values for a validator at the specified index on the specified host.
+// The function retrieves information about the validator from the host's internal state and formats it into a map of ValidatorColumnName keys and corresponding values.
+// The function also includes emoji values in the map if the specified flag is true.
+// Returns a map of ValidatorColumnName keys to corresponding values.
+func getValidatorColumnValues(idx int, host *host.Host, enabledEmojis bool) map[columnnames.ValidatorColumnName]any {
+	var (
+		status  any = host.Status
+		country any = host.Location.String()
+		address     = host.HostPort.Address
+	)
+
+	if !enabledEmojis {
+		status = host.Status.StatusToPlaceholder()
+	}
+
+	columnValues := map[columnnames.ValidatorColumnName]any{
+		columnnames.ValidatorColumnNameIndex:                        idx + 1,
+		columnnames.ValidatorColumnNameHealth:                       status,
+		columnnames.ValidatorColumnNameAddress:                      address,
+		columnnames.ValidatorColumnNameTotalTransactionCertificates: host.Metrics.TotalTransactionCertificates,
+		columnnames.ValidatorColumnNameTotalTransactionEffects:      host.Metrics.TotalTransactionEffects,
+		columnnames.ValidatorColumnNameHighestKnownCheckpoint:       host.Metrics.HighestKnownCheckpoint,
+		columnnames.ValidatorColumnNameHighestSyncedCheckpoint:      host.Metrics.HighestSyncedCheckpoint,
+		columnnames.ValidatorColumnNameLastExecutedCheckpoint:       host.Metrics.LastExecutedCheckpoint,
+		columnnames.ValidatorColumnNameCheckpointExecBacklog:        host.Metrics.CheckpointExecBacklog,
+		columnnames.ValidatorColumnNameCheckpointSyncBacklog:        host.Metrics.CheckpointSyncBacklog,
+		columnnames.ValidatorColumnNameCurrentEpoch:                 host.Metrics.CurrentEpoch,
+		columnnames.ValidatorColumnNameCheckSyncPercentage:          fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage),
+		columnnames.ValidatorColumnNameNetworkPeers:                 host.Metrics.NetworkPeers,
+		columnnames.ValidatorColumnNameUptime:                       host.Metrics.Uptime,
+		columnnames.ValidatorColumnNameVersion:                      host.Metrics.Version,
+		columnnames.ValidatorColumnNameCommit:                       host.Metrics.Commit,
+		columnnames.ValidatorColumnNameCurrentRound:                 host.Metrics.CurrentRound,
+		columnnames.ValidatorColumnNameHighestProcessedRound:        host.Metrics.HighestProcessedRound,
+		columnnames.ValidatorColumnNameLastCommittedRound:           host.Metrics.LastCommittedRound,
+		columnnames.ValidatorColumnNamePrimaryNetworkPeers:          host.Metrics.PrimaryNetworkPeers,
+		columnnames.ValidatorColumnNameWorkerNetworkPeers:           host.Metrics.WorkerNetworkPeers,
+		columnnames.ValidatorColumnNameSkippedConsensusTransactions: host.Metrics.SkippedConsensusTransactions,
+		columnnames.ValidatorColumnNameTotalSignatureErrors:         host.Metrics.TotalSignatureErrors,
+	}
+
+	if host.Location != nil {
+		if !enabledEmojis {
+			country = host.Location.CountryName
+		}
+
+		columnValues[columnnames.ValidatorColumnNameCountry] = country
+	}
+
+	return columnValues
+}
+
+// getRPCColumnValues returns a map of NodeColumnName values to corresponding values for the RPC service on the specified host.
+// The function retrieves information about the RPC service from the host's internal state and formats it into a map of NodeColumnName keys and corresponding values.
+// Returns a map of NodeColumnName keys to corresponding values.
+func getRPCColumnValues(idx int, host *host.Host) map[columnnames.NodeColumnName]any {
+	var (
+		status  any = host.Status
+		port        = host.Ports[enums.PortTypeRPC]
+		address     = host.HostPort.Address
+	)
+
+	if port == "" {
+		port = rpcPortDefault
+	}
+
+	return map[columnnames.NodeColumnName]any{
+		columnnames.NodeColumnNameIndex:                  idx + 1,
+		columnnames.NodeColumnNameHealth:                 status,
+		columnnames.NodeColumnNameAddress:                address,
+		columnnames.NodeColumnNamePortRPC:                port,
+		columnnames.NodeColumnNameTotalTransactionBlocks: host.Metrics.TotalTransactionsBlocks,
+		columnnames.NodeColumnNameLatestCheckpoint:       host.Metrics.LatestCheckpoint,
+	}
+}
+
+// getSystemStateColumnValues returns a map of SystemColumnName values to corresponding values for the system state on the specified host.
+// The function retrieves information about the system state from the host's internal state and formats it into a map of SystemColumnName keys and corresponding values.
+// Returns a map of SystemColumnName keys to corresponding values.
+func getSystemStateColumnValues(idx int, host *host.Host) map[columnnames.SystemColumnName]any {
+	systemState := host.Metrics.SystemState
+
+	return map[columnnames.SystemColumnName]any{
+		columnnames.SystemColumnNameIndex:                          idx + 1,
+		columnnames.SystemColumnNameEpoch:                          systemState.Epoch,
+		columnnames.SystemColumnNameEpochDurationMs:                systemState.EpochDurationMs,
+		columnnames.SystemColumnNameStorageFund:                    systemState.StorageFund,
+		columnnames.SystemColumnNameReferenceGasPrice:              systemState.ReferenceGasPrice,
+		columnnames.SystemColumnNameStakeSubsidyCounter:            systemState.StakeSubsidyEpochCounter,
+		columnnames.SystemColumnNameStakeSubsidyBalance:            systemState.StakeSubsidyBalance,
+		columnnames.SystemColumnNameStakeSubsidyCurrentEpochAmount: systemState.StakeSubsidyCurrentEpochAmount,
+		columnnames.SystemColumnNameTotalStake:                     systemState.TotalStake,
+		columnnames.SystemColumnNameValidatorsCount:                len(systemState.ActiveValidators),
+		columnnames.SystemColumnNamePendingActiveValidatorsSize:    systemState.PendingActiveValidatorsSize,
+		columnnames.SystemColumnNamePendingRemovals:                len(systemState.PendingRemovals),
+		columnnames.SystemColumnNameValidatorsCandidateSize:        systemState.ValidatorCandidatesSize,
+		columnnames.SystemColumnNameValidatorsAtRiskCount:          len(systemState.AtRiskValidators),
+	}
+}
+
+// getActiveValidatorColumnValues returns a map of ActiveValidatorColumnName values to corresponding values for the specified active validator.
+// The function retrieves information about the active validator from the provided metrics.Validator object and formats it into a map of ActiveValidatorColumnName keys and corresponding values.
+// Returns a map of ActiveValidatorColumnName keys to corresponding values.
+func getActiveValidatorColumnValues(idx int, validator *metrics.Validator) map[columnnames.ActiveValidatorColumnName]any {
+	return map[columnnames.ActiveValidatorColumnName]any{
+		columnnames.ActiveValidatorColumnNameIndex:                   idx + 1,
+		columnnames.ActiveValidatorColumnNameName:                    validator.Name,
+		columnnames.ActiveValidatorColumnNameNetAddress:              validator.NetAddress,
+		columnnames.ActiveValidatorColumnNameVotingPower:             validator.VotingPower,
+		columnnames.ActiveValidatorColumnNameGasPrice:                validator.GasPrice,
+		columnnames.ActiveValidatorColumnNameCommissionRate:          validator.CommissionRate,
+		columnnames.ActiveValidatorColumnNameNextEpochStake:          validator.NextEpochStake,
+		columnnames.ActiveValidatorColumnNameNextEpochGasPrice:       validator.NextEpochGasPrice,
+		columnnames.ActiveValidatorColumnNameNextEpochCommissionRate: validator.NextEpochCommissionRate,
+		columnnames.ActiveValidatorColumnNameStakingPoolSuiBalance:   validator.StakingPoolSuiBalance,
+		columnnames.ActiveValidatorColumnNameRewardsPool:             validator.RewardsPool,
+		columnnames.ActiveValidatorColumnNamePoolTokenBalance:        validator.PoolTokenBalance,
+		columnnames.ActiveValidatorColumnNamePendingStake:            validator.PendingStake,
+	}
 }

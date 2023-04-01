@@ -19,151 +19,158 @@ import (
 
 const ipInfoCacheExp = 5 * time.Minute
 
-type CheckerController struct {
-	suimonConfig config.SuimonConfig
+type (
+	Clients struct {
+		rpcClient  jsonrpc.RPCClient
+		httpClient *http.Client
+		ipClient   *ipinfo.Client
+	}
 
-	rpc       []host.Host
-	node      []host.Host
-	validator []host.Host
-	peers     []host.Host
+	Builders struct {
+		peer             ports.Builder
+		node             ports.Builder
+		validator        ports.Builder
+		rpc              ports.Builder
+		system           ports.Builder
+		activeValidators ports.Builder
+	}
 
-	rpcClient  jsonrpc.RPCClient
-	httpClient *http.Client
-	ipClient   *ipinfo.Client
+	Hosts struct {
+		rpc       []host.Host
+		node      []host.Host
+		validator []host.Host
+		peers     []host.Host
+	}
 
-	tableConfig tablebuilder.TableConfig
+	CheckerController struct {
+		suimonConfig config.SuimonConfig
 
-	tableBuilderPeer             ports.Builder
-	tableBuilderNode             ports.Builder
-	tableBuilderValidator        ports.Builder
-	tableBuilderRPC              ports.Builder
-	tableBuilderSystem           ports.Builder
-	tableBuilderActiveValidators ports.Builder
+		logger log.Logger
 
-	DashboardBuilder *dashboardbuilder.DashboardBuilder
+		hosts            Hosts
+		clients          Clients
+		tableBuilders    Builders
+		DashboardBuilder *dashboardbuilder.DashboardBuilder
+		tableConfig      tablebuilder.TableConfig
+	}
+)
 
-	logger log.Logger
-}
-
-// NewCheckerController creates a new Checker object for the given Suimon and node configurations and network type.
-// This function accepts the following parameters:
-// - suimonConfig: a config.SuimonConfig struct containing the Suimon configuration data.
-// - nodeConfig: a config.NodeConfig struct containing the node configuration data.
-// - networkType: an enums.NetworkType representing the type of network to configure the Checker object for.
-// The function returns a pointer to a Checker struct, and an error if there was an issue creating the Checker object.
+// NewCheckerController creates a new CheckerController object based on the specified SuimonConfig object.
+// The function initializes the CheckerController's internal state and creates a new Host object for each host in the SuimonConfig.
+// Returns a pointer to the new CheckerController object and an error value if the creation process fails for any reason.
 func NewCheckerController(suimonConfig config.SuimonConfig) (*CheckerController, error) {
 	rpcClient := jsonrpc.NewClient(suimonConfig.PublicRPC[0])
 	httpClient := &http.Client{Timeout: httpClientTimeout}
 	ipClient := ipinfo.NewClient(httpClient, ipinfo.NewCache(cache.NewInMemory().WithExpiration(ipInfoCacheExp)), suimonConfig.IPLookup.AccessToken)
 
 	return &CheckerController{
-		rpcClient:    rpcClient,
-		httpClient:   httpClient,
-		ipClient:     ipClient,
+		clients: Clients{
+			rpcClient:  rpcClient,
+			httpClient: httpClient,
+			ipClient:   ipClient,
+		},
+
 		suimonConfig: suimonConfig,
 		logger:       log.NewLogger(),
 	}, nil
 }
 
-// getHostsByTableType returns a list of Host objects associated with the given table type in the Checker struct.
-// This function accepts the following parameter:
-// - tableType: an enums.TableType representing the type of table to retrieve hosts for.
-// The function returns a slice of Host objects representing the hosts associated with the given table type.
+// getHostsByTableType returns a list of Host objects that correspond to the specified table type.
+// The function searches through the CheckerController's internal state to find all hosts that have the specified table type, and returns a list of those hosts.
+// Returns a slice of Host objects that correspond to the specified table type.
 func (checker CheckerController) getHostsByTableType(tableType enums.TableType) []host.Host {
-	var hosts []host.Host
-
 	switch tableType {
 	case enums.TableTypeNode:
-		hosts = checker.node
+		return checker.hosts.node
 	case enums.TableTypeValidator:
-		hosts = checker.validator
+		return checker.hosts.validator
 	case enums.TableTypeActiveValidators:
-		hosts = checker.rpc[:1]
+		return checker.hosts.rpc[:1]
 	case enums.TableTypeSystemState:
-		hosts = checker.rpc[:1]
+		return checker.hosts.rpc[:1]
 	case enums.TableTypePeers:
-		hosts = checker.peers
+		return checker.hosts.peers
 	case enums.TableTypeRPC:
-		hosts = checker.rpc
+		return checker.hosts.rpc
 	}
 
-	return hosts
+	return nil
 }
 
-// setHostsByTableType sets the list of Host objects associated with the given table type in the Checker struct.
-// This function accepts the following parameters:
-// - tableType: an enums.TableType representing the type of table to set hosts for.
-// - hosts: a slice of Host objects representing the hosts to associate with the given table type.
-// This function does not return anything.
+// setHostsByTableType sets the list of Host objects that correspond to the specified table type.
+// The function updates the CheckerController's internal state to include the specified hosts for the specified table type.
+// Returns nothing.
 func (checker *CheckerController) setHostsByTableType(tableType enums.TableType, hosts []host.Host) {
 	switch tableType {
 	case enums.TableTypeNode:
-		checker.node = hosts
+		checker.hosts.node = hosts
 	case enums.TableTypeValidator:
-		checker.validator = hosts
+		checker.hosts.validator = hosts
 	case enums.TableTypePeers:
-		checker.peers = hosts
+		checker.hosts.peers = hosts
 	case enums.TableTypeRPC:
-		checker.rpc = hosts
+		checker.hosts.rpc = hosts
+	default:
+		checker.logger.Error("Unknown table type:", tableType)
 	}
 }
 
-// setBuilderTableType sets the table configuration for the given table type in the Checker struct using the provided TableConfig.
-// This function accepts the following parameters:
-// - tableType: an enums.TableType representing the type of table to set the configuration for.
-// - tableConfig: a tablebuilder.TableConfig struct containing the configuration data for the table.
-// This function does not return anything.
+// setBuilderTableType sets the TableConfig object for the specified table type in the CheckerController's internal state.
+// The function updates the CheckerController's internal state to include the specified TableConfig object for the specified table type.
+// Returns nothing.
 func (checker *CheckerController) setBuilderTableType(tableType enums.TableType, tableConfig tablebuilder.TableConfig) {
 	tableBuilder := tablebuilder.NewTableBuilder(tableConfig)
 
 	switch tableType {
 	case enums.TableTypeNode:
-		checker.tableBuilderNode = tableBuilder
+		checker.tableBuilders.node = tableBuilder
 	case enums.TableTypeValidator:
-		checker.tableBuilderValidator = tableBuilder
+		checker.tableBuilders.validator = tableBuilder
 	case enums.TableTypePeers:
-		checker.tableBuilderPeer = tableBuilder
+		checker.tableBuilders.peer = tableBuilder
 	case enums.TableTypeRPC:
-		checker.tableBuilderRPC = tableBuilder
+		checker.tableBuilders.rpc = tableBuilder
 	case enums.TableTypeSystemState:
-		checker.tableBuilderSystem = tableBuilder
+		checker.tableBuilders.system = tableBuilder
 	case enums.TableTypeActiveValidators:
-		checker.tableBuilderActiveValidators = tableBuilder
+		checker.tableBuilders.activeValidators = tableBuilder
+	default:
+		checker.logger.Error("Unknown table type:", tableType)
 	}
 }
 
 // RenderTables draws tables for each type of table in the Checker struct.
 // This function does not accept any parameters.
 // This function does not return anything.
-func (checker CheckerController) RenderTables() error {
-	if checker.suimonConfig.MonitorsConfig.RPCTable.Display && len(checker.rpc) > 0 {
-		checker.tableBuilderRPC.Render()
+func (checker *CheckerController) RenderTables() error {
+	if checker.suimonConfig.MonitorsConfig.RPCTable.Display && len(checker.hosts.rpc) > 0 {
+		checker.tableBuilders.rpc.Render()
 	}
 
-	if checker.suimonConfig.MonitorsConfig.NodeTable.Display && len(checker.node) > 0 {
-		checker.tableBuilderNode.Render()
+	if checker.suimonConfig.MonitorsConfig.NodeTable.Display && len(checker.hosts.node) > 0 {
+		checker.tableBuilders.node.Render()
 	}
 
-	if checker.suimonConfig.MonitorsConfig.ValidatorTable.Display && len(checker.validator) > 0 {
-		checker.tableBuilderValidator.Render()
+	if checker.suimonConfig.MonitorsConfig.ValidatorTable.Display && len(checker.hosts.validator) > 0 {
+		checker.tableBuilders.validator.Render()
 	}
 
-	if checker.suimonConfig.MonitorsConfig.SystemTable.Display && len(checker.rpc) > 0 {
-		checker.tableBuilderSystem.Render()
+	if checker.suimonConfig.MonitorsConfig.SystemTable.Display && len(checker.hosts.rpc) > 0 {
+		checker.tableBuilders.system.Render()
 	}
 
-	if checker.suimonConfig.MonitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
-		checker.tableBuilderPeer.Render()
+	if checker.suimonConfig.MonitorsConfig.PeersTable.Display && len(checker.hosts.peers) > 0 {
+		checker.tableBuilders.peer.Render()
 	}
 
-	if checker.suimonConfig.MonitorsConfig.ActiveValidatorsTable.Display && len(checker.rpc) > 0 {
-		systemState := checker.rpc[0].Metrics.SystemState
+	if checker.suimonConfig.MonitorsConfig.ActiveValidatorsTable.Display && len(checker.hosts.rpc) > 0 {
+		systemState := checker.hosts.rpc[0].Metrics.SystemState
 
 		if len(systemState.ActiveValidators) == 0 {
 			return nil
 		}
 
-		checker.tableBuilderActiveValidators.Render()
+		checker.tableBuilders.activeValidators.Render()
 	}
 
 	return nil

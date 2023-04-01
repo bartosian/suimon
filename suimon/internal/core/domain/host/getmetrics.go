@@ -2,15 +2,17 @@ package host
 
 import (
 	"context"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
+	"fmt"
+	"net"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/ybbus/jsonrpc/v3"
 
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/metricsparser"
 )
 
@@ -68,19 +70,16 @@ var prometheusMetrics = map[enums.PrometheusMetricName]metricsparser.MetricConfi
 	},
 }
 
-// GetPrometheusMetrics returns a "Metrics" object representing the current state of network checks for the "Host" object
-// passed as a pointer receiver. This object contains the results of each metric check performed on the host,
-// including the number of successful checks, the total number of checks performed, and the percentage progress
-// for each metric.
-// Parameters: None.
-// Returns: - a "Metrics" object representing the current state of network checks for the "Host" object.
-func (host *Host) GetPrometheusMetrics() {
+// GetPrometheusMetrics fetches Prometheus metrics for the host and sends the metric values to the host's Metrics field.
+// The function constructs a URL using the host's HostPort and Ports fields, sends an HTTP GET request to the URL, and parses the response as a Prometheus text format.
+// Returns an error if the HTTP request fails or if the response cannot be parsed as Prometheus text format.
+func (host *Host) GetPrometheusMetrics() error {
 	metricsURL := host.getUrl(requestTypeMetrics, false)
-	parser := metricsparser.NewPrometheusMetricParser(host.httpClient, metricsURL, prometheusMetrics)
+	parser := metricsparser.NewPrometheusMetricParser(host.clients.httpClient, metricsURL, prometheusMetrics)
 
 	result, err := parser.GetMetrics()
 	if err != nil {
-		return
+		return err
 	}
 
 	for metricName, metricValue := range result {
@@ -129,156 +128,136 @@ func (host *Host) GetPrometheusMetrics() {
 			}
 		}
 	}
+
+	return nil
 }
 
-// GetTotalTransactionNumber returns the total number of transactions performed on the "Host" object passed
-// as a pointer receiver. This method retrieves the "Metrics" object for the host and calculates the total
-// number of transactions performed across all metric types.
-// Parameters: None.
-// Returns: an integer representing the total number of transactions performed on the "Host" object.
-func (host *Host) GetTotalTransactionNumber() {
-	var result any
+// GetMetricRPC fetches a specific metric for the host from an RPC server.
+// The method parameter specifies the RPC method to call, and the metricType parameter specifies the type of metric to retrieve.
+// The function sends the metric value to the host's Metrics field if successful.
+// Returns an error if the RPC call fails or if the metric value cannot be retrieved.
+func (host *Host) GetMetricRPC(method enums.RPCMethod, metricType enums.MetricType) error {
+	var err error
+	useSSL := host.clients.rpcSSLClient != nil
 
-	if result = getFromRPC(host.rpcHttpClient, enums.RPCMethodGetTotalTransactionNumber); result == nil {
-		if result = getFromRPC(host.rpcHttpsClient, enums.RPCMethodGetTotalTransactionNumber); result == nil {
-			return
+	if useSSL {
+		if result, err := getFromRPC(host.clients.rpcSSLClient, method); err == nil {
+			return host.Metrics.SetValue(metricType, result)
 		}
 	}
 
-	host.Metrics.SetValue(enums.MetricTypeTotalTransactions, result)
+	result, err := getFromRPC(host.clients.rpcClient, method)
+	if err != nil {
+		return err
+	}
+
+	return host.Metrics.SetValue(metricType, result)
 }
 
-// GetLatestCheckpoint returns a "Checkpoint" object representing the most recent checkpoint for the "Host"
-// object passed as a pointer receiver. This object contains information about the time and status of the
-// most recent checkpoint performed on the host.
-// Parameters: None.
-// Returns: a "Checkpoint" object representing the most recent checkpoint for the "Host" object.
-func (host *Host) GetLatestCheckpoint() {
-	var result any
+// getFromRPC sends an RPC call to an RPC client and returns the response. The type parameter T specifies the expected type of the response.
+// The function uses the method parameter to determine which RPC method to call.
+// Returns the response value of type T and an error value if the RPC call fails or if the response cannot be converted to type T.
+func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) (any, error) {
+	respChan := make(chan any)
+	timeout := time.After(rpcClientTimeout)
 
-	if result = getFromRPC(host.rpcHttpClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result == nil {
-		if result = getFromRPC(host.rpcHttpsClient, enums.RPCMethodGetLatestCheckpointSequenceNumber); result == nil {
+	go func() {
+		var response any
+
+		if err := rpcClient.CallFor(context.Background(), &response, method.String()); err != nil {
+			respChan <- nil
+
 			return
 		}
-	}
 
-	host.Metrics.SetValue(enums.MetricTypeLatestCheckpoint, result)
-}
-
-// GetLatestSuiSystemState returns a "SUISystemState" object representing the current system state for the "Host"
-// object passed as a pointer receiver. This object contains information about the status of various components
-// of the SUISystem software running on the host.
-// Parameters: None.
-// Returns: a "SUISystemState" object representing the current system state for the "Host" object.
-func (host *Host) GetLatestSuiSystemState() {
-	var result any
-
-	if result = getFromRPC(host.rpcHttpClient, enums.RPCMethodGetSuiSystemState); result == nil {
-		if result = getFromRPC(host.rpcHttpsClient, enums.RPCMethodGetSuiSystemState); result == nil {
-			return
-		}
-	}
-
-	host.Metrics.SetValue(enums.MetricTypeSuiSystemState, result)
-}
-
-// getFromRPC makes a JSON-RPC call to the specified method using the provided RPC client, and returns
-// the result of the call. The returned type will depend on the specific method called and its response.
-// Parameters:
-// - rpcClient: a jsonrpc.RPCClient representing the client to use for the JSON-RPC call.
-// - method: an enums.RPCMethod representing the name of the JSON-RPC method to call.
-// Returns:
-//   - the result of the JSON-RPC call. The specific type of the returned value will depend on the method called
-//     and its response.
-func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) any {
-	var (
-		respChan = make(chan any)
-		timeout  = time.After(rpcClientTimeout)
-	)
-
-	switch method {
-	case enums.RPCMethodGetSuiSystemState:
-		var response metrics.SuiSystemState
-
-		go func() {
-			if err := rpcClient.CallFor(context.Background(), &response, method.String()); err != nil {
-				return
-			}
-
-			respChan <- response
-		}()
-	default:
-		var response int
-
-		go func() {
-			if err := rpcClient.CallFor(context.Background(), &response, method.String()); err != nil {
-				return
-			}
-
-			respChan <- response
-		}()
-	}
+		respChan <- response
+	}()
 
 	select {
 	case response := <-respChan:
-		return response
+		if response == nil {
+			return nil, fmt.Errorf("failed to get response from RPC client")
+		}
+
+		return response, nil
 	case <-timeout:
-		return nil
+		return nil, fmt.Errorf("timeout while waiting for RPC response")
 	}
 }
 
-// GetData returns a "HostData" object representing the current data for the "Host" object passed as a pointer receiver.
-// This object contains various metrics and status information about the host.
-// Parameters: None.
-// Returns: a "HostData" object representing the current data for the "Host" object.
-func (host *Host) GetData() {
-	doneCH := make(chan struct{})
-
-	defer close(doneCH)
-
-	go func() {
-		host.GetTotalTransactionNumber()
-
-		doneCH <- struct{}{}
-	}()
-
-	go func() {
-		host.GetLatestCheckpoint()
-
-		doneCH <- struct{}{}
-	}()
-
-	go func() {
-		host.GetPrometheusMetrics()
-
-		doneCH <- struct{}{}
-	}()
-
-	for i := 0; i < 3; i++ {
-		<-doneCH
+// GetData fetches data from the host by calling three different methods asynchronously: GetTotalTransactionNumber, GetLatestCheckpoint, and GetPrometheusMetrics.
+// The function waits for all three methods to complete before returning.
+// Returns an error if any of the three methods fail or return an error.
+func (host *Host) GetData() error {
+	methodsMapRPC := map[enums.RPCMethod]enums.MetricType{
+		enums.RPCMethodGetTotalTransactionBlocks:         enums.MetricTypeTotalTransactionBlocks,
+		enums.RPCMethodGetLatestCheckpointSequenceNumber: enums.MetricTypeLatestCheckpoint,
 	}
+
+	doneCH := make(chan error, len(methodsMapRPC)+1)
+
+	var wg sync.WaitGroup
+
+	for method, metric := range methodsMapRPC {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			err := host.GetMetricRPC(method, metric)
+			doneCH <- err
+		}()
+	}
+
+	if host.TableType != enums.TableTypeRPC {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			err := host.GetPrometheusMetrics()
+			doneCH <- err
+		}()
+	}
+
+	go func() {
+		wg.Wait()
+		close(doneCH)
+	}()
+
+	var errors []error
+
+	for err := range doneCH {
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+
+	if len(errors) > 0 {
+		return fmt.Errorf("errors occurred while fetching data: %v", errors)
+	}
+
+	return nil
 }
 
-// getUrl returns the URL for a given request type and security setting.
-// Parameters:
-// - request: a requestType indicating the type of request for which to generate a URL.
-// - secure: a boolean indicating whether the generated URL should use HTTPS (true) or HTTP (false).
-// Returns: a string representing the URL for the specified request type and security setting.
+// getUrl returns the URL for the specified request type and security status. The request parameter specifies the type of request to be made, and the secure parameter specifies whether to use HTTPS or HTTP for the URL.
+// The function constructs the URL using the host's HostPort and Ports fields, and sets the appropriate scheme and port based on the request type and security status.
+// Returns the constructed URL as a string.
 func (host *Host) getUrl(request requestType, secure bool) string {
 	var (
-		protocol = "http"
-		hostPort = host.HostPort
-		hostUrl  = new(url.URL)
+		protocol    = "http"
+		hostAddress = host.HostPort
+		hostUrl     = new(url.URL)
 	)
 
-	if hostPort.Host != nil {
-		hostUrl.Host = *hostPort.Host
+	if hostAddress.Host != nil {
+		hostUrl.Host = *hostAddress.Host
 	} else {
-		hostUrl.Host = *hostPort.IP
+		hostUrl.Host = *hostAddress.IP
 	}
 
-	if hostPort.Path != nil {
-		hostUrl.Path = *hostPort.Path
+	if hostAddress.Path != nil {
+		hostUrl.Path = *hostAddress.Path
 	}
 
 	if secure {
@@ -290,17 +269,17 @@ func (host *Host) getUrl(request requestType, secure bool) string {
 	switch request {
 	case requestTypeRPC:
 		if port, ok := host.Ports[enums.PortTypeRPC]; ok {
-			hostUrl.Host = hostUrl.Hostname() + ":" + port
+			hostUrl.Host = net.JoinHostPort(hostUrl.Hostname(), port)
 		} else {
-			hostUrl.Host = hostUrl.Hostname() + ":" + rpcPortDefault
+			hostUrl.Host = net.JoinHostPort(hostUrl.Hostname(), rpcPortDefault)
 		}
 	case requestTypeMetrics:
 		hostUrl.Path = "/metrics"
 
 		if port, ok := host.Ports[enums.PortTypeMetrics]; ok {
-			hostUrl.Host = hostUrl.Hostname() + ":" + port
+			hostUrl.Host = net.JoinHostPort(hostUrl.Hostname(), port)
 		} else {
-			hostUrl.Host = hostUrl.Hostname() + ":" + metricsPortDefault
+			hostUrl.Host = net.JoinHostPort(hostUrl.Hostname(), metricsPortDefault)
 		}
 	}
 

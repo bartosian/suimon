@@ -10,7 +10,7 @@ import (
 // This method does not accept any parameters and does not return anything.
 func (host Host) SetLocation() {
 	var parseLocation = func(ip net.IP) {
-		record, err := host.ipClient.GetIPInfo(ip)
+		record, err := host.clients.ipClient.GetIPInfo(ip)
 		if err != nil {
 			return
 		}

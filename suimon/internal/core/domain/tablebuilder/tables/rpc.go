@@ -10,12 +10,12 @@ import (
 var (
 	TableStyleRPC      = table.StyleLight
 	TableTagRPC        = ""
-	TableSortConfigRPC = []table.SortBy{
+	TableSortConfigRPC = tableSortConfig{
 		{Name: "HEALTH", Mode: table.Dsc},
 		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
 		{Name: "LATEST\nCHECKPOINT", Mode: table.Dsc},
 	}
-	ColumnsConfigRPC = []table.ColumnConfig{
+	ColumnsConfigRPC = tableColumnConfig{
 		columnnames.NodeColumnNameIndex: {
 			Name:         "",
 			Align:        text.AlignCenter,
@@ -48,8 +48,8 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameTotalTransactions: {
-			Name:         "TOTAL\nTRANSACTIONS",
+		columnnames.NodeColumnNameTotalTransactionBlocks: {
+			Name:         "TOTAL TRANSACTIONS\nBLOCKS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -65,13 +65,13 @@ var (
 			Hidden:       false,
 		},
 	}
-	RowsRPC = [][]int{
+	RowsRPC = tableRows{
 		0: {
 			int(columnnames.NodeColumnNameIndex),
 			int(columnnames.NodeColumnNameHealth),
 			int(columnnames.NodeColumnNameAddress),
 			int(columnnames.NodeColumnNamePortRPC),
-			int(columnnames.NodeColumnNameTotalTransactions),
+			int(columnnames.NodeColumnNameTotalTransactionBlocks),
 			int(columnnames.NodeColumnNameLatestCheckpoint),
 		},
 	}

@@ -3,18 +3,18 @@ package tables
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-	
+
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums/columnnames"
 )
 
 var (
 	TableStyleActiveValidator      = table.StyleLight
 	TableTagActiveValidator        = ""
-	TableSortConfigActiveValidator = []table.SortBy{
+	TableSortConfigActiveValidator = tableSortConfig{
 		{Name: "NEXT EPOCH STAKE", Mode: table.Dsc},
 		{Name: "NEXT EPOCH\nGAS PRICE", Mode: table.Dsc},
 	}
-	ColumnConfigActiveValidator = []table.ColumnConfig{
+	ColumnConfigActiveValidator = tableColumnConfig{
 		columnnames.ActiveValidatorColumnNameIndex: {
 			Name:         "IDX",
 			Align:        text.AlignCenter,
@@ -120,7 +120,7 @@ var (
 			Hidden:       false,
 		},
 	}
-	RowsActiveValidator = [][]int{
+	RowsActiveValidator = tableRows{
 		0: {
 			int(columnnames.ActiveValidatorColumnNameIndex),
 			int(columnnames.ActiveValidatorColumnNameName),

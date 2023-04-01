@@ -48,6 +48,19 @@ func main() {
 		return
 	}
 
+	defer func() {
+		if err := recover(); err != nil {
+			checkerController.DashboardBuilder.Terminal.Close()
+			checkerController.DashboardBuilder.Ctx.Done()
+
+			logger.Error("failed to execute suimon, please check an issue: ", err)
+
+			os.Exit(1)
+		}
+
+		return
+	}()
+
 	// initialize checker instance with seed data
 	if err = checkerController.ParseData(); err != nil {
 		logger.Error("failed to init suimon instance: ", err)
@@ -68,17 +81,4 @@ func main() {
 		// draw initialized tables to the terminal
 		checkerController.RenderTables()
 	}
-
-	defer func() {
-		if err := recover(); err != nil {
-			checkerController.DashboardBuilder.Terminal.Close()
-			checkerController.DashboardBuilder.Ctx.Done()
-
-			logger.Error("failed to execute suimon, please check an issue: ", err)
-
-			os.Exit(1)
-		}
-
-		return
-	}()
 }

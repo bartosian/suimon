@@ -3,24 +3,18 @@ package controller
 import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
+	"sync"
 )
 
-// createHosts creates a list of "Host" values based on the provided "AddressInfo" values
-// and returns the list along with an error, if any. This method belongs to the "Checker"
-// struct and operates on an instance of the struct passed as a pointer receiver.
-// Parameters:
-// - addresses: a slice of "AddressInfo" values representing the addresses to create hosts for.
-// Returns:
-// - a slice of "Host" values created from the provided "AddressInfo" values.
-// - an error, if any occurred during host creation.
-func (checker CheckerController) createHosts(tableType enums.TableType, addresses []host.AddressInfo) ([]host.Host, error) {
-	var (
-		hostCH             = make(chan host.Host, len(addresses))
-		hosts              = make([]host.Host, 0, len(addresses))
-		processedAddresses = make(map[string]struct{})
-	)
+// createHosts creates a list of Host objects based on the specified table type and address information.
+// The function creates a new Host object for each address in the specified list and sets the Host's internal state based on the specified table type.
+// Returns a slice of Host objects and an error value if the creation process fails for any reason.
+func (checker *CheckerController) createHosts(tableType enums.TableType, addresses []host.AddressInfo) ([]host.Host, error) {
+	hosts := make([]host.Host, 0, len(addresses))
+	processedAddresses := make(map[string]struct{})
+	hostCH := make(chan host.Host, len(addresses))
 
-	defer close(hostCH)
+	var wg sync.WaitGroup
 
 	for _, addressInfo := range addresses {
 		address := addressInfo.HostPort.Address
@@ -30,21 +24,34 @@ func (checker CheckerController) createHosts(tableType enums.TableType, addresse
 
 		processedAddresses[address] = struct{}{}
 
+		wg.Add(1)
+
 		go func(addressInfo host.AddressInfo) {
-			host := host.NewHost(tableType, addressInfo, checker.ipClient, checker.httpClient)
+			defer wg.Done()
+
+			host := host.NewHost(tableType, addressInfo, checker.clients.ipClient, checker.clients.httpClient)
 
 			if checker.suimonConfig.IPLookup.AccessToken != "" {
 				host.SetLocation()
 			}
 
-			host.GetData()
+			if err := host.GetData(); err != nil {
+				checker.logger.Error("failed to get host data: ", err)
+
+				return
+			}
 
 			hostCH <- *host
 		}(addressInfo)
 	}
 
-	for i := 0; i < len(addresses); i++ {
-		hosts = append(hosts, <-hostCH)
+	go func() {
+		wg.Wait()
+		close(hostCH)
+	}()
+
+	for h := range hostCH {
+		hosts = append(hosts, h)
 	}
 
 	return hosts, nil

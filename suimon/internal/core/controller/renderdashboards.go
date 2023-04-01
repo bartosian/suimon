@@ -98,11 +98,11 @@ func (checker *CheckerController) RenderDashboards() error {
 		checker.Watch()
 	}()
 
-	if monitorsConfig.NodeTable.Display && len(checker.node) > 0 {
+	if monitorsConfig.NodeTable.Display && len(checker.hosts.node) > 0 {
 		wg.Add(2)
 
 		go streamLogs()
-		go render(checker.node)
+		go render(checker.hosts.node)
 	}
 
 	if err := termdash.Run(dashboardBuilder.Ctx, dashboardBuilder.Terminal, dashboardBuilder.Dashboard, termdash.KeyboardSubscriber(dashboardBuilder.Quitter)); err != nil {

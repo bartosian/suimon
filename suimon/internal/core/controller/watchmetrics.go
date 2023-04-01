@@ -12,15 +12,13 @@ const (
 	watchHostsTimeout = 1 * time.Second
 )
 
-// Watch begins monitoring the "Host" objects in the "Checker" struct instance passed as a pointer
-// receiver, continuously checking their status and updating the dashboard and tables accordingly. This
-// method runs indefinitely until the program is terminated, and does not return anything.
-// Parameters: None.
-// Returns: None.
+// Watch periodically retrieves the latest data from all active hosts and updates the CheckerController's internal state with the new data.
+// The function retrieves data for each table type in parallel and displays a progress bar indicating the progress of the data retrieval process.
+// Returns an error if the data cannot be retrieved from any of the active hosts or if there is an issue updating the CheckerController's internal state.
 func (checker CheckerController) Watch() error {
 	var (
 		monitorsConfig = checker.suimonConfig.MonitorsConfig
-		comparatorRPC  = checker.rpc[0]
+		comparatorRPC  = checker.hosts.rpc[0]
 		ticker         = time.NewTicker(watchHostsTimeout)
 		ctx            = checker.DashboardBuilder.Ctx
 		wg             sync.WaitGroup
@@ -28,10 +26,8 @@ func (checker CheckerController) Watch() error {
 
 	defer ticker.Stop()
 
-	var watch = func(hosts []host.Host) {
+	var watch = func(hosts []host.Host, doneCH chan<- struct{}) {
 		defer wg.Done()
-
-		doneCH := make(chan struct{}, len(hosts))
 
 		for {
 			select {
@@ -48,31 +44,34 @@ func (checker CheckerController) Watch() error {
 					}(idx)
 				}
 
-				for i := 0; i < len(hosts); i++ {
-					<-doneCH
-				}
 			case <-ctx.Done():
 				return
 			}
 		}
 	}
 
-	if monitorsConfig.RPCTable.Display && len(checker.rpc) > 0 {
+	if monitorsConfig.RPCTable.Display && len(checker.hosts.rpc) > 0 {
+		doneCH := make(chan struct{}, len(checker.hosts.rpc))
+
 		wg.Add(1)
 
-		go watch(checker.rpc)
+		go watch(checker.hosts.rpc, doneCH)
 	}
 
-	if monitorsConfig.NodeTable.Display && len(checker.node) > 0 {
+	if monitorsConfig.NodeTable.Display && len(checker.hosts.node) > 0 {
+		doneCH := make(chan struct{}, len(checker.hosts.node))
+
 		wg.Add(1)
 
-		go watch(checker.node)
+		go watch(checker.hosts.node, doneCH)
 	}
 
-	if monitorsConfig.PeersTable.Display && len(checker.peers) > 0 {
+	if monitorsConfig.PeersTable.Display && len(checker.hosts.peers) > 0 {
+		doneCH := make(chan struct{}, len(checker.hosts.peers))
+
 		wg.Add(1)
 
-		go watch(checker.peers)
+		go watch(checker.hosts.peers, doneCH)
 	}
 
 	wg.Wait()

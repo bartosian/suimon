@@ -3,7 +3,7 @@ package tables
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-	
+
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums/columnnames"
 )
 
@@ -48,8 +48,8 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameTotalTransactions: {
-			Name:         "TOTAL\nTRANSACTIONS",
+		columnnames.NodeColumnNameTotalTransactionBlocks: {
+			Name:         "TOTAL TRANSACTION]\nBLOCKS",
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -191,7 +191,7 @@ var (
 			int(columnnames.NodeColumnNameHealth),
 			int(columnnames.NodeColumnNameAddress),
 			int(columnnames.NodeColumnNamePortRPC),
-			int(columnnames.NodeColumnNameTotalTransactions),
+			int(columnnames.NodeColumnNameTotalTransactionBlocks),
 			int(columnnames.NodeColumnNameLatestCheckpoint),
 			int(columnnames.NodeColumnNameTotalTransactionCertificates),
 			int(columnnames.NodeColumnNameTotalTransactionEffects),

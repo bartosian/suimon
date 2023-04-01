@@ -7,7 +7,7 @@ const (
 	NodeColumnNameHealth
 	NodeColumnNameAddress
 	NodeColumnNamePortRPC
-	NodeColumnNameTotalTransactions
+	NodeColumnNameTotalTransactionBlocks
 	NodeColumnNameTotalTransactionCertificates
 	NodeColumnNameTotalTransactionEffects
 	NodeColumnNameLatestCheckpoint

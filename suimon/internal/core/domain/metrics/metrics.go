@@ -12,48 +12,136 @@ const (
 	TotalCheckpointsSyncPercentage  = 99
 )
 
-type Metrics struct {
-	Updated bool
-
-	SystemState SuiSystemState
-
-	TotalTransactions            int
-	TotalTransactionCertificates int
-	TotalTransactionEffects      int
-	TransactionsPerSecond        int
-	TransactionsHistory          []int
-	LatestCheckpoint             int
-	HighestKnownCheckpoint       int
-	HighestSyncedCheckpoint      int
-	LastExecutedCheckpoint       int
-	CheckpointsPerSecond         int
-	CheckpointExecBacklog        int
-	CheckpointSyncBacklog        int
-	CheckpointsHistory           []int
-	CurrentEpoch                 int
-	EpochTotalDuration           int
-	EpochPercentage              int
-	TimeTillNextEpochMs          int
-	TxSyncPercentage             int
-	CheckSyncPercentage          int
-	NetworkPeers                 int
-	Uptime                       string
-	Version                      string
-	Commit                       string
-	CurrentRound                 int
-	HighestProcessedRound        int
-	LastCommittedRound           int
-	PrimaryNetworkPeers          int
-	WorkerNetworkPeers           int
-	SkippedConsensusTransactions int
-	TotalSignatureErrors         int
-}
-
-// NewMetrics creates and returns a new instance of the Metrics struct.
-// Returns: a new instance of the Metrics struct.
-func NewMetrics() Metrics {
-	return Metrics{
-		TransactionsHistory: make([]int, 0, TransactionsPerSecondWindow),
-		CheckpointsHistory:  make([]int, 0, CheckpointsPerSecondWindow),
+type (
+	Validator struct {
+		SuiAddress                   string      `json:"suiAddress"`
+		ProtocolPubkeyBytes          string      `json:"protocolPubkeyBytes"`
+		NetworkPubkeyBytes           string      `json:"networkPubkeyBytes"`
+		WorkerPubkeyBytes            string      `json:"workerPubkeyBytes"`
+		ProofOfPossessionBytes       string      `json:"proofOfPossessionBytes"`
+		Name                         string      `json:"name"`
+		Description                  string      `json:"description"`
+		ImageURL                     string      `json:"imageUrl"`
+		ProjectURL                   string      `json:"projectUrl"`
+		NetAddress                   string      `json:"netAddress"`
+		P2PAddress                   string      `json:"p2pAddress"`
+		PrimaryAddress               string      `json:"primaryAddress"`
+		WorkerAddress                string      `json:"workerAddress"`
+		NextEpochProtocolPubkeyBytes interface{} `json:"nextEpochProtocolPubkeyBytes"`
+		NextEpochProofOfPossession   interface{} `json:"nextEpochProofOfPossession"`
+		NextEpochNetworkPubkeyBytes  interface{} `json:"nextEpochNetworkPubkeyBytes"`
+		NextEpochWorkerPubkeyBytes   interface{} `json:"nextEpochWorkerPubkeyBytes"`
+		NextEpochNetAddress          interface{} `json:"nextEpochNetAddress"`
+		NextEpochP2PAddress          interface{} `json:"nextEpochP2pAddress"`
+		NextEpochPrimaryAddress      interface{} `json:"nextEpochPrimaryAddress"`
+		NextEpochWorkerAddress       interface{} `json:"nextEpochWorkerAddress"`
+		VotingPower                  int         `json:"votingPower"`
+		OperationCapID               string      `json:"operationCapId"`
+		GasPrice                     int         `json:"gasPrice"`
+		CommissionRate               int         `json:"commissionRate"`
+		NextEpochStake               int64       `json:"nextEpochStake"`
+		NextEpochGasPrice            int         `json:"nextEpochGasPrice"`
+		NextEpochCommissionRate      int         `json:"nextEpochCommissionRate"`
+		StakingPoolID                string      `json:"stakingPoolId"`
+		StakingPoolActivationEpoch   int         `json:"stakingPoolActivationEpoch"`
+		StakingPoolDeactivationEpoch interface{} `json:"stakingPoolDeactivationEpoch"`
+		StakingPoolSuiBalance        int         `json:"stakingPoolSuiBalance"`
+		RewardsPool                  int         `json:"rewardsPool"`
+		PoolTokenBalance             int         `json:"poolTokenBalance"`
+		PendingStake                 int         `json:"pendingStake"`
+		PendingTotalSuiWithdraw      int         `json:"pendingTotalSuiWithdraw"`
+		PendingPoolTokenWithdraw     int         `json:"pendingPoolTokenWithdraw"`
+		ExchangeRatesID              string      `json:"exchangeRatesId"`
+		ExchangeRatesSize            int         `json:"exchangeRatesSize"`
 	}
-}
+
+	SuiSystemState struct {
+		Epoch                          int           `json:"epoch"`
+		ProtocolVersion                int           `json:"protocolVersion"`
+		SystemStateVersion             int           `json:"systemStateVersion"`
+		StorageFund                    int           `json:"storageFund"`
+		ReferenceGasPrice              int           `json:"referenceGasPrice"`
+		SafeMode                       bool          `json:"safeMode"`
+		EpochStartTimestampMs          int           `json:"epochStartTimestampMs"`
+		GovernanceStartEpoch           int           `json:"governanceStartEpoch"`
+		EpochDurationMs                int           `json:"epochDurationMs"`
+		StakeSubsidyEpochCounter       int           `json:"stakeSubsidyEpochCounter"`
+		StakeSubsidyBalance            int64         `json:"stakeSubsidyBalance"`
+		StakeSubsidyCurrentEpochAmount int64         `json:"stakeSubsidyCurrentEpochAmount"`
+		TotalStake                     int64         `json:"totalStake"`
+		ActiveValidators               []Validator   `json:"activeValidators"`
+		PendingActiveValidatorsID      string        `json:"pendingActiveValidatorsId"`
+		PendingActiveValidatorsSize    int           `json:"pendingActiveValidatorsSize"`
+		PendingRemovals                []interface{} `json:"pendingRemovals"`
+		StakingPoolMappingsID          string        `json:"stakingPoolMappingsId"`
+		StakingPoolMappingsSize        int           `json:"stakingPoolMappingsSize"`
+		InactivePoolsID                string        `json:"inactivePoolsId"`
+		InactivePoolsSize              int           `json:"inactivePoolsSize"`
+		ValidatorCandidatesID          string        `json:"validatorCandidatesId"`
+		ValidatorCandidatesSize        int           `json:"validatorCandidatesSize"`
+		AtRiskValidators               []interface{} `json:"atRiskValidators"`
+		ValidatorReportRecords         []interface{} `json:"validatorReportRecords"`
+	}
+
+	Transactions struct {
+		TotalTransactionsBlocks      int
+		TotalTransactionCertificates int
+		TotalTransactionEffects      int
+		TransactionsPerSecond        int
+		TxSyncPercentage             int
+		TransactionsHistory          []int
+	}
+
+	Checkpoints struct {
+		LatestCheckpoint        int
+		HighestKnownCheckpoint  int
+		HighestSyncedCheckpoint int
+		LastExecutedCheckpoint  int
+		CheckpointsPerSecond    int
+		CheckpointExecBacklog   int
+		CheckpointSyncBacklog   int
+		CheckSyncPercentage     int
+		CheckpointsHistory      []int
+	}
+
+	Rounds struct {
+		CurrentRound          int
+		HighestProcessedRound int
+		LastCommittedRound    int
+	}
+
+	Peers struct {
+		NetworkPeers        int
+		PrimaryNetworkPeers int
+		WorkerNetworkPeers  int
+	}
+
+	Epoch struct {
+		CurrentEpoch        int
+		EpochTotalDuration  int
+		EpochPercentage     int
+		TimeTillNextEpochMs int
+	}
+
+	Errors struct {
+		SkippedConsensusTransactions int
+		TotalSignatureErrors         int
+	}
+
+	Metrics struct {
+		Updated bool
+
+		SystemState SuiSystemState
+
+		Uptime  string
+		Version string
+		Commit  string
+
+		Transactions
+		Checkpoints
+		Rounds
+		Peers
+		Epoch
+		Errors
+	}
+)

@@ -12,12 +12,24 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 )
 
+const (
+	bytesInTB   = 1024 * 1024 * 1024 * 1024
+	bytesInGB   = 1024 * 1024 * 1024
+	bytesInByte = 1024
+
+	suiDBDirName = "suidb"
+)
+
+type (
+	MetricValue interface{}
+)
+
 // GetValue returns the current value of the specified metric.
 // Parameters:
 // - metric: an enums.MetricType representing the metric whose value to retrieve.
 // - rpc: a boolean indicating whether to retrieve the value for RPC host.
 // Returns: the current value of the specified metric, which can be of any type.
-func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
+func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) MetricValue {
 	switch metric {
 	case enums.MetricTypeUptime:
 		return metrics.Uptime
@@ -29,14 +41,14 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
 		return metrics.HighestSyncedCheckpoint
 	case enums.MetricTypeSuiNetworkPeers:
 		return metrics.NetworkPeers
-	case enums.MetricTypeTotalTransactions:
-		return metrics.TotalTransactions
+	case enums.MetricTypeTotalTransactionBlocks:
+		return metrics.TotalTransactionsBlocks
 	case enums.MetricTypeTransactionsPerSecond:
 		return metrics.TransactionsPerSecond
 	case enums.MetricTypeCheckpointsPerSecond:
 		return metrics.CheckpointsPerSecond
 	case enums.MetricTypeTxSyncPercentage:
-		return metrics.TotalTransactions
+		return metrics.TotalTransactionsBlocks
 	case enums.MetricTypeCheckSyncPercentage:
 		if rpc {
 			return metrics.LatestCheckpoint
@@ -50,25 +62,25 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) any {
 	}
 }
 
-// GetTimeTillNextEpoch returns the time remaining until the next epoch in milliseconds.
+// GetMillisecondsTillNextEpoch returns the time remaining until the next epoch in milliseconds.
 // Returns: an integer representing the time remaining until the next epoch in seconds.
-func (metrics *Metrics) GetTimeTillNextEpoch() int {
+func (metrics *Metrics) GetMillisecondsTillNextEpoch() int {
 	nextEpochStartMs := metrics.SystemState.EpochStartTimestampMs + metrics.SystemState.EpochDurationMs
 	currentTimeMs := int(time.Now().UnixNano() / 1000000)
 
 	return nextEpochStartMs - currentTimeMs
 }
 
-// GetEpochTimer returns an array of strings representing the epoch timer data.
+// GetTimeUntilNextEpochDisplay returns an array of strings representing the epoch timer data.
 // Returns: an array of strings representing the epoch timer data.
-func (metrics *Metrics) GetEpochTimer() []string {
+func (metrics *Metrics) GetTimeUntilNextEpochDisplay() []string {
 	duration := time.Duration(metrics.TimeTillNextEpochMs) * time.Millisecond
 	hours := int(duration.Hours())
 	minutes := int(duration.Minutes()) - (hours * 60)
 	second := time.Now().Second()
 
 	if hours < 0 {
-		return []string{""}
+		return nil
 	}
 
 	spacer := " "
@@ -93,24 +105,19 @@ func (metrics *Metrics) GetEpochProgress() int {
 	return int(percent.PercentOf(epochCurrentLength, metrics.SystemState.EpochDurationMs))
 }
 
-// GetDonutUsageMetric retrieves the usage data for a specific unit and returns it as a formatted string and a percentage value for display in a donut chart.
+// GetUsageDataForDonutChart retrieves the usage data for a specific unit and returns it as a formatted string and a percentage value for display in a donut chart.
 // Parameters:
 // - unit: a string representing the unit for which to retrieve usage data.
 // - option: a function that returns a pointer to a utility.UsageData object and an error, used to retrieve the actual usage data.
-// Returns:
-// - a string representing the formatted usage data for display in a donut chart.
-// - an integer representing the percentage value of the usage data for display in a donut chart.
-func GetDonutUsageMetric(unit string, option func() (*utility.UsageData, error)) (string, int) {
+func GetUsageDataForDonutChart(unit enums.MetricUnit, option func() (*utility.UsageData, error)) (string, int) {
 	var (
 		usageLabel      = "LOADING..."
 		usagePercentage = 1
-		usageData       *utility.UsageData
-		err             error
 	)
 
-	if usageData, err = option(); err == nil {
-		usageLabel = fmt.Sprintf("TOTAL/USED: %d/%d%s", usageData.Total, usageData.Used, unit)
-		usagePercentage = usageData.PercentageUsed
+	if usageDataResult, err := option(); err == nil {
+		usageLabel = fmt.Sprintf("TOTAL/USED: %d/%d%s", usageDataResult.Total, usageDataResult.Used, unit)
+		usagePercentage = usageDataResult.PercentageUsed
 
 		if usagePercentage == 0 {
 			usagePercentage = 1
@@ -120,91 +127,104 @@ func GetDonutUsageMetric(unit string, option func() (*utility.UsageData, error))
 	return usageLabel, usagePercentage
 }
 
-// GetNetworkUsageMetric retrieves the usage data for a specific network metric and returns it as an array of formatted strings for display in a table.
+type NetworkUsageResult struct {
+	UsageData string
+	Unit      enums.MetricUnit
+}
+
+// GetFormattedNetworkUsage retrieves the usage data for a specific network metric and returns it as an array of formatted strings for display in a table.
 // Parameters: networkMetric: a dashboards.CellName representing the name of the network metric for which to retrieve usage data.
 // Returns: an array of strings representing the formatted usage data for display in a table.
-func GetNetworkUsageMetric(networkMetric enums.CellName) []string {
+func GetFormattedNetworkUsage(networkMetric enums.CellName) NetworkUsageResult {
 	var (
 		usageData    = ""
 		networkUsage *utility.NetworkUsage
-		unit         string
+		unit         enums.MetricUnit
 		err          error
 	)
 
 	if networkUsage, err = utility.GetNetworkUsage(); err == nil {
-		metric := networkUsage.Sent
-		formatString := "%.02f"
-		unit = "GB"
-
+		var metric float64
 		if networkMetric == enums.CellNameBytesReceived {
 			metric = networkUsage.Recv
+		} else {
+			metric = networkUsage.Sent
 		}
 
-		if metric >= 100 {
-			metric = metric / 1024
-			unit = "TB"
+		if metric >= bytesInTB {
+			metric = metric / bytesInTB
+			unit = enums.MetricUnitTB
+		} else {
+			metric = metric / bytesInGB
+			unit = enums.MetricUnitGB
+		}
 
-			if metric >= 100 {
-				formatString = "%.01f"
-			}
+		formatString := "%.02f"
+		if metric >= 100 {
+			formatString = "%.01f"
 		}
 
 		usageData = fmt.Sprintf(formatString, metric)
 	}
 
-	return []string{usageData, unit}
+	return NetworkUsageResult{UsageData: usageData, Unit: unit}
 }
 
-// GetDirectorySize retrieves the sizes of all files and directories within a given directory and returns them as an array of formatted strings for display in a table.
+type FileSizeResult struct {
+	Size float64
+	Unit enums.MetricUnit
+}
+
+// GetFileSize retrieves the sizes of all files and directories within a given directory and returns them as an array of formatted strings for display in a table.
 // Parameters:
 // - dirPath: a string representing the path of the directory for which to retrieve sizes.
 // Returns:
 // - an array of strings representing the formatted size data for all files and directories within the given directory.
-func GetDirectorySize(dirPath string) []string {
+func GetFileSize(filePath string) FileSizeResult {
 	var (
-		usageData = ""
-		dirSize   float64
-		unit      string
+		usageData string
+		fileSize  float64
+		unit      enums.MetricUnit
 		err       error
 	)
 
-	if dirPath == "suidb" {
+	if filePath == suiDBDirName {
 		var homeDir string
 
 		if homeDir, err = os.UserHomeDir(); err != nil {
-			return nil
+			return FileSizeResult{}
 		}
 
-		dirPath = filepath.Join(homeDir, "sui", dirPath)
+		filePath = filepath.Join(homeDir, "sui", suiDBDirName)
 	}
 
-	var processSize = func() {
-		formatString := "%.02f"
-		unit = "GB"
-
-		if dirSize >= 100 {
-			dirSize = dirSize / 1024
-			unit = "TB"
-
-			if dirSize >= 100 {
-				formatString = "%.01f"
-			}
-		}
-
-		if usageData = fmt.Sprintf(formatString, dirSize); usageData == "0.00" {
-			usageData = ""
-		}
+	if fileSize, err = utility.GetDirSize(filePath); err == nil {
+		unit = enums.MetricUnitB
+	} else if fileSize, err = utility.GetVolumeSize(filePath); err == nil {
+		unit = enums.MetricUnitGB
+		fileSize = fileSize / bytesInGB
+	} else {
+		return FileSizeResult{}
 	}
 
-	if dirSize, err = utility.GetDirSize(dirPath); err == nil {
-		processSize()
-
-		return []string{usageData, unit}
+	if fileSize >= 100 {
+		fileSize = fileSize / bytesInByte
+		unit = enums.MetricUnitTB
 	}
 
-	if dirSize, err = utility.GetVolumeSize("suidb"); err == nil {
-		processSize()
+	formatString := "%.02f"
+	if fileSize >= 100 {
+		formatString = "%.01f"
 	}
 
-	return []string{usageData, unit}
+	usageData = fmt.Sprintf(formatString, fileSize)
+
+	if usageData == "0.00" {
+		usageData = ""
+	}
+
+	return FileSizeResult{
+		Size: fileSize,
+		Unit: unit,
+	}
 }

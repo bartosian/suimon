@@ -10,12 +10,12 @@ import (
 var (
 	TableStyleValidator      = table.StyleLight
 	TableTagValidator        = ""
-	TableSortConfigValidator = []table.SortBy{
+	TableSortConfigValidator = tableSortConfig{
 		{Name: "HEALTH", Mode: table.Dsc},
 		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
 		{Name: "LATEST\nCHECKPOINT", Mode: table.Dsc},
 	}
-	ColumnsConfigValidator = []table.ColumnConfig{
+	ColumnsConfigValidator = tableColumnConfig{
 		columnnames.ValidatorColumnNameIndex: {
 			Name:         "IDX",
 			Align:        text.AlignCenter,
@@ -209,7 +209,7 @@ var (
 			Hidden:       false,
 		},
 	}
-	RowsValidator = [][]int{
+	RowsValidator = tableRows{
 		0: {
 			int(columnnames.ValidatorColumnNameIndex),
 			int(columnnames.ValidatorColumnNameHealth),
