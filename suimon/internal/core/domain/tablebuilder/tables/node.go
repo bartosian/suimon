@@ -9,6 +9,7 @@ import (
 
 var (
 	TableStyleNode      = table.StyleLight
+	TableColorsNode     = text.Colors{text.BgHiGreen, text.FgBlack}
 	TableTagNode        = ""
 	TableSortConfigNode = []table.SortBy{
 		{Name: "HEALTH", Mode: table.Dsc},

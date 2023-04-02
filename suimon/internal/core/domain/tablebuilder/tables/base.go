@@ -75,6 +75,25 @@ func GetTableStyle(table enums.TableType) styles.Style {
 	}
 }
 
+func GetTableColors(table enums.TableType) text.Colors {
+	switch table {
+	case enums.TableTypeRPC:
+		return TableColorsRPC
+	case enums.TableTypePeers:
+		return TableColorsPeer
+	case enums.TableTypeValidator:
+		return TableColorsValidator
+	case enums.TableTypeSystemState:
+		return TableColorsSystem
+	case enums.TableTypeNode:
+		return TableColorsNode
+	case enums.TableTypeActiveValidators:
+		return TableColorsActiveValidator
+	default:
+		return text.Colors{text.BgHiGreen, text.FgBlack}
+	}
+}
+
 func GetTableRows(table enums.TableType) tableRows {
 	switch table {
 	case enums.TableTypeRPC:

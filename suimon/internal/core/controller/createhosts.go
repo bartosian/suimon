@@ -1,9 +1,10 @@
 package controller
 
 import (
+	"sync"
+
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
-	"sync"
 )
 
 // createHosts creates a list of Host objects based on the specified table type and address information.

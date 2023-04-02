@@ -9,6 +9,7 @@ import (
 
 var (
 	TableStyleActiveValidator      = table.StyleLight
+	TableColorsActiveValidator     = text.Colors{text.BgHiBlue, text.FgBlack}
 	TableTagActiveValidator        = ""
 	TableSortConfigActiveValidator = tableSortConfig{
 		{Name: "NEXT EPOCH STAKE", Mode: table.Dsc},

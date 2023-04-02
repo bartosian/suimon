@@ -47,14 +47,15 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) {
 	columns := make(tablebuilder.Columns, len(columnConfig))
 	hosts := checker.getHostsByTableType(tableType)
 
-	for i, config := range columnConfig {
-		columns[i].Config = config
+	for columnName, config := range columnConfig {
+		columns[columnName].Config = config
 	}
 
 	tableConfig := tablebuilder.TableConfig{
 		Name:         tables.GetTableTitle(tableType),
 		Tag:          tables.GetTableTag(tableType),
 		Style:        tables.GetTableStyle(tableType),
+		Colors:       tables.GetTableColors(tableType),
 		Rows:         tables.GetTableRows(tableType),
 		SortConfig:   tables.GetTableSortConfig(tableType),
 		Columns:      columns,
@@ -77,7 +78,7 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) {
 		case enums.TableTypePeers:
 			tables.SetColumnValues(columns, getNodeColumnValues(idx, &host, enabledEmojis))
 		case enums.TableTypeRPC:
-			tables.SetColumnValues(columns, getRPCColumnValues(idx, &host))
+			tables.SetColumnValues(columns, getRPCColumnValues(idx, &host, enabledEmojis))
 		case enums.TableTypeSystemState:
 			tables.SetColumnValues(columns, getSystemStateColumnValues(idx, &host))
 		case enums.TableTypeActiveValidators:
@@ -208,12 +209,16 @@ func getValidatorColumnValues(idx int, host *host.Host, enabledEmojis bool) map[
 // getRPCColumnValues returns a map of NodeColumnName values to corresponding values for the RPC service on the specified host.
 // The function retrieves information about the RPC service from the host's internal state and formats it into a map of NodeColumnName keys and corresponding values.
 // Returns a map of NodeColumnName keys to corresponding values.
-func getRPCColumnValues(idx int, host *host.Host) map[columnnames.NodeColumnName]any {
+func getRPCColumnValues(idx int, host *host.Host, enabledEmojis bool) map[columnnames.NodeColumnName]any {
 	var (
 		status  any = host.Status
 		port        = host.Ports[enums.PortTypeRPC]
 		address     = host.HostPort.Address
 	)
+
+	if !enabledEmojis {
+		status = host.Status.StatusToPlaceholder()
+	}
 
 	if port == "" {
 		port = rpcPortDefault
@@ -236,20 +241,20 @@ func getSystemStateColumnValues(idx int, host *host.Host) map[columnnames.System
 	systemState := host.Metrics.SystemState
 
 	return map[columnnames.SystemColumnName]any{
-		columnnames.SystemColumnNameIndex:                          idx + 1,
-		columnnames.SystemColumnNameEpoch:                          systemState.Epoch,
-		columnnames.SystemColumnNameEpochDurationMs:                systemState.EpochDurationMs,
-		columnnames.SystemColumnNameStorageFund:                    systemState.StorageFund,
-		columnnames.SystemColumnNameReferenceGasPrice:              systemState.ReferenceGasPrice,
-		columnnames.SystemColumnNameStakeSubsidyCounter:            systemState.StakeSubsidyEpochCounter,
-		columnnames.SystemColumnNameStakeSubsidyBalance:            systemState.StakeSubsidyBalance,
-		columnnames.SystemColumnNameStakeSubsidyCurrentEpochAmount: systemState.StakeSubsidyCurrentEpochAmount,
-		columnnames.SystemColumnNameTotalStake:                     systemState.TotalStake,
-		columnnames.SystemColumnNameValidatorsCount:                len(systemState.ActiveValidators),
-		columnnames.SystemColumnNamePendingActiveValidatorsSize:    systemState.PendingActiveValidatorsSize,
-		columnnames.SystemColumnNamePendingRemovals:                len(systemState.PendingRemovals),
-		columnnames.SystemColumnNameValidatorsCandidateSize:        systemState.ValidatorCandidatesSize,
-		columnnames.SystemColumnNameValidatorsAtRiskCount:          len(systemState.AtRiskValidators),
+		columnnames.SystemColumnNameIndex:           idx + 1,
+		columnnames.SystemColumnNameEpoch:           systemState.Epoch,
+		columnnames.SystemColumnNameEpochDurationMs: systemState.EpochDurationMs,
+		//columnnames.SystemColumnNameStorageFund:                    systemState.StorageFund,
+		columnnames.SystemColumnNameReferenceGasPrice: systemState.ReferenceGasPrice,
+		//columnnames.SystemColumnNameStakeSubsidyCounter:            systemState.StakeSubsidyEpochCounter,
+		columnnames.SystemColumnNameStakeSubsidyBalance: systemState.StakeSubsidyBalance,
+		//columnnames.SystemColumnNameStakeSubsidyCurrentEpochAmount: systemState.StakeSubsidyCurrentEpochAmount,
+		columnnames.SystemColumnNameTotalStake:                  systemState.TotalStake,
+		columnnames.SystemColumnNameValidatorsCount:             len(systemState.ActiveValidators),
+		columnnames.SystemColumnNamePendingActiveValidatorsSize: systemState.PendingActiveValidatorsSize,
+		columnnames.SystemColumnNamePendingRemovals:             len(systemState.PendingRemovals),
+		columnnames.SystemColumnNameValidatorsCandidateSize:     systemState.ValidatorCandidatesSize,
+		columnnames.SystemColumnNameValidatorsAtRiskCount:       len(systemState.AtRiskValidators),
 	}
 }
 

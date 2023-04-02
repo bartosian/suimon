@@ -18,6 +18,7 @@ type (
 		Name         string
 		Tag          string
 		Style        table.Style
+		Colors       text.Colors
 		Columns      []Column
 		ColumnsCount int
 		Rows         [][]int
@@ -47,13 +48,14 @@ func (tb *TableBuilder) SetColumns() {
 }
 
 func (tb *TableBuilder) SetRows() {
-	rowsConfig, columnsConfig := tb.config.Rows, tb.config.Columns
+	rowsConfig := tb.config.Rows
+	columnsConfig := tb.config.Columns
 	rowsCount := tb.config.RowsCount
 
-	for i := 0; i < rowsCount; i++ {
+	for rowIndex := 0; rowIndex < rowsCount; rowIndex++ {
 		colsPerRow := len(rowsConfig[0])
 
-		for j, columns := range rowsConfig {
+		for columnIndex, columns := range rowsConfig {
 			header := NewRow(true, colsPerRow)
 			footer := NewRow(false, colsPerRow)
 			row := NewRow(false, colsPerRow)
@@ -65,7 +67,7 @@ func (tb *TableBuilder) SetRows() {
 
 			for columnIdx, columnName = range columns {
 				columnConfig := columnsConfig[columnName]
-				columnValue := columnConfig.Values[i]
+				columnValue := columnConfig.Values[rowIndex]
 
 				header.SetValue(columnConfig.Config.Name)
 				footer.SetValue(emptyValue)
@@ -82,10 +84,10 @@ func (tb *TableBuilder) SetRows() {
 				columnIdx++
 			}
 
-			if i == 0 && j == 0 {
+			if rowIndex == 0 && columnIndex == 0 {
 				tb.builder.AppendHeader(header.Values, header.Config)
 				tb.builder.AppendFooter(footer.Values, footer.Config)
-			} else if j%2 == 1 || i > 0 && len(rowsConfig) > 1 && j%2 == 0 {
+			} else if columnIndex%2 == 1 || rowIndex > 0 && len(rowsConfig) > 1 && columnIndex%2 == 0 {
 				tb.builder.AppendRow(header.Values, header.Config)
 			}
 
@@ -108,11 +110,13 @@ func (tb *TableBuilder) SetStyle() {
 }
 
 func (tb *TableBuilder) SetColors() {
-	tb.builder.Style().Title.Colors = text.Colors{text.BgHiGreen, text.FgBlack}
+	tableColor := tb.config.Colors
+
+	tb.builder.Style().Title.Colors = tableColor
 	tb.builder.Style().Color = table.ColorOptions{
 		Header: text.Colors{text.FgBlack, text.BgWhite},
 		Row:    text.Colors{text.BgWhite},
-		Footer: text.Colors{text.BgHiGreen, text.FgBlack},
+		Footer: tableColor,
 	}
 
 	var f = func() func(row table.Row) text.Colors {

@@ -198,18 +198,19 @@ func (host *Host) GetData() error {
 
 	var wg sync.WaitGroup
 
-	for method, metric := range methodsMapRPC {
-		wg.Add(1)
+	switch host.TableType {
+	case enums.TableTypeNode, enums.TableTypePeers:
+		for method, metric := range methodsMapRPC {
+			wg.Add(1)
 
-		go func() {
-			defer wg.Done()
+			go func(method enums.RPCMethod, metric enums.MetricType) {
+				defer wg.Done()
 
-			err := host.GetMetricRPC(method, metric)
-			doneCH <- err
-		}()
-	}
+				err := host.GetMetricRPC(method, metric)
+				doneCH <- err
+			}(method, metric)
+		}
 
-	if host.TableType != enums.TableTypeRPC {
 		wg.Add(1)
 
 		go func() {
@@ -218,6 +219,26 @@ func (host *Host) GetData() error {
 			err := host.GetPrometheusMetrics()
 			doneCH <- err
 		}()
+	case enums.TableTypeValidator:
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			err := host.GetPrometheusMetrics()
+			doneCH <- err
+		}()
+	case enums.TableTypeRPC:
+		for method, metric := range methodsMapRPC {
+			wg.Add(1)
+
+			go func(method enums.RPCMethod, metric enums.MetricType) {
+				defer wg.Done()
+
+				err := host.GetMetricRPC(method, metric)
+				doneCH <- err
+			}(method, metric)
+		}
 	}
 
 	go func() {

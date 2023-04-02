@@ -56,31 +56,43 @@ type (
 	}
 
 	SuiSystemState struct {
-		Epoch                          int           `json:"epoch"`
-		ProtocolVersion                int           `json:"protocolVersion"`
-		SystemStateVersion             int           `json:"systemStateVersion"`
-		StorageFund                    int           `json:"storageFund"`
-		ReferenceGasPrice              int           `json:"referenceGasPrice"`
-		SafeMode                       bool          `json:"safeMode"`
-		EpochStartTimestampMs          int           `json:"epochStartTimestampMs"`
-		GovernanceStartEpoch           int           `json:"governanceStartEpoch"`
-		EpochDurationMs                int           `json:"epochDurationMs"`
-		StakeSubsidyEpochCounter       int           `json:"stakeSubsidyEpochCounter"`
-		StakeSubsidyBalance            int64         `json:"stakeSubsidyBalance"`
-		StakeSubsidyCurrentEpochAmount int64         `json:"stakeSubsidyCurrentEpochAmount"`
-		TotalStake                     int64         `json:"totalStake"`
-		ActiveValidators               []Validator   `json:"activeValidators"`
-		PendingActiveValidatorsID      string        `json:"pendingActiveValidatorsId"`
-		PendingActiveValidatorsSize    int           `json:"pendingActiveValidatorsSize"`
-		PendingRemovals                []interface{} `json:"pendingRemovals"`
-		StakingPoolMappingsID          string        `json:"stakingPoolMappingsId"`
-		StakingPoolMappingsSize        int           `json:"stakingPoolMappingsSize"`
-		InactivePoolsID                string        `json:"inactivePoolsId"`
-		InactivePoolsSize              int           `json:"inactivePoolsSize"`
-		ValidatorCandidatesID          string        `json:"validatorCandidatesId"`
-		ValidatorCandidatesSize        int           `json:"validatorCandidatesSize"`
-		AtRiskValidators               []interface{} `json:"atRiskValidators"`
-		ValidatorReportRecords         []interface{} `json:"validatorReportRecords"`
+		Epoch                                 int             `json:"epoch"`
+		ProtocolVersion                       int             `json:"protocolVersion"`
+		SystemStateVersion                    int             `json:"systemStateVersion"`
+		StorageFundTotalObjectStorageRebates  int             `json:"storageFundTotalObjectStorageRebates"`
+		StorageFundNonRefundableBalance       int             `json:"storageFundNonRefundableBalance"`
+		ReferenceGasPrice                     int             `json:"referenceGasPrice"`
+		SafeMode                              bool            `json:"safeMode"`
+		SafeModeStorageRewards                int             `json:"safeModeStorageRewards"`
+		SafeModeComputationRewards            int             `json:"safeModeComputationRewards"`
+		SafeModeStorageRebates                int             `json:"safeModeStorageRebates"`
+		SafeModeNonRefundableStorageFee       int             `json:"safeModeNonRefundableStorageFee"`
+		EpochStartTimestampMs                 int             `json:"epochStartTimestampMs"`
+		EpochDurationMs                       int             `json:"epochDurationMs"`
+		StakeSubsidyStartEpoch                int             `json:"stakeSubsidyStartEpoch"`
+		MaxValidatorCount                     int             `json:"maxValidatorCount"`
+		MinValidatorJoiningStake              int             `json:"minValidatorJoiningStake"`
+		ValidatorLowStakeThreshold            int             `json:"validatorLowStakeThreshold"`
+		ValidatorVeryLowStakeThreshold        int             `json:"validatorVeryLowStakeThreshold"`
+		ValidatorLowStakeGracePeriod          int             `json:"validatorLowStakeGracePeriod"`
+		StakeSubsidyBalance                   int             `json:"stakeSubsidyBalance"`
+		StakeSubsidyDistributionCounter       int             `json:"stakeSubsidyDistributionCounter"`
+		StakeSubsidyCurrentDistributionAmount int             `json:"stakeSubsidyCurrentDistributionAmount"`
+		StakeSubsidyPeriodLength              int             `json:"stakeSubsidyPeriodLength"`
+		StakeSubsidyDecreaseRate              int             `json:"stakeSubsidyDecreaseRate"`
+		TotalStake                            int             `json:"totalStake"`
+		ActiveValidators                      []Validator     `json:"activeValidators"`
+		PendingActiveValidatorsID             string          `json:"pendingActiveValidatorsId"`
+		PendingActiveValidatorsSize           int             `json:"pendingActiveValidatorsSize"`
+		PendingRemovals                       []interface{}   `json:"pendingRemovals"`
+		StakingPoolMappingsID                 string          `json:"stakingPoolMappingsId"`
+		StakingPoolMappingsSize               int             `json:"stakingPoolMappingsSize"`
+		InactivePoolsID                       string          `json:"inactivePoolsId"`
+		InactivePoolsSize                     int             `json:"inactivePoolsSize"`
+		ValidatorCandidatesID                 string          `json:"validatorCandidatesId"`
+		ValidatorCandidatesSize               int             `json:"validatorCandidatesSize"`
+		AtRiskValidators                      []interface{}   `json:"atRiskValidators"`
+		ValidatorReportRecords                [][]interface{} `json:"validatorReportRecords"`
 	}
 
 	Transactions struct {

@@ -9,6 +9,7 @@ import (
 
 var (
 	TableStyleValidator      = table.StyleLight
+	TableColorsValidator     = text.Colors{text.BgHiGreen, text.FgBlack}
 	TableTagValidator        = ""
 	TableSortConfigValidator = tableSortConfig{
 		{Name: "HEALTH", Mode: table.Dsc},

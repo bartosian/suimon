@@ -9,6 +9,7 @@ import (
 
 var (
 	TableStyleRPC      = table.StyleLight
+	TableColorsRPC     = text.Colors{text.BgHiBlue, text.FgBlack}
 	TableTagRPC        = ""
 	TableSortConfigRPC = tableSortConfig{
 		{Name: "HEALTH", Mode: table.Dsc},

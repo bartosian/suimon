@@ -9,6 +9,7 @@ import (
 
 var (
 	TableStyleSystem      = table.StyleLight
+	TableColorsSystem     = text.Colors{text.BgHiYellow, text.FgBlack}
 	TableTagSystem        = ""
 	TableSortConfigSystem = make(tableSortConfig, 0)
 	ColumnsConfigSystem   = tableColumnConfig{

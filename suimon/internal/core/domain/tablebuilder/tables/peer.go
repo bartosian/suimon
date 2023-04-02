@@ -9,6 +9,7 @@ import (
 
 var (
 	TableStylePeer      = table.StyleLight
+	TableColorsPeer     = text.Colors{text.BgHiMagenta, text.FgBlack}
 	TableTagPeer        = ""
 	TableSortConfigPeer = tableSortConfig{
 		{Name: "HEALTH", Mode: table.Dsc},
