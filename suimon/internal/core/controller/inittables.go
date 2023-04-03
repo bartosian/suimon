@@ -20,12 +20,13 @@ const (
 func (checker *CheckerController) InitTables() error {
 	displayConfig := checker.suimonConfig.MonitorsConfig
 	tableConfigMap := map[enums.TableType]bool{
-		enums.TableTypeRPC:              displayConfig.RPCTable.Display,
-		enums.TableTypeNode:             displayConfig.NodeTable.Display,
-		enums.TableTypeValidator:        displayConfig.ValidatorTable.Display,
-		enums.TableTypePeers:            displayConfig.PeersTable.Display,
-		enums.TableTypeSystemState:      displayConfig.SystemTable.Display,
-		enums.TableTypeActiveValidators: displayConfig.ActiveValidatorsTable.Display,
+		enums.TableTypeRPC:                   displayConfig.RPCTable.Display,
+		enums.TableTypeNode:                  displayConfig.NodeTable.Display,
+		enums.TableTypeValidator:             displayConfig.ValidatorTable.Display,
+		enums.TableTypePeers:                 displayConfig.PeersTable.Display,
+		enums.TableTypeSystemState:           displayConfig.SystemTable.Display,
+		enums.TableTypeSystemStateValidators: displayConfig.SystemTable.Display,
+		enums.TableTypeActiveValidators:      displayConfig.ActiveValidatorsTable.Display,
 	}
 
 	for tableType, shouldDisplay := range tableConfigMap {
@@ -84,6 +85,8 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) {
 			tables.SetColumnValues(columns, getRPCColumnValues(idx, &hostToRender, enabledEmojis))
 		case enums.TableTypeSystemState:
 			tables.SetColumnValues(columns, getSystemStateColumnValues(idx, &hostToRender))
+		case enums.TableTypeSystemStateValidators:
+			tables.SetColumnValues(columns, getSystemStateValidatorsColumnValues(idx, &hostToRender))
 		case enums.TableTypeActiveValidators:
 			activeValidators := hosts[0].Metrics.SystemState.ActiveValidators
 
@@ -254,21 +257,32 @@ func getSystemStateColumnValues(idx int, host *host.Host) map[enums.ColumnName]a
 		enums.ColumnNameSystemStorageFundNonRefundableBalance:       systemState.StorageFundNonRefundableBalance,
 		enums.ColumnNameSystemReferenceGasPrice:                     systemState.ReferenceGasPrice,
 		enums.ColumnNameSystemStakeSubsidyStartEpoch:                systemState.StakeSubsidyStartEpoch,
-		enums.ColumnNameSystemMaxValidatorCount:                     systemState.MaxValidatorCount,
-		enums.ColumnNameSystemMinValidatorJoiningStake:              systemState.MinValidatorJoiningStake,
-		enums.ColumnNameSystemValidatorLowStakeThreshold:            systemState.ValidatorLowStakeThreshold,
-		enums.ColumnNameSystemValidatorVeryLowStakeThreshold:        systemState.ValidatorVeryLowStakeThreshold,
-		enums.ColumnNameSystemValidatorLowStakeGracePeriod:          systemState.ValidatorLowStakeGracePeriod,
 		enums.ColumnNameSystemStakeSubsidyBalance:                   systemState.StakeSubsidyBalance,
 		enums.ColumnNameSystemStakeSubsidyDistributionCounter:       systemState.StakeSubsidyDistributionCounter,
 		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: systemState.StakeSubsidyCurrentDistributionAmount,
 		enums.ColumnNameSystemStakeSubsidyPeriodLength:              systemState.StakeSubsidyPeriodLength,
 		enums.ColumnNameSystemStakeSubsidyDecreaseRate:              systemState.StakeSubsidyDecreaseRate,
-		enums.ColumnNameSystemActiveValidatorCount:                  len(systemState.ActiveValidators),
-		enums.ColumnNameSystemPendingActiveValidatorCount:           systemState.PendingActiveValidatorsSize,
-		enums.ColumnNameSystemPendingRemovalsCount:                  len(systemState.PendingRemovals),
-		enums.ColumnNameSystemValidatorCandidateCount:               systemState.ValidatorCandidatesSize,
-		enums.ColumnNameSystemAtRiskValidatorCount:                  len(systemState.AtRiskValidators),
+	}
+}
+
+// getSystemStateValidatorsColumnValues returns a map of ColumnName values to corresponding values for the system state validators metrics.
+// The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
+// Returns a map of ColumnName keys to corresponding values.
+func getSystemStateValidatorsColumnValues(idx int, host *host.Host) map[enums.ColumnName]any {
+	systemState := host.Metrics.SystemState
+
+	return map[enums.ColumnName]any{
+		enums.ColumnNameIndex:                                idx + 1,
+		enums.ColumnNameSystemMaxValidatorCount:              systemState.MaxValidatorCount,
+		enums.ColumnNameSystemActiveValidatorCount:           len(systemState.ActiveValidators),
+		enums.ColumnNameSystemPendingActiveValidatorCount:    systemState.PendingActiveValidatorsSize,
+		enums.ColumnNameSystemValidatorCandidateCount:        systemState.ValidatorCandidatesSize,
+		enums.ColumnNameSystemPendingRemovalsCount:           len(systemState.PendingRemovals),
+		enums.ColumnNameSystemAtRiskValidatorCount:           len(systemState.AtRiskValidators),
+		enums.ColumnNameSystemMinValidatorJoiningStake:       systemState.MinValidatorJoiningStake,
+		enums.ColumnNameSystemValidatorLowStakeThreshold:     systemState.ValidatorLowStakeThreshold,
+		enums.ColumnNameSystemValidatorVeryLowStakeThreshold: systemState.ValidatorVeryLowStakeThreshold,
+		enums.ColumnNameSystemValidatorLowStakeGracePeriod:   systemState.ValidatorLowStakeGracePeriod,
 	}
 }
 

@@ -32,6 +32,7 @@ type (
 		validator        ports.Builder
 		rpc              ports.Builder
 		system           ports.Builder
+		systemValidators ports.Builder
 		activeValidators ports.Builder
 	}
 
@@ -85,7 +86,7 @@ func (checker CheckerController) getHostsByTableType(tableType enums.TableType) 
 		return checker.hosts.validator
 	case enums.TableTypeActiveValidators:
 		return checker.hosts.rpc[:1]
-	case enums.TableTypeSystemState:
+	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
 		return checker.hosts.rpc[:1]
 	case enums.TableTypePeers:
 		return checker.hosts.peers
@@ -131,6 +132,8 @@ func (checker *CheckerController) setBuilderTableType(tableType enums.TableType,
 		checker.tableBuilders.rpc = tableBuilder
 	case enums.TableTypeSystemState:
 		checker.tableBuilders.system = tableBuilder
+	case enums.TableTypeSystemStateValidators:
+		checker.tableBuilders.systemValidators = tableBuilder
 	case enums.TableTypeActiveValidators:
 		checker.tableBuilders.activeValidators = tableBuilder
 	default:
@@ -161,8 +164,12 @@ func (checker *CheckerController) RenderTables() error {
 	}
 
 	if checker.suimonConfig.MonitorsConfig.SystemTable.Display && len(checker.hosts.rpc) > 0 {
-		if err := checker.tableBuilders.system.Render(); err != nil {
-			return nil
+		systemTableBuilders := []ports.Builder{checker.tableBuilders.system, checker.tableBuilders.systemValidators}
+
+		for _, builder := range systemTableBuilders {
+			if err := builder.Render(); err != nil {
+				return err
+			}
 		}
 	}
 

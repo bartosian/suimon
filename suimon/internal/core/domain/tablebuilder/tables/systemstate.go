@@ -9,7 +9,7 @@ import (
 
 var (
 	TableStyleSystem      = table.StyleLight
-	TableColorsSystem     = text.Colors{text.BgHiYellow, text.FgBlack}
+	TableColorsSystem     = text.Colors{text.BgHiBlue, text.FgBlack}
 	TableTagSystem        = ""
 	TableSortConfigSystem = make(tableSortConfig, 0)
 	ColumnsConfigSystem   = tableColumnConfig{
@@ -220,8 +220,25 @@ var (
 			enums.ColumnNameSystemStorageFundTotalObjectStorageRebates,
 			enums.ColumnNameSystemStorageFundNonRefundableBalance,
 			enums.ColumnNameSystemReferenceGasPrice,
+		},
+		1: {
 			enums.ColumnNameSystemStakeSubsidyStartEpoch,
+			enums.ColumnNameSystemStakeSubsidyBalance,
+			enums.ColumnNameSystemStakeSubsidyDistributionCounter,
+			enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount,
+			enums.ColumnNameSystemStakeSubsidyPeriodLength,
+			enums.ColumnNameSystemStakeSubsidyDecreaseRate,
+		},
+	}
+	RowsSystemStateValidators = tableRows{
+		0: {
+			enums.ColumnNameIndex,
 			enums.ColumnNameSystemMaxValidatorCount,
+			enums.ColumnNameSystemActiveValidatorCount,
+			enums.ColumnNameSystemPendingActiveValidatorCount,
+			enums.ColumnNameSystemValidatorCandidateCount,
+			enums.ColumnNameSystemPendingRemovalsCount,
+			enums.ColumnNameSystemAtRiskValidatorCount,
 			enums.ColumnNameSystemMinValidatorJoiningStake,
 			enums.ColumnNameSystemValidatorLowStakeThreshold,
 			enums.ColumnNameSystemValidatorVeryLowStakeThreshold,

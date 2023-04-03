@@ -1,7 +1,9 @@
 package metrics
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"math"
 	"strconv"
 
@@ -21,8 +23,15 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 
 	switch metric {
 	case enums.MetricTypeSuiSystemState:
-		valueSystemState, ok := value.(SuiSystemState)
-		if !ok {
+		dataBytes, err := json.Marshal(value.(map[string]interface{}))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var valueSystemState SuiSystemState
+
+		err = json.Unmarshal(dataBytes, &valueSystemState)
+		if err != nil {
 			return fmt.Errorf("unexpected value type for MetricTypeSuiSystemState: %T", value)
 		}
 

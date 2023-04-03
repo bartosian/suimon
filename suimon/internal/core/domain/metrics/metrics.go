@@ -39,7 +39,7 @@ type (
 		OperationCapID               string      `json:"operationCapId"`
 		GasPrice                     int         `json:"gasPrice"`
 		CommissionRate               int         `json:"commissionRate"`
-		NextEpochStake               int64       `json:"nextEpochStake"`
+		NextEpochStake               int         `json:"nextEpochStake"`
 		NextEpochGasPrice            int         `json:"nextEpochGasPrice"`
 		NextEpochCommissionRate      int         `json:"nextEpochCommissionRate"`
 		StakingPoolID                string      `json:"stakingPoolId"`
@@ -91,7 +91,7 @@ type (
 		InactivePoolsSize                     int             `json:"inactivePoolsSize"`
 		ValidatorCandidatesID                 string          `json:"validatorCandidatesId"`
 		ValidatorCandidatesSize               int             `json:"validatorCandidatesSize"`
-		AtRiskValidators                      []interface{}   `json:"atRiskValidators"`
+		AtRiskValidators                      [][]interface{} `json:"atRiskValidators"`
 		ValidatorReportRecords                [][]interface{} `json:"validatorReportRecords"`
 	}
 

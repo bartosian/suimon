@@ -36,7 +36,7 @@ func GetTableTag(table enums.TableType) string {
 		return TableTagPeer
 	case enums.TableTypeValidator:
 		return TableTagValidator
-	case enums.TableTypeSystemState:
+	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
 		return TableTagSystem
 	case enums.TableTypeNode:
 		return TableTagNode
@@ -55,7 +55,7 @@ func GetTableStyle(table enums.TableType) styles.Style {
 		return TableStylePeer
 	case enums.TableTypeValidator:
 		return TableStyleValidator
-	case enums.TableTypeSystemState:
+	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
 		return TableStyleSystem
 	case enums.TableTypeNode:
 		return TableStyleNode
@@ -74,7 +74,7 @@ func GetTableColors(table enums.TableType) text.Colors {
 		return TableColorsPeer
 	case enums.TableTypeValidator:
 		return TableColorsValidator
-	case enums.TableTypeSystemState:
+	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
 		return TableColorsSystem
 	case enums.TableTypeNode:
 		return TableColorsNode
@@ -95,6 +95,8 @@ func GetTableRows(table enums.TableType) tableRows {
 		return RowsValidator
 	case enums.TableTypeSystemState:
 		return RowsSystemState
+	case enums.TableTypeSystemStateValidators:
+		return RowsSystemStateValidators
 	case enums.TableTypeNode:
 		return RowsNode
 	case enums.TableTypeActiveValidators:
@@ -112,7 +114,7 @@ func GetTableSortConfig(table enums.TableType) tableSortConfig {
 		return TableSortConfigPeer
 	case enums.TableTypeValidator:
 		return TableSortConfigValidator
-	case enums.TableTypeSystemState:
+	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
 		return TableSortConfigSystem
 	case enums.TableTypeNode:
 		return TableSortConfigNode
@@ -131,7 +133,7 @@ func GetColumnConfig(table enums.TableType) tableColumnConfig {
 		return ColumnsConfigPeer
 	case enums.TableTypeValidator:
 		return ColumnsConfigValidator
-	case enums.TableTypeSystemState:
+	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
 		return ColumnsConfigSystem
 	case enums.TableTypeNode:
 		return ColumnsConfigNode
