@@ -34,13 +34,20 @@ func (checker CheckerController) Watch() error {
 			case <-ticker.C:
 				for idx := range hosts {
 					go func(idx int) {
-						hosts[idx].GetData()
+						if err := hosts[idx].GetData(); err != nil {
+							return
+						}
 
-						hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, comparatorRPC)
-						hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, comparatorRPC)
+						if err := hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, comparatorRPC); err != nil {
+							return
+						}
+						if err := hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, comparatorRPC); err != nil {
+							return
+						}
+
 						hosts[idx].SetStatus(comparatorRPC)
 
-						doneCH <- struct{}{}
+						defer func() { doneCH <- struct{}{} }()
 					}(idx)
 				}
 

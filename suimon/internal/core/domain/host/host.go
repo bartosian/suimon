@@ -18,10 +18,9 @@ import (
 type requestType int
 
 const (
-	rpcPortDefault      = "9000"
-	metricsPortDefault  = "9184"
-	rpcClientTimeout    = 2 * time.Second
-	metricVersionRegexp = `\{(.*?)\}`
+	rpcPortDefault     = "9000"
+	metricsPortDefault = "9184"
+	rpcClientTimeout   = 2 * time.Second
 
 	requestTypeRPC requestType = iota
 	requestTypeMetrics
@@ -34,10 +33,9 @@ type (
 	}
 
 	Clients struct {
-		rpcClient    jsonrpc.RPCClient
-		rpcSSLClient jsonrpc.RPCClient
-		httpClient   *http.Client
-		ipClient     *ipinfo.Client
+		rpcClient  jsonrpc.RPCClient
+		httpClient *http.Client
+		ipClient   *ipinfo.Client
 	}
 
 	Host struct {
@@ -66,14 +64,13 @@ func NewHost(tableType enums.TableType, addressInfo AddressInfo, ipClient *ipinf
 		logger:      log.NewLogger(),
 	}
 
-	rpcClient := jsonrpc.NewClient(host.getUrl(requestTypeRPC, false))
-	rpcSSLClient := jsonrpc.NewClient(host.getUrl(requestTypeRPC, true))
+	secureURL := addressInfo.HostPort.SSL
+	rpcClient := jsonrpc.NewClient(host.getUrl(requestTypeRPC, secureURL))
 
 	host.clients = Clients{
-		rpcClient:    rpcClient,
-		rpcSSLClient: rpcSSLClient,
-		httpClient:   httpClient,
-		ipClient:     ipClient,
+		rpcClient:  rpcClient,
+		httpClient: httpClient,
+		ipClient:   ipClient,
 	}
 
 	return host

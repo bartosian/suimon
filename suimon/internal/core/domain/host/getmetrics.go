@@ -139,17 +139,12 @@ func (host *Host) GetPrometheusMetrics() error {
 // The function sends the metric value to the host's Metrics field if successful.
 // Returns an error if the RPC call fails or if the metric value cannot be retrieved.
 func (host *Host) GetMetricRPC(method enums.RPCMethod, metricType enums.MetricType) error {
-	var err error
-	useSSL := host.clients.rpcSSLClient != nil
+	var (
+		result any
+		err    error
+	)
 
-	if useSSL {
-		if result, err := getFromRPC(host.clients.rpcSSLClient, method); err == nil {
-			return host.Metrics.SetValue(metricType, result)
-		}
-	}
-
-	result, err := getFromRPC(host.clients.rpcClient, method)
-	if err != nil {
+	if result, err = getFromRPC(host.clients.rpcClient, method); err != nil {
 		return err
 	}
 

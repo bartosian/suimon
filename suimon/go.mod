@@ -7,7 +7,6 @@ require (
 	github.com/dariubs/percent v1.0.0
 	github.com/docker/docker v23.0.1+incompatible
 	github.com/glendc/go-external-ip v0.1.0
-	github.com/hashicorp/go-multierror v1.1.1
 	github.com/ipinfo/go/v2 v2.9.1
 	github.com/jedib0t/go-pretty/v6 v6.4.4
 	github.com/mum4k/termdash v0.18.0
@@ -24,14 +23,12 @@ require (
 	github.com/Microsoft/go-winio v0.6.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/dmarkham/enumer v1.5.8 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
@@ -42,7 +39,6 @@ require (
 	github.com/nsf/termbox-go v1.1.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
-	github.com/pascaldekloe/name v1.0.0 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect

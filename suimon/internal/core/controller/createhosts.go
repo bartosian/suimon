@@ -30,19 +30,19 @@ func (checker *CheckerController) createHosts(tableType enums.TableType, address
 		go func(addressInfo host.AddressInfo) {
 			defer wg.Done()
 
-			host := host.NewHost(tableType, addressInfo, checker.clients.ipClient, checker.clients.httpClient)
+			createdHost := host.NewHost(tableType, addressInfo, checker.clients.ipClient, checker.clients.httpClient)
 
 			if checker.suimonConfig.IPLookup.AccessToken != "" {
-				host.SetLocation()
+				createdHost.SetLocation()
 			}
 
-			if err := host.GetData(); err != nil && tableType != enums.TableTypePeers {
+			if err := createdHost.GetData(); err != nil && tableType != enums.TableTypePeers {
 				checker.logger.Error("failed to get host data: ", err)
 
 				return
 			}
 
-			hostCH <- *host
+			hostCH <- *createdHost
 		}(addressInfo)
 	}
 

@@ -17,6 +17,7 @@ type HostPort struct {
 	Host    *string
 	Path    *string
 	Port    *string
+	SSL     bool
 }
 
 func (hp *HostPort) GetHostWithPath() *string {
@@ -106,6 +107,7 @@ func ParseURL(address string) (*HostPort, error) {
 	hostPort := &HostPort{
 		Address: fmt.Sprintf("%s://%s%s", scheme, hostName, path),
 		Host:    &hostName,
+		SSL:     scheme == "https",
 	}
 
 	if ip, err := ParseIP(hostName); err == nil {

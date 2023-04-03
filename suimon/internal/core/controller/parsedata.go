@@ -207,7 +207,7 @@ func (checker *CheckerController) getHostsData(tableType enums.TableType, progre
 		checker.sortHosts(enums.TableTypeRPC)
 
 		if monitorsConfig.ActiveValidatorsTable.Display || monitorsConfig.SystemTable.Display {
-			checker.hosts.rpc[0].GetMetricRPC(enums.RPCMethodGetSuiSystemState, enums.MetricTypeSuiSystemState)
+			return checker.hosts.rpc[0].GetMetricRPC(enums.RPCMethodGetSuiSystemState, enums.MetricTypeSuiSystemState)
 		}
 	}
 
