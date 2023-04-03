@@ -95,11 +95,19 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 			return fmt.Errorf("unexpected value type for MetricTypeCheckpointExecBacklog: %T", value)
 		}
 
+		if valueInt < 0 {
+			valueInt = 0
+		}
+
 		metrics.CheckpointExecBacklog = valueInt
 	case enums.MetricTypeCheckpointSyncBacklog:
 		valueInt, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected value type for MetricTypeCheckpointSyncBacklog: %T", value)
+		}
+
+		if valueInt < 0 {
+			valueInt = 0
 		}
 
 		metrics.CheckpointSyncBacklog = valueInt

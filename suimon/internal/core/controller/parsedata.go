@@ -128,11 +128,16 @@ func (checker *CheckerController) ParseData() error {
 	monitorsConfig := checker.suimonConfig.MonitorsConfig
 
 	tableMap := map[enums.TableType]bool{
-		enums.TableTypeRPC:       true,
 		enums.TableTypeNode:      monitorsConfig.NodeTable.Display,
 		enums.TableTypeValidator: monitorsConfig.ValidatorTable.Display,
 		enums.TableTypePeers:     monitorsConfig.PeersTable.Display,
 	}
+
+	if err := checker.getHostsData(enums.TableTypeRPC, progress.ColorBlue); err != nil {
+		return err
+	}
+
+	checker.setHostsHealth(enums.TableTypeRPC)
 
 	errChan := make(chan error, len(tableMap))
 	defer close(errChan)

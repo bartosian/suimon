@@ -66,8 +66,8 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) {
 		RowsCount:    0,
 	}
 
-	for idx, host := range hosts {
-		if !host.Metrics.Updated {
+	for idx, hostToRender := range hosts {
+		if !hostToRender.Metrics.Updated {
 			continue
 		}
 
@@ -75,15 +75,15 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) {
 
 		switch tableType {
 		case enums.TableTypeNode:
-			tables.SetColumnValues(columns, getNodeColumnValues(idx, &host, enabledEmojis))
+			tables.SetColumnValues(columns, getNodeColumnValues(idx, &hostToRender, enabledEmojis))
 		case enums.TableTypeValidator:
-			tables.SetColumnValues(columns, getValidatorColumnValues(idx, &host, enabledEmojis))
+			tables.SetColumnValues(columns, getValidatorColumnValues(idx, &hostToRender, enabledEmojis))
 		case enums.TableTypePeers:
-			tables.SetColumnValues(columns, getNodeColumnValues(idx, &host, enabledEmojis))
+			tables.SetColumnValues(columns, getNodeColumnValues(idx, &hostToRender, enabledEmojis))
 		case enums.TableTypeRPC:
-			tables.SetColumnValues(columns, getRPCColumnValues(idx, &host, enabledEmojis))
+			tables.SetColumnValues(columns, getRPCColumnValues(idx, &hostToRender, enabledEmojis))
 		case enums.TableTypeSystemState:
-			tables.SetColumnValues(columns, getSystemStateColumnValues(idx, &host))
+			tables.SetColumnValues(columns, getSystemStateColumnValues(idx, &hostToRender))
 		case enums.TableTypeActiveValidators:
 			activeValidators := hosts[0].Metrics.SystemState.ActiveValidators
 
@@ -196,6 +196,7 @@ func getValidatorColumnValues(idx int, host *host.Host, enabledEmojis bool) map[
 		enums.ColumnNameWorkerNetworkPeers:           host.Metrics.WorkerNetworkPeers,
 		enums.ColumnNameSkippedConsensusTransactions: host.Metrics.SkippedConsensusTransactions,
 		enums.ColumnNameTotalSignatureErrors:         host.Metrics.TotalSignatureErrors,
+		enums.ColumnNameCountry:                      nil,
 	}
 
 	if host.Location != nil {

@@ -1,14 +1,15 @@
 package tables
 
 import (
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
+
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
 var (
 	TableStyleValidator      = table.StyleLight
-	TableColorsValidator     = text.Colors{text.BgHiGreen, text.FgBlack}
+	TableColorsValidator     = text.Colors{text.BgHiYellow, text.FgBlack}
 	TableTagValidator        = ""
 	TableSortConfigValidator = tableSortConfig{
 		{Name: string(enums.ColumnNameHealth), Mode: table.Dsc},
