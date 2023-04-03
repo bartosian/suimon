@@ -7,27 +7,18 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums/columnnames"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/tablebuilder"
 )
 
 const suiEmoji = "💧"
 
 type (
-	tableRows         [][]int
+	tableRows         [][]enums.ColumnName
 	tableSortConfig   []styles.SortBy
-	tableColumnConfig []styles.ColumnConfig
-
-	ColumnName interface {
-		columnnames.NodeColumnName | columnnames.ValidatorColumnName | columnnames.ActiveValidatorColumnName | columnnames.SystemColumnName
-	}
+	tableColumnConfig map[enums.ColumnName]styles.ColumnConfig
 )
 
-var nameTransformer = text.Transformer(func(val interface{}) string {
-	return text.Bold.Sprint(val)
-})
-
-func SetColumnValues[E ColumnName](columns tablebuilder.Columns, values map[E]any) {
+func SetColumnValues(columns tablebuilder.Columns, values map[enums.ColumnName]any) {
 	for name, value := range values {
 		columns[name].SetValue(value)
 	}

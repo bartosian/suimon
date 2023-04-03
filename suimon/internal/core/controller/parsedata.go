@@ -128,7 +128,7 @@ func (checker *CheckerController) ParseData() error {
 	monitorsConfig := checker.suimonConfig.MonitorsConfig
 
 	tableMap := map[enums.TableType]bool{
-		enums.TableTypeRPC:       monitorsConfig.RPCTable.Display,
+		enums.TableTypeRPC:       true,
 		enums.TableTypeNode:      monitorsConfig.NodeTable.Display,
 		enums.TableTypeValidator: monitorsConfig.ValidatorTable.Display,
 		enums.TableTypePeers:     monitorsConfig.PeersTable.Display,

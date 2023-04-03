@@ -1,10 +1,9 @@
 package tables
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums/columnnames"
 )
 
 var (
@@ -12,53 +11,47 @@ var (
 	TableColorsRPC     = text.Colors{text.BgHiBlue, text.FgBlack}
 	TableTagRPC        = ""
 	TableSortConfigRPC = tableSortConfig{
-		{Name: "HEALTH", Mode: table.Dsc},
-		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
-		{Name: "LATEST\nCHECKPOINT", Mode: table.Dsc},
+		{Name: string(enums.ColumnNameHealth), Mode: table.Dsc},
+		{Name: string(enums.ColumnNameTotalTransactionBlocks), Mode: table.Dsc},
+		{Name: string(enums.ColumnNameLatestCheckpoint), Mode: table.Dsc},
 	}
 	ColumnsConfigRPC = tableColumnConfig{
-		columnnames.NodeColumnNameIndex: {
-			Name:         "",
+		enums.ColumnNameIndex: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameHealth: {
-			Name:         "HEALTH",
+		enums.ColumnNameHealth: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameAddress: {
-			Name:         "ADDRESS",
+		enums.ColumnNameAddress: {
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNamePortRPC: {
-			Name:         "RPC",
+		enums.ColumnNamePortRPC: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameTotalTransactionBlocks: {
-			Name:         "TOTAL TRANSACTIONS\nBLOCKS",
+		enums.ColumnNameTotalTransactionBlocks: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameLatestCheckpoint: {
-			Name:         "LATEST\nCHECKPOINT",
+		enums.ColumnNameLatestCheckpoint: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -68,12 +61,12 @@ var (
 	}
 	RowsRPC = tableRows{
 		0: {
-			int(columnnames.NodeColumnNameIndex),
-			int(columnnames.NodeColumnNameHealth),
-			int(columnnames.NodeColumnNameAddress),
-			int(columnnames.NodeColumnNamePortRPC),
-			int(columnnames.NodeColumnNameTotalTransactionBlocks),
-			int(columnnames.NodeColumnNameLatestCheckpoint),
+			enums.ColumnNameIndex,
+			enums.ColumnNameHealth,
+			enums.ColumnNameAddress,
+			enums.ColumnNamePortRPC,
+			enums.ColumnNameTotalTransactionBlocks,
+			enums.ColumnNameLatestCheckpoint,
 		},
 	}
 )

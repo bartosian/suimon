@@ -35,7 +35,6 @@ func main() {
 		suimonConfig      *config.SuimonConfig
 		err               error
 	)
-
 	// parse suimon.yaml config file
 	if suimonConfig, err = config.ParseSuimonConfig(suimonConfigPath); err != nil {
 		return
@@ -48,18 +47,7 @@ func main() {
 		return
 	}
 
-	defer func() {
-		if err := recover(); err != nil {
-			checkerController.DashboardBuilder.Terminal.Close()
-			checkerController.DashboardBuilder.Ctx.Done()
-
-			logger.Error("failed to execute suimon, please check an issue: ", err)
-
-			os.Exit(1)
-		}
-
-		return
-	}()
+	defer handlePanic(&logger)
 
 	// initialize checker instance with seed data
 	if err = checkerController.ParseData(); err != nil {
@@ -70,15 +58,43 @@ func main() {
 
 	if *watch {
 		// initialize realtime dashboard with styles
-		checkerController.InitDashboards()
+		if err = checkerController.InitDashboards(); err != nil {
+			logger.Error("failed to init dashboard: ", err)
+
+			return
+		}
 
 		// draw initialized dashboard to the terminal
-		checkerController.RenderDashboards()
+		if err = checkerController.RenderDashboards(); err != nil {
+			logger.Error("failed to render dashboard: ", err)
+
+			return
+		}
+
+		defer func() {
+			checkerController.DashboardBuilder.Terminal.Close()
+			checkerController.DashboardBuilder.Ctx.Done()
+		}()
 	} else {
 		// initialize tables with the styles
-		checkerController.InitTables()
+		if err = checkerController.InitTables(); err != nil {
+			logger.Error("failed to init tables: ", err)
+
+			return
+		}
 
 		// draw initialized tables to the terminal
-		checkerController.RenderTables()
+		if err = checkerController.RenderTables(); err != nil {
+			logger.Error("failed to render tables: ", err)
+
+			return
+		}
+	}
+}
+
+func handlePanic(logger *log.Logger) {
+	if r := recover(); r != nil {
+		logger.Error("failed to execute suimon, please check an issue: ", r)
+		os.Exit(1)
 	}
 }

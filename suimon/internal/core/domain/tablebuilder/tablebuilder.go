@@ -5,6 +5,8 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
+
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
 const emptyValue = ""
@@ -19,11 +21,11 @@ type (
 		Tag          string
 		Style        table.Style
 		Colors       text.Colors
-		Columns      []Column
-		ColumnsCount int
-		Rows         [][]int
-		RowsCount    int
+		Columns      map[enums.ColumnName]*Column
+		Rows         [][]enums.ColumnName
 		SortConfig   []table.SortBy
+		ColumnsCount int
+		RowsCount    int
 	}
 )
 
@@ -62,14 +64,14 @@ func (tb *TableBuilder) SetRows() {
 
 			var (
 				columnIdx  int
-				columnName int
+				columnName enums.ColumnName
 			)
 
 			for columnIdx, columnName = range columns {
 				columnConfig := columnsConfig[columnName]
 				columnValue := columnConfig.Values[rowIndex]
 
-				header.SetValue(columnConfig.Config.Name)
+				header.SetValue(string(columnName))
 				footer.SetValue(emptyValue)
 				row.SetValue(columnValue)
 			}

@@ -1,184 +1,162 @@
 package tables
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums/columnnames"
 )
 
 var (
 	TableStylePeer      = table.StyleLight
-	TableColorsPeer     = text.Colors{text.BgHiMagenta, text.FgBlack}
+	TableColorsPeer     = text.Colors{text.BgHiYellow, text.FgBlack}
 	TableTagPeer        = ""
 	TableSortConfigPeer = tableSortConfig{
-		{Name: "HEALTH", Mode: table.Dsc},
-		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
-		{Name: "LATEST\nCHECKPOINT", Mode: table.Dsc},
+		{Name: string(enums.ColumnNameHealth), Mode: table.Dsc},
+		{Name: string(enums.ColumnNameTotalTransactionBlocks), Mode: table.Dsc},
+		{Name: string(enums.ColumnNameLatestCheckpoint), Mode: table.Dsc},
 	}
 	ColumnsConfigPeer = tableColumnConfig{
-		columnnames.NodeColumnNameIndex: {
-			Name:         "IDX",
+		enums.ColumnNameIndex: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameHealth: {
-			Name:         "HEALTH",
+		enums.ColumnNameHealth: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameAddress: {
-			Name:         "ADDRESS",
+		enums.ColumnNameAddress: {
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNamePortRPC: {
-			Name:         "RPC",
+		enums.ColumnNamePortRPC: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameTotalTransactionBlocks: {
-			Name:         "TOTAL TRANSACTION\nBLOCKS",
+		enums.ColumnNameTotalTransactionBlocks: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameLatestCheckpoint: {
-			Name:         "LATEST\nCHECKPOINT",
+		enums.ColumnNameLatestCheckpoint: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameTotalTransactionCertificates: {
-			Name:         "TOTAL TRANSACTION\nCERTIFICATES",
+		enums.ColumnNameTotalTransactionCertificates: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameTotalTransactionEffects: {
-			Name:         "TOTAL TRANSACTION\nEFFECTS",
+		enums.ColumnNameTotalTransactionEffects: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameHighestKnownCheckpoint: {
-			Name:         "HIGHEST KNOWN\nCHECKPOINT",
+		enums.ColumnNameHighestKnownCheckpoint: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameHighestSyncedCheckpoint: {
-			Name:         "HIGHEST SYNCED\nCHECKPOINT",
+		enums.ColumnNameHighestSyncedCheckpoint: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameLastExecutedCheckpoint: {
-			Name:         "LAST EXECUTED\nCHECKPOINT",
+		enums.ColumnNameLastExecutedCheckpoint: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameCheckpointExecBacklog: {
-			Name:         "CHECKPOINT EXEC\nBACKLOG",
+		enums.ColumnNameCheckpointExecBacklog: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameCheckpointSyncBacklog: {
-			Name:         "CHECKPOINT SYNC\nBACKLOG",
+		enums.ColumnNameCheckpointSyncBacklog: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameCurrentEpoch: {
-			Name:         "CURRENT\nEPOCH",
+		enums.ColumnNameCurrentEpoch: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameTXSyncPercentage: {
-			Name:         "TRANSACTIONS\nSYNC PERCENTAGE",
+		enums.ColumnNameTXSyncPercentage: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameCheckSyncPercentage: {
-			Name:         "CHECKPOINTS\nSYNC PERCENTAGE",
+		enums.ColumnNameCheckSyncPercentage: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameNetworkPeers: {
-			Name:         "NETWORK\nPEERS",
+		enums.ColumnNameNetworkPeers: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameUptime: {
-			Name:         "UPTIME\nDAYS",
+		enums.ColumnNameUptime: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameVersion: {
-			Name:         "VERSION",
+		enums.ColumnNameVersion: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameCommit: {
-			Name:         "COMMIT",
+		enums.ColumnNameCommit: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.NodeColumnNameCountry: {
-			Name:         "COUNTRY",
+		enums.ColumnNameCountry: {
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -188,29 +166,29 @@ var (
 	}
 	RowsPeer = tableRows{
 		0: {
-			int(columnnames.NodeColumnNameIndex),
-			int(columnnames.NodeColumnNameHealth),
-			int(columnnames.NodeColumnNameAddress),
-			int(columnnames.NodeColumnNamePortRPC),
-			int(columnnames.NodeColumnNameTotalTransactionBlocks),
-			int(columnnames.NodeColumnNameLatestCheckpoint),
-			int(columnnames.NodeColumnNameTotalTransactionCertificates),
-			int(columnnames.NodeColumnNameTotalTransactionEffects),
-			int(columnnames.NodeColumnNameHighestKnownCheckpoint),
-			int(columnnames.NodeColumnNameLastExecutedCheckpoint),
-			int(columnnames.NodeColumnNameCheckpointExecBacklog),
-			int(columnnames.NodeColumnNameHighestSyncedCheckpoint),
-			int(columnnames.NodeColumnNameCheckpointSyncBacklog),
+			enums.ColumnNameIndex,
+			enums.ColumnNameHealth,
+			enums.ColumnNameAddress,
+			enums.ColumnNamePortRPC,
+			enums.ColumnNameTotalTransactionBlocks,
+			enums.ColumnNameLatestCheckpoint,
+			enums.ColumnNameTotalTransactionCertificates,
+			enums.ColumnNameTotalTransactionEffects,
+			enums.ColumnNameHighestKnownCheckpoint,
+			enums.ColumnNameLastExecutedCheckpoint,
+			enums.ColumnNameCheckpointExecBacklog,
+			enums.ColumnNameHighestSyncedCheckpoint,
+			enums.ColumnNameCheckpointSyncBacklog,
 		},
 		1: {
-			int(columnnames.NodeColumnNameCurrentEpoch),
-			int(columnnames.NodeColumnNameTXSyncPercentage),
-			int(columnnames.NodeColumnNameCheckSyncPercentage),
-			int(columnnames.NodeColumnNameNetworkPeers),
-			int(columnnames.NodeColumnNameUptime),
-			int(columnnames.NodeColumnNameVersion),
-			int(columnnames.NodeColumnNameCommit),
-			int(columnnames.NodeColumnNameCountry),
+			enums.ColumnNameCurrentEpoch,
+			enums.ColumnNameTXSyncPercentage,
+			enums.ColumnNameCheckSyncPercentage,
+			enums.ColumnNameNetworkPeers,
+			enums.ColumnNameUptime,
+			enums.ColumnNameVersion,
+			enums.ColumnNameCommit,
+			enums.ColumnNameCountry,
 		},
 	}
 )

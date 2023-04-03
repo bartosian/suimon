@@ -8,7 +8,7 @@ import (
 
 // SetLocation sets the location data for the Host struct by querying an IP address database.
 // This method does not accept any parameters and does not return anything.
-func (host Host) SetLocation() {
+func (host *Host) SetLocation() {
 	var parseLocation = func(ip net.IP) {
 		record, err := host.clients.ipClient.GetIPInfo(ip)
 		if err != nil {

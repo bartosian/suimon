@@ -29,8 +29,6 @@ func IsInvalidPort(port string) bool {
 
 func IsValidCharCount(str string, char string, count int) bool {
 	charCount := strings.Count(str, char)
-	if charCount != count {
-		return false
-	}
-	return true
+
+	return charCount == count
 }

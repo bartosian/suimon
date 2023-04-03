@@ -182,10 +182,9 @@ type FileSizeResult struct {
 // - an array of strings representing the formatted size data for all files and directories within the given directory.
 func GetFileSize(filePath string) FileSizeResult {
 	var (
-		usageData string
-		fileSize  float64
-		unit      enums.MetricUnit
-		err       error
+		fileSize float64
+		unit     enums.MetricUnit
+		err      error
 	)
 
 	if filePath == suiDBDirName {
@@ -210,17 +209,6 @@ func GetFileSize(filePath string) FileSizeResult {
 	if fileSize >= 100 {
 		fileSize = fileSize / bytesInByte
 		unit = enums.MetricUnitTB
-	}
-
-	formatString := "%.02f"
-	if fileSize >= 100 {
-		formatString = "%.01f"
-	}
-
-	usageData = fmt.Sprintf(formatString, fileSize)
-
-	if usageData == "0.00" {
-		usageData = ""
 	}
 
 	return FileSizeResult{

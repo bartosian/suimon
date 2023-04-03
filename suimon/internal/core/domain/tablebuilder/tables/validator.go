@@ -1,10 +1,9 @@
 package tables
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums/columnnames"
 )
 
 var (
@@ -12,197 +11,173 @@ var (
 	TableColorsValidator     = text.Colors{text.BgHiGreen, text.FgBlack}
 	TableTagValidator        = ""
 	TableSortConfigValidator = tableSortConfig{
-		{Name: "HEALTH", Mode: table.Dsc},
-		{Name: "TOTAL\nTRANSACTIONS", Mode: table.Dsc},
-		{Name: "LATEST\nCHECKPOINT", Mode: table.Dsc},
+		{Name: string(enums.ColumnNameHealth), Mode: table.Dsc},
+		{Name: string(enums.ColumnNameTotalTransactionBlocks), Mode: table.Dsc},
+		{Name: string(enums.ColumnNameLatestCheckpoint), Mode: table.Dsc},
 	}
 	ColumnsConfigValidator = tableColumnConfig{
-		columnnames.ValidatorColumnNameIndex: {
-			Name:         "IDX",
+		enums.ColumnNameIndex: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameHealth: {
-			Name:         "HEALTH",
+		enums.ColumnNameHealth: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameAddress: {
-			Name:         "ADDRESS",
+		enums.ColumnNameAddress: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameTotalTransactionCertificates: {
-			Name:         "TOTAL TRANSACTION\nCERTIFICATES",
+		enums.ColumnNameTotalTransactionCertificates: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameTotalTransactionEffects: {
-			Name:         "TOTAL TRANSACTION\nEFFECTS",
+		enums.ColumnNameTotalTransactionEffects: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameHighestKnownCheckpoint: {
-			Name:         "HIGHEST KNOWN\nCHECKPOINT",
+		enums.ColumnNameHighestKnownCheckpoint: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameHighestSyncedCheckpoint: {
-			Name:         "HIGHEST SYNCED\nCHECKPOINT",
+		enums.ColumnNameHighestSyncedCheckpoint: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameLastExecutedCheckpoint: {
-			Name:         "LAST EXECUTED\nCHECKPOINT",
+		enums.ColumnNameLastExecutedCheckpoint: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameCheckpointExecBacklog: {
-			Name:         "CHECKPOINT EXEC\nBACKLOG",
+		enums.ColumnNameCheckpointExecBacklog: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameCheckpointSyncBacklog: {
-			Name:         "CHECKPOINT SYNC\nBACKLOG",
+		enums.ColumnNameCheckpointSyncBacklog: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameCurrentEpoch: {
-			Name:         "CURRENT\nEPOCH",
+		enums.ColumnNameCurrentEpoch: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameCheckSyncPercentage: {
-			Name:         "CHECKPOINTS\nSYNC PERCENTAGE",
+		enums.ColumnNameCheckSyncPercentage: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameNetworkPeers: {
-			Name:         "NETWORK\nPEERS",
+		enums.ColumnNameNetworkPeers: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameUptime: {
-			Name:         "UPTIME DAYS",
+		enums.ColumnNameUptime: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameVersion: {
-			Name:         "VERSION",
+		enums.ColumnNameVersion: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameCommit: {
-			Name:         "COMMIT",
+		enums.ColumnNameCommit: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameCountry: {
-			Name:         "COUNTRY",
+		enums.ColumnNameCountry: {
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameCurrentRound: {
-			Name:         "CURRENT ROUND",
+		enums.ColumnNameCurrentRound: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameHighestProcessedRound: {
-			Name:         "HIGHEST\nPROCESSED ROUND",
+		enums.ColumnNameHighestProcessedRound: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameLastCommittedRound: {
-			Name:         "LAST\nCOMMITTED ROUND",
+		enums.ColumnNameLastCommittedRound: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNamePrimaryNetworkPeers: {
-			Name:         "PRIMARY\nNETWORK PEERS",
+		enums.ColumnNamePrimaryNetworkPeers: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameWorkerNetworkPeers: {
-			Name:         "WORKER\nNETWORK PEERS",
+		enums.ColumnNameWorkerNetworkPeers: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameSkippedConsensusTransactions: {
-			Name:         "SKIPPED CONSENSUS\nTRANSACTIONS",
+		enums.ColumnNameSkippedConsensusTransactions: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ValidatorColumnNameTotalSignatureErrors: {
-			Name:         "TOTAL\nSIGNATURE ERRORS",
+		enums.ColumnNameTotalSignatureErrors: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -212,32 +187,32 @@ var (
 	}
 	RowsValidator = tableRows{
 		0: {
-			int(columnnames.ValidatorColumnNameIndex),
-			int(columnnames.ValidatorColumnNameHealth),
-			int(columnnames.ValidatorColumnNameAddress),
-			int(columnnames.ValidatorColumnNameCurrentEpoch),
-			int(columnnames.ValidatorColumnNameTotalTransactionCertificates),
-			int(columnnames.ValidatorColumnNameTotalTransactionEffects),
-			int(columnnames.ValidatorColumnNameHighestKnownCheckpoint),
-			int(columnnames.ValidatorColumnNameLastExecutedCheckpoint),
-			int(columnnames.ValidatorColumnNameCheckpointExecBacklog),
-			int(columnnames.ValidatorColumnNameHighestSyncedCheckpoint),
-			int(columnnames.ValidatorColumnNameCheckpointSyncBacklog),
-			int(columnnames.ValidatorColumnNameCheckSyncPercentage),
-			int(columnnames.ValidatorColumnNameNetworkPeers),
+			enums.ColumnNameIndex,
+			enums.ColumnNameHealth,
+			enums.ColumnNameAddress,
+			enums.ColumnNameCurrentEpoch,
+			enums.ColumnNameTotalTransactionCertificates,
+			enums.ColumnNameTotalTransactionEffects,
+			enums.ColumnNameHighestKnownCheckpoint,
+			enums.ColumnNameLastExecutedCheckpoint,
+			enums.ColumnNameCheckpointExecBacklog,
+			enums.ColumnNameHighestSyncedCheckpoint,
+			enums.ColumnNameCheckpointSyncBacklog,
+			enums.ColumnNameCheckSyncPercentage,
+			enums.ColumnNameNetworkPeers,
 		},
 		1: {
-			int(columnnames.ValidatorColumnNameUptime),
-			int(columnnames.ValidatorColumnNameVersion),
-			int(columnnames.ValidatorColumnNameCommit),
-			int(columnnames.ValidatorColumnNameCountry),
-			int(columnnames.ValidatorColumnNameCurrentRound),
-			int(columnnames.ValidatorColumnNameHighestProcessedRound),
-			int(columnnames.ValidatorColumnNameLastCommittedRound),
-			int(columnnames.ValidatorColumnNamePrimaryNetworkPeers),
-			int(columnnames.ValidatorColumnNameWorkerNetworkPeers),
-			int(columnnames.ValidatorColumnNameSkippedConsensusTransactions),
-			int(columnnames.ValidatorColumnNameTotalSignatureErrors),
+			enums.ColumnNameUptime,
+			enums.ColumnNameVersion,
+			enums.ColumnNameCommit,
+			enums.ColumnNameCountry,
+			enums.ColumnNameCurrentRound,
+			enums.ColumnNameHighestProcessedRound,
+			enums.ColumnNameLastCommittedRound,
+			enums.ColumnNamePrimaryNetworkPeers,
+			enums.ColumnNameWorkerNetworkPeers,
+			enums.ColumnNameSkippedConsensusTransactions,
+			enums.ColumnNameTotalSignatureErrors,
 		},
 	}
 )

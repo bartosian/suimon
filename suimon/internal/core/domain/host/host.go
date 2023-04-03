@@ -2,7 +2,6 @@ package host
 
 import (
 	"net/http"
-	"regexp"
 	"time"
 
 	"github.com/dariubs/percent"
@@ -27,8 +26,6 @@ const (
 	requestTypeRPC requestType = iota
 	requestTypeMetrics
 )
-
-var versionRegex = regexp.MustCompile(metricVersionRegexp)
 
 type (
 	AddressInfo struct {
@@ -85,14 +82,14 @@ func NewHost(tableType enums.TableType, addressInfo AddressInfo, ipClient *ipinf
 // SetPctProgress updates the value of the specified metric type for the Host instance with a percentage that reflects the Host's progress relative to the progress of the RPC Host.
 // The function obtains the current metric value for the Host and RPC Host, calculates the percentage using the percent.PercentOf function, and sets the new percentage value for the Host's Metrics instance for the specified metric type.
 // The second argument is the RPC Host to compare the progress against.
-func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) {
+func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) error {
 	hostMetric := host.Metrics.GetValue(metricType, false)
 	rpcMetric := rpc.Metrics.GetValue(metricType, true)
 	hostMetricInt, rpcMetricInt := hostMetric.(int), rpcMetric.(int)
 
 	percentage := int(percent.PercentOf(hostMetricInt, rpcMetricInt))
 
-	host.Metrics.SetValue(metricType, percentage)
+	return host.Metrics.SetValue(metricType, percentage)
 }
 
 func (host *Host) SetStatus(rpc Host) {
@@ -127,6 +124,4 @@ func (host *Host) SetStatus(rpc Host) {
 	}
 
 	host.Status = enums.StatusGreen
-
-	return
 }

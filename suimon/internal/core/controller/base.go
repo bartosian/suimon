@@ -51,7 +51,6 @@ type (
 		clients          Clients
 		tableBuilders    Builders
 		DashboardBuilder *dashboardbuilder.DashboardBuilder
-		tableConfig      tablebuilder.TableConfig
 	}
 )
 
@@ -144,23 +143,33 @@ func (checker *CheckerController) setBuilderTableType(tableType enums.TableType,
 // This function does not return anything.
 func (checker *CheckerController) RenderTables() error {
 	if checker.suimonConfig.MonitorsConfig.RPCTable.Display && len(checker.hosts.rpc) > 0 {
-		checker.tableBuilders.rpc.Render()
+		if err := checker.tableBuilders.rpc.Render(); err != nil {
+			return err
+		}
 	}
 
 	if checker.suimonConfig.MonitorsConfig.NodeTable.Display && len(checker.hosts.node) > 0 {
-		checker.tableBuilders.node.Render()
+		if err := checker.tableBuilders.node.Render(); err != nil {
+			return err
+		}
 	}
 
 	if checker.suimonConfig.MonitorsConfig.ValidatorTable.Display && len(checker.hosts.validator) > 0 {
-		checker.tableBuilders.validator.Render()
+		if err := checker.tableBuilders.validator.Render(); err != nil {
+			return err
+		}
 	}
 
 	if checker.suimonConfig.MonitorsConfig.SystemTable.Display && len(checker.hosts.rpc) > 0 {
-		checker.tableBuilders.system.Render()
+		if err := checker.tableBuilders.system.Render(); err != nil {
+			return nil
+		}
 	}
 
 	if checker.suimonConfig.MonitorsConfig.PeersTable.Display && len(checker.hosts.peers) > 0 {
-		checker.tableBuilders.peer.Render()
+		if err := checker.tableBuilders.peer.Render(); err != nil {
+			return err
+		}
 	}
 
 	if checker.suimonConfig.MonitorsConfig.ActiveValidatorsTable.Display && len(checker.hosts.rpc) > 0 {
@@ -170,7 +179,9 @@ func (checker *CheckerController) RenderTables() error {
 			return nil
 		}
 
-		checker.tableBuilders.activeValidators.Render()
+		if err := checker.tableBuilders.activeValidators.Render(); err != nil {
+			return err
+		}
 	}
 
 	return nil

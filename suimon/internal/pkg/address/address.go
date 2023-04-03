@@ -108,6 +108,10 @@ func ParseURL(address string) (*HostPort, error) {
 		Host:    &hostName,
 	}
 
+	if ip, err := ParseIP(hostName); err == nil {
+		hostPort.IP = ip
+	}
+
 	if port != "" {
 		if validation.IsInvalidPort(port) {
 			return nil, fmt.Errorf("invalid port provided: %s", address)
@@ -155,7 +159,9 @@ func ParseIP(address string) (*string, error) {
 
 func GetPublicIP() net.IP {
 	consensus := externalIP.DefaultConsensus(nil, nil)
-	consensus.UseIPProtocol(4)
+	if err := consensus.UseIPProtocol(4); err != nil {
+		return nil
+	}
 
 	ip, err := consensus.ExternalIP()
 	if err != nil {

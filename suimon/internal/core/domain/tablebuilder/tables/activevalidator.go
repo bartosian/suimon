@@ -1,10 +1,9 @@
 package tables
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums/columnnames"
 )
 
 var (
@@ -16,104 +15,105 @@ var (
 		{Name: "NEXT EPOCH\nGAS PRICE", Mode: table.Dsc},
 	}
 	ColumnConfigActiveValidator = tableColumnConfig{
-		columnnames.ActiveValidatorColumnNameIndex: {
-			Name:         "IDX",
+		enums.ColumnNameIndex: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNameName: {
-			Name:         "NAME",
+		enums.ColumnNameValidatorName: {
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNameNetAddress: {
-			Name:         "NET ADDRESS",
+		enums.ColumnNameValidatorNetAddress: {
 			Align:        text.AlignLeft,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNameVotingPower: {
-			Name:         "VOTING POWER",
+		enums.ColumnNameValidatorVotingPower: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNameGasPrice: {
-			Name:         "GAS PRIZE",
+		enums.ColumnNameValidatorGasPrice: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNameCommissionRate: {
-			Name:         "COMMISSION RATE",
+		enums.ColumnNameValidatorCommissionRate: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNameNextEpochStake: {
-			Name:         "NEXT EPOCH STAKE",
+		enums.ColumnNameValidatorNextEpochStake: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNameNextEpochGasPrice: {
-			Name:         "NEXT EPOCH\nGAS PRICE",
+		enums.ColumnNameValidatorNextEpochGasPrice: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNameNextEpochCommissionRate: {
-			Name:         "NEXT EPOCH\nCOMMISSION RATE",
+		enums.ColumnNameValidatorNextEpochCommissionRate: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNameStakingPoolSuiBalance: {
-			Name:         "STAKING POOL\nSUI BALANCE",
+		enums.ColumnNameValidatorStakingPoolSuiBalance: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNameRewardsPool: {
-			Name:         "REWARDS POOL",
+		enums.ColumnNameValidatorRewardsPool: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNamePoolTokenBalance: {
-			Name:         "POOL TOKEN BALANCE",
+		enums.ColumnNameValidatorPoolTokenBalance: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.ActiveValidatorColumnNamePendingStake: {
-			Name:         "POOL PENDING STAKE",
+		enums.ColumnNameValidatorPendingStake: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameValidatorPendingTotalSuiWithdraw: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameValidatorPendingPoolTokenWithdraw: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -123,21 +123,23 @@ var (
 	}
 	RowsActiveValidator = tableRows{
 		0: {
-			int(columnnames.ActiveValidatorColumnNameIndex),
-			int(columnnames.ActiveValidatorColumnNameName),
-			int(columnnames.ActiveValidatorColumnNameNetAddress),
-			int(columnnames.ActiveValidatorColumnNameVotingPower),
-			int(columnnames.ActiveValidatorColumnNameGasPrice),
-			int(columnnames.ActiveValidatorColumnNameCommissionRate),
-			int(columnnames.ActiveValidatorColumnNameNextEpochStake),
-			int(columnnames.ActiveValidatorColumnNameNextEpochGasPrice),
-			int(columnnames.ActiveValidatorColumnNameNextEpochCommissionRate),
+			enums.ColumnNameIndex,
+			enums.ColumnNameValidatorName,
+			enums.ColumnNameValidatorNetAddress,
+			enums.ColumnNameValidatorVotingPower,
+			enums.ColumnNameValidatorGasPrice,
+			enums.ColumnNameValidatorCommissionRate,
+			enums.ColumnNameValidatorNextEpochStake,
+			enums.ColumnNameValidatorNextEpochGasPrice,
+			enums.ColumnNameValidatorNextEpochCommissionRate,
 		},
 		1: {
-			int(columnnames.ActiveValidatorColumnNameStakingPoolSuiBalance),
-			int(columnnames.ActiveValidatorColumnNameRewardsPool),
-			int(columnnames.ActiveValidatorColumnNamePoolTokenBalance),
-			int(columnnames.ActiveValidatorColumnNamePendingStake),
+			enums.ColumnNameValidatorStakingPoolSuiBalance,
+			enums.ColumnNameValidatorRewardsPool,
+			enums.ColumnNameValidatorPoolTokenBalance,
+			enums.ColumnNameValidatorPendingStake,
+			enums.ColumnNameValidatorPendingTotalSuiWithdraw,
+			enums.ColumnNameValidatorPendingPoolTokenWithdraw,
 		},
 	}
 )

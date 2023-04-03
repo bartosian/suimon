@@ -182,11 +182,7 @@ func serviceExists(name string) bool {
 
 	status := strings.TrimSpace(string(out))
 
-	if status == "active" {
-		return true
-	}
-
-	return false
+	return status == "active"
 }
 
 func getPID(command string) (string, error) {

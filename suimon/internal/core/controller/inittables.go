@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums/columnnames"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/tablebuilder"
@@ -48,7 +47,11 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) {
 	hosts := checker.getHostsByTableType(tableType)
 
 	for columnName, config := range columnConfig {
-		columns[columnName].Config = config
+		column := tablebuilder.Column{
+			Config: config,
+		}
+
+		columns[columnName] = &column
 	}
 
 	tableConfig := tablebuilder.TableConfig{
@@ -103,7 +106,7 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) {
 // The function retrieves information about the node from the host's internal state and formats it into a map of NodeColumnName keys and corresponding values.
 // The function also includes emoji values in the map if the specified flag is true.
 // Returns a map of NodeColumnName keys to corresponding values.
-func getNodeColumnValues(idx int, host *host.Host, enabledEmojis bool) map[columnnames.NodeColumnName]any {
+func getNodeColumnValues(idx int, host *host.Host, enabledEmojis bool) map[enums.ColumnName]any {
 	var (
 		status  any = host.Status
 		country any = host.Location.String()
@@ -119,28 +122,28 @@ func getNodeColumnValues(idx int, host *host.Host, enabledEmojis bool) map[colum
 		port = rpcPortDefault
 	}
 
-	columnValues := map[columnnames.NodeColumnName]any{
-		columnnames.NodeColumnNameIndex:                        idx + 1,
-		columnnames.NodeColumnNameHealth:                       status,
-		columnnames.NodeColumnNameAddress:                      address,
-		columnnames.NodeColumnNamePortRPC:                      port,
-		columnnames.NodeColumnNameTotalTransactionBlocks:       host.Metrics.TotalTransactionsBlocks,
-		columnnames.NodeColumnNameTotalTransactionCertificates: host.Metrics.TotalTransactionCertificates,
-		columnnames.NodeColumnNameTotalTransactionEffects:      host.Metrics.TotalTransactionEffects,
-		columnnames.NodeColumnNameLatestCheckpoint:             host.Metrics.LatestCheckpoint,
-		columnnames.NodeColumnNameHighestKnownCheckpoint:       host.Metrics.HighestKnownCheckpoint,
-		columnnames.NodeColumnNameHighestSyncedCheckpoint:      host.Metrics.HighestSyncedCheckpoint,
-		columnnames.NodeColumnNameLastExecutedCheckpoint:       host.Metrics.LastExecutedCheckpoint,
-		columnnames.NodeColumnNameCheckpointExecBacklog:        host.Metrics.CheckpointExecBacklog,
-		columnnames.NodeColumnNameCheckpointSyncBacklog:        host.Metrics.CheckpointSyncBacklog,
-		columnnames.NodeColumnNameCurrentEpoch:                 host.Metrics.CurrentEpoch,
-		columnnames.NodeColumnNameTXSyncPercentage:             fmt.Sprintf("%v%%", host.Metrics.TxSyncPercentage),
-		columnnames.NodeColumnNameCheckSyncPercentage:          fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage),
-		columnnames.NodeColumnNameNetworkPeers:                 host.Metrics.NetworkPeers,
-		columnnames.NodeColumnNameUptime:                       host.Metrics.Uptime,
-		columnnames.NodeColumnNameVersion:                      host.Metrics.Version,
-		columnnames.NodeColumnNameCommit:                       host.Metrics.Commit,
-		columnnames.NodeColumnNameCountry:                      nil,
+	columnValues := map[enums.ColumnName]any{
+		enums.ColumnNameIndex:                        idx + 1,
+		enums.ColumnNameHealth:                       status,
+		enums.ColumnNameAddress:                      address,
+		enums.ColumnNamePortRPC:                      port,
+		enums.ColumnNameTotalTransactionBlocks:       host.Metrics.TotalTransactionsBlocks,
+		enums.ColumnNameTotalTransactionCertificates: host.Metrics.TotalTransactionCertificates,
+		enums.ColumnNameTotalTransactionEffects:      host.Metrics.TotalTransactionEffects,
+		enums.ColumnNameLatestCheckpoint:             host.Metrics.LatestCheckpoint,
+		enums.ColumnNameHighestKnownCheckpoint:       host.Metrics.HighestKnownCheckpoint,
+		enums.ColumnNameHighestSyncedCheckpoint:      host.Metrics.HighestSyncedCheckpoint,
+		enums.ColumnNameLastExecutedCheckpoint:       host.Metrics.LastExecutedCheckpoint,
+		enums.ColumnNameCheckpointExecBacklog:        host.Metrics.CheckpointExecBacklog,
+		enums.ColumnNameCheckpointSyncBacklog:        host.Metrics.CheckpointSyncBacklog,
+		enums.ColumnNameCurrentEpoch:                 host.Metrics.CurrentEpoch,
+		enums.ColumnNameTXSyncPercentage:             fmt.Sprintf("%v%%", host.Metrics.TxSyncPercentage),
+		enums.ColumnNameCheckSyncPercentage:          fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage),
+		enums.ColumnNameNetworkPeers:                 host.Metrics.NetworkPeers,
+		enums.ColumnNameUptime:                       host.Metrics.Uptime,
+		enums.ColumnNameVersion:                      host.Metrics.Version,
+		enums.ColumnNameCommit:                       host.Metrics.Commit,
+		enums.ColumnNameCountry:                      nil,
 	}
 
 	if host.Location != nil {
@@ -148,7 +151,7 @@ func getNodeColumnValues(idx int, host *host.Host, enabledEmojis bool) map[colum
 			country = host.Location.CountryName
 		}
 
-		columnValues[columnnames.NodeColumnNameCountry] = country
+		columnValues[enums.ColumnNameCountry] = country
 	}
 
 	return columnValues
@@ -158,7 +161,7 @@ func getNodeColumnValues(idx int, host *host.Host, enabledEmojis bool) map[colum
 // The function retrieves information about the validator from the host's internal state and formats it into a map of ValidatorColumnName keys and corresponding values.
 // The function also includes emoji values in the map if the specified flag is true.
 // Returns a map of ValidatorColumnName keys to corresponding values.
-func getValidatorColumnValues(idx int, host *host.Host, enabledEmojis bool) map[columnnames.ValidatorColumnName]any {
+func getValidatorColumnValues(idx int, host *host.Host, enabledEmojis bool) map[enums.ColumnName]any {
 	var (
 		status  any = host.Status
 		country any = host.Location.String()
@@ -169,30 +172,30 @@ func getValidatorColumnValues(idx int, host *host.Host, enabledEmojis bool) map[
 		status = host.Status.StatusToPlaceholder()
 	}
 
-	columnValues := map[columnnames.ValidatorColumnName]any{
-		columnnames.ValidatorColumnNameIndex:                        idx + 1,
-		columnnames.ValidatorColumnNameHealth:                       status,
-		columnnames.ValidatorColumnNameAddress:                      address,
-		columnnames.ValidatorColumnNameTotalTransactionCertificates: host.Metrics.TotalTransactionCertificates,
-		columnnames.ValidatorColumnNameTotalTransactionEffects:      host.Metrics.TotalTransactionEffects,
-		columnnames.ValidatorColumnNameHighestKnownCheckpoint:       host.Metrics.HighestKnownCheckpoint,
-		columnnames.ValidatorColumnNameHighestSyncedCheckpoint:      host.Metrics.HighestSyncedCheckpoint,
-		columnnames.ValidatorColumnNameLastExecutedCheckpoint:       host.Metrics.LastExecutedCheckpoint,
-		columnnames.ValidatorColumnNameCheckpointExecBacklog:        host.Metrics.CheckpointExecBacklog,
-		columnnames.ValidatorColumnNameCheckpointSyncBacklog:        host.Metrics.CheckpointSyncBacklog,
-		columnnames.ValidatorColumnNameCurrentEpoch:                 host.Metrics.CurrentEpoch,
-		columnnames.ValidatorColumnNameCheckSyncPercentage:          fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage),
-		columnnames.ValidatorColumnNameNetworkPeers:                 host.Metrics.NetworkPeers,
-		columnnames.ValidatorColumnNameUptime:                       host.Metrics.Uptime,
-		columnnames.ValidatorColumnNameVersion:                      host.Metrics.Version,
-		columnnames.ValidatorColumnNameCommit:                       host.Metrics.Commit,
-		columnnames.ValidatorColumnNameCurrentRound:                 host.Metrics.CurrentRound,
-		columnnames.ValidatorColumnNameHighestProcessedRound:        host.Metrics.HighestProcessedRound,
-		columnnames.ValidatorColumnNameLastCommittedRound:           host.Metrics.LastCommittedRound,
-		columnnames.ValidatorColumnNamePrimaryNetworkPeers:          host.Metrics.PrimaryNetworkPeers,
-		columnnames.ValidatorColumnNameWorkerNetworkPeers:           host.Metrics.WorkerNetworkPeers,
-		columnnames.ValidatorColumnNameSkippedConsensusTransactions: host.Metrics.SkippedConsensusTransactions,
-		columnnames.ValidatorColumnNameTotalSignatureErrors:         host.Metrics.TotalSignatureErrors,
+	columnValues := map[enums.ColumnName]any{
+		enums.ColumnNameIndex:                        idx + 1,
+		enums.ColumnNameHealth:                       status,
+		enums.ColumnNameAddress:                      address,
+		enums.ColumnNameTotalTransactionCertificates: host.Metrics.TotalTransactionCertificates,
+		enums.ColumnNameTotalTransactionEffects:      host.Metrics.TotalTransactionEffects,
+		enums.ColumnNameHighestKnownCheckpoint:       host.Metrics.HighestKnownCheckpoint,
+		enums.ColumnNameHighestSyncedCheckpoint:      host.Metrics.HighestSyncedCheckpoint,
+		enums.ColumnNameLastExecutedCheckpoint:       host.Metrics.LastExecutedCheckpoint,
+		enums.ColumnNameCheckpointExecBacklog:        host.Metrics.CheckpointExecBacklog,
+		enums.ColumnNameCheckpointSyncBacklog:        host.Metrics.CheckpointSyncBacklog,
+		enums.ColumnNameCurrentEpoch:                 host.Metrics.CurrentEpoch,
+		enums.ColumnNameCheckSyncPercentage:          fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage),
+		enums.ColumnNameNetworkPeers:                 host.Metrics.NetworkPeers,
+		enums.ColumnNameUptime:                       host.Metrics.Uptime,
+		enums.ColumnNameVersion:                      host.Metrics.Version,
+		enums.ColumnNameCommit:                       host.Metrics.Commit,
+		enums.ColumnNameCurrentRound:                 host.Metrics.CurrentRound,
+		enums.ColumnNameHighestProcessedRound:        host.Metrics.HighestProcessedRound,
+		enums.ColumnNameLastCommittedRound:           host.Metrics.LastCommittedRound,
+		enums.ColumnNamePrimaryNetworkPeers:          host.Metrics.PrimaryNetworkPeers,
+		enums.ColumnNameWorkerNetworkPeers:           host.Metrics.WorkerNetworkPeers,
+		enums.ColumnNameSkippedConsensusTransactions: host.Metrics.SkippedConsensusTransactions,
+		enums.ColumnNameTotalSignatureErrors:         host.Metrics.TotalSignatureErrors,
 	}
 
 	if host.Location != nil {
@@ -200,7 +203,7 @@ func getValidatorColumnValues(idx int, host *host.Host, enabledEmojis bool) map[
 			country = host.Location.CountryName
 		}
 
-		columnValues[columnnames.ValidatorColumnNameCountry] = country
+		columnValues[enums.ColumnNameCountry] = country
 	}
 
 	return columnValues
@@ -209,7 +212,7 @@ func getValidatorColumnValues(idx int, host *host.Host, enabledEmojis bool) map[
 // getRPCColumnValues returns a map of NodeColumnName values to corresponding values for the RPC service on the specified host.
 // The function retrieves information about the RPC service from the host's internal state and formats it into a map of NodeColumnName keys and corresponding values.
 // Returns a map of NodeColumnName keys to corresponding values.
-func getRPCColumnValues(idx int, host *host.Host, enabledEmojis bool) map[columnnames.NodeColumnName]any {
+func getRPCColumnValues(idx int, host *host.Host, enabledEmojis bool) map[enums.ColumnName]any {
 	var (
 		status  any = host.Status
 		port        = host.Ports[enums.PortTypeRPC]
@@ -224,57 +227,69 @@ func getRPCColumnValues(idx int, host *host.Host, enabledEmojis bool) map[column
 		port = rpcPortDefault
 	}
 
-	return map[columnnames.NodeColumnName]any{
-		columnnames.NodeColumnNameIndex:                  idx + 1,
-		columnnames.NodeColumnNameHealth:                 status,
-		columnnames.NodeColumnNameAddress:                address,
-		columnnames.NodeColumnNamePortRPC:                port,
-		columnnames.NodeColumnNameTotalTransactionBlocks: host.Metrics.TotalTransactionsBlocks,
-		columnnames.NodeColumnNameLatestCheckpoint:       host.Metrics.LatestCheckpoint,
+	return map[enums.ColumnName]any{
+		enums.ColumnNameIndex:                  idx + 1,
+		enums.ColumnNameHealth:                 status,
+		enums.ColumnNameAddress:                address,
+		enums.ColumnNamePortRPC:                port,
+		enums.ColumnNameTotalTransactionBlocks: host.Metrics.TotalTransactionsBlocks,
+		enums.ColumnNameLatestCheckpoint:       host.Metrics.LatestCheckpoint,
 	}
 }
 
 // getSystemStateColumnValues returns a map of SystemColumnName values to corresponding values for the system state on the specified host.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of SystemColumnName keys and corresponding values.
 // Returns a map of SystemColumnName keys to corresponding values.
-func getSystemStateColumnValues(idx int, host *host.Host) map[columnnames.SystemColumnName]any {
+func getSystemStateColumnValues(idx int, host *host.Host) map[enums.ColumnName]any {
 	systemState := host.Metrics.SystemState
 
-	return map[columnnames.SystemColumnName]any{
-		columnnames.SystemColumnNameIndex:           idx + 1,
-		columnnames.SystemColumnNameEpoch:           systemState.Epoch,
-		columnnames.SystemColumnNameEpochDurationMs: systemState.EpochDurationMs,
-		//columnnames.SystemColumnNameStorageFund:                    systemState.StorageFund,
-		columnnames.SystemColumnNameReferenceGasPrice: systemState.ReferenceGasPrice,
-		//columnnames.SystemColumnNameStakeSubsidyCounter:            systemState.StakeSubsidyEpochCounter,
-		columnnames.SystemColumnNameStakeSubsidyBalance: systemState.StakeSubsidyBalance,
-		//columnnames.SystemColumnNameStakeSubsidyCurrentEpochAmount: systemState.StakeSubsidyCurrentEpochAmount,
-		columnnames.SystemColumnNameTotalStake:                  systemState.TotalStake,
-		columnnames.SystemColumnNameValidatorsCount:             len(systemState.ActiveValidators),
-		columnnames.SystemColumnNamePendingActiveValidatorsSize: systemState.PendingActiveValidatorsSize,
-		columnnames.SystemColumnNamePendingRemovals:             len(systemState.PendingRemovals),
-		columnnames.SystemColumnNameValidatorsCandidateSize:     systemState.ValidatorCandidatesSize,
-		columnnames.SystemColumnNameValidatorsAtRiskCount:       len(systemState.AtRiskValidators),
+	return map[enums.ColumnName]any{
+		enums.ColumnNameIndex:                                       idx + 1,
+		enums.ColumnNameSystemEpoch:                                 systemState.Epoch,
+		enums.ColumnNameSystemEpochStartTimestampMs:                 systemState.EpochStartTimestampMs,
+		enums.ColumnNameSystemEpochDurationMs:                       systemState.EpochDurationMs,
+		enums.ColumnNameSystemTotalStake:                            systemState.TotalStake,
+		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  systemState.StorageFundTotalObjectStorageRebates,
+		enums.ColumnNameSystemStorageFundNonRefundableBalance:       systemState.StorageFundNonRefundableBalance,
+		enums.ColumnNameSystemReferenceGasPrice:                     systemState.ReferenceGasPrice,
+		enums.ColumnNameSystemStakeSubsidyStartEpoch:                systemState.StakeSubsidyStartEpoch,
+		enums.ColumnNameSystemMaxValidatorCount:                     systemState.MaxValidatorCount,
+		enums.ColumnNameSystemMinValidatorJoiningStake:              systemState.MinValidatorJoiningStake,
+		enums.ColumnNameSystemValidatorLowStakeThreshold:            systemState.ValidatorLowStakeThreshold,
+		enums.ColumnNameSystemValidatorVeryLowStakeThreshold:        systemState.ValidatorVeryLowStakeThreshold,
+		enums.ColumnNameSystemValidatorLowStakeGracePeriod:          systemState.ValidatorLowStakeGracePeriod,
+		enums.ColumnNameSystemStakeSubsidyBalance:                   systemState.StakeSubsidyBalance,
+		enums.ColumnNameSystemStakeSubsidyDistributionCounter:       systemState.StakeSubsidyDistributionCounter,
+		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: systemState.StakeSubsidyCurrentDistributionAmount,
+		enums.ColumnNameSystemStakeSubsidyPeriodLength:              systemState.StakeSubsidyPeriodLength,
+		enums.ColumnNameSystemStakeSubsidyDecreaseRate:              systemState.StakeSubsidyDecreaseRate,
+		enums.ColumnNameSystemActiveValidatorCount:                  len(systemState.ActiveValidators),
+		enums.ColumnNameSystemPendingActiveValidatorCount:           systemState.PendingActiveValidatorsSize,
+		enums.ColumnNameSystemPendingRemovalsCount:                  len(systemState.PendingRemovals),
+		enums.ColumnNameSystemValidatorCandidateCount:               systemState.ValidatorCandidatesSize,
+		enums.ColumnNameSystemAtRiskValidatorCount:                  len(systemState.AtRiskValidators),
 	}
 }
 
 // getActiveValidatorColumnValues returns a map of ActiveValidatorColumnName values to corresponding values for the specified active validator.
 // The function retrieves information about the active validator from the provided metrics.Validator object and formats it into a map of ActiveValidatorColumnName keys and corresponding values.
 // Returns a map of ActiveValidatorColumnName keys to corresponding values.
-func getActiveValidatorColumnValues(idx int, validator *metrics.Validator) map[columnnames.ActiveValidatorColumnName]any {
-	return map[columnnames.ActiveValidatorColumnName]any{
-		columnnames.ActiveValidatorColumnNameIndex:                   idx + 1,
-		columnnames.ActiveValidatorColumnNameName:                    validator.Name,
-		columnnames.ActiveValidatorColumnNameNetAddress:              validator.NetAddress,
-		columnnames.ActiveValidatorColumnNameVotingPower:             validator.VotingPower,
-		columnnames.ActiveValidatorColumnNameGasPrice:                validator.GasPrice,
-		columnnames.ActiveValidatorColumnNameCommissionRate:          validator.CommissionRate,
-		columnnames.ActiveValidatorColumnNameNextEpochStake:          validator.NextEpochStake,
-		columnnames.ActiveValidatorColumnNameNextEpochGasPrice:       validator.NextEpochGasPrice,
-		columnnames.ActiveValidatorColumnNameNextEpochCommissionRate: validator.NextEpochCommissionRate,
-		columnnames.ActiveValidatorColumnNameStakingPoolSuiBalance:   validator.StakingPoolSuiBalance,
-		columnnames.ActiveValidatorColumnNameRewardsPool:             validator.RewardsPool,
-		columnnames.ActiveValidatorColumnNamePoolTokenBalance:        validator.PoolTokenBalance,
-		columnnames.ActiveValidatorColumnNamePendingStake:            validator.PendingStake,
+func getActiveValidatorColumnValues(idx int, validator *metrics.Validator) map[enums.ColumnName]any {
+	return map[enums.ColumnName]any{
+		enums.ColumnNameIndex:                             idx + 1,
+		enums.ColumnNameValidatorName:                     validator.Name,
+		enums.ColumnNameValidatorNetAddress:               validator.NetAddress,
+		enums.ColumnNameValidatorVotingPower:              validator.VotingPower,
+		enums.ColumnNameValidatorGasPrice:                 validator.GasPrice,
+		enums.ColumnNameValidatorCommissionRate:           validator.CommissionRate,
+		enums.ColumnNameValidatorNextEpochStake:           validator.NextEpochStake,
+		enums.ColumnNameValidatorNextEpochGasPrice:        validator.NextEpochGasPrice,
+		enums.ColumnNameValidatorNextEpochCommissionRate:  validator.NextEpochCommissionRate,
+		enums.ColumnNameValidatorStakingPoolSuiBalance:    validator.StakingPoolSuiBalance,
+		enums.ColumnNameValidatorRewardsPool:              validator.RewardsPool,
+		enums.ColumnNameValidatorPoolTokenBalance:         validator.PoolTokenBalance,
+		enums.ColumnNameValidatorPendingStake:             validator.PendingStake,
+		enums.ColumnNameValidatorPendingTotalSuiWithdraw:  validator.PendingTotalSuiWithdraw,
+		enums.ColumnNameValidatorPendingPoolTokenWithdraw: validator.PendingPoolTokenWithdraw,
 	}
 }

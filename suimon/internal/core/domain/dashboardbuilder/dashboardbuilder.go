@@ -31,8 +31,6 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 		err       error
 	)
 
-	ctx, cancel := context.WithCancel(context.Background())
-
 	if terminal, err = termbox.New(); err != nil {
 		return nil, err
 	}
@@ -40,6 +38,8 @@ func NewDashboardBuilder() (*DashboardBuilder, error) {
 	if dashboard, err = initDashboard(terminal); err != nil {
 		return nil, err
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
 
 	return &DashboardBuilder{
 		Ctx:       ctx,

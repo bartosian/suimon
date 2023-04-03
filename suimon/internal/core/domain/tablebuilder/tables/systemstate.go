@@ -1,10 +1,9 @@
 package tables
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums/columnnames"
 )
 
 var (
@@ -13,112 +12,196 @@ var (
 	TableTagSystem        = ""
 	TableSortConfigSystem = make(tableSortConfig, 0)
 	ColumnsConfigSystem   = tableColumnConfig{
-		columnnames.SystemColumnNameIndex: {
-			Name:         "IDX",
+		enums.ColumnNameIndex: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNameEpoch: {
-			Name:         "EPOCH",
+		enums.ColumnNameSystemEpoch: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNameEpochDurationMs: {
-			Name:         "EPOCH DURATION",
+		enums.ColumnNameSystemEpochStartTimestampMs: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNameStorageFund: {
-			Name:         "STORAGE FUND",
+		enums.ColumnNameSystemEpochDurationMs: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNameReferenceGasPrice: {
-			Name:         "REFERENCE\nGAS PRICE",
+		enums.ColumnNameSystemTotalStake: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNameStakeSubsidyCounter: {
-			Name:         "STAKE SUBSIDY\nCOUNTER",
+		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNameStakeSubsidyBalance: {
-			Name:         "STAKE SUBSIDY BALANCE",
+		enums.ColumnNameSystemStorageFundNonRefundableBalance: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNameStakeSubsidyCurrentEpochAmount: {
-			Name:         "STAKE SUBSIDY\nCURRENT EPOCH AMOUNT",
+		enums.ColumnNameSystemReferenceGasPrice: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNameTotalStake: {
-			Name:         "TOTAL STAKE",
+		enums.ColumnNameSystemStakeSubsidyStartEpoch: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNameValidatorsCount: {
-			Name:         "VALIDATORS\nCOUNT",
+		enums.ColumnNameSystemMaxValidatorCount: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNamePendingActiveValidatorsSize: {
-			Name:         "PENDING\nVALIDATORS COUNT",
+		enums.ColumnNameSystemMinValidatorJoiningStake: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNamePendingRemovals: {
-			Name:         "PENDING\nREMOVALS",
+		enums.ColumnNameSystemValidatorLowStakeThreshold: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNameValidatorsCandidateSize: {
-			Name:         "VALIDATORS\nCANDIDATE COUNT",
+		enums.ColumnNameSystemValidatorVeryLowStakeThreshold: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		columnnames.SystemColumnNameValidatorsAtRiskCount: {
-			Name:         "VALIDATORS\nAT RISK COUNT",
+		enums.ColumnNameSystemValidatorLowStakeGracePeriod: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemStakeSubsidyBalance: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemStakeSubsidyDistributionCounter: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemStakeSubsidyPeriodLength: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemStakeSubsidyDecreaseRate: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemActiveValidatorCount: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemPendingActiveValidatorCount: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemPendingRemovalsCount: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemValidatorCandidateCount: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemAtRiskValidatorCount: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemAtRiskValidatorName: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemAtRiskValidatorSinceEpoch: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemValidatorReportReporter: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemValidatorReportReported: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -128,20 +211,20 @@ var (
 	}
 	RowsSystemState = tableRows{
 		0: {
-			int(columnnames.SystemColumnNameIndex),
-			int(columnnames.SystemColumnNameEpoch),
-			int(columnnames.SystemColumnNameEpochDurationMs),
-			int(columnnames.SystemColumnNameStorageFund),
-			int(columnnames.SystemColumnNameReferenceGasPrice),
-			int(columnnames.SystemColumnNameStakeSubsidyCounter),
-			int(columnnames.SystemColumnNameStakeSubsidyBalance),
-			int(columnnames.SystemColumnNameStakeSubsidyCurrentEpochAmount),
-			int(columnnames.SystemColumnNameTotalStake),
-			int(columnnames.SystemColumnNameValidatorsCount),
-			int(columnnames.SystemColumnNamePendingActiveValidatorsSize),
-			int(columnnames.SystemColumnNamePendingRemovals),
-			int(columnnames.SystemColumnNameValidatorsCandidateSize),
-			int(columnnames.SystemColumnNameValidatorsAtRiskCount),
+			enums.ColumnNameIndex,
+			enums.ColumnNameSystemEpoch,
+			enums.ColumnNameSystemEpochStartTimestampMs,
+			enums.ColumnNameSystemEpochDurationMs,
+			enums.ColumnNameSystemTotalStake,
+			enums.ColumnNameSystemStorageFundTotalObjectStorageRebates,
+			enums.ColumnNameSystemStorageFundNonRefundableBalance,
+			enums.ColumnNameSystemReferenceGasPrice,
+			enums.ColumnNameSystemStakeSubsidyStartEpoch,
+			enums.ColumnNameSystemMaxValidatorCount,
+			enums.ColumnNameSystemMinValidatorJoiningStake,
+			enums.ColumnNameSystemValidatorLowStakeThreshold,
+			enums.ColumnNameSystemValidatorVeryLowStakeThreshold,
+			enums.ColumnNameSystemValidatorLowStakeGracePeriod,
 		},
 	}
 )

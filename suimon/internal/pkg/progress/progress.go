@@ -2,6 +2,7 @@ package progress
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/schollz/progressbar/v3"
@@ -41,12 +42,17 @@ func NewProgressBar(action string, color Color) chan<- struct{} {
 			select {
 			case <-progressChan:
 				progressTicker.Stop()
-				bar.Clear()
+
+				if err := bar.Clear(); err != nil {
+					os.Exit(1)
+				}
 
 				return
 			case <-progressTicker.C:
 				for i := 0; i < 100; i++ {
-					bar.Add(1)
+					if err := bar.Add(1); err != nil {
+						os.Exit(1)
+					}
 
 					time.Sleep(15 * time.Millisecond)
 				}

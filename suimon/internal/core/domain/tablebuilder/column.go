@@ -1,13 +1,14 @@
 package tablebuilder
 
 import (
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
 const tableNoData = "no data"
 
 type (
-	Columns []Column
+	Columns map[enums.ColumnName]*Column
 
 	Column struct {
 		Values []any

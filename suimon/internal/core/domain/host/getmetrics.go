@@ -82,48 +82,50 @@ func (host *Host) GetPrometheusMetrics() error {
 		return err
 	}
 
+	metricMap := map[enums.PrometheusMetricName]enums.MetricType{
+		enums.PrometheusMetricNameTotalTransactionCertificates: enums.MetricTypeTotalTransactionCertificates,
+		enums.PrometheusMetricNameTotalTransactionEffects:      enums.MetricTypeTotalTransactionEffects,
+		enums.PrometheusMetricNameHighestKnownCheckpoint:       enums.MetricTypeHighestKnownCheckpoint,
+		enums.PrometheusMetricNameHighestSyncedCheckpoint:      enums.MetricTypeHighestSyncedCheckpoint,
+		enums.PrometheusMetricNameLastExecutedCheckpoint:       enums.MetricTypeLastExecutedCheckpoint,
+		enums.PrometheusMetricNameCurrentEpoch:                 enums.MetricTypeCurrentEpoch,
+		enums.PrometheusMetricNameEpochTotalDuration:           enums.MetricTypeEpochTotalDuration,
+		enums.PrometheusMetricNameCurrentRound:                 enums.MetricTypeCurrentRound,
+		enums.PrometheusMetricNameHighestProcessedRound:        enums.MetricTypeHighestProcessedRound,
+		enums.PrometheusMetricNameLastCommittedRound:           enums.MetricTypeLastCommittedRound,
+		enums.PrometheusMetricNamePrimaryNetworkPeers:          enums.MetricTypePrimaryNetworkPeers,
+		enums.PrometheusMetricNameWorkerNetworkPeers:           enums.MetricTypeWorkerNetworkPeers,
+		enums.PrometheusMetricNameSuiNetworkPeers:              enums.MetricTypeSuiNetworkPeers,
+		enums.PrometheusMetricNameSkippedConsensusTransactions: enums.MetricTypeSkippedConsensusTransactions,
+		enums.PrometheusMetricNameTotalSignatureErrors:         enums.MetricTypeTotalSignatureErrors,
+		enums.PrometheusMetricNameUptime:                       enums.MetricTypeUptime,
+	}
+
 	for metricName, metricValue := range result {
-		switch metricName {
-		case enums.PrometheusMetricNameTotalTransactionCertificates:
-			host.Metrics.SetValue(enums.MetricTypeTotalTransactionCertificates, metricValue.Value)
-		case enums.PrometheusMetricNameTotalTransactionEffects:
-			host.Metrics.SetValue(enums.MetricTypeTotalTransactionEffects, metricValue.Value)
-		case enums.PrometheusMetricNameHighestKnownCheckpoint:
-			host.Metrics.SetValue(enums.MetricTypeHighestKnownCheckpoint, metricValue.Value)
-		case enums.PrometheusMetricNameHighestSyncedCheckpoint:
-			host.Metrics.SetValue(enums.MetricTypeHighestSyncedCheckpoint, metricValue.Value)
-		case enums.PrometheusMetricNameLastExecutedCheckpoint:
-			host.Metrics.SetValue(enums.MetricTypeLastExecutedCheckpoint, metricValue.Value)
-		case enums.PrometheusMetricNameCurrentEpoch:
-			host.Metrics.SetValue(enums.MetricTypeCurrentEpoch, metricValue.Value)
-		case enums.PrometheusMetricNameEpochTotalDuration:
-			host.Metrics.SetValue(enums.MetricTypeEpochTotalDuration, metricValue.Value)
-		case enums.PrometheusMetricNameCurrentRound:
-			host.Metrics.SetValue(enums.MetricTypeCurrentRound, metricValue.Value)
-		case enums.PrometheusMetricNameHighestProcessedRound:
-			host.Metrics.SetValue(enums.MetricTypeHighestProcessedRound, metricValue.Value)
-		case enums.PrometheusMetricNameLastCommittedRound:
-			host.Metrics.SetValue(enums.MetricTypeLastCommittedRound, metricValue.Value)
-		case enums.PrometheusMetricNamePrimaryNetworkPeers:
-			host.Metrics.SetValue(enums.MetricTypePrimaryNetworkPeers, metricValue.Value)
-		case enums.PrometheusMetricNameWorkerNetworkPeers:
-			host.Metrics.SetValue(enums.MetricTypeWorkerNetworkPeers, metricValue.Value)
-		case enums.PrometheusMetricNameSuiNetworkPeers:
-			host.Metrics.SetValue(enums.MetricTypeSuiNetworkPeers, metricValue.Value)
-		case enums.PrometheusMetricNameSkippedConsensusTransactions:
-			host.Metrics.SetValue(enums.MetricTypeSkippedConsensusTransactions, metricValue.Value)
-		case enums.PrometheusMetricNameTotalSignatureErrors:
-			host.Metrics.SetValue(enums.MetricTypeTotalSignatureErrors, metricValue.Value)
-		case enums.PrometheusMetricNameUptime:
-			host.Metrics.SetValue(enums.MetricTypeUptime, metricValue.Value)
+		metricType, ok := metricMap[metricName]
+		if !ok {
+			delete(result, metricName)
+			continue
+		}
 
-			if value, ok := metricValue.Labels["version"]; ok {
-				versionInfo := strings.Split(value, "-")
+		if err := host.Metrics.SetValue(metricType, metricValue.Value); err != nil {
+			continue
+		}
 
-				host.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0])
+		if metricType != enums.MetricTypeUptime {
+			continue
+		}
 
-				if len(versionInfo) == 2 {
-					host.Metrics.SetValue(enums.MetricTypeCommit, versionInfo[1])
+		if value, ok := metricValue.Labels["version"]; ok {
+			versionInfo := strings.SplitN(value, "-", 2)
+
+			if err := host.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0]); err != nil {
+				continue
+			}
+
+			if len(versionInfo) == 2 {
+				if err := host.Metrics.SetValue(enums.MetricTypeCommit, versionInfo[1]); err != nil {
+					continue
 				}
 			}
 		}
