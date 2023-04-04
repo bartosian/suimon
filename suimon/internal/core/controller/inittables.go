@@ -10,9 +10,7 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/tablebuilder/tables"
 )
 
-const (
-	rpcPortDefault = "9000"
-)
+const rpcPortDefault = "9000"
 
 // InitTables initializes the CheckerController's internal state for the tables by creating and setting the appropriate TableConfig objects for each table type.
 // The function populates the CheckerController's internal state with information about the available hosts and their corresponding tables.
@@ -20,18 +18,22 @@ const (
 func (checker *CheckerController) InitTables() error {
 	displayConfig := checker.suimonConfig.MonitorsConfig
 	tableConfigMap := map[enums.TableType]bool{
-		enums.TableTypeRPC:                   displayConfig.RPCTable.Display,
-		enums.TableTypeNode:                  displayConfig.NodeTable.Display,
-		enums.TableTypeValidator:             displayConfig.ValidatorTable.Display,
-		enums.TableTypePeers:                 displayConfig.PeersTable.Display,
-		enums.TableTypeSystemState:           displayConfig.SystemTable.Display,
-		enums.TableTypeSystemStateValidators: displayConfig.SystemTable.Display,
-		enums.TableTypeActiveValidators:      displayConfig.ActiveValidatorsTable.Display,
+		enums.TableTypeRPC:              displayConfig.RPCTable.Display,
+		enums.TableTypeNode:             displayConfig.NodeTable.Display,
+		enums.TableTypeValidator:        displayConfig.ValidatorTable.Display,
+		enums.TableTypePeers:            displayConfig.PeersTable.Display,
+		enums.TableTypeSystemState:      displayConfig.SystemStateTable.Display,
+		enums.TableTypeValidatorsCounts: displayConfig.ValidatorsCountsTable.Display,
+		enums.TableTypeValidatorsAtRisk: displayConfig.ValidatorsAtRiskTable.Display,
+		enums.TableTypeValidatorReports: displayConfig.ValidatorReportsTable.Display,
+		enums.TableTypeActiveValidators: displayConfig.ActiveValidatorsTable.Display,
 	}
 
 	for tableType, shouldDisplay := range tableConfigMap {
 		if shouldDisplay {
-			checker.InitTable(tableType)
+			if err := checker.InitTable(tableType); err != nil {
+				return fmt.Errorf("error initializing table %s: %w", tableType, err)
+			}
 		}
 	}
 
@@ -41,7 +43,7 @@ func (checker *CheckerController) InitTables() error {
 // InitTable initializes the CheckerController's internal state for the specified table type by creating and setting the appropriate Host objects for each host that supports that table type.
 // The function populates the CheckerController's internal state with information about the available hosts and their corresponding tables of the specified type.
 // Returns nothing.
-func (checker *CheckerController) InitTable(tableType enums.TableType) {
+func (checker *CheckerController) InitTable(tableType enums.TableType) error {
 	enabledEmojis := checker.suimonConfig.MonitorsVisual.EnableEmojis
 	columnConfig := tables.GetColumnConfig(tableType)
 	columns := make(tablebuilder.Columns, len(columnConfig))
@@ -67,12 +69,11 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) {
 		RowsCount:    0,
 	}
 
+OUTER:
 	for idx, hostToRender := range hosts {
 		if !hostToRender.Metrics.Updated {
 			continue
 		}
-
-		tableConfig.RowsCount++
 
 		switch tableType {
 		case enums.TableTypeNode:
@@ -85,8 +86,67 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) {
 			tables.SetColumnValues(columns, getRPCColumnValues(idx, &hostToRender, enabledEmojis))
 		case enums.TableTypeSystemState:
 			tables.SetColumnValues(columns, getSystemStateColumnValues(idx, &hostToRender))
-		case enums.TableTypeSystemStateValidators:
+		case enums.TableTypeValidatorsCounts:
 			tables.SetColumnValues(columns, getSystemStateValidatorsColumnValues(idx, &hostToRender))
+		case enums.TableTypeValidatorsAtRisk:
+			addressToValidatorName := hosts[0].Metrics.SystemState.AddressToValidatorName
+			validatorsAtRisk := hosts[0].Metrics.SystemState.AtRiskValidators
+
+			for idx, validator := range validatorsAtRisk {
+				suiAddress, ok := validator[0].(string)
+				if !ok {
+					return fmt.Errorf("unsupported validatorsAtRisk attribute type: %v", validator)
+				}
+
+				epochCount, ok := validator[1].(float64)
+				if !ok {
+					return fmt.Errorf("unsupported validatorsAtRisk attribute type: %v", validator)
+				}
+
+				validatorName := addressToValidatorName[suiAddress]
+
+				columnValues := getValidatorAtRiskColumnValues(idx, validatorName, suiAddress, epochCount)
+
+				tables.SetColumnValues(columns, columnValues)
+
+				tableConfig.RowsCount++
+			}
+
+			break OUTER
+		case enums.TableTypeValidatorReports:
+			addressToValidatorName := hosts[0].Metrics.SystemState.AddressToValidatorName
+			validatorReports := hosts[0].Metrics.SystemState.ValidatorReportRecords
+
+			for idx, report := range validatorReports {
+				reportedAddress, ok := report[0].(string)
+				if !ok {
+					return fmt.Errorf("unsupported validatorsReport attribute type: %v", report)
+				}
+
+				reporters, ok := report[1].([]any)
+				if !ok {
+					return fmt.Errorf("unsupported validatorsReport attribute type: %v", report)
+				}
+
+				reportedName := addressToValidatorName[reportedAddress]
+
+				for _, reporterAddress := range reporters {
+					reporter, ok := reporterAddress.(string)
+					if !ok {
+						return fmt.Errorf("unsupported suiAddress attribute type: %v", reporterAddress)
+					}
+
+					reporterName := addressToValidatorName[reporter]
+
+					columnValues := getValidatorReportColumnValues(idx, reportedName, reportedAddress, reporterName, reporter)
+
+					tables.SetColumnValues(columns, columnValues)
+
+					tableConfig.RowsCount++
+				}
+			}
+
+			break OUTER
 		case enums.TableTypeActiveValidators:
 			activeValidators := hosts[0].Metrics.SystemState.ActiveValidators
 
@@ -98,11 +158,15 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) {
 				tableConfig.RowsCount++
 			}
 
+			break OUTER
 		}
 
+		tableConfig.RowsCount++
 	}
 
 	checker.setBuilderTableType(tableType, tableConfig)
+
+	return nil
 }
 
 // getNodeColumnValues returns a map of NodeColumnName values to corresponding values for a node at the specified index on the specified host.
@@ -283,6 +347,31 @@ func getSystemStateValidatorsColumnValues(idx int, host *host.Host) map[enums.Co
 		enums.ColumnNameSystemValidatorLowStakeThreshold:     systemState.ValidatorLowStakeThreshold,
 		enums.ColumnNameSystemValidatorVeryLowStakeThreshold: systemState.ValidatorVeryLowStakeThreshold,
 		enums.ColumnNameSystemValidatorLowStakeGracePeriod:   systemState.ValidatorLowStakeGracePeriod,
+	}
+}
+
+// getValidatorAtRiskColumnValues returns a map of ColumnName values to corresponding values for the system state validators metrics.
+// The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
+// Returns a map of ColumnName keys to corresponding values.
+func getValidatorAtRiskColumnValues(idx int, name string, address string, epochs float64) map[enums.ColumnName]any {
+	return map[enums.ColumnName]any{
+		enums.ColumnNameIndex:                               idx + 1,
+		enums.ColumnNameSystemAtRiskValidatorName:           name,
+		enums.ColumnNameSystemAtRiskValidatorAddress:        address,
+		enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs: epochs,
+	}
+}
+
+// getValidatorAtRiskColumnValues returns a map of ColumnName values to corresponding values for the system state validators metrics.
+// The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
+// Returns a map of ColumnName keys to corresponding values.
+func getValidatorReportColumnValues(idx int, reportedName, reportedAddress, reporterName, reporterAddress string) map[enums.ColumnName]any {
+	return map[enums.ColumnName]any{
+		enums.ColumnNameIndex:                          idx + 1,
+		enums.ColumnNameSystemValidatorReportedName:    reportedName,
+		enums.ColumnNameSystemValidatorReportedAddress: reportedAddress,
+		enums.ColumnNameSystemValidatorReporterName:    reporterName,
+		enums.ColumnNameSystemValidatorReporterAddress: reporterAddress,
 	}
 }
 

@@ -8,7 +8,13 @@ monitors-config:
     display: true
   peers-table:
     display: true
-  system-table:
+  system-state-table:
+    display: true
+  validator-counts-table:
+    display: true
+  validators-at-risk-table:
+    display: true
+  validator-reports-table:
     display: true
   active-validators-table:
     display: true

@@ -36,7 +36,7 @@ func (logger *Logger) Error(messages ...any) {
 }
 
 func colorPrint(color enums.Color, messages ...any) {
-	fmt.Println(color, messages, enums.ColorReset)
+	fmt.Println("\n", color, messages, enums.ColorReset)
 }
 
 func (logger *Logger) StreamFromService(serviceName string, stream chan string) error {

@@ -35,6 +35,14 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 			return fmt.Errorf("unexpected value type for MetricTypeSuiSystemState: %T", value)
 		}
 
+		addressToValidatorName := make(map[string]string, len(valueSystemState.ActiveValidators))
+
+		for _, activeValidator := range valueSystemState.ActiveValidators {
+			addressToValidatorName[activeValidator.SuiAddress] = activeValidator.Name
+		}
+
+		valueSystemState.AddressToValidatorName = addressToValidatorName
+
 		metrics.SystemState = valueSystemState
 		metrics.TimeTillNextEpochMs = metrics.GetMillisecondsTillNextEpoch()
 	case enums.MetricTypeTotalTransactionBlocks:

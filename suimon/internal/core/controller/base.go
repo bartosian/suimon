@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -32,7 +33,9 @@ type (
 		validator        ports.Builder
 		rpc              ports.Builder
 		system           ports.Builder
-		systemValidators ports.Builder
+		validatorCounts  ports.Builder
+		atRiskValidators ports.Builder
+		validatorReports ports.Builder
 		activeValidators ports.Builder
 	}
 
@@ -86,7 +89,10 @@ func (checker CheckerController) getHostsByTableType(tableType enums.TableType) 
 		return checker.hosts.validator
 	case enums.TableTypeActiveValidators:
 		return checker.hosts.rpc[:1]
-	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
+	case enums.TableTypeSystemState,
+		enums.TableTypeValidatorsCounts,
+		enums.TableTypeValidatorsAtRisk,
+		enums.TableTypeValidatorReports:
 		return checker.hosts.rpc[:1]
 	case enums.TableTypePeers:
 		return checker.hosts.peers
@@ -132,8 +138,12 @@ func (checker *CheckerController) setBuilderTableType(tableType enums.TableType,
 		checker.tableBuilders.rpc = tableBuilder
 	case enums.TableTypeSystemState:
 		checker.tableBuilders.system = tableBuilder
-	case enums.TableTypeSystemStateValidators:
-		checker.tableBuilders.systemValidators = tableBuilder
+	case enums.TableTypeValidatorsCounts:
+		checker.tableBuilders.validatorCounts = tableBuilder
+	case enums.TableTypeValidatorsAtRisk:
+		checker.tableBuilders.atRiskValidators = tableBuilder
+	case enums.TableTypeValidatorReports:
+		checker.tableBuilders.validatorReports = tableBuilder
 	case enums.TableTypeActiveValidators:
 		checker.tableBuilders.activeValidators = tableBuilder
 	default:
@@ -145,49 +155,62 @@ func (checker *CheckerController) setBuilderTableType(tableType enums.TableType,
 // This function does not accept any parameters.
 // This function does not return anything.
 func (checker *CheckerController) RenderTables() error {
-	if checker.suimonConfig.MonitorsConfig.RPCTable.Display && len(checker.hosts.rpc) > 0 {
-		if err := checker.tableBuilders.rpc.Render(); err != nil {
-			return err
-		}
+	monitorsConfig := checker.suimonConfig.MonitorsConfig
+
+	rpcProvided := len(checker.hosts.rpc) > 0
+	nodeProvided := len(checker.hosts.node) > 0
+	peersProvided := len(checker.hosts.peers) > 0
+	validatorProvided := len(checker.hosts.validator) > 0
+
+	tableTypeToBuilder := map[enums.TableType]struct {
+		builder ports.Builder
+		enabled bool
+	}{
+		enums.TableTypeRPC: {
+			builder: checker.tableBuilders.rpc,
+			enabled: monitorsConfig.RPCTable.Display && rpcProvided,
+		},
+		enums.TableTypeNode: {
+			builder: checker.tableBuilders.node,
+			enabled: monitorsConfig.NodeTable.Display && nodeProvided,
+		},
+		enums.TableTypeValidator: {
+			builder: checker.tableBuilders.validator,
+			enabled: monitorsConfig.ValidatorTable.Display && validatorProvided,
+		},
+		enums.TableTypePeers: {
+			builder: checker.tableBuilders.peer,
+			enabled: monitorsConfig.PeersTable.Display && peersProvided,
+		},
+		enums.TableTypeSystemState: {
+			builder: checker.tableBuilders.system,
+			enabled: monitorsConfig.SystemStateTable.Display && rpcProvided,
+		},
+		enums.TableTypeValidatorsCounts: {
+			builder: checker.tableBuilders.validatorCounts,
+			enabled: monitorsConfig.ValidatorsCountsTable.Display && rpcProvided,
+		},
+		enums.TableTypeValidatorsAtRisk: {
+			builder: checker.tableBuilders.atRiskValidators,
+			enabled: monitorsConfig.ValidatorsAtRiskTable.Display && rpcProvided,
+		},
+		enums.TableTypeValidatorReports: {
+			builder: checker.tableBuilders.validatorReports,
+			enabled: monitorsConfig.ValidatorReportsTable.Display && rpcProvided,
+		},
+		enums.TableTypeActiveValidators: {
+			builder: checker.tableBuilders.activeValidators,
+			enabled: monitorsConfig.ActiveValidatorsTable.Display && rpcProvided,
+		},
 	}
 
-	if checker.suimonConfig.MonitorsConfig.NodeTable.Display && len(checker.hosts.node) > 0 {
-		if err := checker.tableBuilders.node.Render(); err != nil {
-			return err
-		}
-	}
-
-	if checker.suimonConfig.MonitorsConfig.ValidatorTable.Display && len(checker.hosts.validator) > 0 {
-		if err := checker.tableBuilders.validator.Render(); err != nil {
-			return err
-		}
-	}
-
-	if checker.suimonConfig.MonitorsConfig.SystemTable.Display && len(checker.hosts.rpc) > 0 {
-		systemTableBuilders := []ports.Builder{checker.tableBuilders.system, checker.tableBuilders.systemValidators}
-
-		for _, builder := range systemTableBuilders {
-			if err := builder.Render(); err != nil {
-				return err
-			}
-		}
-	}
-
-	if checker.suimonConfig.MonitorsConfig.PeersTable.Display && len(checker.hosts.peers) > 0 {
-		if err := checker.tableBuilders.peer.Render(); err != nil {
-			return err
-		}
-	}
-
-	if checker.suimonConfig.MonitorsConfig.ActiveValidatorsTable.Display && len(checker.hosts.rpc) > 0 {
-		systemState := checker.hosts.rpc[0].Metrics.SystemState
-
-		if len(systemState.ActiveValidators) == 0 {
-			return nil
+	for tableType, builderConfig := range tableTypeToBuilder {
+		if !builderConfig.enabled {
+			continue
 		}
 
-		if err := checker.tableBuilders.activeValidators.Render(); err != nil {
-			return err
+		if err := builderConfig.builder.Render(); err != nil {
+			return fmt.Errorf("error rendering table %s: %w", tableType, err)
 		}
 	}
 

@@ -93,6 +93,7 @@ type (
 		ValidatorCandidatesSize               int             `json:"validatorCandidatesSize"`
 		AtRiskValidators                      [][]interface{} `json:"atRiskValidators"`
 		ValidatorReportRecords                [][]interface{} `json:"validatorReportRecords"`
+		AddressToValidatorName                map[string]string
 	}
 
 	Transactions struct {

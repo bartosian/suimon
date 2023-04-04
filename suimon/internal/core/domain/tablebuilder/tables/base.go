@@ -36,7 +36,10 @@ func GetTableTag(table enums.TableType) string {
 		return TableTagPeer
 	case enums.TableTypeValidator:
 		return TableTagValidator
-	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
+	case enums.TableTypeSystemState,
+		enums.TableTypeValidatorsCounts,
+		enums.TableTypeValidatorsAtRisk,
+		enums.TableTypeValidatorReports:
 		return TableTagSystem
 	case enums.TableTypeNode:
 		return TableTagNode
@@ -55,7 +58,10 @@ func GetTableStyle(table enums.TableType) styles.Style {
 		return TableStylePeer
 	case enums.TableTypeValidator:
 		return TableStyleValidator
-	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
+	case enums.TableTypeSystemState,
+		enums.TableTypeValidatorsCounts,
+		enums.TableTypeValidatorsAtRisk,
+		enums.TableTypeValidatorReports:
 		return TableStyleSystem
 	case enums.TableTypeNode:
 		return TableStyleNode
@@ -74,7 +80,10 @@ func GetTableColors(table enums.TableType) text.Colors {
 		return TableColorsPeer
 	case enums.TableTypeValidator:
 		return TableColorsValidator
-	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
+	case enums.TableTypeSystemState,
+		enums.TableTypeValidatorsCounts,
+		enums.TableTypeValidatorsAtRisk,
+		enums.TableTypeValidatorReports:
 		return TableColorsSystem
 	case enums.TableTypeNode:
 		return TableColorsNode
@@ -95,8 +104,12 @@ func GetTableRows(table enums.TableType) tableRows {
 		return RowsValidator
 	case enums.TableTypeSystemState:
 		return RowsSystemState
-	case enums.TableTypeSystemStateValidators:
-		return RowsSystemStateValidators
+	case enums.TableTypeValidatorsCounts:
+		return RowsValidatorCounts
+	case enums.TableTypeValidatorsAtRisk:
+		return RowsValidatorsAtRisk
+	case enums.TableTypeValidatorReports:
+		return RowsValidatorReports
 	case enums.TableTypeNode:
 		return RowsNode
 	case enums.TableTypeActiveValidators:
@@ -114,7 +127,10 @@ func GetTableSortConfig(table enums.TableType) tableSortConfig {
 		return TableSortConfigPeer
 	case enums.TableTypeValidator:
 		return TableSortConfigValidator
-	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
+	case enums.TableTypeSystemState,
+		enums.TableTypeValidatorsCounts,
+		enums.TableTypeValidatorsAtRisk,
+		enums.TableTypeValidatorReports:
 		return TableSortConfigSystem
 	case enums.TableTypeNode:
 		return TableSortConfigNode
@@ -133,7 +149,10 @@ func GetColumnConfig(table enums.TableType) tableColumnConfig {
 		return ColumnsConfigPeer
 	case enums.TableTypeValidator:
 		return ColumnsConfigValidator
-	case enums.TableTypeSystemState, enums.TableTypeSystemStateValidators:
+	case enums.TableTypeSystemState,
+		enums.TableTypeValidatorsCounts,
+		enums.TableTypeValidatorsAtRisk,
+		enums.TableTypeValidatorReports:
 		return ColumnsConfigSystem
 	case enums.TableTypeNode:
 		return ColumnsConfigNode

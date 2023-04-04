@@ -127,16 +127,21 @@ func (checker CheckerController) getAddressInfoByTableType(tableType enums.Table
 func (checker *CheckerController) ParseData() error {
 	monitorsConfig := checker.suimonConfig.MonitorsConfig
 
+	enabledSystemState := monitorsConfig.SystemStateTable.Display || monitorsConfig.ActiveValidatorsTable.Display || monitorsConfig.ValidatorReportsTable.Display ||
+		monitorsConfig.ValidatorsAtRiskTable.Display || monitorsConfig.ValidatorsCountsTable.Display
+
 	tableMap := map[enums.TableType]bool{
-		enums.TableTypeNode:      monitorsConfig.NodeTable.Display,
-		enums.TableTypeValidator: monitorsConfig.ValidatorTable.Display,
-		enums.TableTypePeers:     monitorsConfig.PeersTable.Display,
+		enums.TableTypeNode:        monitorsConfig.NodeTable.Display,
+		enums.TableTypeValidator:   monitorsConfig.ValidatorTable.Display,
+		enums.TableTypePeers:       monitorsConfig.PeersTable.Display,
+		enums.TableTypeSystemState: enabledSystemState,
 	}
 
 	if err := checker.getHostsData(enums.TableTypeRPC, progress.ColorBlue); err != nil {
 		return err
 	}
 
+	checker.sortHosts(enums.TableTypeRPC)
 	checker.setHostsHealth(enums.TableTypeRPC)
 
 	errChan := make(chan error, len(tableMap))
@@ -179,8 +184,6 @@ func (checker *CheckerController) ParseData() error {
 // The function retrieves data for each host in parallel and displays a progress bar indicating the progress of the data retrieval process.
 // Returns an error if the data cannot be retrieved from any of the active hosts or if there is an issue updating the CheckerController's internal state.
 func (checker *CheckerController) getHostsData(tableType enums.TableType, progressColor progress.Color) error {
-	monitorsConfig := checker.suimonConfig.MonitorsConfig
-
 	progressChan := progress.NewProgressBar("PARSING DATA FOR "+string(tableType), progressColor)
 	defer func() { progressChan <- struct{}{} }()
 
@@ -204,19 +207,11 @@ func (checker *CheckerController) getHostsData(tableType enums.TableType, progre
 		return nil
 	}
 
-	if err := parseHosts(); err != nil {
-		return err
+	if tableType == enums.TableTypeSystemState {
+		return checker.hosts.rpc[0].GetMetricRPC(enums.RPCMethodGetSuiSystemState, enums.MetricTypeSuiSystemState)
 	}
 
-	if tableType == enums.TableTypeRPC {
-		checker.sortHosts(enums.TableTypeRPC)
-
-		if monitorsConfig.ActiveValidatorsTable.Display || monitorsConfig.SystemTable.Display {
-			return checker.hosts.rpc[0].GetMetricRPC(enums.RPCMethodGetSuiSystemState, enums.MetricTypeSuiSystemState)
-		}
-	}
-
-	return nil
+	return parseHosts()
 }
 
 // sortHosts sorts the active hosts for the specified table type based on their corresponding metric values.

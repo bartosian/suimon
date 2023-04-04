@@ -37,7 +37,7 @@ func (checker *CheckerController) createHosts(tableType enums.TableType, address
 			}
 
 			if err := createdHost.GetData(); err != nil && tableType != enums.TableTypePeers {
-				checker.logger.Error("failed to get host data: ", err)
+				checker.logger.Error(err)
 
 				return
 			}

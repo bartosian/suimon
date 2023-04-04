@@ -67,10 +67,14 @@ const (
 	ColumnNameSystemValidatorVeryLowStakeThreshold ColumnName = "VALIDATOR VERY LOW\nSTAKE THRESHOLD"
 	ColumnNameSystemValidatorLowStakeGracePeriod   ColumnName = "VALIDATOR LOW STAKE\nGRACE PERIOD"
 
-	ColumnNameSystemAtRiskValidatorName       ColumnName = "VALIDATOR AT RISK NAME"
-	ColumnNameSystemAtRiskValidatorSinceEpoch ColumnName = "VALIDATOR AT RISK SINCE EPOCH"
-	ColumnNameSystemValidatorReportReporter   ColumnName = "VALIDATOR REPORTER"
-	ColumnNameSystemValidatorReportReported   ColumnName = "VALIDATOR REPORTED"
+	ColumnNameSystemAtRiskValidatorName           ColumnName = "VALIDATOR NAME"
+	ColumnNameSystemAtRiskValidatorAddress        ColumnName = "VALIDATOR ADDRESS"
+	ColumnNameSystemAtRiskValidatorNumberOfEpochs ColumnName = "NUMBER OF EPOCHS\nAT RISK"
+
+	ColumnNameSystemValidatorReporterName    ColumnName = "VALIDATOR REPORTER NAME"
+	ColumnNameSystemValidatorReporterAddress ColumnName = "VALIDATOR REPORTER ADDRESS"
+	ColumnNameSystemValidatorReportedName    ColumnName = "VALIDATOR REPORTED NAME"
+	ColumnNameSystemValidatorReportedAddress ColumnName = "VALIDATOR REPORTED ADDRESS"
 
 	ColumnNameSystemStakeSubsidyStartEpoch                ColumnName = "STAKE SUBSIDY\nSTART EPOCH"
 	ColumnNameSystemStakeSubsidyBalance                   ColumnName = "STAKE SUBSIDY\nBALANCE"

@@ -41,9 +41,18 @@ type (
 			PeersTable struct {
 				Display bool `yaml:"display"`
 			} `yaml:"peers-table"`
-			SystemTable struct {
+			SystemStateTable struct {
 				Display bool `yaml:"display"`
-			} `yaml:"system-table"`
+			} `yaml:"system-state-table"`
+			ValidatorsCountsTable struct {
+				Display bool `yaml:"display"`
+			} `yaml:"validators-counts-table"`
+			ValidatorsAtRiskTable struct {
+				Display bool `yaml:"display"`
+			} `yaml:"validators-at-risk-table"`
+			ValidatorReportsTable struct {
+				Display bool `yaml:"display"`
+			} `yaml:"validator-reports-table"`
 			ActiveValidatorsTable struct {
 				Display bool `yaml:"display"`
 			} `yaml:"active-validators-table"`

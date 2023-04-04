@@ -188,21 +188,42 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ColumnNameSystemAtRiskValidatorSinceEpoch: {
+		enums.ColumnNameSystemAtRiskValidatorAddress: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ColumnNameSystemValidatorReportReporter: {
+		enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ColumnNameSystemValidatorReportReported: {
+		enums.ColumnNameSystemValidatorReporterName: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemValidatorReporterAddress: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemValidatorReportedName: {
+			Align:        text.AlignCenter,
+			AlignHeader:  text.AlignCenter,
+			VAlign:       text.VAlignMiddle,
+			VAlignHeader: text.VAlignMiddle,
+			Hidden:       false,
+		},
+		enums.ColumnNameSystemValidatorReportedAddress: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -230,7 +251,7 @@ var (
 			enums.ColumnNameSystemStakeSubsidyDecreaseRate,
 		},
 	}
-	RowsSystemStateValidators = tableRows{
+	RowsValidatorCounts = tableRows{
 		0: {
 			enums.ColumnNameIndex,
 			enums.ColumnNameSystemMaxValidatorCount,
@@ -243,6 +264,23 @@ var (
 			enums.ColumnNameSystemValidatorLowStakeThreshold,
 			enums.ColumnNameSystemValidatorVeryLowStakeThreshold,
 			enums.ColumnNameSystemValidatorLowStakeGracePeriod,
+		},
+	}
+	RowsValidatorsAtRisk = tableRows{
+		0: {
+			enums.ColumnNameIndex,
+			enums.ColumnNameSystemAtRiskValidatorName,
+			enums.ColumnNameSystemAtRiskValidatorAddress,
+			enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs,
+		},
+	}
+	RowsValidatorReports = tableRows{
+		0: {
+			enums.ColumnNameIndex,
+			enums.ColumnNameSystemValidatorReportedName,
+			enums.ColumnNameSystemValidatorReportedAddress,
+			enums.ColumnNameSystemValidatorReporterName,
+			enums.ColumnNameSystemValidatorReporterAddress,
 		},
 	}
 )

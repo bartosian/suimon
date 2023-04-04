@@ -95,6 +95,7 @@ func main() {
 func handlePanic(logger *log.Logger) {
 	if r := recover(); r != nil {
 		logger.Error("failed to execute suimon, please check an issue: ", r)
+		
 		os.Exit(1)
 	}
 }

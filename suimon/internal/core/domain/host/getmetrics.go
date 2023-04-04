@@ -79,7 +79,7 @@ func (host *Host) GetPrometheusMetrics() error {
 
 	result, err := parser.GetMetrics()
 	if err != nil {
-		return err
+		return fmt.Errorf("error while requesting prometheus metrics: %w", err)
 	}
 
 	metricMap := map[enums.PrometheusMetricName]enums.MetricType{
@@ -145,7 +145,7 @@ func (host *Host) GetMetricRPC(method enums.RPCMethod, metricType enums.MetricTy
 	)
 
 	if result, err = getFromRPC(host.clients.rpcClient, method); err != nil {
-		return err
+		return fmt.Errorf("error while requesting %s: %w", string(method), err)
 	}
 
 	return host.Metrics.SetValue(metricType, result)
@@ -252,7 +252,7 @@ func (host *Host) GetData() error {
 	}
 
 	if len(errors) > 0 {
-		return fmt.Errorf("errors occurred while fetching data: %v", errors)
+		return fmt.Errorf("errors occurred while fetching data for table: %s, host: %s - %v", host.TableType, host.HostPort.Address, errors)
 	}
 
 	return nil
