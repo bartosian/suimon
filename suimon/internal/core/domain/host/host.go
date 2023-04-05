@@ -20,7 +20,7 @@ type requestType int
 const (
 	rpcPortDefault     = "9000"
 	metricsPortDefault = "9184"
-	rpcClientTimeout   = 2 * time.Second
+	rpcClientTimeout   = 3 * time.Second
 
 	requestTypeRPC requestType = iota
 	requestTypeMetrics

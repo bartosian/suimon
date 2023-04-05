@@ -8,9 +8,6 @@ import (
 )
 
 var (
-	TableStyleRPC      = table.StyleLight
-	TableColorsRPC     = text.Colors{text.BgHiBlue, text.FgBlack}
-	TableTagRPC        = ""
 	TableSortConfigRPC = tableSortConfig{
 		{Name: string(enums.ColumnNameHealth), Mode: table.Dsc},
 		{Name: string(enums.ColumnNameTotalTransactionBlocks), Mode: table.Dsc},
@@ -53,8 +50,8 @@ var (
 			Hidden:       false,
 		},
 		enums.ColumnNameLatestCheckpoint: {
-			Align:        text.AlignCenter,
-			AlignHeader:  text.AlignCenter,
+			Align:        text.AlignLeft,
+			AlignHeader:  text.AlignLeft,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
@@ -62,7 +59,6 @@ var (
 	}
 	RowsRPC = tableRows{
 		0: {
-			enums.ColumnNameIndex,
 			enums.ColumnNameHealth,
 			enums.ColumnNameAddress,
 			enums.ColumnNamePortRPC,

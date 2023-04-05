@@ -8,9 +8,6 @@ import (
 )
 
 var (
-	TableStylePeer      = table.StyleLight
-	TableColorsPeer     = text.Colors{text.BgHiGreen, text.FgBlack}
-	TableTagPeer        = ""
 	TableSortConfigPeer = tableSortConfig{
 		{Name: string(enums.ColumnNameHealth), Mode: table.Dsc},
 		{Name: string(enums.ColumnNameTotalTransactionBlocks), Mode: table.Dsc},

@@ -8,9 +8,6 @@ import (
 )
 
 var (
-	TableStyleNode      = table.StyleLight
-	TableColorsNode     = text.Colors{text.BgHiGreen, text.FgBlack}
-	TableTagNode        = ""
 	TableSortConfigNode = tableSortConfig{
 		{Name: string(enums.ColumnNameHealth), Mode: table.Dsc},
 		{Name: string(enums.ColumnNameTotalTransactionBlocks), Mode: table.Dsc},

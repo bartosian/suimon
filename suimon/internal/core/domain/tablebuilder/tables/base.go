@@ -18,6 +18,49 @@ type (
 	tableColumnConfig map[enums.ColumnName]styles.ColumnConfig
 )
 
+var (
+	TableStyleDefault = styles.Style{
+		Name: "DEFAULT",
+		Box: styles.BoxStyle{
+			BottomLeft:       "└",
+			BottomRight:      "┘",
+			BottomSeparator:  "┴",
+			EmptySeparator:   text.RepeatAndTrim(" ", text.RuneWidthWithoutEscSequences("┼")),
+			Left:             "│",
+			LeftSeparator:    "├",
+			MiddleHorizontal: "─",
+			MiddleSeparator:  "┼",
+			MiddleVertical:   "│",
+			PaddingLeft:      " ",
+			PaddingRight:     " ",
+			PageSeparator:    "\n",
+			Right:            "│",
+			RightSeparator:   "┤",
+			TopLeft:          "┌",
+			TopRight:         "┐",
+			TopSeparator:     "┬",
+			UnfinishedRow:    " ≈",
+		},
+		Color: styles.ColorOptions{
+			Header: text.Colors{text.FgBlack, text.BgWhite},
+			Row:    text.Colors{text.BgWhite},
+			Footer: text.Colors{text.BgHiBlue, text.FgBlack},
+		},
+		Options: styles.Options{
+			DoNotColorBordersAndSeparators: true,
+			DrawBorder:                     true,
+			SeparateColumns:                true,
+			SeparateFooter:                 true,
+			SeparateHeader:                 true,
+			SeparateRows:                   true,
+		},
+		Title: styles.TitleOptions{
+			Align:  text.AlignLeft,
+			Colors: text.Colors{text.BgHiBlue, text.FgBlack},
+		},
+	}
+)
+
 func SetColumnValues(columns tablebuilder.Columns, values map[enums.ColumnName]any) {
 	for name, value := range values {
 		columns[name].SetValue(value)
@@ -28,70 +71,8 @@ func GetTableTitle(table enums.TableType) string {
 	return fmt.Sprintf("%s [ %s ]", suiEmoji, table)
 }
 
-func GetTableTag(table enums.TableType) string {
-	switch table {
-	case enums.TableTypeRPC:
-		return TableTagRPC
-	case enums.TableTypePeers:
-		return TableTagPeer
-	case enums.TableTypeValidator:
-		return TableTagValidator
-	case enums.TableTypeSystemState,
-		enums.TableTypeValidatorsCounts,
-		enums.TableTypeValidatorsAtRisk,
-		enums.TableTypeValidatorReports:
-		return TableTagSystem
-	case enums.TableTypeNode:
-		return TableTagNode
-	case enums.TableTypeActiveValidators:
-		return TableTagActiveValidator
-	default:
-		return ""
-	}
-}
-
 func GetTableStyle(table enums.TableType) styles.Style {
-	switch table {
-	case enums.TableTypeRPC:
-		return TableStyleRPC
-	case enums.TableTypePeers:
-		return TableStylePeer
-	case enums.TableTypeValidator:
-		return TableStyleValidator
-	case enums.TableTypeSystemState,
-		enums.TableTypeValidatorsCounts,
-		enums.TableTypeValidatorsAtRisk,
-		enums.TableTypeValidatorReports:
-		return TableStyleSystem
-	case enums.TableTypeNode:
-		return TableStyleNode
-	case enums.TableTypeActiveValidators:
-		return TableStyleActiveValidator
-	default:
-		return styles.StyleLight
-	}
-}
-
-func GetTableColors(table enums.TableType) text.Colors {
-	switch table {
-	case enums.TableTypeRPC:
-		return TableColorsRPC
-	case enums.TableTypePeers:
-		return TableColorsPeer
-	case enums.TableTypeValidator:
-		return TableColorsValidator
-	case enums.TableTypeSystemState,
-		enums.TableTypeValidatorsCounts,
-		enums.TableTypeValidatorsAtRisk,
-		enums.TableTypeValidatorReports:
-		return TableColorsSystem
-	case enums.TableTypeNode:
-		return TableColorsNode
-	case enums.TableTypeActiveValidators:
-		return TableColorsActiveValidator
-	default:
-		return text.Colors{text.BgHiGreen, text.FgBlack}
-	}
+	return TableStyleDefault
 }
 
 func GetTableRows(table enums.TableType) tableRows {
@@ -161,4 +142,20 @@ func GetColumnConfig(table enums.TableType) tableColumnConfig {
 	default:
 		return nil
 	}
+}
+
+func GetAutoIndexConfig(table enums.TableType) bool {
+	tableToAutoIndexMap := map[enums.TableType]bool{
+		enums.TableTypeSystemState:      false,
+		enums.TableTypeValidatorsCounts: false,
+		enums.TableTypeValidatorReports: false,
+		enums.TableTypePeers:            false,
+		enums.TableTypeNode:             false,
+		enums.TableTypeValidatorsAtRisk: false,
+		enums.TableTypeValidator:        false,
+		enums.TableTypeRPC:              true,
+		enums.TableTypeActiveValidators: true,
+	}
+
+	return tableToAutoIndexMap[table]
 }

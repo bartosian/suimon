@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	httpClientTimeout = 2 * time.Second
+	httpClientTimeout = 3 * time.Second
 )
 
 type (

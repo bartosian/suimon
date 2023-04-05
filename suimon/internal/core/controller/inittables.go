@@ -59,11 +59,10 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) error {
 
 	tableConfig := tablebuilder.TableConfig{
 		Name:         tables.GetTableTitle(tableType),
-		Tag:          tables.GetTableTag(tableType),
 		Style:        tables.GetTableStyle(tableType),
-		Colors:       tables.GetTableColors(tableType),
-		Rows:         tables.GetTableRows(tableType),
 		SortConfig:   tables.GetTableSortConfig(tableType),
+		Rows:         tables.GetTableRows(tableType),
+		AutoIndex:    tables.GetAutoIndexConfig(tableType),
 		Columns:      columns,
 		ColumnsCount: len(columns),
 		RowsCount:    0,

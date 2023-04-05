@@ -8,9 +8,6 @@ import (
 )
 
 var (
-	TableStyleValidator      = table.StyleLight
-	TableColorsValidator     = text.Colors{text.BgHiBlue, text.FgBlack}
-	TableTagValidator        = ""
 	TableSortConfigValidator = tableSortConfig{
 		{Name: string(enums.ColumnNameHealth), Mode: table.Dsc},
 		{Name: string(enums.ColumnNameTotalTransactionBlocks), Mode: table.Dsc},
@@ -199,14 +196,12 @@ var (
 			enums.ColumnNameCheckpointExecBacklog,
 			enums.ColumnNameHighestSyncedCheckpoint,
 			enums.ColumnNameCheckpointSyncBacklog,
-			enums.ColumnNameCheckSyncPercentage,
 			enums.ColumnNameNetworkPeers,
 		},
 		1: {
 			enums.ColumnNameUptime,
 			enums.ColumnNameVersion,
 			enums.ColumnNameCommit,
-			enums.ColumnNameCountry,
 			enums.ColumnNameCurrentRound,
 			enums.ColumnNameHighestProcessedRound,
 			enums.ColumnNameLastCommittedRound,

@@ -18,12 +18,11 @@ type (
 	}
 	TableConfig struct {
 		Name         string
-		Tag          string
 		Style        table.Style
-		Colors       text.Colors
+		SortConfig   []table.SortBy
+		AutoIndex    bool
 		Columns      map[enums.ColumnName]*Column
 		Rows         [][]enums.ColumnName
-		SortConfig   []table.SortBy
 		ColumnsCount int
 		RowsCount    int
 	}
@@ -100,27 +99,15 @@ func (tb *TableBuilder) SetRows() {
 }
 
 func (tb *TableBuilder) SetStyle() {
+	tb.builder.SortBy(tb.config.SortConfig)
 	tb.builder.SetTitle(tb.config.Name)
 	tb.builder.SetStyle(tb.config.Style)
-	tb.builder.Style().Title.Align = text.AlignLeft
-	tb.builder.Style().Box.RightSeparator = emptyValue
-	tb.builder.Style().Options.DrawBorder = true
-	tb.builder.Style().Options.SeparateRows = true
-	tb.builder.Style().Options.DoNotColorBordersAndSeparators = true
+	tb.builder.SetAutoIndex(tb.config.AutoIndex)
 
 	tb.SetColors()
 }
 
 func (tb *TableBuilder) SetColors() {
-	tableColor := tb.config.Colors
-
-	tb.builder.Style().Title.Colors = tableColor
-	tb.builder.Style().Color = table.ColorOptions{
-		Header: text.Colors{text.FgBlack, text.BgWhite},
-		Row:    text.Colors{text.BgWhite},
-		Footer: tableColor,
-	}
-
 	var f = func() func(row table.Row) text.Colors {
 		bgColor := []text.Color{text.BgWhite, text.BgHiBlue, text.BgHiBlue, text.BgWhite}
 		currentColor := 0
@@ -145,7 +132,6 @@ func (tb *TableBuilder) SetColors() {
 		return handler
 	}()
 
-	tb.builder.SuppressEmptyColumns()
 	tb.builder.SetRowPainter(f)
 }
 

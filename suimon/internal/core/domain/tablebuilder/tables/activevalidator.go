@@ -1,18 +1,16 @@
 package tables
 
 import (
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
+
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
 var (
-	TableStyleActiveValidator      = table.StyleLight
-	TableColorsActiveValidator     = text.Colors{text.BgHiBlue, text.FgBlack}
-	TableTagActiveValidator        = ""
 	TableSortConfigActiveValidator = tableSortConfig{
-		{Name: "NEXT EPOCH STAKE", Mode: table.Dsc},
-		{Name: "NEXT EPOCH\nGAS PRICE", Mode: table.Dsc},
+		{Name: string(enums.ColumnNameValidatorNextEpochStake), Mode: table.Asc},
+		{Name: string(enums.ColumnNameValidatorVotingPower), Mode: table.Asc},
 	}
 	ColumnConfigActiveValidator = tableColumnConfig{
 		enums.ColumnNameIndex: {
@@ -123,23 +121,17 @@ var (
 	}
 	RowsActiveValidator = tableRows{
 		0: {
-			enums.ColumnNameIndex,
 			enums.ColumnNameValidatorName,
-			enums.ColumnNameValidatorNetAddress,
 			enums.ColumnNameValidatorVotingPower,
 			enums.ColumnNameValidatorGasPrice,
 			enums.ColumnNameValidatorCommissionRate,
 			enums.ColumnNameValidatorNextEpochStake,
 			enums.ColumnNameValidatorNextEpochGasPrice,
 			enums.ColumnNameValidatorNextEpochCommissionRate,
-		},
-		1: {
 			enums.ColumnNameValidatorStakingPoolSuiBalance,
 			enums.ColumnNameValidatorRewardsPool,
 			enums.ColumnNameValidatorPoolTokenBalance,
 			enums.ColumnNameValidatorPendingStake,
-			enums.ColumnNameValidatorPendingTotalSuiWithdraw,
-			enums.ColumnNameValidatorPendingPoolTokenWithdraw,
 		},
 	}
 )

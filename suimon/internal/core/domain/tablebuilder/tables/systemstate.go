@@ -1,16 +1,12 @@
 package tables
 
 import (
-	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
 var (
-	TableStyleSystem      = table.StyleLight
-	TableColorsSystem     = text.Colors{text.BgHiBlue, text.FgBlack}
-	TableTagSystem        = ""
 	TableSortConfigSystem = make(tableSortConfig, 0)
 	ColumnsConfigSystem   = tableColumnConfig{
 		enums.ColumnNameIndex: {
@@ -253,7 +249,6 @@ var (
 	}
 	RowsValidatorCounts = tableRows{
 		0: {
-			enums.ColumnNameIndex,
 			enums.ColumnNameSystemMaxValidatorCount,
 			enums.ColumnNameSystemActiveValidatorCount,
 			enums.ColumnNameSystemPendingActiveValidatorCount,

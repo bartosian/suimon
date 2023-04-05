@@ -2,6 +2,7 @@ package tablebuilder
 
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 )
 
 type Row struct {
@@ -13,7 +14,7 @@ type Row struct {
 func NewRow(isHeader bool, length int) Row {
 	return Row{
 		Values:   make(table.Row, 0, length),
-		Config:   table.RowConfig{AutoMerge: true},
+		Config:   table.RowConfig{AutoMerge: false, AutoMergeAlign: text.AlignCenter},
 		IsHeader: isHeader,
 	}
 }
