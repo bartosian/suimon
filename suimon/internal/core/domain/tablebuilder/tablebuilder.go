@@ -9,8 +9,6 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
-const emptyValue = ""
-
 type (
 	TableBuilder struct {
 		builder table.Writer
@@ -21,7 +19,7 @@ type (
 		Style        table.Style
 		SortConfig   []table.SortBy
 		AutoIndex    bool
-		Columns      map[enums.ColumnName]*Column
+		Columns      map[enums.ColumnName]Column
 		Rows         [][]enums.ColumnName
 		ColumnsCount int
 		RowsCount    int
@@ -51,12 +49,12 @@ func (tb *TableBuilder) SetColumns() {
 func (tb *TableBuilder) SetRows() {
 	rowsConfig := tb.config.Rows
 	columnsConfig := tb.config.Columns
-	rowsCount := tb.config.RowsCount
+	itemsCount := tb.config.RowsCount
 
-	for rowIndex := 0; rowIndex < rowsCount; rowIndex++ {
+	for itemIndex := 0; itemIndex < itemsCount; itemIndex++ {
 		colsPerRow := len(rowsConfig[0])
 
-		for columnIndex, columns := range rowsConfig {
+		for rowIndex, columns := range rowsConfig {
 			header := NewRow(true, colsPerRow)
 			footer := NewRow(false, colsPerRow)
 			row := NewRow(false, colsPerRow)
@@ -68,27 +66,27 @@ func (tb *TableBuilder) SetRows() {
 
 			for columnIdx, columnName = range columns {
 				columnConfig := columnsConfig[columnName]
-				columnValue := columnConfig.Values[rowIndex]
+				columnValue := columnConfig.Values[itemIndex]
 
-				header.SetValue(string(columnName))
-				footer.SetValue(emptyValue)
-				row.SetValue(columnValue)
+				header.AppendValue(string(columnName))
+				row.AppendValue(columnValue)
+				footer.PrependValue("")
 			}
 
 			columnIdx++
 
 			for columnIdx < colsPerRow {
-				header.SetValue(emptyValue)
-				footer.SetValue(emptyValue)
-				row.SetValue(emptyValue)
+				header.PrependValue("")
+				footer.PrependValue("")
+				row.PrependValue("")
 
 				columnIdx++
 			}
 
-			if rowIndex == 0 && columnIndex == 0 {
+			if itemIndex == 0 && rowIndex == 0 {
 				tb.builder.AppendHeader(header.Values, header.Config)
 				tb.builder.AppendFooter(footer.Values, footer.Config)
-			} else if columnIndex%2 == 1 || rowIndex > 0 && len(rowsConfig) > 1 && columnIndex%2 == 0 {
+			} else if rowIndex%2 == 1 || itemIndex > 0 && len(rowsConfig) > 1 && rowIndex%2 == 0 {
 				tb.builder.AppendRow(header.Values, header.Config)
 			}
 
@@ -109,13 +107,19 @@ func (tb *TableBuilder) SetStyle() {
 
 func (tb *TableBuilder) SetColors() {
 	var f = func() func(row table.Row) text.Colors {
+		valuesRowFgColor := text.Colors{text.FgWhite}
 		bgColor := []text.Color{text.BgWhite, text.BgHiBlue, text.BgHiBlue, text.BgWhite}
 		currentColor := 0
 
 		var handler = func(row table.Row) text.Colors {
 			for _, column := range row {
-				if _, ok := column.(int); ok {
-					return text.Colors{text.FgWhite}
+				switch value := column.(type) {
+				case int:
+					return valuesRowFgColor
+				case string:
+					if value == EmptyValue {
+						return valuesRowFgColor
+					}
 				}
 			}
 

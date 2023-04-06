@@ -144,7 +144,10 @@ func (host *Host) GetMetricRPC(method enums.RPCMethod, metricType enums.MetricTy
 		err    error
 	)
 
-	if result, err = getFromRPC(host.clients.rpcClient, method); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if result, err = getFromRPC(ctx, host.clients.rpcClient, method); err != nil {
 		return fmt.Errorf("error while requesting %s: %w", string(method), err)
 	}
 
@@ -154,15 +157,15 @@ func (host *Host) GetMetricRPC(method enums.RPCMethod, metricType enums.MetricTy
 // getFromRPC sends an RPC call to an RPC client and returns the response. The type parameter T specifies the expected type of the response.
 // The function uses the method parameter to determine which RPC method to call.
 // Returns the response value of type T and an error value if the RPC call fails or if the response cannot be converted to type T.
-func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) (any, error) {
+func getFromRPC(ctx context.Context, rpcClient jsonrpc.RPCClient, method enums.RPCMethod) (any, error) {
 	respChan := make(chan any)
 	timeout := time.After(rpcClientTimeout)
 
 	go func() {
 		var response any
 
-		if err := rpcClient.CallFor(context.Background(), &response, method.String()); err != nil {
-			respChan <- nil
+		if err := rpcClient.CallFor(ctx, &response, method.String()); err != nil {
+			respChan <- err
 
 			return
 		}
@@ -172,13 +175,18 @@ func getFromRPC(rpcClient jsonrpc.RPCClient, method enums.RPCMethod) (any, error
 
 	select {
 	case response := <-respChan:
-		if response == nil {
+		switch response.(type) {
+		case error:
+			return nil, fmt.Errorf("failed to get response from RPC client: %s", response)
+		case nil:
 			return nil, fmt.Errorf("failed to get response from RPC client")
+		default:
+			return response, nil
 		}
-
-		return response, nil
 	case <-timeout:
-		return nil, fmt.Errorf("timeout while waiting for RPC response")
+		return nil, fmt.Errorf("RPC call timed out after %s", rpcClientTimeout.String())
+	case <-ctx.Done():
+		return nil, ctx.Err()
 	}
 }
 

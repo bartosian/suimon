@@ -63,7 +63,11 @@ var (
 
 func SetColumnValues(columns tablebuilder.Columns, values map[enums.ColumnName]any) {
 	for name, value := range values {
-		columns[name].SetValue(value)
+		column := columns[name]
+
+		column.SetValue(value)
+
+		columns[name] = column
 	}
 }
 

@@ -23,14 +23,14 @@ var (
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ColumnNameSystemEpochStartTimestampMs: {
+		enums.ColumnNameSystemEpochStartTimestamp: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
 			VAlignHeader: text.VAlignMiddle,
 			Hidden:       false,
 		},
-		enums.ColumnNameSystemEpochDurationMs: {
+		enums.ColumnNameSystemEpochDuration: {
 			Align:        text.AlignCenter,
 			AlignHeader:  text.AlignCenter,
 			VAlign:       text.VAlignMiddle,
@@ -231,17 +231,17 @@ var (
 		0: {
 			enums.ColumnNameIndex,
 			enums.ColumnNameSystemEpoch,
-			enums.ColumnNameSystemEpochStartTimestampMs,
-			enums.ColumnNameSystemEpochDurationMs,
+			enums.ColumnNameSystemEpochStartTimestamp,
+			enums.ColumnNameSystemEpochDuration,
 			enums.ColumnNameSystemTotalStake,
 			enums.ColumnNameSystemStorageFundTotalObjectStorageRebates,
 			enums.ColumnNameSystemStorageFundNonRefundableBalance,
 			enums.ColumnNameSystemReferenceGasPrice,
-		},
-		1: {
 			enums.ColumnNameSystemStakeSubsidyStartEpoch,
 			enums.ColumnNameSystemStakeSubsidyBalance,
 			enums.ColumnNameSystemStakeSubsidyDistributionCounter,
+		},
+		1: {
 			enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount,
 			enums.ColumnNameSystemStakeSubsidyPeriodLength,
 			enums.ColumnNameSystemStakeSubsidyDecreaseRate,

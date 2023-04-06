@@ -8,6 +8,7 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/tablebuilder"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/tablebuilder/tables"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 )
 
 const rpcPortDefault = "9000"
@@ -54,7 +55,7 @@ func (checker *CheckerController) InitTable(tableType enums.TableType) error {
 			Config: config,
 		}
 
-		columns[columnName] = &column
+		columns[columnName] = column
 	}
 
 	tableConfig := tablebuilder.TableConfig{
@@ -86,7 +87,7 @@ OUTER:
 		case enums.TableTypeSystemState:
 			tables.SetColumnValues(columns, getSystemStateColumnValues(idx, &hostToRender))
 		case enums.TableTypeValidatorsCounts:
-			tables.SetColumnValues(columns, getSystemStateValidatorsColumnValues(idx, &hostToRender))
+			tables.SetColumnValues(columns, getValidatorsColumnValues(idx, &hostToRender))
 		case enums.TableTypeValidatorsAtRisk:
 			addressToValidatorName := hosts[0].Metrics.SystemState.AddressToValidatorName
 			validatorsAtRisk := hosts[0].Metrics.SystemState.AtRiskValidators
@@ -116,7 +117,7 @@ OUTER:
 			addressToValidatorName := hosts[0].Metrics.SystemState.AddressToValidatorName
 			validatorReports := hosts[0].Metrics.SystemState.ValidatorReportRecords
 
-			for idx, report := range validatorReports {
+			for reportIdx, report := range validatorReports {
 				reportedAddress, ok := report[0].(string)
 				if !ok {
 					return fmt.Errorf("unsupported validatorsReport attribute type: %v", report)
@@ -136,10 +137,12 @@ OUTER:
 					}
 
 					reporterName := addressToValidatorName[reporter]
-
-					columnValues := getValidatorReportColumnValues(idx, reportedName, reportedAddress, reporterName, reporter)
+					columnValues := getValidatorReportColumnValues(reportIdx, reportedName, reportedAddress, reporterName, reporter)
 
 					tables.SetColumnValues(columns, columnValues)
+
+					reportedName = tablebuilder.EmptyValue
+					reportedAddress = tablebuilder.EmptyValue
 
 					tableConfig.RowsCount++
 				}
@@ -313,8 +316,8 @@ func getSystemStateColumnValues(idx int, host *host.Host) map[enums.ColumnName]a
 	return map[enums.ColumnName]any{
 		enums.ColumnNameIndex:                                       idx + 1,
 		enums.ColumnNameSystemEpoch:                                 systemState.Epoch,
-		enums.ColumnNameSystemEpochStartTimestampMs:                 systemState.EpochStartTimestampMs,
-		enums.ColumnNameSystemEpochDurationMs:                       systemState.EpochDurationMs,
+		enums.ColumnNameSystemEpochStartTimestamp:                   utility.EpochToUTCDate(systemState.EpochStartTimestampMs),
+		enums.ColumnNameSystemEpochDuration:                         utility.MSToHoursAndMinutes(systemState.EpochDurationMs),
 		enums.ColumnNameSystemTotalStake:                            systemState.TotalStake,
 		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  systemState.StorageFundTotalObjectStorageRebates,
 		enums.ColumnNameSystemStorageFundNonRefundableBalance:       systemState.StorageFundNonRefundableBalance,
@@ -331,7 +334,7 @@ func getSystemStateColumnValues(idx int, host *host.Host) map[enums.ColumnName]a
 // getSystemStateValidatorsColumnValues returns a map of ColumnName values to corresponding values for the system state validators metrics.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
-func getSystemStateValidatorsColumnValues(idx int, host *host.Host) map[enums.ColumnName]any {
+func getValidatorsColumnValues(idx int, host *host.Host) map[enums.ColumnName]any {
 	systemState := host.Metrics.SystemState
 
 	return map[enums.ColumnName]any{
@@ -365,8 +368,14 @@ func getValidatorAtRiskColumnValues(idx int, name string, address string, epochs
 // The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
 func getValidatorReportColumnValues(idx int, reportedName, reportedAddress, reporterName, reporterAddress string) map[enums.ColumnName]any {
+	var indexValue any = idx + 1
+
+	if reportedAddress == tablebuilder.EmptyValue {
+		indexValue = tablebuilder.EmptyValue
+	}
+
 	return map[enums.ColumnName]any{
-		enums.ColumnNameIndex:                          idx + 1,
+		enums.ColumnNameIndex:                          indexValue,
 		enums.ColumnNameSystemValidatorReportedName:    reportedName,
 		enums.ColumnNameSystemValidatorReportedAddress: reportedAddress,
 		enums.ColumnNameSystemValidatorReporterName:    reporterName,

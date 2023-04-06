@@ -49,8 +49,8 @@ const (
 	ColumnNameValidatorPendingPoolTokenWithdraw ColumnName = "PENDING POOL\nTOKEN WITHDRAW"
 
 	ColumnNameSystemEpoch                                ColumnName = "EPOCH"
-	ColumnNameSystemEpochStartTimestampMs                ColumnName = "EPOCH START\nTIME MS"
-	ColumnNameSystemEpochDurationMs                      ColumnName = "EPOCH\nDURATION MS"
+	ColumnNameSystemEpochStartTimestamp                  ColumnName = "EPOCH START TIME UTC"
+	ColumnNameSystemEpochDuration                        ColumnName = "EPOCH DURATION"
 	ColumnNameSystemTotalStake                           ColumnName = "TOTAL STAKE"
 	ColumnNameSystemStorageFundTotalObjectStorageRebates ColumnName = "STORAGE FUND TOTAL\nOBJECT REBATES"
 	ColumnNameSystemStorageFundNonRefundableBalance      ColumnName = "STORAGE FUND\nREFUNDABLE BALANCE"

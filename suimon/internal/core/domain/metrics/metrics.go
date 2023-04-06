@@ -67,8 +67,8 @@ type (
 		SafeModeComputationRewards            int             `json:"safeModeComputationRewards"`
 		SafeModeStorageRebates                int             `json:"safeModeStorageRebates"`
 		SafeModeNonRefundableStorageFee       int             `json:"safeModeNonRefundableStorageFee"`
-		EpochStartTimestampMs                 int             `json:"epochStartTimestampMs"`
-		EpochDurationMs                       int             `json:"epochDurationMs"`
+		EpochStartTimestampMs                 int64           `json:"epochStartTimestampMs"`
+		EpochDurationMs                       int64           `json:"epochDurationMs"`
 		StakeSubsidyStartEpoch                int             `json:"stakeSubsidyStartEpoch"`
 		MaxValidatorCount                     int             `json:"maxValidatorCount"`
 		MinValidatorJoiningStake              int             `json:"minValidatorJoiningStake"`
@@ -130,10 +130,10 @@ type (
 	}
 
 	Epoch struct {
-		CurrentEpoch        int
-		EpochTotalDuration  int
-		EpochPercentage     int
-		TimeTillNextEpochMs int
+		CurrentEpoch       int
+		EpochTotalDuration int
+		EpochPercentage    int
+		TimeTillNextEpoch  int64
 	}
 
 	Errors struct {

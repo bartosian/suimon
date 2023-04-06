@@ -44,7 +44,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		valueSystemState.AddressToValidatorName = addressToValidatorName
 
 		metrics.SystemState = valueSystemState
-		metrics.TimeTillNextEpochMs = metrics.GetMillisecondsTillNextEpoch()
+		metrics.TimeTillNextEpoch = metrics.GetMillisecondsTillNextEpoch()
 	case enums.MetricTypeTotalTransactionBlocks:
 		switch v := value.(type) {
 		case string:

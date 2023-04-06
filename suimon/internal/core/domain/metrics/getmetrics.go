@@ -64,9 +64,9 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) MetricValue 
 
 // GetMillisecondsTillNextEpoch returns the time remaining until the next epoch in milliseconds.
 // Returns: an integer representing the time remaining until the next epoch in seconds.
-func (metrics *Metrics) GetMillisecondsTillNextEpoch() int {
+func (metrics *Metrics) GetMillisecondsTillNextEpoch() int64 {
 	nextEpochStartMs := metrics.SystemState.EpochStartTimestampMs + metrics.SystemState.EpochDurationMs
-	currentTimeMs := int(time.Now().UnixNano() / 1000000)
+	currentTimeMs := time.Now().UnixNano() / 1000000
 
 	return nextEpochStartMs - currentTimeMs
 }
@@ -74,7 +74,7 @@ func (metrics *Metrics) GetMillisecondsTillNextEpoch() int {
 // GetTimeUntilNextEpochDisplay returns an array of strings representing the epoch timer data.
 // Returns: an array of strings representing the epoch timer data.
 func (metrics *Metrics) GetTimeUntilNextEpochDisplay() []string {
-	duration := time.Duration(metrics.TimeTillNextEpochMs) * time.Millisecond
+	duration := time.Duration(metrics.TimeTillNextEpoch) * time.Millisecond
 	hours := int(duration.Hours())
 	minutes := int(duration.Minutes()) - (hours * 60)
 	second := time.Now().Second()
@@ -100,9 +100,9 @@ func (metrics *Metrics) GetEpochLabel() string {
 // GetEpochProgress returns an integer representing the current epoch progress.
 // Returns: an integer representing the current epoch progress.
 func (metrics *Metrics) GetEpochProgress() int {
-	epochCurrentLength := metrics.SystemState.EpochDurationMs - metrics.TimeTillNextEpochMs
+	epochCurrentLength := metrics.SystemState.EpochDurationMs - metrics.TimeTillNextEpoch
 
-	return int(percent.PercentOf(epochCurrentLength, metrics.SystemState.EpochDurationMs))
+	return int(percent.PercentOf(int(epochCurrentLength), int(metrics.SystemState.EpochDurationMs)))
 }
 
 // GetUsageDataForDonutChart retrieves the usage data for a specific unit and returns it as a formatted string and a percentage value for display in a donut chart.

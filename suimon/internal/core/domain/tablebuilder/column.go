@@ -5,10 +5,13 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
-const tableNoData = "no data"
+const (
+	TableNoData = "no data"
+	EmptyValue  = " "
+)
 
 type (
-	Columns map[enums.ColumnName]*Column
+	Columns map[enums.ColumnName]Column
 
 	Column struct {
 		Values []any
@@ -18,7 +21,7 @@ type (
 
 func (col *Column) SetValue(value any) {
 	if value == nil || value == "" {
-		value = tableNoData
+		value = TableNoData
 	}
 
 	col.Values = append(col.Values, value)
@@ -29,7 +32,9 @@ func (col *Column) SetNoDataValue() {
 }
 
 func (col Columns) SetNoDataValue() {
-	for idx := range col {
-		col[idx].SetNoDataValue()
+	for idx, column := range col {
+		column.SetNoDataValue()
+
+		col[idx] = column
 	}
 }

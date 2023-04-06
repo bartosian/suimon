@@ -2,6 +2,7 @@ package utility
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -157,4 +158,18 @@ func GetCPUUsage() (*UsageData, error) {
 		Used:           used,
 		PercentageUsed: pct,
 	}, nil
+}
+
+func EpochToUTCDate(epoch int64) string {
+	utcTime := time.Unix(epoch/1000, 0).UTC()
+
+	return utcTime.Format("2006-01-02 15:04:05")
+}
+
+func MSToHoursAndMinutes(durationMs int64) string {
+	duration := time.Duration(durationMs * int64(time.Millisecond))
+	hours := int64(duration.Hours())
+	minutes := int64(duration.Minutes()) % 60
+
+	return fmt.Sprintf("%02d:%02d", hours, minutes)
 }
