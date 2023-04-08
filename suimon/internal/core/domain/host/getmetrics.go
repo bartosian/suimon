@@ -70,7 +70,7 @@ var prometheusMetrics = map[enums.PrometheusMetricName]metricsparser.MetricConfi
 	},
 }
 
-// GetPrometheusMetrics fetches Prometheus metrics for the host and sends the metric values to the host's Metrics field.
+// GetPrometheusMetrics fetches Prometheus rpcgw for the host and sends the metric values to the host's Metrics field.
 // The function constructs a URL using the host's HostPort and Ports fields, sends an HTTP GET request to the URL, and parses the response as a Prometheus text format.
 // Returns an error if the HTTP request fails or if the response cannot be parsed as Prometheus text format.
 func (host *Host) GetPrometheusMetrics() error {
@@ -79,7 +79,7 @@ func (host *Host) GetPrometheusMetrics() error {
 
 	result, err := parser.GetMetrics()
 	if err != nil {
-		return fmt.Errorf("error while requesting prometheus metrics: %w", err)
+		return fmt.Errorf("error while requesting prometheus rpcgw: %w", err)
 	}
 
 	metricMap := map[enums.PrometheusMetricName]enums.MetricType{
@@ -300,7 +300,7 @@ func (host *Host) getUrl(request requestType, secure bool) string {
 			hostUrl.Host = net.JoinHostPort(hostUrl.Hostname(), rpcPortDefault)
 		}
 	case requestTypeMetrics:
-		hostUrl.Path = "/metrics"
+		hostUrl.Path = "/rpcgw"
 
 		if port, ok := host.Ports[enums.PortTypeMetrics]; ok {
 			hostUrl.Host = net.JoinHostPort(hostUrl.Hostname(), port)

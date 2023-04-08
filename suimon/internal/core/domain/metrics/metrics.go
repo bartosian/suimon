@@ -13,6 +13,7 @@ const (
 )
 
 type (
+	// Validator represents a validator node on the Sui blockchain network.
 	Validator struct {
 		SuiAddress                   string      `json:"suiAddress"`
 		ProtocolPubkeyBytes          string      `json:"protocolPubkeyBytes"`
@@ -55,6 +56,7 @@ type (
 		ExchangeRatesSize            int         `json:"exchangeRatesSize"`
 	}
 
+	// SuiSystemState represents the current state of the Sui blockchain system.
 	SuiSystemState struct {
 		Epoch                                 int             `json:"epoch"`
 		ProtocolVersion                       int             `json:"protocolVersion"`
@@ -94,8 +96,11 @@ type (
 		AtRiskValidators                      [][]interface{} `json:"atRiskValidators"`
 		ValidatorReportRecords                [][]interface{} `json:"validatorReportRecords"`
 		AddressToValidatorName                map[string]string
+		ValidatorsAtRiskParsed                []ValidatorAtRisk
+		ValidatorReportsParsed                []ValidatorReport
 	}
 
+	// Transactions represents information about transactions on the Sui blockchain network.
 	Transactions struct {
 		TotalTransactionsBlocks      int
 		TotalTransactionCertificates int
@@ -105,6 +110,7 @@ type (
 		TransactionsHistory          []int
 	}
 
+	// Checkpoints represents information about checkpoints on the Sui blockchain network.
 	Checkpoints struct {
 		LatestCheckpoint        int
 		HighestKnownCheckpoint  int
@@ -117,18 +123,21 @@ type (
 		CheckpointsHistory      []int
 	}
 
+	// Rounds represents information about rounds on the Sui blockchain network.
 	Rounds struct {
 		CurrentRound          int
 		HighestProcessedRound int
 		LastCommittedRound    int
 	}
 
+	// Peers represents information about peers on the Sui blockchain network.
 	Peers struct {
 		NetworkPeers        int
 		PrimaryNetworkPeers int
 		WorkerNetworkPeers  int
 	}
 
+	// Epoch represents information about the current epoch on the Sui blockchain network.
 	Epoch struct {
 		CurrentEpoch       int
 		EpochTotalDuration int
@@ -136,11 +145,28 @@ type (
 		TimeTillNextEpoch  int64
 	}
 
+	// Errors represents information about errors on the Sui blockchain network.
 	Errors struct {
 		SkippedConsensusTransactions int
 		TotalSignatureErrors         int
 	}
 
+	// ValidatorReport represents a report about a validator node on the Sui blockchain network.
+	ValidatorReport struct {
+		ReportedName    string
+		ReportedAddress string
+		ReporterName    string
+		ReporterAddress string
+	}
+
+	// ValidatorAtRisk represents a validator node at risk on the Sui blockchain network.
+	ValidatorAtRisk struct {
+		Name         string
+		Address      string
+		EpochsAtRisk float64
+	}
+
+	// Metrics represents various metrics about the Sui blockchain network.
 	Metrics struct {
 		Updated bool
 
@@ -158,3 +184,69 @@ type (
 		Errors
 	}
 )
+
+// NewMetrics initializes a new instance of Metrics with default values.
+func NewMetrics() *Metrics {
+	return &Metrics{
+		Updated:     false,
+		SystemState: SuiSystemState{},
+		Uptime:      "",
+		Version:     "",
+		Commit:      "",
+		Transactions: Transactions{
+			TotalTransactionsBlocks:      0,
+			TotalTransactionCertificates: 0,
+			TotalTransactionEffects:      0,
+			TransactionsPerSecond:        0.0,
+			TxSyncPercentage:             0,
+		},
+		Checkpoints: Checkpoints{
+			LatestCheckpoint:        0,
+			HighestKnownCheckpoint:  0,
+			HighestSyncedCheckpoint: 0,
+			LastExecutedCheckpoint:  0,
+			CheckpointExecBacklog:   0,
+			CheckpointSyncBacklog:   0,
+			CheckpointsPerSecond:    0.0,
+			CheckSyncPercentage:     0,
+		},
+		Rounds: Rounds{
+			CurrentRound:          0,
+			HighestProcessedRound: 0,
+			LastCommittedRound:    0,
+		},
+		Peers: Peers{
+			NetworkPeers:        0,
+			PrimaryNetworkPeers: 0,
+			WorkerNetworkPeers:  0,
+		},
+		Epoch: Epoch{
+			CurrentEpoch:       0,
+			EpochTotalDuration: 0,
+			TimeTillNextEpoch:  0,
+		},
+		Errors: Errors{
+			TotalSignatureErrors:         0,
+			SkippedConsensusTransactions: 0,
+		},
+	}
+}
+
+// NewValidatorReport returns a new ValidatorReport instance.
+func NewValidatorReport(reportedName, reportedAddress, reporterName, reporterAddress string) ValidatorReport {
+	return ValidatorReport{
+		ReportedName:    reportedName,
+		ReportedAddress: reportedAddress,
+		ReporterName:    reporterName,
+		ReporterAddress: reporterAddress,
+	}
+}
+
+// NewValidatorAtRisk returns a new ValidatorAtRisk instance.
+func NewValidatorAtRisk(name, address string, epochsAtRisk float64) ValidatorAtRisk {
+	return ValidatorAtRisk{
+		Name:         name,
+		Address:      address,
+		EpochsAtRisk: epochsAtRisk,
+	}
+}

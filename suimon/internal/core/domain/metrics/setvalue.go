@@ -1,19 +1,25 @@
 package metrics
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"math"
 	"strconv"
 
+	"encoding/json"
+
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
-// SetValue sets the value of a given metric type.
-// Parameters:
-// - metric: an enums.MetricType representing the metric type to set.
-// - value: a value of any type representing the value to set for the given metric type.
+const (
+	ErrUnexpectedMetricValueType       = "unexpected value type for %s: %T"
+	ErrUnsupportedValidatorsAtRiskAttr = "unsupported validatorsAtRisk attribute type: %v"
+	ErrUnsupportedValidatorsReportAttr = "unsupported validatorsReport attribute type: %v"
+	ErrUnsupportedSuiAddressAttr       = "unsupported suiAddress attribute type: %v"
+)
+
+// SetValue updates a metric with the given value, parsing it if necessary.
+// It returns an error if the value type is not supported for the given metric.
 func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 	metrics.Updated = true
 
@@ -23,28 +29,72 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 
 	switch metric {
 	case enums.MetricTypeSuiSystemState:
+		// Parse the JSON data of the SystemState object.
 		dataBytes, err := json.Marshal(value.(map[string]interface{}))
 		if err != nil {
 			log.Fatal(err)
 		}
 
+		// Unmarshal the JSON data into a SuiSystemState struct.
 		var valueSystemState SuiSystemState
-
-		err = json.Unmarshal(dataBytes, &valueSystemState)
-		if err != nil {
-			return fmt.Errorf("unexpected value type for MetricTypeSuiSystemState: %T", value)
+		if err = json.Unmarshal(dataBytes, &valueSystemState); err != nil {
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
+		// Create a mapping between validator addresses and their corresponding names.
 		addressToValidatorName := make(map[string]string, len(valueSystemState.ActiveValidators))
-
 		for _, activeValidator := range valueSystemState.ActiveValidators {
 			addressToValidatorName[activeValidator.SuiAddress] = activeValidator.Name
 		}
-
 		valueSystemState.AddressToValidatorName = addressToValidatorName
 
+		// Parse the validators at risk from the raw JSON data.
+		validatorsAtRisk := make([]ValidatorAtRisk, 0, len(valueSystemState.AtRiskValidators))
+		for _, validator := range valueSystemState.AtRiskValidators {
+			address, ok := validator[0].(string)
+			if !ok {
+				return fmt.Errorf(ErrUnsupportedValidatorsAtRiskAttr, validator)
+			}
+			epochCount, ok := validator[1].(float64)
+			if !ok {
+				return fmt.Errorf(ErrUnsupportedValidatorsAtRiskAttr, validator)
+			}
+			validatorName := addressToValidatorName[address]
+			validatorAtRisk := NewValidatorAtRisk(validatorName, address, epochCount)
+
+			validatorsAtRisk = append(validatorsAtRisk, validatorAtRisk)
+		}
+		valueSystemState.ValidatorsAtRiskParsed = validatorsAtRisk
+
+		// Parse the validator reports from the raw JSON data.
+		validatorReports := make([]ValidatorReport, 0, len(valueSystemState.ValidatorReportRecords))
+		for _, report := range valueSystemState.ValidatorReportRecords {
+			reportedAddress, ok := report[0].(string)
+			if !ok {
+				return fmt.Errorf(ErrUnsupportedValidatorsReportAttr, report)
+			}
+			reporters, ok := report[1].([]any)
+			if !ok {
+				return fmt.Errorf(ErrUnsupportedValidatorsReportAttr, report)
+			}
+			reportedName := addressToValidatorName[reportedAddress]
+			for _, reporterAddress := range reporters {
+				reporter, ok := reporterAddress.(string)
+				if !ok {
+					return fmt.Errorf(ErrUnsupportedSuiAddressAttr, reporterAddress)
+				}
+				reporterName := addressToValidatorName[reporter]
+				validatorReport := NewValidatorReport(reportedName, reportedAddress, reporterName, reporter)
+
+				validatorReports = append(validatorReports, validatorReport)
+			}
+		}
+		valueSystemState.ValidatorReportsParsed = validatorReports
+
+		// Update the SystemState property of the Metrics struct with the parsed data.
 		metrics.SystemState = valueSystemState
-		metrics.TimeTillNextEpoch = metrics.GetMillisecondsTillNextEpoch()
+
+		// Update the TimeTillNextEpoch property of the Metrics struct with the new value
 	case enums.MetricTypeTotalTransactionBlocks:
 		switch v := value.(type) {
 		case string:
@@ -52,23 +102,23 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 			if err != nil {
 				return err
 			}
-			metrics.TotalTransactionsBlocks = valueInt
 
+			metrics.TotalTransactionsBlocks = valueInt
 			metrics.CalculateTPS()
 		default:
-			return fmt.Errorf("unexpected value type for MetricTypeTotalTransactionBlocks: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 	case enums.MetricTypeTotalTransactionCertificates:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeTotalTransactionCertificates: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.TotalTransactionCertificates = convFToI(valueFloat)
 	case enums.MetricTypeTotalTransactionEffects:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeTotalTransactionEffects: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.TotalTransactionEffects = convFToI(valueFloat)
@@ -81,19 +131,19 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 			}
 			metrics.LatestCheckpoint = valueInt
 		default:
-			return fmt.Errorf("unexpected value type for MetricTypeLatestCheckpoint: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 	case enums.MetricTypeHighestKnownCheckpoint:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeHighestKnownCheckpoint: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.HighestKnownCheckpoint = convFToI(valueFloat)
 	case enums.MetricTypeHighestSyncedCheckpoint:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeHighestSyncedCheckpoint: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.HighestSyncedCheckpoint = convFToI(valueFloat)
@@ -102,14 +152,14 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 	case enums.MetricTypeLastExecutedCheckpoint:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeLastExecutedCheckpoint: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.LastExecutedCheckpoint = convFToI(valueFloat)
 	case enums.MetricTypeCheckpointExecBacklog:
 		valueInt, ok := value.(int)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeCheckpointExecBacklog: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		if valueInt < 0 {
@@ -120,7 +170,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 	case enums.MetricTypeCheckpointSyncBacklog:
 		valueInt, ok := value.(int)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeCheckpointSyncBacklog: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		if valueInt < 0 {
@@ -131,105 +181,105 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 	case enums.MetricTypeCurrentEpoch:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeCurrentEpoch: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.CurrentEpoch = convFToI(valueFloat)
 	case enums.MetricTypeEpochTotalDuration:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeEpochTotalDuration: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.EpochTotalDuration = convFToI(valueFloat)
 	case enums.MetricTypeSuiNetworkPeers:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeSuiNetworkPeers: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.NetworkPeers = convFToI(valueFloat)
 	case enums.MetricTypeUptime:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeUptime: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.Uptime = fmt.Sprintf("%.2f", valueFloat/86400)
 	case enums.MetricTypeVersion:
 		valueString, ok := value.(string)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeVersion: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.Version = valueString
 	case enums.MetricTypeCommit:
 		valueString, ok := value.(string)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeCommit: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.Commit = valueString
 	case enums.MetricTypeCurrentRound:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeCurrentRound: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.CurrentRound = convFToI(valueFloat)
 	case enums.MetricTypeHighestProcessedRound:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeHighestProcessedRound: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.HighestProcessedRound = convFToI(valueFloat)
 	case enums.MetricTypeLastCommittedRound:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeLastCommittedRound: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.LastCommittedRound = convFToI(valueFloat)
 	case enums.MetricTypePrimaryNetworkPeers:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypePrimaryNetworkPeers: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.PrimaryNetworkPeers = convFToI(valueFloat)
 	case enums.MetricTypeWorkerNetworkPeers:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeWorkerNetworkPeers: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.WorkerNetworkPeers = convFToI(valueFloat)
 	case enums.MetricTypeSkippedConsensusTransactions:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeSkippedConsensusTransactions: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.SkippedConsensusTransactions = convFToI(valueFloat)
 	case enums.MetricTypeTotalSignatureErrors:
 		valueFloat, ok := value.(float64)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeTotalSignatureErrors: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.TotalSignatureErrors = convFToI(valueFloat)
 	case enums.MetricTypeTxSyncPercentage:
 		valueInt, ok := value.(int)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeTxSyncPercentage: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.TxSyncPercentage = valueInt
 	case enums.MetricTypeCheckSyncPercentage:
 		valueInt, ok := value.(int)
 		if !ok {
-			return fmt.Errorf("unexpected value type for MetricTypeCheckSyncPercentage: %T", value)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		metrics.CheckSyncPercentage = valueInt
@@ -296,16 +346,10 @@ func (metrics *Metrics) CalculateCPS() {
 	metrics.CheckpointsPerSecond = cps
 }
 
-// IsHealthy checks if a given metric is healthy based on its current value.
-// It returns a boolean value indicating whether the metric is healthy or not.
-// A metric is considered healthy if it meets a certain condition or threshold,
-// otherwise, it is considered unhealthy.
-// Parameters:
-//   - metric: the metric to check for healthiness.
-//   - valueRPC: the current value of the metric, retrieved via an RPC call.
-//
-// Returns:
-//   - a boolean value indicating whether the metric is healthy or not.
+// IsHealthy checks if the given metric's value satisfies the threshold defined for it.
+// If the metric type is not recognized, returns true.
+// The valueRPC argument is the value retrieved from the Sui RPC endpoint for the corresponding metric.
+// Returns true if the metric value is healthy, false otherwise.
 func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC any) bool {
 	switch metric {
 	case enums.MetricTypeTotalTransactionBlocks:

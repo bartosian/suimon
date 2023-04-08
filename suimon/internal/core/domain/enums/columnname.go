@@ -83,3 +83,7 @@ const (
 	ColumnNameSystemStakeSubsidyPeriodLength              ColumnName = "STAKE SUBSIDY\nPERIOD LENGTH"
 	ColumnNameSystemStakeSubsidyDecreaseRate              ColumnName = "STAKE SUBSIDY\nDECREASE RATE"
 )
+
+func (e ColumnName) ToString() string {
+	return string(e)
+}

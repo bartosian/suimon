@@ -59,7 +59,7 @@ After completing these steps, you should be able to run the suimon command from 
 7. Create ``SUIMON`` config directory and put ``suimon.yaml`` file there:
 ```shell
 mkdir $HOME/.suimon && \
-cp $HOME/sui_helpers/suimon/cmd/checker/config/suimon.template.yaml $HOME/.suimon
+cp $HOME/sui_helpers/suimon/cmd/checker/tables/suimon.template.yaml $HOME/.suimon
 ```
 
 ``suimon.yaml`` is a configuration file used by the ``SUIMON`` tool. If this file is properly configured, it can eliminate the need to use command-line interface (CLI) flags when using the tool. This is because the configuration file can contain default values and settings that are automatically applied to the tool when it is executed. By using a configuration file, users can streamline their workflow and reduce the amount of time and effort required to run the tool.
@@ -76,11 +76,11 @@ monitors-config:
   peers-table:
     display: true
 
-# update this section to add/remove rpc hosts for rpc-table
+# update this section to add/remove rpcgw hosts for rpcgw-table
 rpc-config:
   testnet:
-    - "https://rpc-office.cosmostation.io/sui-testnet-wave-2"
-    - "https://rpc.ankr.com/sui_testnet"
+    - "https://rpcgw-office.cosmostation.io/sui-testnet-wave-2"
+    - "https://rpcgw.ankr.com/sui_testnet"
     - "https://sui-api.rpcpool.com"
     - "https://sui-testnet.public.blastapi.io"
     - "https://fullnode.testnet.vincagame.com"
@@ -197,12 +197,12 @@ suimon --help
 
 Usage of suimon:
   -f string
-    	(optional) path to the node config file, can use SUIMON_NODE_CONFIG_PATH variable instead
+    	(optional) path to the node tables file, can use SUIMON_NODE_CONFIG_PATH variable instead
   -n string
     	(optional) network name, possible values: testnet, devnet
   -s string
-    	(optional) path to the suimon config file, can use SUIMON_CONFIG_PATH env variable instead
-  -w	(optional) flag to enable a dynamic dashboard to monitor node metrics in real-time
+    	(optional) path to the suimon tables file, can use SUIMON_CONFIG_PATH env variable instead
+  -w	(optional) flag to enable a dynamic dashboard to monitor node rpcgw in real-time
 ```
 
 | Name   | Required | Default               | Purpose                                                                                                                                                                                                                                         |
