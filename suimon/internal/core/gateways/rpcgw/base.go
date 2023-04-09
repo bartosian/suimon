@@ -2,6 +2,7 @@ package rpcgw
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/ybbus/jsonrpc/v3"
@@ -20,11 +21,19 @@ type Gateway struct {
 }
 
 func NewGateway(logger log.Logger, url string) ports.RPCGateway {
-	rpcClient := jsonrpc.NewClient(url)
+	httpClient := &http.Client{
+		Timeout: rpcClientTimeout,
+	}
+
+	opts := &jsonrpc.RPCClientOpts{
+		HTTPClient: httpClient,
+	}
+
+	rpcClient := jsonrpc.NewClientWithOpts(url, opts)
 
 	return &Gateway{
-		url:    url,
 		ctx:    context.Background(),
+		url:    url,
 		client: rpcClient,
 		logger: logger,
 	}

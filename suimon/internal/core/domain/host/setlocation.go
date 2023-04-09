@@ -1,37 +1,32 @@
 package host
 
 import (
+	"fmt"
 	"net"
-
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/location"
 )
 
-// SetLocation sets the location data for the Host struct by querying an IP address database.
-// This method does not accept any parameters and does not return anything.
-func (host *Host) SetLocation() {
-	var parseLocation = func(ip net.IP) {
-		record, err := host.clients.ipClient.GetIPInfo(ip)
-		if err != nil {
-			return
-		}
+const (
+	ErrInvalidIPAddressProvided = "invalid IP address: %v"
+)
 
-		countryISOCode := record.Country
-		countryName := record.CountryName
-		flag := record.CountryFlag.Emoji
-
-		var company string
-		if record.Company != nil {
-			company = record.Company.Name
-		}
-
-		host.Location = location.NewLocation(countryISOCode, countryName, flag, company)
-	}
-
+// SetIPInfo sets the IPInfo property of a Host struct by calling an external geolocation API with the host's IP address.
+// It returns an error if the IP address is invalid or if the API call fails.
+func (host *Host) SetIPInfo() error {
 	if host.HostPort.IP == nil {
-		return
+		return nil
 	}
 
-	if ip := net.ParseIP(*host.HostPort.IP); ip != nil {
-		parseLocation(ip)
+	ip := net.ParseIP(*host.HostPort.IP)
+	if ip == nil {
+		return fmt.Errorf(ErrInvalidIPAddressProvided, host.HostPort.IP)
 	}
+
+	ipInfo, err := host.gateways.geo.CallFor(ip)
+	if err != nil {
+		return err
+	}
+
+	host.IPInfo = &ipInfo
+
+	return nil
 }

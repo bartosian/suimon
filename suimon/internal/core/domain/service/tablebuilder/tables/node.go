@@ -76,8 +76,8 @@ var (
 func GetNodeColumnValues(idx int, host host.Host) tablebuilder.ColumnValues {
 	status := host.Status.StatusToPlaceholder()
 	country := ""
-	if host.Location != nil {
-		country = host.Location.String()
+	if host.IPInfo != nil {
+		country = host.IPInfo.Country
 	}
 	port := host.Ports[enums.PortTypeRPC]
 	if port == "" {

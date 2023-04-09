@@ -3,18 +3,26 @@ package prometheusgw
 import (
 	"context"
 	"fmt"
-	"net/http"
-
 	"github.com/prometheus/client_golang/prometheus"
 	ioPrometheusClient "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
+	"net/http"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
 )
 
-type MetricsData map[string]*ioPrometheusClient.MetricFamily
+type (
+	MetricsData map[string]*ioPrometheusClient.MetricFamily
 
+	responseWithError struct {
+		response *http.Response
+		err      error
+	}
+)
+
+// CallFor makes an HTTP request to the specified gateway URL to fetch metrics.
+// It returns the metrics result or an error if something goes wrong.
 func (gateway *Gateway) CallFor(metrics ports.Metrics) (result ports.MetricsResult, err error) {
 	if len(metrics) == 0 {
 		return nil, fmt.Errorf("no metrics provided")
@@ -25,46 +33,58 @@ func (gateway *Gateway) CallFor(metrics ports.Metrics) (result ports.MetricsResu
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), httpClientTimeout)
+	ctx, cancel := context.WithTimeout(gateway.ctx, httpClientTimeout)
 	defer cancel()
 
 	req = req.WithContext(ctx)
 
-	resp, err := gateway.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
+	respChan := make(chan responseWithError)
 
-	defer func() {
-		if closeErr := resp.Body.Close(); closeErr != nil {
-			err = closeErr
-		}
+	go func() {
+		resp, err := gateway.client.Do(req)
+
+		respChan <- responseWithError{response: resp, err: err}
 	}()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
+	select {
+	case <-ctx.Done():
+		return nil, fmt.Errorf("http call timed out: %w", ctx.Err())
+	case result := <-respChan:
+		if result.err != nil {
+			return nil, fmt.Errorf("failed to get response from http client: %w", result.err)
+		}
 
-	parser := expfmt.TextParser{}
-	data, err := parser.TextToMetricFamilies(resp.Body)
-	if err != nil {
-		return nil, err
-	}
+		response := result.response
+		defer func() {
+			if closeErr := response.Body.Close(); closeErr != nil {
+				err = fmt.Errorf("failed to close response body: %w", closeErr)
+			}
+		}()
 
-	metricsResult := make(ports.MetricsResult)
-
-	for metricType, metricConfig := range metrics {
-		result, err := getMetricValueWithLabelFiltering(data, metricType.ToString(), metricConfig)
+		parser := expfmt.TextParser{}
+		data, err := parser.TextToMetricFamilies(response.Body)
 		if err != nil {
 			return nil, err
 		}
 
-		metricsResult[metricType] = result
-	}
+		metricsResult := make(ports.MetricsResult)
 
-	return metricsResult, nil
+		for metricType, metricConfig := range metrics {
+			result, err := getMetricValueWithLabelFiltering(data, metricType.ToString(), metricConfig)
+			if err != nil {
+				return nil, err
+			}
+
+			metricsResult[metricType] = result
+		}
+
+		return metricsResult, nil
+	}
 }
 
+// getMetricValueWithLabelFiltering searches for a specific metric in the provided MetricsData
+// by the given metricName and metricConfig. If a matching metric is found, it returns
+// the metric result containing its value and labels. If no matching metric is found, it returns an error.
 func getMetricValueWithLabelFiltering(metrics MetricsData, metricName string, metricConfig ports.MetricConfig) (result ports.MetricResult, err error) {
 	if metrics == nil {
 		return result, fmt.Errorf("no metrics provided")

@@ -1,30 +1,17 @@
 package host
 
 import (
-	"net/http"
-	"time"
-
 	"github.com/dariubs/percent"
-	"github.com/ipinfo/go/v2/ipinfo"
-	"github.com/ybbus/jsonrpc/v3"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/location"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
+	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
+	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/address"
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 type requestType int
-
-const (
-	rpcPortDefault     = "9000"
-	metricsPortDefault = "9184"
-	rpcClientTimeout   = 4 * time.Second
-
-	requestTypeRPC requestType = iota
-	requestTypeMetrics
-)
 
 type (
 	AddressInfo struct {
@@ -32,10 +19,11 @@ type (
 		Ports    map[enums.PortType]string
 	}
 
-	Clients struct {
-		rpcClient  jsonrpc.RPCClient
-		httpClient *http.Client
-		ipClient   *ipinfo.Client
+	Gateways struct {
+		rpc        ports.RPCGateway
+		geo        ports.GeoGateway
+		prometheus ports.PrometheusGateway
+		cli        *cligw.Gateway
 	}
 
 	Host struct {
@@ -43,34 +31,35 @@ type (
 
 		TableType enums.TableType
 
-		Status   enums.Status
-		Location *location.Location
-		Metrics  metrics.Metrics
+		Status  enums.Status
+		IPInfo  *ports.IPResult
+		Metrics metrics.Metrics
 
-		clients Clients
+		gateways Gateways
 
 		logger log.Logger
 	}
 )
 
-// NewHost creates a new Host instance with the given table type and address information.
-// The function initializes a new Metrics instance and logger, and creates a new JSON-RPC client for both secure and non-secure connections using the Host's URL obtained from the address information.
-// The function also initializes an HTTP client and IP info client for the Host.
-// Returns a pointer to the Host instance.
-func NewHost(tableType enums.TableType, addressInfo AddressInfo, ipClient *ipinfo.Client, httpClient *http.Client) *Host {
+func NewHost(
+	logger log.Logger,
+	tableType enums.TableType,
+	addressInfo AddressInfo,
+	rpcGW ports.RPCGateway,
+	geoGW ports.GeoGateway,
+	prometheusGW ports.PrometheusGateway,
+	cliGW *cligw.Gateway,
+) *Host {
 	host := &Host{
 		TableType:   tableType,
 		AddressInfo: addressInfo,
-		logger:      log.NewLogger(),
-	}
-
-	secureURL := addressInfo.HostPort.SSL
-	rpcClient := jsonrpc.NewClient(host.getUrl(requestTypeRPC, secureURL))
-
-	host.clients = Clients{
-		rpcClient:  rpcClient,
-		httpClient: httpClient,
-		ipClient:   ipClient,
+		logger:      logger,
+		gateways: Gateways{
+			rpc:        rpcGW,
+			geo:        geoGW,
+			prometheus: prometheusGW,
+			cli:        cliGW,
+		},
 	}
 
 	return host

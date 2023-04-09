@@ -1,39 +1,43 @@
 package rpcgw
 
 import (
+	"context"
 	"fmt"
-	"time"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
-func (gateway *Gateway) CallFor(method enums.RPCMethod) (result any, err error) {
-	timeout := time.After(rpcClientTimeout)
+type responseWithError struct {
+	response any
+	err      error
+}
 
-	respChan := make(chan any)
-	errChan := make(chan error)
+func (gateway *Gateway) CallFor(method enums.RPCMethod) (result any, err error) {
+	respChan := make(chan responseWithError)
+
+	ctx, cancel := context.WithTimeout(gateway.ctx, rpcClientTimeout)
+	defer cancel()
 
 	go func() {
-		var response any
+		var resp any
 
-		if err := gateway.client.CallFor(gateway.ctx, &response, method.String()); err != nil {
-			errChan <- err
+		err := gateway.client.CallFor(ctx, &resp, method.String())
+
+		if err != nil || resp == nil {
+			respChan <- responseWithError{response: nil, err: fmt.Errorf("failed to get response from RPC client: %w", err)}
+		} else {
+			respChan <- responseWithError{response: resp, err: nil}
 		}
-
-		respChan <- response
 	}()
 
 	select {
-	case response := <-respChan:
-		switch response.(type) {
-		case nil:
-			return nil, fmt.Errorf("failed to get response from RPC client")
-		default:
-			return response, nil
+	case <-ctx.Done():
+		return nil, fmt.Errorf("rpc call timed out: %w", ctx.Err())
+	case result := <-respChan:
+		if result.err != nil {
+			return nil, result.err
 		}
-	case err := <-errChan:
-		return nil, fmt.Errorf("failed to get response from RPC client: %w", err)
-	case <-timeout:
-		return nil, fmt.Errorf("RPC call timed out after %s", rpcClientTimeout.String())
+
+		return result.response, nil
 	}
 }

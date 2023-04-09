@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"fmt"
+
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
@@ -9,7 +10,10 @@ func (c *Controller) Static() error {
 	return nil
 }
 
-func (c *Controller) initTables() error {
+// InitTables initializes the enabled tables based on the display configuration.
+// It retrieves the corresponding hosts for each table and initializes the table builder.
+// If an error occurs during table initialization, it returns an error.
+func (c *Controller) InitTables() error {
 	displayConfig := c.config.MonitorsConfig
 	tableConfigMap := map[enums.TableType]bool{
 		enums.TableTypeRPC:              displayConfig.RPCTable.Display,
@@ -23,11 +27,21 @@ func (c *Controller) initTables() error {
 		enums.TableTypeActiveValidators: displayConfig.ActiveValidatorsTable.Display,
 	}
 
-	for tableType, shouldDisplay := range tableConfigMap {
-		if shouldDisplay {
-			if err := c.initTable(tableType); err != nil {
-				return fmt.Errorf("error initializing table %s: %w", tableType, err)
-			}
+	for table, isEnabled := range tableConfigMap {
+		if !isEnabled {
+			continue
+		}
+
+		builder := c.builders.static[table]
+
+		hosts, err := c.getHostsByTableType(table)
+		if err != nil {
+			return err
+		}
+
+		err = builder.Init(table, hosts)
+		if err != nil {
+			return fmt.Errorf("error initializing table %s: %w", table, err)
 		}
 	}
 

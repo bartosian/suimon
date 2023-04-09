@@ -7,9 +7,9 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/tablebuilder/tables"
 )
 
-// InitTable initializes the table configuration based on the given table type and host data.
+// Init initializes the table configuration based on the given table type and host data.
 // It processes the host data and calls the appropriate handler function for the specified table type.
-func (tb *Builder) InitTable(table enums.TableType, hosts []host.Host) error {
+func (tb *Builder) Init(table enums.TableType, hosts []host.Host) error {
 	switch table {
 	case enums.TableTypeNode:
 		tb.handleNodeTable(hosts)
