@@ -21,10 +21,7 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
-const (
-	dashboardName     = "💧 SUIMON: PRESS Q or ESC TO QUIT"
-	logsWidgetMessage = "Looking for the sui-node process to stream the logs.\n\n"
-)
+const dashboardName = "💧 SUIMON: PRESS Q or ESC TO QUIT"
 
 var (
 	DashboardConfigNode = []container.Option{
@@ -76,27 +73,6 @@ var (
 			Columns[enums.CellNameCheckpointsPerSecond],
 			Columns[enums.CellNameDatabaseSize],
 		),
-		//3: NewRowPct(50,
-		//	NewColumnPct(40,
-		//		NewRowPct(50,
-		//			Columns[enums.CellNameEpochProgress],
-		//			Columns[enums.CellNameDiskUsage],
-		//		),
-		//		NewRowPct(50,
-		//			Columns[enums.CellNameCpuUsage],
-		//			Columns[enums.CellNameMemoryUsage],
-		//		),
-		//	),
-		//	NewColumnPct(60,
-		//		NewRowPct(15,
-		//			Columns[enums.CellNameTXSyncProgress],
-		//			Columns[enums.CellNameCheckSyncProgress],
-		//		),
-		//		NewRowPct(20, Columns[enums.CellNameTPSTracker]),
-		//		NewRowPct(20, Columns[enums.CellNameCPSTracker]),
-		//		NewRowPct(45, Columns[enums.CellNameNodeLogs]),
-		//	),
-		//),
 	}
 
 	Columns = []grid.Element{
@@ -387,14 +363,6 @@ func newWidgetByCellName(name enums.CellName) widgetapi.Widget {
 
 		if widget, err = newTextNoScrollWidget(); err == nil {
 			widget.Write(enums.StatusGrey.DashboardStatus(), text.WriteCellOpts(cell.FgColor(cell.ColorGray), cell.BgColor(cell.ColorGray)))
-
-			return widget
-		}
-	case enums.CellNameNodeLogs:
-		var widget *text.Text
-
-		if widget, err = newTextWidget(); err == nil {
-			widget.Write(logsWidgetMessage, text.WriteCellOpts(cell.FgColor(cell.ColorWhite), cell.Bold()))
 
 			return widget
 		}

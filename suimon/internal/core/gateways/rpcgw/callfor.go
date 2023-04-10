@@ -12,6 +12,8 @@ type responseWithError struct {
 	err      error
 }
 
+// CallFor executes an RPC method and returns the result or an error.
+// The function sends an RPC request using the specified method, waits for the response, and handles timeouts.
 func (gateway *Gateway) CallFor(method enums.RPCMethod) (result any, err error) {
 	respChan := make(chan responseWithError)
 

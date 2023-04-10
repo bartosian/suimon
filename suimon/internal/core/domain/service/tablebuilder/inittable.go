@@ -9,8 +9,8 @@ import (
 
 // Init initializes the table configuration based on the given table type and host data.
 // It processes the host data and calls the appropriate handler function for the specified table type.
-func (tb *Builder) Init(table enums.TableType, hosts []host.Host) error {
-	switch table {
+func (tb *Builder) Init(hosts []host.Host) error {
+	switch tb.tableType {
 	case enums.TableTypeNode:
 		tb.handleNodeTable(hosts)
 	case enums.TableTypeRPC:

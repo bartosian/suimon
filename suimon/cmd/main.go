@@ -17,11 +17,8 @@ import (
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/controllers"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/controllers/monitor"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/config"
+	domainconfig "github.com/bartosian/sui_helpers/suimon/internal/core/domain/config"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/geogw"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/prometheusgw"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/rpcgw"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/handlers/commands"
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
@@ -31,29 +28,18 @@ func main() {
 
 	cliGateway := cligw.NewCliGateway()
 
-	config, err := config.NewConfig(logger)
+	config, err := domainconfig.NewConfig(logger)
 	if err != nil {
 		// If an error occurs during initialization of the tables object, log the error and exit the program.
 		cliGateway.Error(err.Error())
+
 		return
 	}
-
-	// Instantiate gateways
-	rpcGateway := rpcgw.NewGateway(logger, "")
-	geoGateway := geogw.NewGateway(logger, "", "")
-	prometheusGateway := prometheusgw.NewGateway(logger, "")
 
 	// Instantiate controllers
 	rootController := controllers.NewRootController(cliGateway)
 	versionController := controllers.NewVersionController(cliGateway)
-	monitorController := monitor.NewController(
-		logger,
-		config,
-		rpcGateway,
-		geoGateway,
-		prometheusGateway,
-		cliGateway,
-	)
+	monitorController := monitor.NewController(logger, config, cliGateway)
 
 	// Instantiate Handlers - Root
 	rootCmdHandler := cmdhandlers.NewRootHandler(rootController)
@@ -63,10 +49,7 @@ func main() {
 	monitorCmdHandler := cmdhandlers.NewMonitorHandler(monitorController)
 
 	// Add subcommands to the root command handler
-	rootCmdHandler.AddSubCommands(
-		versionCmdHandler,
-		monitorCmdHandler,
-	)
+	rootCmdHandler.AddSubCommands(versionCmdHandler, monitorCmdHandler)
 
 	// Start the root command handler
 	rootCmdHandler.Start()

@@ -15,7 +15,7 @@ type (
 )
 
 // GetValue returns the metric value for the given metric type.
-func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) MetricValue {
+func (metrics *Metrics) GetValue(metric enums.MetricType) MetricValue {
 	switch metric {
 	case enums.MetricTypeSuiSystemState:
 		return metrics.SystemState
@@ -50,10 +50,6 @@ func (metrics *Metrics) GetValue(metric enums.MetricType, rpc bool) MetricValue 
 	case enums.MetricTypeTxSyncPercentage:
 		return metrics.TotalTransactionsBlocks
 	case enums.MetricTypeCheckSyncPercentage:
-		if rpc {
-			return metrics.LatestCheckpoint
-		}
-
 		return metrics.HighestSyncedCheckpoint
 	case enums.MetricTypeSuiNetworkPeers:
 		return metrics.NetworkPeers

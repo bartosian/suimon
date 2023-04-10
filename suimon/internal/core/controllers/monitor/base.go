@@ -14,10 +14,7 @@ import (
 
 type (
 	Gateways struct {
-		rpc        ports.RPCGateway
-		geo        ports.GeoGateway
-		prometheus ports.PrometheusGateway
-		cli        *cligw.Gateway
+		cli *cligw.Gateway
 	}
 
 	Hosts struct {
@@ -46,19 +43,13 @@ type (
 func NewController(
 	logger log.Logger,
 	config *config.Config,
-	rpcGW ports.RPCGateway,
-	geoGW ports.GeoGateway,
-	prometheusGW ports.PrometheusGateway,
 	cliGW *cligw.Gateway,
 ) *Controller {
 	return &Controller{
 		logger: logger,
 		config: config,
 		gateways: Gateways{
-			rpc:        rpcGW,
-			geo:        geoGW,
-			prometheus: prometheusGW,
-			cli:        cliGW,
+			cli: cliGW,
 		},
 	}
 }

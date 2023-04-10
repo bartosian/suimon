@@ -24,20 +24,22 @@ type (
 	}
 
 	Builder struct {
+		tableType  enums.TableType
 		cliGateway *cligw.Gateway
-		builder    table.Writer
+		writer     table.Writer
 		config     *TableConfig
 	}
 )
 
 // NewBuilder creates a new instance of the table builder, using the CLI gateway
-func NewBuilder(cliGateway *cligw.Gateway) *Builder {
+func NewBuilder(tableType enums.TableType, cliGateway *cligw.Gateway) *Builder {
 	tableWR := table.NewWriter()
 	tableWR.SetOutputMirror(os.Stdout)
 
 	return &Builder{
+		tableType:  tableType,
 		cliGateway: cliGateway,
-		builder:    tableWR,
+		writer:     tableWR,
 	}
 }
 
@@ -49,7 +51,7 @@ func (tb *Builder) setColumns() {
 		columnsConfig = append(columnsConfig, *column.Config)
 	}
 
-	tb.builder.SetColumnConfigs(columnsConfig)
+	tb.writer.SetColumnConfigs(columnsConfig)
 }
 
 // setRows sets the rows of the table builder based on the configuration in the builder's table config
@@ -90,24 +92,24 @@ func (tb *Builder) setRows() {
 			}
 
 			if itemIndex == 0 && rowIndex == 0 {
-				tb.builder.AppendHeader(header.Values, header.Config)
-				tb.builder.AppendFooter(footer.Values, footer.Config)
+				tb.writer.AppendHeader(header.Values, header.Config)
+				tb.writer.AppendFooter(footer.Values, footer.Config)
 			} else if rowIndex%2 == 1 || itemIndex > 0 && len(rowsConfig) > 1 && rowIndex%2 == 0 {
-				tb.builder.AppendRow(header.Values, header.Config)
+				tb.writer.AppendRow(header.Values, header.Config)
 			}
 
-			tb.builder.AppendRow(row.Values, row.Config)
-			tb.builder.AppendSeparator()
+			tb.writer.AppendRow(row.Values, row.Config)
+			tb.writer.AppendSeparator()
 		}
 	}
 }
 
 // setStyle sets the style for the table builder based on the configuration in the builder's table config
 func (tb *Builder) setStyle() {
-	tb.builder.SortBy(tb.config.Sort)
-	tb.builder.SetTitle(tb.config.Name)
-	tb.builder.SetStyle(tb.config.Style)
-	tb.builder.SetAutoIndex(tb.config.AutoIndex)
+	tb.writer.SortBy(tb.config.Sort)
+	tb.writer.SetTitle(tb.config.Name)
+	tb.writer.SetStyle(tb.config.Style)
+	tb.writer.SetAutoIndex(tb.config.AutoIndex)
 
 	tb.setColors()
 }
@@ -144,13 +146,5 @@ func (tb *Builder) setColors() {
 		return handler
 	}()
 
-	tb.builder.SetRowPainter(f)
-}
-
-func (tb *Builder) Render() {
-	tb.setRows()
-	tb.setColumns()
-	tb.setStyle()
-
-	tb.builder.Render()
+	tb.writer.SetRowPainter(f)
 }
