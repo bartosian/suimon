@@ -20,15 +20,12 @@ import (
 	domainconfig "github.com/bartosian/sui_helpers/suimon/internal/core/domain/config"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/handlers/commands"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 func main() {
-	var logger = log.NewLogger()
+	cliGateway := cligw.NewGateway()
 
-	cliGateway := cligw.NewCliGateway()
-
-	config, err := domainconfig.NewConfig(logger)
+	config, err := domainconfig.NewConfig()
 	if err != nil {
 		// If an error occurs during initialization of the tables object, log the error and exit the program.
 		cliGateway.Error(err.Error())
@@ -39,7 +36,7 @@ func main() {
 	// Instantiate controllers
 	rootController := controllers.NewRootController(cliGateway)
 	versionController := controllers.NewVersionController(cliGateway)
-	monitorController := monitor.NewController(logger, config, cliGateway)
+	monitorController := monitor.NewController(config, cliGateway)
 
 	// Instantiate Handlers - Root
 	rootCmdHandler := cmdhandlers.NewRootHandler(rootController)
@@ -55,9 +52,9 @@ func main() {
 	rootCmdHandler.Start()
 }
 
-func handlePanic(logger *log.Logger) {
+func handlePanic() {
 	if r := recover(); r != nil {
-		logger.Error("failed to execute suimon, please check an issue: ", r)
+		//logger.Error("failed to execute suimon, please check an issue: ", r)
 
 		os.Exit(1)
 	}

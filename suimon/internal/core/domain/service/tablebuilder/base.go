@@ -7,6 +7,8 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/tablebuilder/tables"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
 )
 
@@ -25,19 +27,21 @@ type (
 
 	Builder struct {
 		tableType  enums.TableType
+		hosts      []host.Host
 		cliGateway *cligw.Gateway
 		writer     table.Writer
-		config     *TableConfig
+		config     *tables.TableConfig
 	}
 )
 
 // NewBuilder creates a new instance of the table builder, using the CLI gateway
-func NewBuilder(tableType enums.TableType, cliGateway *cligw.Gateway) *Builder {
+func NewBuilder(tableType enums.TableType, hosts []host.Host, cliGateway *cligw.Gateway) *Builder {
 	tableWR := table.NewWriter()
 	tableWR.SetOutputMirror(os.Stdout)
 
 	return &Builder{
 		tableType:  tableType,
+		hosts:      hosts,
 		cliGateway: cliGateway,
 		writer:     tableWR,
 	}
@@ -63,9 +67,9 @@ func (tb *Builder) setRows() {
 
 	for itemIndex := 0; itemIndex < itemsCount; itemIndex++ {
 		for rowIndex, columns := range rowsConfig {
-			header := NewRow(true, false, columnsPerRow, true, text.AlignCenter)
-			footer := NewRow(false, false, columnsPerRow, true, text.AlignCenter)
-			row := NewRow(false, true, columnsPerRow, true, text.AlignCenter)
+			header := tables.NewRow(true, false, columnsPerRow, true, text.AlignCenter)
+			footer := tables.NewRow(false, false, columnsPerRow, true, text.AlignCenter)
+			row := tables.NewRow(false, true, columnsPerRow, true, text.AlignCenter)
 
 			var (
 				columnIdx  int
@@ -78,15 +82,15 @@ func (tb *Builder) setRows() {
 
 				header.AppendValue(columnName.ToString())
 				row.AppendValue(columnValue)
-				footer.PrependValue(EmptyValue)
+				footer.PrependValue(tables.EmptyValue)
 			}
 
 			columnIdx++
 
 			for columnIdx < columnsPerRow {
-				header.PrependValue(EmptyValue)
-				footer.PrependValue(EmptyValue)
-				row.PrependValue(EmptyValue)
+				header.PrependValue(tables.EmptyValue)
+				footer.PrependValue(tables.EmptyValue)
+				row.PrependValue(tables.EmptyValue)
 
 				columnIdx++
 			}
@@ -123,13 +127,8 @@ func (tb *Builder) setColors() {
 
 		var handler = func(row table.Row) text.Colors {
 			for _, column := range row {
-				switch value := column.(type) {
-				case int:
+				if _, ok := column.(int); ok {
 					return valuesRowFgColor
-				case string:
-					if value == EmptyValue {
-						return valuesRowFgColor
-					}
 				}
 			}
 

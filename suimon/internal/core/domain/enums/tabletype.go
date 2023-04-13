@@ -13,3 +13,7 @@ const (
 	TableTypeValidatorReports TableType = "VALIDATOR REPORTS"
 	TableTypeActiveValidators TableType = "ACTIVE VALIDATORS"
 )
+
+func (e TableType) ToString() string {
+	return string(e)
+}

@@ -9,7 +9,6 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 type (
@@ -32,7 +31,9 @@ type (
 	Controller struct {
 		lock sync.RWMutex
 
-		logger   log.Logger
+		selectedTables     []enums.TableType
+		selectedDashboards []enums.TableType
+
 		config   *config.Config
 		hosts    Hosts
 		gateways Gateways
@@ -41,15 +42,17 @@ type (
 )
 
 func NewController(
-	logger log.Logger,
 	config *config.Config,
 	cliGW *cligw.Gateway,
 ) *Controller {
 	return &Controller{
-		logger: logger,
 		config: config,
 		gateways: Gateways{
 			cli: cliGW,
+		},
+		builders: Builders{
+			static:  make(map[enums.TableType]ports.Builder),
+			dynamic: make(map[enums.TableType]ports.Builder),
 		},
 	}
 }
@@ -62,7 +65,7 @@ func (c *Controller) setBuilderForTable(table enums.TableType, builder ports.Bui
 
 // getHostsByTableType returns the list of hosts for a given table type.
 // It acquires a read lock on the controller lock before accessing the hosts data.
-func (c Controller) getHostsByTableType(table enums.TableType) (hosts []host.Host, err error) {
+func (c *Controller) getHostsByTableType(table enums.TableType) (hosts []host.Host, err error) {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 

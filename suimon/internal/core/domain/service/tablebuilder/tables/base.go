@@ -1,4 +1,4 @@
-package tablebuilder
+package tables
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/tablebuilder/tables"
 )
 
 const suiEmoji = "💧"
@@ -77,14 +76,19 @@ type TableConfig struct {
 // It sets the table name, style, sort, rows, columns, column count, and auto-index.
 func NewDefaultTableConfig(table enums.TableType) *TableConfig {
 	tableName := fmt.Sprintf("%s [ %s ]", suiEmoji, table)
-	columnsConfig := getColumnsConfig(table)
-	sortConfig := getTableSortConfig(table)
-	rowsConfig := getRowsConfig(table)
-	autoIndex := getAutoIndex(table)
+	columnsConfig := GetColumnsConfig(table)
+	sortConfig := GetTableSortConfig(table)
+	rowsConfig := GetRowsConfig(table)
+	autoIndex := GetAutoIndex(table)
+	tableColor := GetTableColor(table)
+
+	tableStyle := tableStyleDefault
+	tableStyle.Title.Colors = tableColor
+	tableStyle.Color.Footer = tableColor
 
 	return &TableConfig{
 		Name:         tableName,
-		Style:        tableStyleDefault,
+		Style:        tableStyle,
 		Sort:         sortConfig,
 		Rows:         rowsConfig,
 		Columns:      columnsConfig,
@@ -93,80 +97,80 @@ func NewDefaultTableConfig(table enums.TableType) *TableConfig {
 	}
 }
 
-// getColumnsConfig returns the columns configuration based on the specified table type.
-func getColumnsConfig(table enums.TableType) ColumnsConfig {
+// GetColumnsConfig returns the columns configuration based on the specified table type.
+func GetColumnsConfig(table enums.TableType) ColumnsConfig {
 	switch table {
 	case enums.TableTypeRPC:
-		return tables.ColumnsConfigRPC
+		return ColumnsConfigRPC
 	case enums.TableTypePeers:
-		return tables.ColumnsConfigPeer
+		return ColumnsConfigPeer
 	case enums.TableTypeValidator:
-		return tables.ColumnsConfigValidator
+		return ColumnsConfigValidator
 	case enums.TableTypeNode:
-		return tables.ColumnsConfigNode
+		return ColumnsConfigNode
 	case enums.TableTypeSystemState,
 		enums.TableTypeValidatorsCounts,
 		enums.TableTypeValidatorsAtRisk,
 		enums.TableTypeValidatorReports:
-		return tables.ColumnsConfigSystem
+		return ColumnsConfigSystem
 	case enums.TableTypeActiveValidators:
-		return tables.ColumnsConfigActiveValidator
+		return ColumnsConfigActiveValidator
 	default:
 		return nil
 	}
 }
 
-// getTableSortConfig returns the sort configuration based on the specified table type.
-func getTableSortConfig(table enums.TableType) SortConfig {
+// GetTableSortConfig returns the sort configuration based on the specified table type.
+func GetTableSortConfig(table enums.TableType) SortConfig {
 	switch table {
 	case enums.TableTypeRPC:
-		return tables.SortConfigRPC
+		return SortConfigRPC
 	case enums.TableTypePeers:
-		return tables.SortConfigPeer
+		return SortConfigPeer
 	case enums.TableTypeValidator:
-		return tables.SortConfigValidator
+		return SortConfigValidator
 	case enums.TableTypeSystemState,
 		enums.TableTypeValidatorsCounts,
 		enums.TableTypeValidatorsAtRisk,
 		enums.TableTypeValidatorReports:
-		return tables.SortConfigSystem
+		return SortConfigSystem
 	case enums.TableTypeNode:
-		return tables.SortConfigNode
+		return SortConfigNode
 	case enums.TableTypeActiveValidators:
-		return tables.SortConfigActiveValidator
+		return SortConfigActiveValidator
 	default:
 		return nil
 	}
 }
 
-// getRowsConfig returns the rows configuration based on the specified table type.
-func getRowsConfig(table enums.TableType) RowsConfig {
+// GetRowsConfig returns the rows configuration based on the specified table type.
+func GetRowsConfig(table enums.TableType) RowsConfig {
 	switch table {
 	case enums.TableTypeRPC:
-		return tables.RowsConfigRPC
+		return RowsConfigRPC
 	case enums.TableTypePeers:
-		return tables.RowsConfigPeer
+		return RowsConfigPeer
 	case enums.TableTypeValidator:
-		return tables.RowsConfigValidator
+		return RowsConfigValidator
 	case enums.TableTypeSystemState:
-		return tables.RowsConfigSystemState
+		return RowsConfigSystemState
 	case enums.TableTypeValidatorsCounts:
-		return tables.RowsConfigValidatorCounts
+		return RowsConfigValidatorCounts
 	case enums.TableTypeValidatorsAtRisk:
-		return tables.RowsConfigValidatorsAtRisk
+		return RowsConfigValidatorsAtRisk
 	case enums.TableTypeValidatorReports:
-		return tables.RowsConfigValidatorReports
+		return RowsConfigValidatorReports
 	case enums.TableTypeNode:
-		return tables.RowsConfigNode
+		return RowsConfigNode
 	case enums.TableTypeActiveValidators:
-		return tables.RowsActiveValidator
+		return RowsActiveValidator
 	default:
 		return nil
 	}
 }
 
-// getAutoIndex returns true if the specified table type needs to be auto-indexed; otherwise, false.
-func getAutoIndex(table enums.TableType) bool {
+// GetAutoIndex returns true if the specified table type needs to be auto-indexed; otherwise, false.
+func GetAutoIndex(table enums.TableType) bool {
 	tableToAutoIndexMap := map[enums.TableType]bool{
 		enums.TableTypeSystemState:      false,
 		enums.TableTypeValidatorsCounts: false,
@@ -175,9 +179,21 @@ func getAutoIndex(table enums.TableType) bool {
 		enums.TableTypeNode:             false,
 		enums.TableTypeValidatorsAtRisk: false,
 		enums.TableTypeValidator:        false,
-		enums.TableTypeRPC:              true,
+		enums.TableTypeRPC:              false,
 		enums.TableTypeActiveValidators: true,
 	}
 
 	return tableToAutoIndexMap[table]
+}
+
+// GetTableColor returns the color configuration based on the specified table type.
+func GetTableColor(table enums.TableType) text.Colors {
+	switch table {
+	case enums.TableTypeRPC, enums.TableTypePeers, enums.TableTypeValidatorsAtRisk:
+		return text.Colors{text.BgHiBlue, text.FgBlack}
+	case enums.TableTypeNode, enums.TableTypeSystemState, enums.TableTypeValidatorReports:
+		return text.Colors{text.BgHiGreen, text.FgBlack}
+	default:
+		return text.Colors{text.BgHiYellow, text.FgBlack}
+	}
 }

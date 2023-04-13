@@ -1,4 +1,4 @@
-package tablebuilder
+package tables
 
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -9,7 +9,7 @@ import (
 
 const (
 	TableNoData    = "no data"
-	EmptyValue     = " "
+	EmptyValue     = ""
 	RpcPortDefault = "9000"
 )
 
@@ -66,16 +66,13 @@ func (cols ColumnsConfig) SetNoDataValue() ColumnsConfig {
 }
 
 // SetColumnValues creates a new slice of columns with the given values set for each column at the corresponding index
-func (cols ColumnsConfig) SetColumnValues(values ColumnValues) ColumnsConfig {
-	newCols := make(ColumnsConfig, len(cols))
+func (cols ColumnsConfig) SetColumnValues(values ColumnValues) {
 	for idx, col := range cols {
 		newCol := col
 
 		if value, ok := values[idx]; ok {
 			newCol.SetValue(value)
 		}
-		newCols[idx] = newCol
+		cols[idx] = newCol
 	}
-
-	return newCols
 }

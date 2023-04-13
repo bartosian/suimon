@@ -13,31 +13,9 @@ import (
 	"github.com/common-nighthawk/go-figure"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
 type Logger struct{}
-
-func NewLogger() Logger {
-	return Logger{}
-}
-
-func (logger *Logger) Info(messages ...any) {
-	colorPrint(enums.ColorGreen, messages)
-}
-
-func (logger *Logger) Warn(messages ...any) {
-	colorPrint(enums.ColorYellow, messages)
-}
-
-func (logger *Logger) Error(messages ...any) {
-	colorPrint(enums.ColorRed, messages)
-}
-
-func colorPrint(color enums.Color, messages ...any) {
-	fmt.Println("\n", color, messages, enums.ColorReset)
-}
 
 func (logger *Logger) StreamFromService(serviceName string, stream chan string) error {
 	var (

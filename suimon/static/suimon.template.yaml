@@ -1,30 +1,9 @@
-# update this section if you want to enable/disable tables
-monitors-config:
-  rpc-table:
-    display: true
-  node-table:
-    display: true
-  validator-table:
-    display: true
-  peers-table:
-    display: true
-  system-state-table:
-    display: true
-  validator-counts-table:
-    display: true
-  validators-at-risk-table:
-    display: true
-  validator-reports-table:
-    display: true
-  active-validators-table:
-    display: true
-
-# update this section to add/remove rpcgw endpoints
+# update this section to add/remove rpc endpoints
 public-rpc:
-  - "https://wave3-rpcgw.testnet.sui.io:443"
+  - "https://wave3-rpc.testnet.sui.io:443"
   - "https://rpcgw-ws-testnet-w3.suiscan.xyz:443"
   - "https://sui-api.rpcpool.com:443"
-  - "https://wave3-rpcgw.synergynodes.com:443"
+  - "https://wave3-rpc.synergynodes.com:443"
 
 # if you wish to monitor the node, update this section with the node information
 full-node:
@@ -47,8 +26,3 @@ seed-peers:
 # which is free and gives you 50k requests per month, which is sufficient for individual usage.
 ip-lookup:
   access-token: "55f30ce0213aa7" # temporary access token with requests limit
-
-# update this section to change the visual appearance of the widgets
-monitors-visual:
-  # update this section if you want to enable/disable emojis in tables
-  enable-emojis: false

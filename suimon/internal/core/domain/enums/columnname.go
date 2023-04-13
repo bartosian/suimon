@@ -31,6 +31,7 @@ const (
 	ColumnNameLastCommittedRound                          ColumnName = "LAST COMMITTED\nROUND"
 	ColumnNameSkippedConsensusTransactions                ColumnName = "SKIPPED\nCONSENSUS TX"
 	ColumnNameTotalSignatureErrors                        ColumnName = "SIGNATURE\nERRORS"
+	ColumnNameCertificatesCreated                         ColumnName = "CERTIFICATES\nCREATED"
 	ColumnNameValidatorName                               ColumnName = "NAME"
 	ColumnNameValidatorNetAddress                         ColumnName = "NET ADDRESS"
 	ColumnNameValidatorVotingPower                        ColumnName = "VOTING\nPOWER"

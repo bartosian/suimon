@@ -5,39 +5,38 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/tablebuilder"
 )
 
 var (
-	SortConfigPeer = tablebuilder.SortConfig{
+	SortConfigPeer = SortConfig{
 		{Name: enums.ColumnNameHealth.ToString(), Mode: table.Dsc},
 		{Name: enums.ColumnNameTotalTransactionBlocks.ToString(), Mode: table.Dsc},
 		{Name: enums.ColumnNameLatestCheckpoint.ToString(), Mode: table.Dsc},
 	}
-	ColumnsConfigPeer = tablebuilder.ColumnsConfig{
-		enums.ColumnNameIndex:                        tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameHealth:                       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameAddress:                      tablebuilder.NewDefaultColumnConfig(text.AlignLeft, text.AlignCenter, false),
-		enums.ColumnNamePortRPC:                      tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameTotalTransactionBlocks:       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameLatestCheckpoint:             tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameTotalTransactionCertificates: tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameTotalTransactionEffects:      tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameHighestKnownCheckpoint:       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameHighestSyncedCheckpoint:      tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameLastExecutedCheckpoint:       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCheckpointExecBacklog:        tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCheckpointSyncBacklog:        tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCurrentEpoch:                 tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameTXSyncPercentage:             tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCheckSyncPercentage:          tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameNetworkPeers:                 tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameUptime:                       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameVersion:                      tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCommit:                       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCountry:                      tablebuilder.NewDefaultColumnConfig(text.AlignLeft, text.AlignCenter, false),
+	ColumnsConfigPeer = ColumnsConfig{
+		enums.ColumnNameIndex:                        NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameHealth:                       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameAddress:                      NewDefaultColumnConfig(text.AlignLeft, text.AlignCenter, false),
+		enums.ColumnNamePortRPC:                      NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameTotalTransactionBlocks:       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameLatestCheckpoint:             NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameTotalTransactionCertificates: NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameTotalTransactionEffects:      NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameHighestKnownCheckpoint:       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameHighestSyncedCheckpoint:      NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameLastExecutedCheckpoint:       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCheckpointExecBacklog:        NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCheckpointSyncBacklog:        NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCurrentEpoch:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameTXSyncPercentage:             NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCheckSyncPercentage:          NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameNetworkPeers:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameUptime:                       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameVersion:                      NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCommit:                       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCountry:                      NewDefaultColumnConfig(text.AlignLeft, text.AlignCenter, false),
 	}
-	RowsConfigPeer = tablebuilder.RowsConfig{
+	RowsConfigPeer = RowsConfig{
 		0: {
 			enums.ColumnNameIndex,
 			enums.ColumnNameHealth,

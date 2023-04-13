@@ -7,20 +7,20 @@ import (
 
 	"github.com/ybbus/jsonrpc/v3"
 
+	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 const rpcClientTimeout = 4 * time.Second
 
 type Gateway struct {
-	ctx    context.Context
-	url    string
-	client jsonrpc.RPCClient
-	logger log.Logger
+	ctx        context.Context
+	url        string
+	client     jsonrpc.RPCClient
+	cliGateway *cligw.Gateway
 }
 
-func NewGateway(logger log.Logger, url string) ports.RPCGateway {
+func NewGateway(cliGW *cligw.Gateway, url string) ports.RPCGateway {
 	httpClient := &http.Client{
 		Timeout: rpcClientTimeout,
 	}
@@ -32,9 +32,9 @@ func NewGateway(logger log.Logger, url string) ports.RPCGateway {
 	rpcClient := jsonrpc.NewClientWithOpts(url, opts)
 
 	return &Gateway{
-		ctx:    context.Background(),
-		url:    url,
-		client: rpcClient,
-		logger: logger,
+		ctx:        context.Background(),
+		url:        url,
+		client:     rpcClient,
+		cliGateway: cliGW,
 	}
 }

@@ -1,74 +1,41 @@
 package monitor
 
 import (
-	"fmt"
-
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
 )
 
-// RenderTables renders the tables for the hosts data provided to the controller.
-// It iterates over the table types and corresponding builders in the tableTypeToBuilder map
-// and renders the tables if they are enabled in the configuration and the data is provided for the table type.
-// If rendering fails for any table, an error is returned.
+// RenderTables renders the selected tables. The function checks whether data has been provided for each table
+// and enables or disables the table based on the availability of data. For each selected table, the function
+// retrieves the corresponding table builder from the static table builders map and calls its Render method.
+// The function returns nil if all selected tables have been rendered successfully.
 func (c *Controller) RenderTables() error {
-	monitorsConfig := c.config.MonitorsConfig
+	selectedTables := c.selectedTables
 
 	rpcProvided := len(c.hosts.rpc) > 0
 	nodeProvided := len(c.hosts.node) > 0
 	peersProvided := len(c.hosts.peers) > 0
 	validatorProvided := len(c.hosts.validator) > 0
 
-	tableTypeToBuilder := map[enums.TableType]struct {
-		builder ports.Builder
-		enabled bool
-	}{
-		enums.TableTypeRPC: {
-			builder: c.builders.static[enums.TableTypeRPC],
-			enabled: monitorsConfig.RPCTable.Display && rpcProvided,
-		},
-		enums.TableTypeNode: {
-			builder: c.builders.static[enums.TableTypeNode],
-			enabled: monitorsConfig.NodeTable.Display && nodeProvided,
-		},
-		enums.TableTypeValidator: {
-			builder: c.builders.static[enums.TableTypeValidator],
-			enabled: monitorsConfig.ValidatorTable.Display && validatorProvided,
-		},
-		enums.TableTypePeers: {
-			builder: c.builders.static[enums.TableTypePeers],
-			enabled: monitorsConfig.PeersTable.Display && peersProvided,
-		},
-		enums.TableTypeSystemState: {
-			builder: c.builders.static[enums.TableTypeSystemState],
-			enabled: monitorsConfig.SystemStateTable.Display && rpcProvided,
-		},
-		enums.TableTypeValidatorsCounts: {
-			builder: c.builders.static[enums.TableTypeValidatorsCounts],
-			enabled: monitorsConfig.ValidatorsCountsTable.Display && rpcProvided,
-		},
-		enums.TableTypeValidatorsAtRisk: {
-			builder: c.builders.static[enums.TableTypeValidatorsAtRisk],
-			enabled: monitorsConfig.ValidatorsAtRiskTable.Display && rpcProvided,
-		},
-		enums.TableTypeValidatorReports: {
-			builder: c.builders.static[enums.TableTypeValidatorReports],
-			enabled: monitorsConfig.ValidatorReportsTable.Display && rpcProvided,
-		},
-		enums.TableTypeActiveValidators: {
-			builder: c.builders.static[enums.TableTypeActiveValidators],
-			enabled: monitorsConfig.ActiveValidatorsTable.Display && rpcProvided,
-		},
+	tableTypeEnabled := map[enums.TableType]bool{
+		enums.TableTypeRPC:              rpcProvided,
+		enums.TableTypeNode:             nodeProvided,
+		enums.TableTypeValidator:        validatorProvided,
+		enums.TableTypePeers:            peersProvided,
+		enums.TableTypeSystemState:      rpcProvided,
+		enums.TableTypeValidatorsCounts: rpcProvided,
+		enums.TableTypeValidatorsAtRisk: rpcProvided,
+		enums.TableTypeValidatorReports: rpcProvided,
+		enums.TableTypeActiveValidators: rpcProvided,
 	}
 
-	for tableType, builderConfig := range tableTypeToBuilder {
-		if !builderConfig.enabled {
+	for _, tableType := range selectedTables {
+		if !tableTypeEnabled[tableType] {
 			continue
 		}
 
-		if err := builderConfig.builder.Render(); err != nil {
-			return fmt.Errorf("error rendering table %s: %w", tableType, err)
-		}
+		builder := c.builders.static[tableType]
+
+		builder.Render()
 	}
 
 	return nil

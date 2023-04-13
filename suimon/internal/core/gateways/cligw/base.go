@@ -6,7 +6,7 @@ type Gateway struct {
 	surveyIcons survey.AskOpt
 }
 
-func NewCliGateway() *Gateway {
+func NewGateway() *Gateway {
 	surveyIcons := survey.WithIcons(func(icons *survey.IconSet) {
 		icons.Question.Text = "❔"
 	})

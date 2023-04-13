@@ -12,13 +12,13 @@ const (
 // SetIPInfo sets the IPInfo property of a Host struct by calling an external geolocation API with the host's IP address.
 // It returns an error if the IP address is invalid or if the API call fails.
 func (host *Host) SetIPInfo() error {
-	if host.HostPort.IP == nil {
+	if host.Endpoint.IP == nil {
 		return nil
 	}
 
-	ip := net.ParseIP(*host.HostPort.IP)
+	ip := net.ParseIP(*host.Endpoint.IP)
 	if ip == nil {
-		return fmt.Errorf(ErrInvalidIPAddressProvided, host.HostPort.IP)
+		return fmt.Errorf(ErrInvalidIPAddressProvided, host.Endpoint.IP)
 	}
 
 	ipInfo, err := host.gateways.geo.CallFor(ip)
@@ -26,7 +26,7 @@ func (host *Host) SetIPInfo() error {
 		return err
 	}
 
-	host.IPInfo = &ipInfo
+	host.IPInfo = ipInfo
 
 	return nil
 }

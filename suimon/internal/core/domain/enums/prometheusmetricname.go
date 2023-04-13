@@ -18,6 +18,7 @@ const (
 	PrometheusMetricNameSuiNetworkPeers              PrometheusMetricName = "sui_network_peers"
 	PrometheusMetricNameSkippedConsensusTransactions PrometheusMetricName = "skipped_consensus_txns"
 	PrometheusMetricNameTotalSignatureErrors         PrometheusMetricName = "total_signature_errors"
+	PrometheusMetricNameCertificatesCreated          PrometheusMetricName = "certificates_created"
 	PrometheusMetricNameUptime                       PrometheusMetricName = "uptime"
 )
 

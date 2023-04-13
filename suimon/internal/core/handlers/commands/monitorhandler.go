@@ -1,6 +1,7 @@
 package cmdhandlers
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
@@ -41,8 +42,8 @@ func (h *MonitorHandler) newCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "monitor",
 		Aliases: []string{"m"},
-		Short:   "suimon monitor",
-		Long:    "suimon monitor",
+		Short:   "Render monitoring dashboards",
+		Long:    "Render monitoring dashboards",
 		Run:     h.handleCommand,
 	}
 
@@ -50,5 +51,7 @@ func (h *MonitorHandler) newCommand() *cobra.Command {
 }
 
 func (h *MonitorHandler) handleCommand(_ *cobra.Command, _ []string) {
-	h.controller.PrintVersion()
+	if err := h.controller.Monitor(); err != nil {
+		fmt.Printf("Failed to run! %s\n", err)
+	}
 }

@@ -2,14 +2,16 @@ package tablebuilder
 
 import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
+	domainhost "github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/tablebuilder/tables"
 )
 
 // Init initializes the table configuration based on the given table type and host data.
 // It processes the host data and calls the appropriate handler function for the specified table type.
-func (tb *Builder) Init(hosts []host.Host) error {
+func (tb *Builder) Init() error {
+	hosts := tb.hosts
+
 	switch tb.tableType {
 	case enums.TableTypeNode:
 		tb.handleNodeTable(hosts)
@@ -49,8 +51,8 @@ func (tb *Builder) Init(hosts []host.Host) error {
 }
 
 // handleNodeTable handles the configuration for the Node table.
-func (tb *Builder) handleNodeTable(hosts []host.Host) {
-	tableConfig := NewDefaultTableConfig(enums.TableTypeNode)
+func (tb *Builder) handleNodeTable(hosts []domainhost.Host) {
+	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeNode)
 
 	for idx, host := range hosts {
 		if !host.Metrics.Updated {
@@ -68,8 +70,8 @@ func (tb *Builder) handleNodeTable(hosts []host.Host) {
 }
 
 // handleRPCTable handles the configuration for the RPC table.
-func (tb *Builder) handleRPCTable(hosts []host.Host) {
-	tableConfig := NewDefaultTableConfig(enums.TableTypeRPC)
+func (tb *Builder) handleRPCTable(hosts []domainhost.Host) {
+	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeRPC)
 
 	for idx, host := range hosts {
 		if !host.Metrics.Updated {
@@ -87,8 +89,8 @@ func (tb *Builder) handleRPCTable(hosts []host.Host) {
 }
 
 // handlePeersTable handles the configuration for the Peers table.
-func (tb *Builder) handlePeersTable(hosts []host.Host) {
-	tableConfig := NewDefaultTableConfig(enums.TableTypePeers)
+func (tb *Builder) handlePeersTable(hosts []domainhost.Host) {
+	tableConfig := tables.NewDefaultTableConfig(enums.TableTypePeers)
 
 	for idx, host := range hosts {
 		if !host.Metrics.Updated {
@@ -106,8 +108,8 @@ func (tb *Builder) handlePeersTable(hosts []host.Host) {
 }
 
 // handleValidatorTable handles the configuration for the Validator table.
-func (tb *Builder) handleValidatorTable(hosts []host.Host) {
-	tableConfig := NewDefaultTableConfig(enums.TableTypeValidator)
+func (tb *Builder) handleValidatorTable(hosts []domainhost.Host) {
+	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidator)
 
 	for idx, host := range hosts {
 		if !host.Metrics.Updated {
@@ -126,7 +128,7 @@ func (tb *Builder) handleValidatorTable(hosts []host.Host) {
 
 // handleSystemStateTable handles the configuration for the System State table.
 func (tb *Builder) handleSystemStateTable(systemState *metrics.SuiSystemState) {
-	tableConfig := NewDefaultTableConfig(enums.TableTypeSystemState)
+	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeSystemState)
 
 	columnValues := tables.GetSystemStateColumnValues(systemState)
 
@@ -139,7 +141,7 @@ func (tb *Builder) handleSystemStateTable(systemState *metrics.SuiSystemState) {
 
 // handleValidatorCountsTable handles the configuration for the Validator Counts table.
 func (tb *Builder) handleValidatorCountsTable(systemState *metrics.SuiSystemState) {
-	tableConfig := NewDefaultTableConfig(enums.TableTypeValidatorsCounts)
+	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidatorsCounts)
 
 	columnValues := tables.GetValidatorCountsColumnValues(systemState)
 
@@ -153,7 +155,7 @@ func (tb *Builder) handleValidatorCountsTable(systemState *metrics.SuiSystemStat
 // handleValidatorsAtRiskTable handles the configuration for the Validators At Risk table.
 // It takes the system state, extracts the necessary data, and updates the table configuration.
 func (tb *Builder) handleValidatorsAtRiskTable(systemState *metrics.SuiSystemState) error {
-	tableConfig := NewDefaultTableConfig(enums.TableTypeValidatorsAtRisk)
+	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidatorsAtRisk)
 
 	validatorsAtRisk := systemState.ValidatorsAtRiskParsed
 
@@ -173,7 +175,7 @@ func (tb *Builder) handleValidatorsAtRiskTable(systemState *metrics.SuiSystemSta
 // handleValidatorReportsTable handles the configuration for the Validator Reports table.
 // It takes the system state, extracts the necessary data, and updates the table configuration.
 func (tb *Builder) handleValidatorReportsTable(systemState *metrics.SuiSystemState) error {
-	tableConfig := NewDefaultTableConfig(enums.TableTypeValidatorReports)
+	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidatorReports)
 
 	validatorReports := systemState.ValidatorReportsParsed
 
@@ -193,7 +195,7 @@ func (tb *Builder) handleValidatorReportsTable(systemState *metrics.SuiSystemSta
 // handleActiveValidatorsTable handles the configuration for the Active Validators table.
 // It takes the system state, extracts the necessary data, and updates the table configuration.
 func (tb *Builder) handleActiveValidatorsTable(systemState *metrics.SuiSystemState) {
-	tableConfig := NewDefaultTableConfig(enums.TableTypeActiveValidators)
+	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeActiveValidators)
 
 	activeValidators := systemState.ActiveValidators
 

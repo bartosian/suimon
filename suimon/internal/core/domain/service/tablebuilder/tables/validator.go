@@ -8,55 +8,56 @@ import (
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/tablebuilder"
 )
 
 var (
-	SortConfigValidator = tablebuilder.SortConfig{
+	SortConfigValidator = SortConfig{
 		{Name: string(enums.ColumnNameHealth), Mode: table.Dsc},
 		{Name: string(enums.ColumnNameTotalTransactionBlocks), Mode: table.Dsc},
 		{Name: string(enums.ColumnNameLatestCheckpoint), Mode: table.Dsc},
 	}
-	ColumnsConfigValidator = tablebuilder.ColumnsConfig{
-		enums.ColumnNameIndex:                        tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameHealth:                       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameAddress:                      tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameTotalTransactionCertificates: tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameTotalTransactionEffects:      tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameHighestKnownCheckpoint:       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameHighestSyncedCheckpoint:      tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameLastExecutedCheckpoint:       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCheckpointExecBacklog:        tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCheckpointSyncBacklog:        tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCurrentEpoch:                 tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCheckSyncPercentage:          tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameNetworkPeers:                 tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameUptime:                       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameVersion:                      tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCommit:                       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameCountry:                      tablebuilder.NewDefaultColumnConfig(text.AlignLeft, text.AlignCenter, false),
-		enums.ColumnNameCurrentRound:                 tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameHighestProcessedRound:        tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameLastCommittedRound:           tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNamePrimaryNetworkPeers:          tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameWorkerNetworkPeers:           tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSkippedConsensusTransactions: tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameTotalSignatureErrors:         tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+	ColumnsConfigValidator = ColumnsConfig{
+		enums.ColumnNameIndex:                        NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameHealth:                       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameAddress:                      NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameTotalTransactionCertificates: NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCertificatesCreated:          NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameTotalTransactionEffects:      NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameHighestKnownCheckpoint:       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameHighestSyncedCheckpoint:      NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameLastExecutedCheckpoint:       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCheckpointExecBacklog:        NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCheckpointSyncBacklog:        NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCurrentEpoch:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCheckSyncPercentage:          NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameNetworkPeers:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameUptime:                       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameVersion:                      NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCommit:                       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameCountry:                      NewDefaultColumnConfig(text.AlignLeft, text.AlignCenter, false),
+		enums.ColumnNameCurrentRound:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameHighestProcessedRound:        NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameLastCommittedRound:           NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNamePrimaryNetworkPeers:          NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameWorkerNetworkPeers:           NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSkippedConsensusTransactions: NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameTotalSignatureErrors:         NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 	}
-	RowsConfigValidator = tablebuilder.RowsConfig{
+	RowsConfigValidator = RowsConfig{
 		0: {
 			enums.ColumnNameIndex,
 			enums.ColumnNameHealth,
 			enums.ColumnNameAddress,
 			enums.ColumnNameCurrentEpoch,
 			enums.ColumnNameTotalTransactionCertificates,
+			enums.ColumnNameCertificatesCreated,
+			enums.ColumnNameSkippedConsensusTransactions,
 			enums.ColumnNameTotalTransactionEffects,
 			enums.ColumnNameHighestKnownCheckpoint,
 			enums.ColumnNameLastExecutedCheckpoint,
 			enums.ColumnNameCheckpointExecBacklog,
 			enums.ColumnNameHighestSyncedCheckpoint,
 			enums.ColumnNameCheckpointSyncBacklog,
-			enums.ColumnNameNetworkPeers,
 		},
 		1: {
 			enums.ColumnNameUptime,
@@ -65,9 +66,9 @@ var (
 			enums.ColumnNameCurrentRound,
 			enums.ColumnNameHighestProcessedRound,
 			enums.ColumnNameLastCommittedRound,
+			enums.ColumnNameNetworkPeers,
 			enums.ColumnNamePrimaryNetworkPeers,
 			enums.ColumnNameWorkerNetworkPeers,
-			enums.ColumnNameSkippedConsensusTransactions,
 			enums.ColumnNameTotalSignatureErrors,
 		},
 	}
@@ -77,16 +78,17 @@ var (
 // The function retrieves information about the validator from the host's internal state and formats it into a map of ValidatorColumnName keys and corresponding values.
 // The function also includes emoji values in the map if the specified flag is true.
 // Returns a map of ValidatorColumnName keys to corresponding values.
-func GetValidatorColumnValues(idx int, host host.Host) tablebuilder.ColumnValues {
+func GetValidatorColumnValues(idx int, host host.Host) ColumnValues {
 	status := host.Status.StatusToPlaceholder()
-	country := ""
-	if host.Location != nil {
-		country = host.Location.String()
+
+	var country string
+	if host.IPInfo != nil {
+		country = host.IPInfo.CountryName
 	}
 
-	address := host.HostPort.Address
+	address := host.Endpoint.Address
 
-	columnValues := tablebuilder.ColumnValues{
+	columnValues := ColumnValues{
 		enums.ColumnNameIndex:                        idx + 1,
 		enums.ColumnNameHealth:                       status,
 		enums.ColumnNameAddress:                      address,
@@ -110,6 +112,7 @@ func GetValidatorColumnValues(idx int, host host.Host) tablebuilder.ColumnValues
 		enums.ColumnNameWorkerNetworkPeers:           host.Metrics.WorkerNetworkPeers,
 		enums.ColumnNameSkippedConsensusTransactions: host.Metrics.SkippedConsensusTransactions,
 		enums.ColumnNameTotalSignatureErrors:         host.Metrics.TotalSignatureErrors,
+		enums.ColumnNameCertificatesCreated:          host.Metrics.CertificatesCreated,
 		enums.ColumnNameCountry:                      country,
 	}
 

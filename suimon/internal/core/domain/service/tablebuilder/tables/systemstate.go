@@ -1,54 +1,54 @@
 package tables
 
 import (
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
+	"strconv"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/tablebuilder"
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 )
 
 var (
-	SortConfigSystem = tablebuilder.SortConfig{
+	SortConfigSystem = SortConfig{
 		{Name: enums.ColumnNameSystemEpoch.ToString(), Mode: table.Dsc},
 	}
-	SortConfigValidatorsAtRisk = tablebuilder.SortConfig{
+	SortConfigValidatorsAtRisk = SortConfig{
 		{Name: enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs.ToString(), Mode: table.Dsc},
 	}
-	ColumnsConfigSystem = tablebuilder.ColumnsConfig{
-		enums.ColumnNameIndex:                                       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemEpoch:                                 tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemEpochStartTimestamp:                   tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemEpochDuration:                         tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemTotalStake:                            tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemStorageFundNonRefundableBalance:       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemReferenceGasPrice:                     tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemStakeSubsidyStartEpoch:                tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemMaxValidatorCount:                     tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemMinValidatorJoiningStake:              tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemValidatorLowStakeThreshold:            tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemValidatorVeryLowStakeThreshold:        tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemValidatorLowStakeGracePeriod:          tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemStakeSubsidyBalance:                   tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemStakeSubsidyDistributionCounter:       tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemStakeSubsidyPeriodLength:              tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemStakeSubsidyDecreaseRate:              tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemActiveValidatorCount:                  tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemPendingActiveValidatorCount:           tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemPendingRemovalsCount:                  tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemValidatorCandidateCount:               tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemAtRiskValidatorCount:                  tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemAtRiskValidatorName:                   tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemAtRiskValidatorAddress:                tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs:         tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemValidatorReportedName:                 tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemValidatorReportedAddress:              tablebuilder.NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+	ColumnsConfigSystem = ColumnsConfig{
+		enums.ColumnNameIndex:                                       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemEpoch:                                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemEpochStartTimestamp:                   NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemEpochDuration:                         NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemTotalStake:                            NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemStorageFundNonRefundableBalance:       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemReferenceGasPrice:                     NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemStakeSubsidyStartEpoch:                NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemMaxValidatorCount:                     NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemMinValidatorJoiningStake:              NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemValidatorLowStakeThreshold:            NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemValidatorVeryLowStakeThreshold:        NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemValidatorLowStakeGracePeriod:          NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemStakeSubsidyBalance:                   NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemStakeSubsidyDistributionCounter:       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemStakeSubsidyPeriodLength:              NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemStakeSubsidyDecreaseRate:              NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemActiveValidatorCount:                  NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemPendingActiveValidatorCount:           NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemPendingRemovalsCount:                  NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemValidatorCandidateCount:               NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemAtRiskValidatorCount:                  NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemAtRiskValidatorName:                   NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemAtRiskValidatorAddress:                NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs:         NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemValidatorReportedName:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemValidatorReportedAddress:              NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 	}
-	RowsConfigSystemState = tablebuilder.RowsConfig{
+	RowsConfigSystemState = RowsConfig{
 		0: {
 			enums.ColumnNameIndex,
 			enums.ColumnNameSystemEpoch,
@@ -68,7 +68,7 @@ var (
 			enums.ColumnNameSystemStakeSubsidyDecreaseRate,
 		},
 	}
-	RowsConfigValidatorCounts = tablebuilder.RowsConfig{
+	RowsConfigValidatorCounts = RowsConfig{
 		0: {
 			enums.ColumnNameSystemMaxValidatorCount,
 			enums.ColumnNameSystemActiveValidatorCount,
@@ -82,7 +82,7 @@ var (
 			enums.ColumnNameSystemValidatorLowStakeGracePeriod,
 		},
 	}
-	RowsConfigValidatorsAtRisk = tablebuilder.RowsConfig{
+	RowsConfigValidatorsAtRisk = RowsConfig{
 		0: {
 			enums.ColumnNameIndex,
 			enums.ColumnNameSystemAtRiskValidatorName,
@@ -90,7 +90,7 @@ var (
 			enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs,
 		},
 	}
-	RowsConfigValidatorReports = tablebuilder.RowsConfig{
+	RowsConfigValidatorReports = RowsConfig{
 		0: {
 			enums.ColumnNameIndex,
 			enums.ColumnNameSystemValidatorReportedName,
@@ -105,11 +105,21 @@ var (
 // The function retrieves information about the system state from the host's internal state and formats it into a map of SystemColumnName keys and corresponding values.
 // Returns a map of SystemColumnName keys to corresponding values.
 func GetSystemStateColumnValues(systemState *metrics.SuiSystemState) map[enums.ColumnName]any {
+	epochStartMs, err := strconv.ParseInt(systemState.EpochStartTimestampMs, 10, 64)
+	if err != nil {
+		return nil
+	}
+
+	epochDurationMs, err := strconv.ParseInt(systemState.EpochDurationMs, 10, 64)
+	if err != nil {
+		return nil
+	}
+
 	return map[enums.ColumnName]any{
 		enums.ColumnNameIndex:                                       1,
 		enums.ColumnNameSystemEpoch:                                 systemState.Epoch,
-		enums.ColumnNameSystemEpochStartTimestamp:                   utility.EpochToUTCDate(systemState.EpochStartTimestampMs),
-		enums.ColumnNameSystemEpochDuration:                         utility.MSToHoursAndMinutes(systemState.EpochDurationMs),
+		enums.ColumnNameSystemEpochStartTimestamp:                   utility.EpochToUTCDate(epochStartMs),
+		enums.ColumnNameSystemEpochDuration:                         utility.MSToHoursAndMinutes(epochDurationMs),
 		enums.ColumnNameSystemTotalStake:                            systemState.TotalStake,
 		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  systemState.StorageFundTotalObjectStorageRebates,
 		enums.ColumnNameSystemStorageFundNonRefundableBalance:       systemState.StorageFundNonRefundableBalance,
@@ -142,17 +152,17 @@ func GetValidatorCountsColumnValues(systemState *metrics.SuiSystemState) map[enu
 	}
 }
 
-// GetValidatorReportColumnValues returns a map of ColumnName values to corresponding values for the system state validators rpcgw.
+// GetValidatorReportColumnValues returns a map of ColumnName values to corresponding values for the system state validator.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
-func GetValidatorReportColumnValues(idx int, report metrics.ValidatorReport) tablebuilder.ColumnValues {
+func GetValidatorReportColumnValues(idx int, report metrics.ValidatorReport) ColumnValues {
 	var indexValue any = idx + 1
 
-	if report.ReportedAddress == tablebuilder.EmptyValue {
-		indexValue = tablebuilder.EmptyValue
+	if report.ReportedAddress == EmptyValue {
+		indexValue = EmptyValue
 	}
 
-	return tablebuilder.ColumnValues{
+	return ColumnValues{
 		enums.ColumnNameIndex:                          indexValue,
 		enums.ColumnNameSystemValidatorReportedName:    report.ReportedName,
 		enums.ColumnNameSystemValidatorReportedAddress: report.ReportedAddress,
@@ -161,11 +171,11 @@ func GetValidatorReportColumnValues(idx int, report metrics.ValidatorReport) tab
 	}
 }
 
-// GetValidatorAtRiskColumnValues returns a map of ColumnName values to corresponding values for the system state validators rpcgw.
+// GetValidatorAtRiskColumnValues returns a map of ColumnName values to corresponding values for the system state validators at risk.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
-func GetValidatorAtRiskColumnValues(idx int, validator metrics.ValidatorAtRisk) tablebuilder.ColumnValues {
-	return tablebuilder.ColumnValues{
+func GetValidatorAtRiskColumnValues(idx int, validator metrics.ValidatorAtRisk) ColumnValues {
+	return ColumnValues{
 		enums.ColumnNameIndex:                               idx + 1,
 		enums.ColumnNameSystemAtRiskValidatorName:           validator.Name,
 		enums.ColumnNameSystemAtRiskValidatorAddress:        validator.Address,

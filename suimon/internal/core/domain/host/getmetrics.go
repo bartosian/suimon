@@ -3,25 +3,13 @@ package host
 import (
 	"errors"
 	"fmt"
-	"net"
-	"net/url"
 	"strings"
-	"time"
 
 	"golang.org/x/sync/errgroup"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
 	"github.com/prometheus/client_golang/prometheus"
-)
-
-const (
-	rpcClientTimeout   = 4 * time.Second
-	rpcPortDefault     = "9000"
-	metricsPortDefault = "9184"
-
-	requestTypeRPC requestType = iota
-	requestTypeMetrics
 )
 
 var (
@@ -48,12 +36,13 @@ var (
 		enums.PrometheusMetricNameSkippedConsensusTransactions: enums.MetricTypeSkippedConsensusTransactions,
 		enums.PrometheusMetricNameTotalSignatureErrors:         enums.MetricTypeTotalSignatureErrors,
 		enums.PrometheusMetricNameUptime:                       enums.MetricTypeUptime,
+		enums.PrometheusMetricNameCertificatesCreated:          enums.MetricTypeCertificatesCreated,
 	}
 )
 
-// getPrometheusMetricsForHostType returns a list of Prometheus metrics that should be collected for a host.
-func getPrometheusMetricsForHostType() ports.Metrics {
-	return ports.Metrics{
+// getPrometheusMetricsForTableType returns a list of Prometheus metrics that should be collected for a table type.
+func getPrometheusMetricsForTableType(table enums.TableType) ports.Metrics {
+	metrics := ports.Metrics{
 		enums.PrometheusMetricNameTotalTransactionCertificates: {
 			MetricType: enums.PrometheusMetricTypeCounter,
 		},
@@ -75,44 +64,52 @@ func getPrometheusMetricsForHostType() ports.Metrics {
 		enums.PrometheusMetricNameEpochTotalDuration: {
 			MetricType: enums.PrometheusMetricTypeGauge,
 		},
-		enums.PrometheusMetricNameCurrentRound: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameHighestProcessedRound: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-			Labels: prometheus.Labels{
-				"source": "own",
-			},
-		},
-		enums.PrometheusMetricNameLastCommittedRound: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNamePrimaryNetworkPeers: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameWorkerNetworkPeers: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
 		enums.PrometheusMetricNameSuiNetworkPeers: {
 			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameSkippedConsensusTransactions: {
-			MetricType: enums.PrometheusMetricTypeCounter,
-		},
-		enums.PrometheusMetricNameTotalSignatureErrors: {
-			MetricType: enums.PrometheusMetricTypeCounter,
 		},
 		enums.PrometheusMetricNameUptime: {
 			MetricType: enums.PrometheusMetricTypeCounter,
 		},
 	}
+
+	if table == enums.TableTypeValidator {
+		metrics[enums.PrometheusMetricNameLastCommittedRound] = ports.MetricConfig{
+			MetricType: enums.PrometheusMetricTypeGauge,
+		}
+		metrics[enums.PrometheusMetricNamePrimaryNetworkPeers] = ports.MetricConfig{
+			MetricType: enums.PrometheusMetricTypeGauge,
+		}
+		metrics[enums.PrometheusMetricNameHighestProcessedRound] = ports.MetricConfig{
+			MetricType: enums.PrometheusMetricTypeGauge,
+			Labels: prometheus.Labels{
+				"source": "own",
+			},
+		}
+		metrics[enums.PrometheusMetricNameWorkerNetworkPeers] = ports.MetricConfig{
+			MetricType: enums.PrometheusMetricTypeGauge,
+		}
+		metrics[enums.PrometheusMetricNameTotalSignatureErrors] = ports.MetricConfig{
+			MetricType: enums.PrometheusMetricTypeCounter,
+		}
+		metrics[enums.PrometheusMetricNameSkippedConsensusTransactions] = ports.MetricConfig{
+			MetricType: enums.PrometheusMetricTypeCounter,
+		}
+		metrics[enums.PrometheusMetricNameCurrentRound] = ports.MetricConfig{
+			MetricType: enums.PrometheusMetricTypeCounter,
+		}
+		metrics[enums.PrometheusMetricNameCertificatesCreated] = ports.MetricConfig{
+			MetricType: enums.PrometheusMetricTypeCounter,
+		}
+	}
+
+	return metrics
 }
 
-// GetPrometheusMetrics fetches Prometheus rpcgw for the host and sends the metric values to the host's Metrics field.
+// GetPrometheusMetrics fetches Prometheus metrics for the host and sends the metric values to the host's Metrics field.
 // The function constructs a URL using the host's HostPort and Ports fields, sends an HTTP GET request to the URL, and parses the response as a Prometheus text format.
 // Returns an error if the HTTP request fails or if the response cannot be parsed as Prometheus text format.
 func (host *Host) GetPrometheusMetrics() error {
-	metricsDef := getPrometheusMetricsForHostType()
+	metricsDef := getPrometheusMetricsForTableType(host.TableType)
 
 	result, err := host.gateways.prometheus.CallFor(metricsDef)
 	if err != nil {
@@ -217,48 +214,4 @@ func (host *Host) GetDataByMetric(method enums.RPCMethod) error {
 	}
 
 	return host.Metrics.SetValue(metric, result)
-}
-
-// getUrl returns the URL for the specified request type and security status. The request parameter specifies the type of request to be made, and the secure parameter specifies whether to use HTTPS or HTTP for the URL.
-// The function constructs the URL using the host's HostPort and Ports fields, and sets the appropriate scheme and port based on the request type and security status.
-// Returns the constructed URL as a string.
-func (host *Host) getUrl(request requestType, secure bool) string {
-	hostUrl := new(url.URL)
-
-	protocol := "http"
-	if secure {
-		protocol = protocol + "s"
-	}
-
-	hostAddress := host.HostPort
-	if hostAddress.Host != nil {
-		hostUrl.Host = *hostAddress.Host
-	} else {
-		hostUrl.Host = *hostAddress.IP
-	}
-
-	if hostAddress.Path != nil {
-		hostUrl.Path = *hostAddress.Path
-	}
-
-	hostUrl.Scheme = protocol
-
-	switch request {
-	case requestTypeRPC:
-		port := host.Ports[enums.PortTypeRPC]
-		if port == "" {
-			port = rpcPortDefault
-		}
-		hostUrl.Host = net.JoinHostPort(hostUrl.Hostname(), port)
-	case requestTypeMetrics:
-		hostUrl.Path = "/rpcgw"
-
-		port := host.Ports[enums.PortTypeMetrics]
-		if port == "" {
-			port = metricsPortDefault
-		}
-		hostUrl.Host = net.JoinHostPort(hostUrl.Hostname(), port)
-	}
-
-	return hostUrl.String()
 }

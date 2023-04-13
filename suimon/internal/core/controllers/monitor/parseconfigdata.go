@@ -10,23 +10,14 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/progress"
 )
 
-// ParseConfigData retrieves the latest data from all active hosts and updates the MonitorController's internal state with the new data.
-// The function parses the data for each table type and sets the corresponding rpcgw and dashboard options accordingly.
-// Returns an error if the data cannot be retrieved from any of the active hosts or if there is an issue parsing the data for any table type.
+// ParseConfigData retrieves data from hosts and sets their health based on the selected tables.
+// The function first retrieves data from the RPC table, sorts the hosts, and sets their health. It then
+// retrieves data from the selected tables in parallel using goroutines. For each selected table, the function
+// retrieves data from the hosts and sets their health. Any errors that occur during this process are sent to
+// a channel. If an error is received from the channel, it is returned immediately. If no errors are received,
+// the function returns nil.
 func (c *Controller) ParseConfigData() error {
-	monitorsConfig := c.config.MonitorsConfig
-
-	enabledSystemState := monitorsConfig.SystemStateTable.Display || monitorsConfig.ActiveValidatorsTable.Display || monitorsConfig.ValidatorReportsTable.Display ||
-		monitorsConfig.ValidatorsAtRiskTable.Display || monitorsConfig.ValidatorsCountsTable.Display
-
-	tableMap := map[enums.TableType]bool{
-		enums.TableTypeNode:        monitorsConfig.NodeTable.Display,
-		enums.TableTypeValidator:   monitorsConfig.ValidatorTable.Display,
-		enums.TableTypePeers:       monitorsConfig.PeersTable.Display,
-		enums.TableTypeSystemState: enabledSystemState,
-	}
-
-	if err := c.getHostsData(enums.TableTypeRPC, progress.ColorBlue); err != nil {
+	if err := c.getHostsData(enums.TableTypeRPC); err != nil {
 		return err
 	}
 
@@ -38,32 +29,52 @@ func (c *Controller) ParseConfigData() error {
 		return err
 	}
 
-	disabledTables := 0
+	tablesToParse := make([]enums.TableType, 0, len(c.selectedTables))
+	systemTables := map[enums.TableType]bool{
+		enums.TableTypeActiveValidators: true,
+		enums.TableTypeValidatorReports: true,
+		enums.TableTypeValidatorsAtRisk: true,
+		enums.TableTypeSystemState:      true,
+		enums.TableTypeValidatorsCounts: true,
+	}
 
-	errChan := make(chan error, len(tableMap))
+	var systemTableAdded bool
+
+	for _, table := range c.selectedTables {
+		if _, ok := systemTables[table]; ok {
+			if systemTableAdded {
+				continue
+			}
+
+			systemTableAdded = true
+			table = enums.TableTypeSystemState
+		}
+
+		if table == enums.TableTypeRPC {
+			continue
+		}
+
+		tablesToParse = append(tablesToParse, table)
+	}
+
+	errChan := make(chan error, len(tablesToParse))
 	defer close(errChan)
 
 	var wg sync.WaitGroup
 
-	for tableType, isEnabled := range tableMap {
-		if !isEnabled {
-			disabledTables++
-
-			continue
-		}
-
+	for _, tableType := range tablesToParse {
 		wg.Add(1)
 
-		go func(tt enums.TableType) {
+		go func(table enums.TableType) {
 			defer wg.Done()
 
-			if err := c.getHostsData(tt, progress.ColorBlue); err != nil {
+			if err := c.getHostsData(table); err != nil {
 				errChan <- err
 
 				return
 			}
 
-			if err := c.setHostsHealth(tt); err != nil {
+			if err := c.setHostsHealth(table); err != nil {
 				errChan <- err
 			}
 		}(tableType)
@@ -75,9 +86,6 @@ func (c *Controller) ParseConfigData() error {
 	case err := <-errChan:
 		return err
 	default:
-		if disabledTables == len(tableMap) {
-			return errors.New("all tables disabled in suimon.yaml")
-		}
 		return nil
 	}
 }
@@ -85,8 +93,8 @@ func (c *Controller) ParseConfigData() error {
 // getHostsData retrieves the latest data for the specified table type from all active hosts and updates the MonitorController's internal state with the new data.
 // The function retrieves data for each host in parallel and displays a progress bar indicating the progress of the data retrieval process.
 // Returns an error if the data cannot be retrieved from any of the active hosts or if there is an issue updating the CheckerController's internal state.
-func (c *Controller) getHostsData(tableType enums.TableType, progressColor progress.Color) error {
-	progressChan := progress.NewProgressBar("PARSING DATA FOR "+string(tableType), progressColor)
+func (c *Controller) getHostsData(tableType enums.TableType) error {
+	progressChan := progress.NewProgressBar("PARSING DATA FOR "+string(tableType), progress.ColorBlue)
 	defer func() { progressChan <- struct{}{} }()
 
 	var (
@@ -96,11 +104,11 @@ func (c *Controller) getHostsData(tableType enums.TableType, progressColor progr
 	)
 
 	if tableType == enums.TableTypeSystemState {
-		rpcHost := c.hosts.rpc[0]
-
-		if err := rpcHost.GetDataByMetric(enums.RPCMethodGetSuiSystemState); err != nil {
-			return err
+		if len(c.hosts.rpc) == 0 {
+			return errors.New("RPC host is not initialized")
 		}
+
+		return c.hosts.rpc[0].GetDataByMetric(enums.RPCMethodGetSuiSystemState)
 	}
 
 	if addresses, err = c.getAddressInfoByTableType(tableType); err != nil {

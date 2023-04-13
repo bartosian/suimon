@@ -31,6 +31,7 @@ const (
 	MetricTypeWorkerNetworkPeers           MetricType = "WORKER_NETWORK_PEERS"
 	MetricTypeSkippedConsensusTransactions MetricType = "SKIPPED_CONSENSUS_TRANSACTIONS"
 	MetricTypeTotalSignatureErrors         MetricType = "TOTAL_SIGNATURE_ERRORS"
+	MetricTypeCertificatesCreated          MetricType = "CERTIFICATES_CREATED"
 )
 
 func (e MetricType) ToString() string {

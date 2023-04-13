@@ -27,7 +27,7 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 	var wg sync.WaitGroup
 
 	for _, addressInfo := range addresses {
-		address := addressInfo.HostPort.Address
+		address := addressInfo.Endpoint.Address
 		if _, ok := processedAddresses[address]; ok {
 			continue
 		}
@@ -39,13 +39,31 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 		go func(addressInfo host.AddressInfo) {
 			defer wg.Done()
 
-			rpcGateway := rpcgw.NewGateway(c.logger, "")
-			geoGateway := geogw.NewGateway(c.logger, "", "")
-			prometheusGateway := prometheusgw.NewGateway(c.logger, "")
+			var result responseWithError
 
-			createdHost := host.NewHost(c.logger, table, addressInfo, rpcGateway, geoGateway, prometheusGateway, c.gateways.cli)
+			rpcUrl, err := addressInfo.GetUrlRPC()
+			if err != nil {
+				result.err = err
+				respChan <- result
 
-			result := responseWithError{response: createdHost}
+				return
+			}
+
+			rpcGateway := rpcgw.NewGateway(c.gateways.cli, rpcUrl)
+
+			metricsUrl, err := addressInfo.GetUrlPrometheus()
+			if err != nil {
+				result.err = err
+				respChan <- result
+
+				return
+			}
+
+			prometheusGateway := prometheusgw.NewGateway(c.gateways.cli, metricsUrl)
+			geoGateway := geogw.NewGateway(c.gateways.cli, c.config.IPLookup.AccessToken)
+
+			createdHost := host.NewHost(table, addressInfo, rpcGateway, geoGateway, prometheusGateway, c.gateways.cli)
+			result.response = createdHost
 
 			if c.config.IPLookup.AccessToken != "" {
 				if err := createdHost.SetIPInfo(); err != nil {

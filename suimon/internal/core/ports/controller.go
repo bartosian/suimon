@@ -9,6 +9,7 @@ type VersionController interface {
 }
 
 type MonitorController interface {
+	Monitor() error
 	Static() error
 	Dynamic() error
 }

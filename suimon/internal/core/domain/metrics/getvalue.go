@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/dariubs/percent"
@@ -65,6 +66,8 @@ func (metrics *Metrics) GetValue(metric enums.MetricType) MetricValue {
 		return metrics.HighestProcessedRound
 	case enums.MetricTypeLastCommittedRound:
 		return metrics.LastCommittedRound
+	case enums.MetricTypeCertificatesCreated:
+		return metrics.CertificatesCreated
 	case enums.MetricTypePrimaryNetworkPeers:
 		return metrics.PrimaryNetworkPeers
 	case enums.MetricTypeWorkerNetworkPeers:
@@ -79,11 +82,21 @@ func (metrics *Metrics) GetValue(metric enums.MetricType) MetricValue {
 }
 
 // GetMillisecondsTillNextEpoch returns the milliseconds till the next epoch.
-func (metrics *Metrics) GetMillisecondsTillNextEpoch() int64 {
-	nextEpochStartMs := metrics.SystemState.EpochStartTimestampMs + metrics.SystemState.EpochDurationMs
-	currentTimeMs := time.Now().UnixNano() / 1000000
+func (metrics *Metrics) GetMillisecondsTillNextEpoch() (int64, error) {
+	epochStartMs, err := strconv.ParseInt(metrics.SystemState.EpochStartTimestampMs, 10, 64)
+	if err != nil {
+		return 0, err
+	}
 
-	return nextEpochStartMs - currentTimeMs
+	epochDurationMs, err := strconv.ParseInt(metrics.SystemState.EpochDurationMs, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	nextEpochStartMs := epochStartMs + epochDurationMs
+	currentTimeMs := time.Now().UnixNano() / int64(time.Millisecond)
+
+	return nextEpochStartMs - currentTimeMs, nil
 }
 
 // GetTimeUntilNextEpochDisplay returns the remaining time till the next epoch in human-readable format.
@@ -111,10 +124,16 @@ func (metrics *Metrics) GetEpochLabel() string {
 }
 
 // GetEpochProgress calculates and returns the percentage of current epoch progress.
-func (metrics *Metrics) GetEpochProgress() int {
-	epochCurrentLength := metrics.SystemState.EpochDurationMs - metrics.TimeTillNextEpoch
+func (metrics *Metrics) GetEpochProgress() (int, error) {
+	epochDurationMs, err := strconv.ParseInt(metrics.SystemState.EpochDurationMs, 10, 64)
+	if err != nil {
+		return 0, err
+	}
 
-	return int(percent.PercentOf(int(epochCurrentLength), int(metrics.SystemState.EpochDurationMs)))
+	epochCurrentLength := epochDurationMs - metrics.TimeTillNextEpoch
+	progressPercent := percent.PercentOf(int(epochCurrentLength), int(epochDurationMs))
+
+	return int(progressPercent), nil
 }
 
 // GetUsageDataForDonutChart returns a label and percentage for displaying data in a donut chart.

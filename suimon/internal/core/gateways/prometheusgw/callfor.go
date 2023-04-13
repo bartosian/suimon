@@ -69,13 +69,13 @@ func (gateway *Gateway) CallFor(metrics ports.Metrics) (result ports.MetricsResu
 
 		metricsResult := make(ports.MetricsResult)
 
-		for metricType, metricConfig := range metrics {
-			result, err := getMetricValueWithLabelFiltering(data, metricType.ToString(), metricConfig)
+		for metricName, metricConfig := range metrics {
+			result, err := getMetricValueWithLabelFiltering(data, metricName.ToString(), metricConfig)
 			if err != nil {
 				return nil, err
 			}
 
-			metricsResult[metricType] = result
+			metricsResult[metricName] = result
 		}
 
 		return metricsResult, nil
@@ -95,7 +95,7 @@ func getMetricValueWithLabelFiltering(metrics MetricsData, metricName string, me
 
 	metricFamily := metrics[metricName]
 	if metricFamily == nil {
-		return result, fmt.Errorf("no metric family found")
+		return result, fmt.Errorf("no metric family found for metric: %s", metricName)
 	}
 
 	extractMetricValue := map[enums.PrometheusMetricType]func(metric *ioPrometheusClient.Metric) float64{

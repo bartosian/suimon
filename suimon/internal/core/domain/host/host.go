@@ -7,18 +7,9 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/address"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
-type requestType int
-
 type (
-	AddressInfo struct {
-		HostPort address.HostPort
-		Ports    map[enums.PortType]string
-	}
-
 	Gateways struct {
 		rpc        ports.RPCGateway
 		geo        ports.GeoGateway
@@ -36,13 +27,10 @@ type (
 		Metrics metrics.Metrics
 
 		gateways Gateways
-
-		logger log.Logger
 	}
 )
 
 func NewHost(
-	logger log.Logger,
 	tableType enums.TableType,
 	addressInfo AddressInfo,
 	rpcGW ports.RPCGateway,
@@ -53,7 +41,6 @@ func NewHost(
 	host := &Host{
 		TableType:   tableType,
 		AddressInfo: addressInfo,
-		logger:      logger,
 		gateways: Gateways{
 			rpc:        rpcGW,
 			geo:        geoGW,
@@ -69,11 +56,14 @@ func NewHost(
 // The function obtains the current metric value for the Host and RPC Host, calculates the percentage using the percent.PercentOf function, and sets the new percentage value for the Host's Metrics instance for the specified metric type.
 // The second argument is the RPC Host to compare the progress against.
 func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) error {
-	hostMetric := host.Metrics.GetValue(metricType, false)
-	rpcMetric := rpc.Metrics.GetValue(metricType, true)
+	hostMetric := host.Metrics.GetValue(metricType)
+	rpcMetric := rpc.Metrics.GetValue(metricType)
 	hostMetricInt, rpcMetricInt := hostMetric.(int), rpcMetric.(int)
 
 	percentage := int(percent.PercentOf(hostMetricInt, rpcMetricInt))
+	if percentage > 100 {
+		percentage = 100
+	}
 
 	return host.Metrics.SetValue(metricType, percentage)
 }

@@ -23,29 +23,29 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses
 		}
 
 		var (
-			hostPortRPC     *address.HostPort
-			hostPortMetrics *address.HostPort
+			endpointRPC     *address.Endpoint
+			endpointMetrics *address.Endpoint
 		)
 
 		if addressRPC != "" {
-			if hostPortRPC, err = address.ParseURL(addressRPC); err != nil {
-				return nil, fmt.Errorf("invalid full-node json-rpcgw-address in fullnode.yaml: %s", err)
+			if endpointRPC, err = address.ParseURL(addressRPC); err != nil {
+				return nil, fmt.Errorf("invalid full-node json-rpc-address in fullnode.yaml: %s", err)
 			}
 		}
 
 		if addressMetrics != "" {
-			if hostPortMetrics, err = address.ParseURL(addressMetrics); err != nil {
-				return nil, fmt.Errorf("invalid full-node rpcgw-address in fullnode.yaml: %s", err)
+			if endpointMetrics, err = address.ParseURL(addressMetrics); err != nil {
+				return nil, fmt.Errorf("invalid full-node rpc-address in fullnode.yaml: %s", err)
 			}
 		}
 
-		addressInfo := host.AddressInfo{HostPort: *hostPortRPC, Ports: make(map[enums.PortType]string)}
-		if hostPortRPC.Port != nil {
-			addressInfo.Ports[enums.PortTypeRPC] = *hostPortRPC.Port
+		addressInfo := host.AddressInfo{Endpoint: *endpointRPC, Ports: make(map[enums.PortType]string)}
+		if endpointRPC.Port != nil {
+			addressInfo.Ports[enums.PortTypeRPC] = *endpointRPC.Port
 		}
 
-		if hostPortMetrics.Port != nil {
-			addressInfo.Ports[enums.PortTypeMetrics] = *hostPortMetrics.Port
+		if endpointMetrics.Port != nil {
+			addressInfo.Ports[enums.PortTypeMetrics] = *endpointMetrics.Port
 		}
 
 		addresses = append(addresses, addressInfo)
@@ -57,16 +57,16 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses
 			return nil, errors.New("validator tables not found in suimon.yaml")
 		}
 
-		var hostPortMetrics *address.HostPort
+		var endpointMetrics *address.Endpoint
 
-		if hostPortMetrics, err = address.ParseURL(addressMetrics); err != nil {
-			return nil, fmt.Errorf("invalid validator rpcgw-address in fullnode.yaml: %s", err)
+		if endpointMetrics, err = address.ParseURL(addressMetrics); err != nil {
+			return nil, fmt.Errorf("invalid validator rpc-address in fullnode.yaml: %s", err)
 		}
 
-		addressInfo := host.AddressInfo{HostPort: *hostPortMetrics, Ports: make(map[enums.PortType]string)}
+		addressInfo := host.AddressInfo{Endpoint: *endpointMetrics, Ports: make(map[enums.PortType]string)}
 
-		if hostPortMetrics.Port != nil {
-			addressInfo.Ports[enums.PortTypeMetrics] = *hostPortMetrics.Port
+		if endpointMetrics.Port != nil {
+			addressInfo.Ports[enums.PortTypeMetrics] = *endpointMetrics.Port
 		}
 
 		addresses = append(addresses, addressInfo)
@@ -77,14 +77,14 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses
 		}
 
 		for _, peer := range peersConfig {
-			hostPort, err := address.ParsePeer(peer)
+			endpoint, err := address.ParsePeer(peer)
 			if err != nil {
 				return nil, fmt.Errorf("invalid peer in suimon.yaml: %s", peer)
 			}
 
-			addressInfo := host.AddressInfo{HostPort: *hostPort, Ports: make(map[enums.PortType]string)}
-			if hostPort.Port != nil {
-				addressInfo.Ports[enums.PortTypePeer] = *hostPort.Port
+			addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}
+			if endpoint.Port != nil {
+				addressInfo.Ports[enums.PortTypePeer] = *endpoint.Port
 			}
 
 			addresses = append(addresses, addressInfo)
@@ -92,18 +92,18 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses
 	case enums.TableTypeRPC:
 		rpcConfig := c.config.PublicRPC
 		if len(rpcConfig) == 0 {
-			return nil, errors.New("public-rpcgw tables not found in suimon.yaml")
+			return nil, errors.New("public-rpc tables not found in suimon.yaml")
 		}
 
 		for _, rpc := range rpcConfig {
-			hostPort, err := address.ParseURL(rpc)
+			endpoint, err := address.ParseURL(rpc)
 			if err != nil {
-				return nil, fmt.Errorf("invalid rpcgw url in suimon.yaml: %s", rpc)
+				return nil, fmt.Errorf("invalid rpc url in suimon.yaml: %s", rpc)
 			}
 
-			addressInfo := host.AddressInfo{HostPort: *hostPort, Ports: make(map[enums.PortType]string)}
-			if hostPort.Port != nil {
-				addressInfo.Ports[enums.PortTypeRPC] = *hostPort.Port
+			addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}
+			if endpoint.Port != nil {
+				addressInfo.Ports[enums.PortTypeRPC] = *endpoint.Port
 			}
 
 			addresses = append(addresses, addressInfo)

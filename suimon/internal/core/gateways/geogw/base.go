@@ -8,8 +8,8 @@ import (
 	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ipinfo/go/v2/ipinfo/cache"
 
+	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
 )
 
 const (
@@ -19,22 +19,20 @@ const (
 
 type Gateway struct {
 	ctx         context.Context
-	url         string
 	accessToken string
 	client      *ipinfo.Client
-	logger      log.Logger
+	cliGateway  *cligw.Gateway
 }
 
-func NewGateway(logger log.Logger, url string, accessToken string) ports.GeoGateway {
+func NewGateway(cliGW *cligw.Gateway, accessToken string) ports.GeoGateway {
 	httpClient := &http.Client{Timeout: httpClientTimeout}
 	infoCache := ipinfo.NewCache(cache.NewInMemory().WithExpiration(ipInfoCacheExp))
 	geoClient := ipinfo.NewClient(httpClient, infoCache, accessToken)
 
 	return &Gateway{
 		ctx:         context.Background(),
-		url:         url,
 		accessToken: accessToken,
 		client:      geoClient,
-		logger:      logger,
+		cliGateway:  cliGW,
 	}
 }

@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"strconv"
 
@@ -32,7 +31,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		// Parse the JSON data of the SystemState object.
 		dataBytes, err := json.Marshal(value.(map[string]interface{}))
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
 		// Unmarshal the JSON data into a SuiSystemState struct.
@@ -89,6 +88,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 				validatorReports = append(validatorReports, validatorReport)
 			}
 		}
+
 		valueSystemState.ValidatorReportsParsed = validatorReports
 
 		// Update the SystemState property of the Metrics struct with the parsed data.
@@ -262,6 +262,13 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		}
 
 		metrics.SkippedConsensusTransactions = convFToI(valueFloat)
+	case enums.MetricTypeCertificatesCreated:
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
+		}
+
+		metrics.CertificatesCreated = convFToI(valueFloat)
 	case enums.MetricTypeTotalSignatureErrors:
 		valueFloat, ok := value.(float64)
 		if !ok {

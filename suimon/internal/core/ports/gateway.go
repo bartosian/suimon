@@ -17,7 +17,7 @@ type PrometheusGateway interface {
 }
 
 type GeoGateway interface {
-	CallFor(ip net.IP) (result IPResult, err error)
+	CallFor(ip net.IP) (result *IPResult, err error)
 }
 
 type (

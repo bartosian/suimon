@@ -11,7 +11,7 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/validation"
 )
 
-type HostPort struct {
+type Endpoint struct {
 	Address string
 	IP      *string
 	Host    *string
@@ -20,7 +20,7 @@ type HostPort struct {
 	SSL     bool
 }
 
-func (hp *HostPort) GetHostWithPath() *string {
+func (hp *Endpoint) GetHostWithPath() *string {
 	if hp.Host == nil {
 		return nil
 	}
@@ -34,7 +34,7 @@ func (hp *HostPort) GetHostWithPath() *string {
 	return &hostPath
 }
 
-func ParseIpPort(address string) (*HostPort, error) {
+func ParseIpPort(address string) (*Endpoint, error) {
 	ip, port, err := net.SplitHostPort(address)
 	if err != nil {
 		return nil, err
@@ -49,14 +49,14 @@ func ParseIpPort(address string) (*HostPort, error) {
 		address = fmt.Sprintf("%s:%s", ip, port)
 	}
 
-	return &HostPort{
+	return &Endpoint{
 		Address: address,
 		IP:      &ip,
 		Port:    &port,
 	}, nil
 }
 
-func ParsePeer(address string) (*HostPort, error) {
+func ParsePeer(address string) (*Endpoint, error) {
 	components := strings.Split(address, "/")
 
 	validLength := len(components) == 5
@@ -75,21 +75,21 @@ func ParsePeer(address string) (*HostPort, error) {
 		return nil, fmt.Errorf("invalid port provided: %s", address)
 	}
 
-	hostPort := &HostPort{
+	endpoint := &Endpoint{
 		Address: address,
 		Port:    &port,
 	}
 
 	if ip, err := ParseIP(host); err != nil {
-		hostPort.Host = &host
+		endpoint.Host = &host
 	} else {
-		hostPort.IP = ip
+		endpoint.IP = ip
 	}
 
-	return hostPort, nil
+	return endpoint, nil
 }
 
-func ParseURL(address string) (*HostPort, error) {
+func ParseURL(address string) (*Endpoint, error) {
 	if !strings.HasPrefix(address, "http") {
 		address = "http://" + address
 	}
@@ -104,14 +104,14 @@ func ParseURL(address string) (*HostPort, error) {
 		return nil, fmt.Errorf("invalid url provided: %s", address)
 	}
 
-	hostPort := &HostPort{
+	endpoint := &Endpoint{
 		Address: fmt.Sprintf("%s://%s%s", scheme, hostName, path),
 		Host:    &hostName,
 		SSL:     scheme == "https",
 	}
 
 	if ip, err := ParseIP(hostName); err == nil {
-		hostPort.IP = ip
+		endpoint.IP = ip
 	}
 
 	if port != "" {
@@ -119,19 +119,19 @@ func ParseURL(address string) (*HostPort, error) {
 			return nil, fmt.Errorf("invalid port provided: %s", address)
 		}
 
-		hostPort.Port = &port
+		endpoint.Port = &port
 	}
 
 	if path != "" {
-		hostPort.Path = &path
+		endpoint.Path = &path
 	}
 
 	ip, err := GetIPByDomain(address)
 	if err == nil {
-		hostPort.IP = ip
+		endpoint.IP = ip
 	}
 
-	return hostPort, nil
+	return endpoint, nil
 }
 
 func GetIPByDomain(address string) (*string, error) {

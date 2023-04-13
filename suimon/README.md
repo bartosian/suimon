@@ -76,11 +76,11 @@ monitors-config:
   peers-table:
     display: true
 
-# update this section to add/remove rpcgw hosts for rpcgw-table
+# update this section to add/remove rpc hosts for rpc-table
 rpc-config:
   testnet:
-    - "https://rpcgw-office.cosmostation.io/sui-testnet-wave-2"
-    - "https://rpcgw.ankr.com/sui_testnet"
+    - "https://rpc-office.cosmostation.io/sui-testnet-wave-2"
+    - "https://rpc.ankr.com/sui_testnet"
     - "https://sui-api.rpcpool.com"
     - "https://sui-testnet.public.blastapi.io"
     - "https://fullnode.testnet.vincagame.com"
@@ -202,7 +202,7 @@ Usage of suimon:
     	(optional) network name, possible values: testnet, devnet
   -s string
     	(optional) path to the suimon tables file, can use SUIMON_CONFIG_PATH env variable instead
-  -w	(optional) flag to enable a dynamic dashboard to monitor node rpcgw in real-time
+  -w	(optional) flag to enable a dynamic dashboard to monitor node rpc in real-time
 ```
 
 | Name   | Required | Default               | Purpose                                                                                                                                                                                                                                         |
