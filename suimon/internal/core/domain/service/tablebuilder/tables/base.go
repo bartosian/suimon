@@ -64,8 +64,6 @@ type SortConfig []table.SortBy
 type TableConfig struct {
 	Name         string        // The name of the table
 	Style        table.Style   // The style of the table
-	Sort         SortConfig    // The sorting configuration for the table
-	AutoIndex    bool          // Whether to automatically generate indices for the table
 	Columns      ColumnsConfig // Configuration for the table's columns
 	Rows         RowsConfig    // Configuration for the table's rows
 	ColumnsCount int           // The total number of columns in the table
@@ -77,9 +75,7 @@ type TableConfig struct {
 func NewDefaultTableConfig(table enums.TableType) *TableConfig {
 	tableName := fmt.Sprintf("%s [ %s ]", suiEmoji, table)
 	columnsConfig := GetColumnsConfig(table)
-	sortConfig := GetTableSortConfig(table)
 	rowsConfig := GetRowsConfig(table)
-	autoIndex := GetAutoIndex(table)
 	tableColor := GetTableColor(table)
 
 	tableStyle := tableStyleDefault
@@ -89,11 +85,9 @@ func NewDefaultTableConfig(table enums.TableType) *TableConfig {
 	return &TableConfig{
 		Name:         tableName,
 		Style:        tableStyle,
-		Sort:         sortConfig,
 		Rows:         rowsConfig,
 		Columns:      columnsConfig,
 		ColumnsCount: len(columnsConfig),
-		AutoIndex:    autoIndex,
 	}
 }
 
@@ -115,29 +109,6 @@ func GetColumnsConfig(table enums.TableType) ColumnsConfig {
 		return ColumnsConfigSystem
 	case enums.TableTypeActiveValidators:
 		return ColumnsConfigActiveValidator
-	default:
-		return nil
-	}
-}
-
-// GetTableSortConfig returns the sort configuration based on the specified table type.
-func GetTableSortConfig(table enums.TableType) SortConfig {
-	switch table {
-	case enums.TableTypeRPC:
-		return SortConfigRPC
-	case enums.TableTypePeers:
-		return SortConfigPeer
-	case enums.TableTypeValidator:
-		return SortConfigValidator
-	case enums.TableTypeSystemState,
-		enums.TableTypeValidatorsCounts,
-		enums.TableTypeValidatorsAtRisk,
-		enums.TableTypeValidatorReports:
-		return SortConfigSystem
-	case enums.TableTypeNode:
-		return SortConfigNode
-	case enums.TableTypeActiveValidators:
-		return SortConfigActiveValidator
 	default:
 		return nil
 	}
@@ -169,31 +140,12 @@ func GetRowsConfig(table enums.TableType) RowsConfig {
 	}
 }
 
-// GetAutoIndex returns true if the specified table type needs to be auto-indexed; otherwise, false.
-func GetAutoIndex(table enums.TableType) bool {
-	tableToAutoIndexMap := map[enums.TableType]bool{
-		enums.TableTypeSystemState:      false,
-		enums.TableTypeValidatorsCounts: false,
-		enums.TableTypeValidatorReports: false,
-		enums.TableTypePeers:            false,
-		enums.TableTypeNode:             false,
-		enums.TableTypeValidatorsAtRisk: false,
-		enums.TableTypeValidator:        false,
-		enums.TableTypeRPC:              false,
-		enums.TableTypeActiveValidators: true,
-	}
-
-	return tableToAutoIndexMap[table]
-}
-
 // GetTableColor returns the color configuration based on the specified table type.
 func GetTableColor(table enums.TableType) text.Colors {
 	switch table {
-	case enums.TableTypeRPC, enums.TableTypePeers, enums.TableTypeValidatorsAtRisk:
+	case enums.TableTypeRPC, enums.TableTypeValidator, enums.TableTypeSystemState, enums.TableTypeValidatorsAtRisk, enums.TableTypeActiveValidators:
 		return text.Colors{text.BgHiBlue, text.FgBlack}
-	case enums.TableTypeNode, enums.TableTypeSystemState, enums.TableTypeValidatorReports:
-		return text.Colors{text.BgHiGreen, text.FgBlack}
 	default:
-		return text.Colors{text.BgHiYellow, text.FgBlack}
+		return text.Colors{text.BgHiGreen, text.FgBlack}
 	}
 }

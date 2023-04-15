@@ -1,7 +1,9 @@
 package tablebuilder
 
 import (
+	"errors"
 	"os"
+	"strconv"
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
@@ -59,7 +61,7 @@ func (tb *Builder) setColumns() {
 }
 
 // setRows sets the rows of the table builder based on the configuration in the builder's table config
-func (tb *Builder) setRows() {
+func (tb *Builder) setRows() error {
 	rowsConfig := tb.config.Rows
 	columnsConfig := tb.config.Columns
 	itemsCount := tb.config.RowsCount
@@ -71,13 +73,14 @@ func (tb *Builder) setRows() {
 			footer := tables.NewRow(false, false, columnsPerRow, true, text.AlignCenter)
 			row := tables.NewRow(false, true, columnsPerRow, true, text.AlignCenter)
 
-			var (
-				columnIdx  int
-				columnName enums.ColumnName
-			)
+			for _, columnName := range columns {
+				columnConfig, ok := columnsConfig[columnName]
+				if !ok {
+					tb.cliGateway.Errorf("column %s not found", columnName)
 
-			for columnIdx, columnName = range columns {
-				columnConfig := columnsConfig[columnName]
+					return errors.New("column not found")
+				}
+
 				columnValue := columnConfig.Values[itemIndex]
 
 				header.AppendValue(columnName.ToString())
@@ -85,20 +88,16 @@ func (tb *Builder) setRows() {
 				footer.PrependValue(tables.EmptyValue)
 			}
 
-			columnIdx++
-
-			for columnIdx < columnsPerRow {
+			for columnIdx := len(columns); columnIdx < columnsPerRow; columnIdx++ {
 				header.PrependValue(tables.EmptyValue)
 				footer.PrependValue(tables.EmptyValue)
 				row.PrependValue(tables.EmptyValue)
-
-				columnIdx++
 			}
 
 			if itemIndex == 0 && rowIndex == 0 {
 				tb.writer.AppendHeader(header.Values, header.Config)
 				tb.writer.AppendFooter(footer.Values, footer.Config)
-			} else if rowIndex%2 == 1 || itemIndex > 0 && len(rowsConfig) > 1 && rowIndex%2 == 0 {
+			} else if len(rowsConfig) > 1 && (rowIndex%2 == 1 || itemIndex > 0 && rowIndex%2 == 0) {
 				tb.writer.AppendRow(header.Values, header.Config)
 			}
 
@@ -106,33 +105,45 @@ func (tb *Builder) setRows() {
 			tb.writer.AppendSeparator()
 		}
 	}
+
+	return nil
 }
 
 // setStyle sets the style for the table builder based on the configuration in the builder's table config
 func (tb *Builder) setStyle() {
-	tb.writer.SortBy(tb.config.Sort)
 	tb.writer.SetTitle(tb.config.Name)
 	tb.writer.SetStyle(tb.config.Style)
-	tb.writer.SetAutoIndex(tb.config.AutoIndex)
 
 	tb.setColors()
 }
 
 // setColors sets the row colors for the table builder based on the current state of the table
 func (tb *Builder) setColors() {
-	var f = func() func(row table.Row) text.Colors {
-		valuesRowFgColor := text.Colors{text.FgWhite}
-		bgColor := []text.Color{text.BgWhite, text.BgHiBlue, text.BgHiBlue, text.BgWhite}
+	var (
+		fgWhite  = text.FgWhite
+		bgWhite  = text.BgWhite
+		bgHiBlue = text.BgHiBlue
+		fgBlack  = text.FgBlack
+	)
+
+	var painter = func() func(row table.Row) text.Colors {
+		valuesRowFgColor := text.Colors{fgWhite}
+		bgColor := []text.Color{bgWhite, bgHiBlue, bgHiBlue, bgWhite}
 		currentColor := 0
 
 		var handler = func(row table.Row) text.Colors {
 			for _, column := range row {
-				if _, ok := column.(int); ok {
+				switch value := column.(type) {
+				case int:
 					return valuesRowFgColor
+				case string:
+					if _, err := strconv.Atoi(value); err == nil {
+						return valuesRowFgColor
+					}
 				}
 			}
 
-			colors := text.Colors{text.FgBlack, bgColor[currentColor]}
+			colors := text.Colors{fgBlack, bgColor[currentColor]}
 
 			currentColor++
 			if currentColor > 3 {
@@ -145,5 +156,5 @@ func (tb *Builder) setColors() {
 		return handler
 	}()
 
-	tb.writer.SetRowPainter(f)
+	tb.writer.SetRowPainter(painter)
 }

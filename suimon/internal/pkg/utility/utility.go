@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/dariubs/percent"
@@ -160,16 +161,60 @@ func GetCPUUsage() (*UsageData, error) {
 	}, nil
 }
 
-func EpochToUTCDate(epoch int64) string {
-	utcTime := time.Unix(epoch/1000, 0).UTC()
+// FormatDate formats a time.Time value to a string using a specific date and time layout string and the specified time zone.
+func FormatDate(date time.Time, timeZone string) string {
+	loc, err := time.LoadLocation(timeZone)
+	if err != nil {
+		loc = time.UTC
+	}
 
-	return utcTime.Format("2006-01-02 15:04:05")
+	localTime := date.In(loc)
+
+	return localTime.Format("01/02/2006 03:04:05 PM")
 }
 
-func MSToHoursAndMinutes(durationMs int64) string {
-	duration := time.Duration(durationMs * int64(time.Millisecond))
+// StringMsToDuration converts a string representing a duration in milliseconds to a time.Duration value.
+func StringMsToDuration(durationString string) (time.Duration, error) {
+	durationInt, err := strconv.ParseInt(durationString, 0, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	duration := time.Duration(durationInt) * time.Millisecond
+
+	return duration, nil
+}
+
+// ParseEpochTime parses a string representing an epoch time and returns a pointer to a time.Time value.
+func ParseEpochTime(epoch string) (*time.Time, error) {
+	epochInt, err := strconv.ParseInt(epoch, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	epochTime := time.Unix(epochInt/1000, (epochInt%1000)*int64(time.Millisecond))
+
+	return &epochTime, nil
+}
+
+// DurationToHoursAndMinutes converts a duration in milliseconds to a formatted string representing hours and minutes.
+func DurationToHoursAndMinutes(duration time.Duration) string {
 	hours := int64(duration.Hours())
 	minutes := int64(duration.Minutes()) % 60
 
-	return fmt.Sprintf("%02d:%02d", hours, minutes)
+	return fmt.Sprintf("%02d:%02d HH:MM", hours, minutes)
+}
+
+// GetDurationTillTime calculates the duration between a specified start time and the current time and returns it as a time.Duration value.
+func GetDurationTillTime(start time.Time, duration time.Duration) (time.Duration, error) {
+	endTime := start.Add(duration)
+	currentTime := time.Now()
+
+	if endTime.Before(currentTime) {
+		return 0, fmt.Errorf("end time is before current time")
+	}
+
+	timeLeft := endTime.Sub(currentTime)
+
+	return timeLeft, nil
 }

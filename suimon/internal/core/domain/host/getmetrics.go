@@ -37,6 +37,7 @@ var (
 		enums.PrometheusMetricNameTotalSignatureErrors:         enums.MetricTypeTotalSignatureErrors,
 		enums.PrometheusMetricNameUptime:                       enums.MetricTypeUptime,
 		enums.PrometheusMetricNameCertificatesCreated:          enums.MetricTypeCertificatesCreated,
+		enums.PrometheusMetricNameNonConsensusLatencySum:       enums.MetricTypeNonConsensusLatencySum,
 	}
 )
 
@@ -95,7 +96,7 @@ func getPrometheusMetricsForTableType(table enums.TableType) ports.Metrics {
 			MetricType: enums.PrometheusMetricTypeCounter,
 		}
 		metrics[enums.PrometheusMetricNameCurrentRound] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeCounter,
+			MetricType: enums.PrometheusMetricTypeGauge,
 		}
 		metrics[enums.PrometheusMetricNameCertificatesCreated] = ports.MetricConfig{
 			MetricType: enums.PrometheusMetricTypeCounter,

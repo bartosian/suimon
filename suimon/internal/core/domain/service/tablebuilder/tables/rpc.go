@@ -1,7 +1,6 @@
 package tables
 
 import (
-	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
@@ -9,11 +8,6 @@ import (
 )
 
 var (
-	SortConfigRPC = SortConfig{
-		{Name: enums.ColumnNameHealth.ToString(), Mode: table.Dsc},
-		{Name: enums.ColumnNameTotalTransactionBlocks.ToString(), Mode: table.Dsc},
-		{Name: enums.ColumnNameLatestCheckpoint.ToString(), Mode: table.Dsc},
-	}
 	ColumnsConfigRPC = ColumnsConfig{
 		enums.ColumnNameIndex:                  NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameHealth:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),

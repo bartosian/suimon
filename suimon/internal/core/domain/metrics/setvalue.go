@@ -54,7 +54,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 			if !ok {
 				return fmt.Errorf(ErrUnsupportedValidatorsAtRiskAttr, validator)
 			}
-			epochCount, ok := validator[1].(float64)
+			epochCount, ok := validator[1].(string)
 			if !ok {
 				return fmt.Errorf(ErrUnsupportedValidatorsAtRiskAttr, validator)
 			}
@@ -276,6 +276,13 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		}
 
 		metrics.TotalSignatureErrors = convFToI(valueFloat)
+	case enums.MetricTypeNonConsensusLatencySum:
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
+		}
+
+		metrics.NonConsensusLatency = convFToI(valueFloat)
 	case enums.MetricTypeTxSyncPercentage:
 		valueInt, ok := value.(int)
 		if !ok {

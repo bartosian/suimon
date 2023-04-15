@@ -105,6 +105,7 @@ type (
 		TotalTransactionsBlocks      int
 		TotalTransactionCertificates int
 		CertificatesCreated          int
+		NonConsensusLatency          int
 		TotalTransactionEffects      int
 		TransactionsPerSecond        int
 		TxSyncPercentage             int
@@ -164,7 +165,7 @@ type (
 	ValidatorAtRisk struct {
 		Name         string
 		Address      string
-		EpochsAtRisk float64
+		EpochsAtRisk string
 	}
 
 	// Metrics represents various metrics about the Sui blockchain network.
@@ -244,7 +245,7 @@ func NewValidatorReport(reportedName, reportedAddress, reporterName, reporterAdd
 }
 
 // NewValidatorAtRisk returns a new ValidatorAtRisk instance.
-func NewValidatorAtRisk(name, address string, epochsAtRisk float64) ValidatorAtRisk {
+func NewValidatorAtRisk(name, address, epochsAtRisk string) ValidatorAtRisk {
 	return ValidatorAtRisk{
 		Name:         name,
 		Address:      address,

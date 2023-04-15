@@ -7,4 +7,5 @@ const (
 	PrometheusMetricTypeGauge
 	PrometheusMetricTypeHistogram
 	PrometheusMetricTypeSummary
+	PrometheusMetricTypeUntyped
 )

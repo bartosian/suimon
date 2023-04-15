@@ -32,6 +32,7 @@ const (
 	MetricTypeSkippedConsensusTransactions MetricType = "SKIPPED_CONSENSUS_TRANSACTIONS"
 	MetricTypeTotalSignatureErrors         MetricType = "TOTAL_SIGNATURE_ERRORS"
 	MetricTypeCertificatesCreated          MetricType = "CERTIFICATES_CREATED"
+	MetricTypeNonConsensusLatencySum       MetricType = "NON_CONSENSUS_LATENCY_SUM"
 )
 
 func (e MetricType) ToString() string {

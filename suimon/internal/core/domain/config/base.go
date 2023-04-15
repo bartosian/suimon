@@ -16,13 +16,13 @@ const (
 
 type Config struct {
 	PublicRPC []string `yaml:"public-rpc"`
-	FullNode  struct {
+	FullNodes []struct {
 		JSONRPCAddress string `yaml:"json-rpc-address"`
 		MetricsAddress string `yaml:"metrics-address"`
-	} `yaml:"full-node"`
-	Validator struct {
+	} `yaml:"full-nodes"`
+	Validators []struct {
 		MetricsAddress string `yaml:"metrics-address"`
-	} `yaml:"validator"`
+	} `yaml:"validators"`
 	SeedPeers []string `yaml:"seed-peers"`
 	IPLookup  struct {
 		AccessToken string `yaml:"access-token"`

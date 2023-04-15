@@ -6,13 +6,17 @@ public-rpc:
   - "https://wave3-rpc.synergynodes.com:443"
 
 # if you wish to monitor the node, update this section with the node information
-full-node:
-  json-rpc-address: 0.0.0.0:9000
-  metrics-address: 0.0.0.0:9184
+full-nodes:
+  - json-rpc-address: 0.0.0.0:9000
+    metrics-address: 0.0.0.0:9184
+  - json-rpc-address: https://sui-rpc.testnet.com
+    metrics-address: https://sui-rpc.testnet.com/metrics
 
 # if you wish to monitor the validator, update this section with the validator information
-validator:
-  metrics-address: 0.0.0.0:9184
+validators:
+  - metrics-address: 0.0.0.0:9184/metrics
+  - metrics-address: https://sui-validator.testnet.com:9184/metrics
+  - metrics-address: https://sui-validator.mainnet.com:9184/metrics
 
 # if you wish to monitor peers, update this section with the peers information
 seed-peers:

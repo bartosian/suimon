@@ -1,9 +1,7 @@
 package tables
 
 import (
-	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-	"strconv"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
@@ -11,17 +9,12 @@ import (
 )
 
 var (
-	SortConfigSystem = SortConfig{
-		{Name: enums.ColumnNameSystemEpoch.ToString(), Mode: table.Dsc},
-	}
-	SortConfigValidatorsAtRisk = SortConfig{
-		{Name: enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs.ToString(), Mode: table.Dsc},
-	}
 	ColumnsConfigSystem = ColumnsConfig{
 		enums.ColumnNameIndex:                                       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemEpoch:                                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemEpochStartTimestamp:                   NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemEpochDuration:                         NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemTimeTillNextEpoch:                     NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemTotalStake:                            NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemStorageFundNonRefundableBalance:       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
@@ -50,10 +43,10 @@ var (
 	}
 	RowsConfigSystemState = RowsConfig{
 		0: {
-			enums.ColumnNameIndex,
 			enums.ColumnNameSystemEpoch,
-			enums.ColumnNameSystemEpochStartTimestamp,
 			enums.ColumnNameSystemEpochDuration,
+			enums.ColumnNameSystemEpochStartTimestamp,
+			enums.ColumnNameSystemTimeTillNextEpoch,
 			enums.ColumnNameSystemTotalStake,
 			enums.ColumnNameSystemStorageFundTotalObjectStorageRebates,
 			enums.ColumnNameSystemStorageFundNonRefundableBalance,
@@ -104,22 +97,32 @@ var (
 // GetSystemStateColumnValues returns a map of SystemColumnName values to corresponding values for the system state.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of SystemColumnName keys and corresponding values.
 // Returns a map of SystemColumnName keys to corresponding values.
-func GetSystemStateColumnValues(systemState *metrics.SuiSystemState) map[enums.ColumnName]any {
-	epochStartMs, err := strconv.ParseInt(systemState.EpochStartTimestampMs, 10, 64)
+func GetSystemStateColumnValues(systemState *metrics.SuiSystemState) (map[enums.ColumnName]any, error) {
+	epochStart, err := utility.ParseEpochTime(systemState.EpochStartTimestampMs)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	epochDurationMs, err := strconv.ParseInt(systemState.EpochDurationMs, 10, 64)
+	epochDuration, err := utility.StringMsToDuration(systemState.EpochDurationMs)
 	if err != nil {
-		return nil
+		return nil, err
 	}
+
+	durationTillEpochEnd, err := utility.GetDurationTillTime(*epochStart, epochDuration)
+	if err != nil {
+		return nil, err
+	}
+
+	epochStartTimeUTC := utility.FormatDate(*epochStart, "America/New_York")
+	epochDurationHHMM := utility.DurationToHoursAndMinutes(epochDuration)
+	durationTillEpochEndHHMM := utility.DurationToHoursAndMinutes(durationTillEpochEnd)
 
 	return map[enums.ColumnName]any{
 		enums.ColumnNameIndex:                                       1,
 		enums.ColumnNameSystemEpoch:                                 systemState.Epoch,
-		enums.ColumnNameSystemEpochStartTimestamp:                   utility.EpochToUTCDate(epochStartMs),
-		enums.ColumnNameSystemEpochDuration:                         utility.MSToHoursAndMinutes(epochDurationMs),
+		enums.ColumnNameSystemEpochStartTimestamp:                   epochStartTimeUTC,
+		enums.ColumnNameSystemEpochDuration:                         epochDurationHHMM,
+		enums.ColumnNameSystemTimeTillNextEpoch:                     durationTillEpochEndHHMM,
 		enums.ColumnNameSystemTotalStake:                            systemState.TotalStake,
 		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  systemState.StorageFundTotalObjectStorageRebates,
 		enums.ColumnNameSystemStorageFundNonRefundableBalance:       systemState.StorageFundNonRefundableBalance,
@@ -130,7 +133,7 @@ func GetSystemStateColumnValues(systemState *metrics.SuiSystemState) map[enums.C
 		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: systemState.StakeSubsidyCurrentDistributionAmount,
 		enums.ColumnNameSystemStakeSubsidyPeriodLength:              systemState.StakeSubsidyPeriodLength,
 		enums.ColumnNameSystemStakeSubsidyDecreaseRate:              systemState.StakeSubsidyDecreaseRate,
-	}
+	}, nil
 }
 
 // GetValidatorCountsColumnValues returns a map of ColumnName values to corresponding values for the system state validators.

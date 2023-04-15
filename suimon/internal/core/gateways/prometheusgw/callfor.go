@@ -3,10 +3,11 @@ package prometheusgw
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/prometheus/client_golang/prometheus"
 	ioPrometheusClient "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
-	"net/http"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
@@ -103,6 +104,7 @@ func getMetricValueWithLabelFiltering(metrics MetricsData, metricName string, me
 		enums.PrometheusMetricTypeCounter:   func(metric *ioPrometheusClient.Metric) float64 { return metric.GetCounter().GetValue() },
 		enums.PrometheusMetricTypeSummary:   func(metric *ioPrometheusClient.Metric) float64 { return metric.GetSummary().GetSampleSum() },
 		enums.PrometheusMetricTypeHistogram: func(metric *ioPrometheusClient.Metric) float64 { return metric.GetHistogram().GetSampleSum() },
+		enums.PrometheusMetricTypeUntyped:   func(metric *ioPrometheusClient.Metric) float64 { return metric.GetUntyped().GetValue() },
 	}
 
 	foundMetric := false

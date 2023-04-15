@@ -4,13 +4,13 @@ type TableType string
 
 const (
 	TableTypeRPC              TableType = "PUBLIC RPC"
-	TableTypeNode             TableType = "YOUR NODE"
-	TableTypeValidator        TableType = "YOUR VALIDATOR"
+	TableTypeNode             TableType = "FULL NODES"
+	TableTypeValidator        TableType = "VALIDATORS"
 	TableTypePeers            TableType = "PEERS"
 	TableTypeSystemState      TableType = "SYSTEM STATE"
-	TableTypeValidatorsCounts TableType = "VALIDATORS COUNTS"
+	TableTypeValidatorsCounts TableType = "VALIDATORS STATISTICS"
 	TableTypeValidatorsAtRisk TableType = "VALIDATORS AT RISK"
-	TableTypeValidatorReports TableType = "VALIDATOR REPORTS"
+	TableTypeValidatorReports TableType = "VALIDATORS REPORTS"
 	TableTypeActiveValidators TableType = "ACTIVE VALIDATORS"
 )
 

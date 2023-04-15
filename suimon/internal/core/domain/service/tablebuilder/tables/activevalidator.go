@@ -32,6 +32,7 @@ var (
 	}
 	RowsActiveValidator = RowsConfig{
 		0: {
+			enums.ColumnNameIndex,
 			enums.ColumnNameValidatorName,
 			enums.ColumnNameValidatorVotingPower,
 			enums.ColumnNameValidatorGasPrice,

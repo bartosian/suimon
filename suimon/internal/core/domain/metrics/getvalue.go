@@ -76,6 +76,8 @@ func (metrics *Metrics) GetValue(metric enums.MetricType) MetricValue {
 		return metrics.SkippedConsensusTransactions
 	case enums.MetricTypeTotalSignatureErrors:
 		return metrics.TotalSignatureErrors
+	case enums.MetricTypeNonConsensusLatencySum:
+		return metrics.NonConsensusLatency
 	default:
 		return nil
 	}

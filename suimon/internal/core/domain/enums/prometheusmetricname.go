@@ -19,6 +19,7 @@ const (
 	PrometheusMetricNameSkippedConsensusTransactions PrometheusMetricName = "skipped_consensus_txns"
 	PrometheusMetricNameTotalSignatureErrors         PrometheusMetricName = "total_signature_errors"
 	PrometheusMetricNameCertificatesCreated          PrometheusMetricName = "certificates_created"
+	PrometheusMetricNameNonConsensusLatencySum       PrometheusMetricName = "validator_service_handle_certificate_non_consensus_latency_sum"
 	PrometheusMetricNameUptime                       PrometheusMetricName = "uptime"
 )
 

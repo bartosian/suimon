@@ -17,26 +17,19 @@ import (
 // a channel. If an error is received from the channel, it is returned immediately. If no errors are received,
 // the function returns nil.
 func (c *Controller) ParseConfigData() error {
-	if err := c.getHostsData(enums.TableTypeRPC); err != nil {
+	if err := c.ParseConfigRPC(); err != nil {
 		return err
 	}
 
-	if err := c.sortHosts(enums.TableTypeRPC); err != nil {
-		return err
-	}
-
-	if err := c.setHostsHealth(enums.TableTypeRPC); err != nil {
-		return err
-	}
-
-	tablesToParse := make([]enums.TableType, 0, len(c.selectedTables))
-	systemTables := map[enums.TableType]bool{
+	var systemTables = map[enums.TableType]bool{
 		enums.TableTypeActiveValidators: true,
 		enums.TableTypeValidatorReports: true,
 		enums.TableTypeValidatorsAtRisk: true,
 		enums.TableTypeSystemState:      true,
 		enums.TableTypeValidatorsCounts: true,
 	}
+
+	tablesToParse := make([]enums.TableType, 0, len(c.selectedTables))
 
 	var systemTableAdded bool
 
@@ -50,11 +43,9 @@ func (c *Controller) ParseConfigData() error {
 			table = enums.TableTypeSystemState
 		}
 
-		if table == enums.TableTypeRPC {
-			continue
+		if table != enums.TableTypeRPC {
+			tablesToParse = append(tablesToParse, table)
 		}
-
-		tablesToParse = append(tablesToParse, table)
 	}
 
 	errChan := make(chan error, len(tablesToParse))
@@ -77,6 +68,10 @@ func (c *Controller) ParseConfigData() error {
 			if err := c.setHostsHealth(table); err != nil {
 				errChan <- err
 			}
+
+			if err := c.sortHosts(table); err != nil {
+				errChan <- err
+			}
 		}(tableType)
 	}
 
@@ -90,11 +85,29 @@ func (c *Controller) ParseConfigData() error {
 	}
 }
 
+// ParseConfigRPC fetches hosts data for the RPC table, sorts the hosts in
+// alphabetical order, and sets their health status.
+func (c *Controller) ParseConfigRPC() error {
+	if err := c.getHostsData(enums.TableTypeRPC); err != nil {
+		return err
+	}
+
+	if err := c.sortHosts(enums.TableTypeRPC); err != nil {
+		return err
+	}
+
+	if err := c.setHostsHealth(enums.TableTypeRPC); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // getHostsData retrieves the latest data for the specified table type from all active hosts and updates the MonitorController's internal state with the new data.
 // The function retrieves data for each host in parallel and displays a progress bar indicating the progress of the data retrieval process.
 // Returns an error if the data cannot be retrieved from any of the active hosts or if there is an issue updating the CheckerController's internal state.
-func (c *Controller) getHostsData(tableType enums.TableType) error {
-	progressChan := progress.NewProgressBar("PARSING DATA FOR "+string(tableType), progress.ColorBlue)
+func (c *Controller) getHostsData(table enums.TableType) error {
+	progressChan := progress.NewProgressBar("PARSING DATA FOR "+string(table), progress.ColorBlue)
 	defer func() { progressChan <- struct{}{} }()
 
 	var (
@@ -103,7 +116,7 @@ func (c *Controller) getHostsData(tableType enums.TableType) error {
 		err       error
 	)
 
-	if tableType == enums.TableTypeSystemState {
+	if table == enums.TableTypeSystemState {
 		if len(c.hosts.rpc) == 0 {
 			return errors.New("RPC host is not initialized")
 		}
@@ -111,21 +124,26 @@ func (c *Controller) getHostsData(tableType enums.TableType) error {
 		return c.hosts.rpc[0].GetDataByMetric(enums.RPCMethodGetSuiSystemState)
 	}
 
-	if addresses, err = c.getAddressInfoByTableType(tableType); err != nil {
+	if addresses, err = c.getAddressInfoByTableType(table); err != nil {
 		return err
 	}
 
-	if hosts, err = c.createHosts(tableType, addresses); err != nil {
+	if hosts, err = c.createHosts(table, addresses); err != nil {
 		return err
 	}
 
-	return c.setHostsByTableType(tableType, hosts)
+	return c.setHostsByTableType(table, hosts)
 }
 
 // sortHosts sorts the active hosts for the specified table type based on their corresponding metric values.
 // The function retrieves the relevant metric for each host, sorts the hosts by their metric values, and updates the CheckerController's internal state accordingly.
 // Returns an error if the specified table type is invalid or if there is an issue sorting the hosts based on their corresponding metric values.
 func (c *Controller) sortHosts(tableType enums.TableType) error {
+
+	if tableType == enums.TableTypeSystemState {
+		return nil
+	}
+
 	hosts, err := c.getHostsByTableType(tableType)
 	if err != nil {
 		return err
@@ -133,15 +151,15 @@ func (c *Controller) sortHosts(tableType enums.TableType) error {
 
 	if len(hosts) > 1 {
 		sort.Slice(hosts, func(left, right int) bool {
-			return hosts[left].Metrics.TotalTransactionsBlocks > hosts[right].Metrics.TotalTransactionsBlocks
+			return hosts[left].Status > hosts[right].Status
 		})
 
 		sort.SliceStable(hosts, func(left, right int) bool {
-			return hosts[left].Metrics.LatestCheckpoint > hosts[right].Metrics.LatestCheckpoint
+			return hosts[left].Metrics.TotalTransactionsBlocks > hosts[right].Metrics.TotalTransactionsBlocks
 		})
 	}
 
-	return c.setHostsByTableType(tableType, hosts)
+	return nil
 }
 
 // setHostsHealth retrieves the latest health information for all active hosts and updates the CheckerController's internal state with the new information.
