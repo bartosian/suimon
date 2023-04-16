@@ -76,7 +76,7 @@ func (c *Controller) getHostsByTableType(table enums.TableType) (hosts []host.Ho
 		return c.hosts.validator, nil
 	case enums.TableTypeActiveValidators:
 		return c.hosts.rpc[:1], nil
-	case enums.TableTypeSystemState,
+	case enums.TableTypeGasPriceAndSubsidy,
 		enums.TableTypeValidatorsCounts,
 		enums.TableTypeValidatorsAtRisk,
 		enums.TableTypeValidatorReports:

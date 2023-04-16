@@ -13,8 +13,9 @@ const (
 )
 
 type (
-	// Validator represents a validator node on the Sui blockchain network.
-	Validator struct {
+	// Validators represents a validator nodes on the Sui blockchain network.
+	Validators []Validator
+	Validator  struct {
 		SuiAddress                   string      `json:"suiAddress"`
 		ProtocolPubkeyBytes          string      `json:"protocolPubkeyBytes"`
 		NetworkPubkeyBytes           string      `json:"networkPubkeyBytes"`
@@ -83,7 +84,7 @@ type (
 		StakeSubsidyPeriodLength              string          `json:"stakeSubsidyPeriodLength"`
 		StakeSubsidyDecreaseRate              int             `json:"stakeSubsidyDecreaseRate"`
 		TotalStake                            string          `json:"totalStake"`
-		ActiveValidators                      []Validator     `json:"activeValidators"`
+		ActiveValidators                      Validators      `json:"activeValidators"`
 		PendingActiveValidatorsID             string          `json:"pendingActiveValidatorsId"`
 		PendingActiveValidatorsSize           string          `json:"pendingActiveValidatorsSize"`
 		PendingRemovals                       []interface{}   `json:"pendingRemovals"`
@@ -141,10 +142,13 @@ type (
 
 	// Epoch represents information about the current epoch on the Sui blockchain network.
 	Epoch struct {
-		CurrentEpoch       int
-		EpochTotalDuration int
-		EpochPercentage    int
-		TimeTillNextEpoch  int64
+		CurrentEpoch             int
+		EpochStartTimeUTC        string
+		EpochTotalDuration       int
+		EpochDurationHHMM        string
+		DurationTillEpochEndHHMM string
+		EpochPercentage          int
+		TimeTillNextEpoch        int64
 	}
 
 	// Errors represents information about errors on the Sui blockchain network.
@@ -168,6 +172,16 @@ type (
 		EpochsAtRisk string
 	}
 
+	// GasPrice represents the different reference gas prices used on the network.
+	GasPrice struct {
+		MinReferenceGasPrice               int // The minimum gas price (in wei) that transactions should pay in order to be included in the next block.
+		MaxReferenceGasPrice               int // The maximum gas price (in wei) that transactions should pay in order to avoid overpaying and wasting funds.
+		MeanReferenceGasPrice              int // The average gas price (in wei) of transactions that were included in the last few blocks.
+		StakeWeightedMeanReferenceGasPrice int // The average gas price (in wei) weighted by the amount of stake that each validator has on the network.
+		MedianReferenceGasPrice            int // The middle value of the sorted list of gas prices (in wei) that were included in the last few blocks.
+		EstimatedNextReferenceGasPrice     int // The gas price (in wei) that is estimated to be included in the next block based on recent network activity and congestion.
+	}
+
 	// Metrics represents various metrics about the Sui blockchain network.
 	Metrics struct {
 		Updated bool
@@ -183,6 +197,7 @@ type (
 		Rounds
 		Peers
 		Epoch
+		GasPrice
 		Errors
 	}
 )

@@ -21,10 +21,10 @@ func (tb *Builder) Init() error {
 		tb.handlePeersTable(hosts)
 	case enums.TableTypeValidator:
 		tb.handleValidatorTable(hosts)
-	case enums.TableTypeSystemState:
-		systemState := hosts[0].Metrics.SystemState
+	case enums.TableTypeGasPriceAndSubsidy:
+		metrics := hosts[0].Metrics
 
-		return tb.handleSystemStateTable(&systemState)
+		return tb.handleSystemStateTable(&metrics)
 	case enums.TableTypeValidatorsCounts:
 		systemState := hosts[0].Metrics.SystemState
 
@@ -127,10 +127,10 @@ func (tb *Builder) handleValidatorTable(hosts []domainhost.Host) {
 }
 
 // handleSystemStateTable handles the configuration for the System State table.
-func (tb *Builder) handleSystemStateTable(systemState *metrics.SuiSystemState) error {
-	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeSystemState)
+func (tb *Builder) handleSystemStateTable(metrics *metrics.Metrics) error {
+	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeGasPriceAndSubsidy)
 
-	columnValues, err := tables.GetSystemStateColumnValues(systemState)
+	columnValues, err := tables.GetSystemStateColumnValues(metrics)
 	if err != nil {
 		return err
 	}

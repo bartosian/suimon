@@ -1,13 +1,17 @@
 package metrics
 
 import (
+	"errors"
 	"fmt"
 	"math"
+	"math/big"
+	"sort"
 	"strconv"
 
 	"encoding/json"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 )
 
 const (
@@ -28,73 +32,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 
 	switch metric {
 	case enums.MetricTypeSuiSystemState:
-		// Parse the JSON data of the SystemState object.
-		dataBytes, err := json.Marshal(value.(map[string]interface{}))
-		if err != nil {
-			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
-		}
-
-		// Unmarshal the JSON data into a SuiSystemState struct.
-		var valueSystemState SuiSystemState
-		if err = json.Unmarshal(dataBytes, &valueSystemState); err != nil {
-			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
-		}
-
-		// Create a mapping between validator addresses and their corresponding names.
-		addressToValidatorName := make(map[string]string, len(valueSystemState.ActiveValidators))
-		for _, activeValidator := range valueSystemState.ActiveValidators {
-			addressToValidatorName[activeValidator.SuiAddress] = activeValidator.Name
-		}
-		valueSystemState.AddressToValidatorName = addressToValidatorName
-
-		// Parse the validators at risk from the raw JSON data.
-		validatorsAtRisk := make([]ValidatorAtRisk, 0, len(valueSystemState.AtRiskValidators))
-		for _, validator := range valueSystemState.AtRiskValidators {
-			address, ok := validator[0].(string)
-			if !ok {
-				return fmt.Errorf(ErrUnsupportedValidatorsAtRiskAttr, validator)
-			}
-			epochCount, ok := validator[1].(string)
-			if !ok {
-				return fmt.Errorf(ErrUnsupportedValidatorsAtRiskAttr, validator)
-			}
-			validatorName := addressToValidatorName[address]
-			validatorAtRisk := NewValidatorAtRisk(validatorName, address, epochCount)
-
-			validatorsAtRisk = append(validatorsAtRisk, validatorAtRisk)
-		}
-		valueSystemState.ValidatorsAtRiskParsed = validatorsAtRisk
-
-		// Parse the validator reports from the raw JSON data.
-		validatorReports := make([]ValidatorReport, 0, len(valueSystemState.ValidatorReportRecords))
-		for _, report := range valueSystemState.ValidatorReportRecords {
-			reportedAddress, ok := report[0].(string)
-			if !ok {
-				return fmt.Errorf(ErrUnsupportedValidatorsReportAttr, report)
-			}
-			reporters, ok := report[1].([]any)
-			if !ok {
-				return fmt.Errorf(ErrUnsupportedValidatorsReportAttr, report)
-			}
-			reportedName := addressToValidatorName[reportedAddress]
-			for _, reporterAddress := range reporters {
-				reporter, ok := reporterAddress.(string)
-				if !ok {
-					return fmt.Errorf(ErrUnsupportedSuiAddressAttr, reporterAddress)
-				}
-				reporterName := addressToValidatorName[reporter]
-				validatorReport := NewValidatorReport(reportedName, reportedAddress, reporterName, reporter)
-
-				validatorReports = append(validatorReports, validatorReport)
-			}
-		}
-
-		valueSystemState.ValidatorReportsParsed = validatorReports
-
-		// Update the SystemState property of the Metrics struct with the parsed data.
-		metrics.SystemState = valueSystemState
-
-		// Update the TimeTillNextEpoch property of the Metrics struct with the new value
+		return metrics.SetSystemStateValue(value)
 	case enums.MetricTypeTotalTransactionBlocks:
 		switch v := value.(type) {
 		case string:
@@ -302,6 +240,135 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 	return nil
 }
 
+// SetSystemStateValue updates the Metrics struct with the data from a SystemState object.
+func (metrics *Metrics) SetSystemStateValue(value any) error {
+	// Parse the JSON data of the SystemState object.
+	dataBytes, err := json.Marshal(value.(map[string]interface{}))
+	if err != nil {
+		return fmt.Errorf(ErrUnexpectedMetricValueType, enums.MetricTypeSuiSystemState, value)
+	}
+
+	// Unmarshal the JSON data into a SuiSystemState struct.
+	var valueSystemState SuiSystemState
+	if err = json.Unmarshal(dataBytes, &valueSystemState); err != nil {
+		return fmt.Errorf(ErrUnexpectedMetricValueType, enums.MetricTypeSuiSystemState, value)
+	}
+
+	// Create a mapping between validator addresses and their corresponding names.
+	addressToValidatorName := make(map[string]string, len(valueSystemState.ActiveValidators))
+	for _, activeValidator := range valueSystemState.ActiveValidators {
+		addressToValidatorName[activeValidator.SuiAddress] = activeValidator.Name
+	}
+	valueSystemState.AddressToValidatorName = addressToValidatorName
+
+	// Parse the validators at risk from the raw JSON data.
+	validatorsAtRisk := make([]ValidatorAtRisk, 0, len(valueSystemState.AtRiskValidators))
+	for _, validator := range valueSystemState.AtRiskValidators {
+		address, ok := validator[0].(string)
+		if !ok {
+			return fmt.Errorf(ErrUnsupportedValidatorsAtRiskAttr, validator)
+		}
+		epochCount, ok := validator[1].(string)
+		if !ok {
+			return fmt.Errorf(ErrUnsupportedValidatorsAtRiskAttr, validator)
+		}
+		validatorName := addressToValidatorName[address]
+		validatorAtRisk := NewValidatorAtRisk(validatorName, address, epochCount)
+
+		validatorsAtRisk = append(validatorsAtRisk, validatorAtRisk)
+	}
+	valueSystemState.ValidatorsAtRiskParsed = validatorsAtRisk
+
+	// Parse the validator reports from the raw JSON data.
+	validatorReports := make([]ValidatorReport, 0, len(valueSystemState.ValidatorReportRecords))
+	for _, report := range valueSystemState.ValidatorReportRecords {
+		reportedAddress, ok := report[0].(string)
+		if !ok {
+			return fmt.Errorf(ErrUnsupportedValidatorsReportAttr, report)
+		}
+		reporters, ok := report[1].([]any)
+		if !ok {
+			return fmt.Errorf(ErrUnsupportedValidatorsReportAttr, report)
+		}
+		reportedName := addressToValidatorName[reportedAddress]
+		for _, reporterAddress := range reporters {
+			reporter, ok := reporterAddress.(string)
+			if !ok {
+				return fmt.Errorf(ErrUnsupportedSuiAddressAttr, reporterAddress)
+			}
+			reporterName := addressToValidatorName[reporter]
+			validatorReport := NewValidatorReport(reportedName, reportedAddress, reporterName, reporter)
+
+			validatorReports = append(validatorReports, validatorReport)
+		}
+	}
+
+	valueSystemState.ValidatorReportsParsed = validatorReports
+
+	// Update the SystemState property of the Metrics struct with the parsed data.
+	metrics.SystemState = valueSystemState
+
+	epochStart, err := utility.ParseEpochTime(valueSystemState.EpochStartTimestampMs)
+	if err != nil {
+		return err
+	}
+
+	epochDuration, err := utility.StringMsToDuration(valueSystemState.EpochDurationMs)
+	if err != nil {
+		return err
+	}
+
+	durationTillEpochEnd, err := utility.GetDurationTillTime(*epochStart, epochDuration)
+	if err != nil {
+		return err
+	}
+
+	metrics.EpochStartTimeUTC = utility.FormatDate(*epochStart, "America/New_York")
+	metrics.EpochDurationHHMM = utility.DurationToHoursAndMinutes(epochDuration)
+	metrics.DurationTillEpochEndHHMM = utility.DurationToHoursAndMinutes(durationTillEpochEnd)
+
+	activeValidators := valueSystemState.ActiveValidators
+
+	minRefGasPrice, err := activeValidators.GetMinRefGasPrice()
+	if err != nil {
+		return err
+	}
+
+	maxRefGasPrice, err := activeValidators.GetMaxRefGasPrice()
+	if err != nil {
+		return err
+	}
+
+	meanRefGasPrice, err := activeValidators.GetMeanRefGasPrice()
+	if err != nil {
+		return err
+	}
+
+	stakeWeightedMeanReferenceGasPrice, err := activeValidators.GetWeightedMeanRefGasPrice()
+	if err != nil {
+		return err
+	}
+
+	medianReferenceGasPrice, err := activeValidators.GetMedianRefGasPrice()
+	if err != nil {
+		return err
+	}
+
+	estimatedNextReferenceGasPrice, err := activeValidators.GetNextRefGasPrice()
+	if err != nil {
+		return err
+	}
+
+	metrics.MinReferenceGasPrice = int(minRefGasPrice)
+	metrics.MaxReferenceGasPrice = int(maxRefGasPrice)
+	metrics.MeanReferenceGasPrice = int(meanRefGasPrice)
+	metrics.StakeWeightedMeanReferenceGasPrice = int(stakeWeightedMeanReferenceGasPrice)
+	metrics.MedianReferenceGasPrice = int(medianReferenceGasPrice)
+	metrics.EstimatedNextReferenceGasPrice = int(estimatedNextReferenceGasPrice)
+
+	return nil
+}
+
 // CalculateTPS calculates the current transaction per second (TPS) based on the number of transactions processed
 // within the current period. The TPS value is then stored in the Metrics struct.
 func (metrics *Metrics) CalculateTPS() {
@@ -393,4 +460,197 @@ func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC any) bool {
 
 func (metrics *Metrics) IsUnhealthy(metric enums.MetricType, valueRPC any) bool {
 	return !metrics.IsHealthy(metric, valueRPC)
+}
+
+// GetMinRefGasPrice returns the minimum reference gas price among all validators.
+// If there are no validators or if all validators have an invalid gas price, it returns an error.
+func (validators Validators) GetMinRefGasPrice() (int64, error) {
+	if len(validators) == 0 {
+		return 0, nil
+	}
+
+	var minRefGasPrice int64 = math.MaxInt64
+
+	for _, validator := range validators {
+		validatorGasPrice, err := strconv.ParseInt(validator.NextEpochGasPrice, 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("unexpected metric value type for NextEpochGasPrice: %s", validator.NextEpochGasPrice)
+		}
+
+		if validatorGasPrice < minRefGasPrice {
+			minRefGasPrice = validatorGasPrice
+		}
+	}
+
+	if minRefGasPrice == math.MaxInt64 {
+		return 0, errors.New("no validators with valid gas price found")
+	}
+
+	return minRefGasPrice, nil
+}
+
+// GetMaxRefGasPrice returns the maximum reference gas price among all validators.
+// If there are no validators or if all validators have an invalid gas price, it returns an error.
+func (validators Validators) GetMaxRefGasPrice() (int64, error) {
+	if len(validators) == 0 {
+		return 0, nil
+	}
+
+	var maxRefGasPrice int64 = math.MinInt64
+
+	for _, validator := range validators {
+		validatorGasPrice, err := strconv.ParseInt(validator.NextEpochGasPrice, 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("unexpected metric value type for NextEpochGasPrice: %s", validator.NextEpochGasPrice)
+		}
+
+		if validatorGasPrice > maxRefGasPrice {
+			maxRefGasPrice = validatorGasPrice
+		}
+	}
+
+	if maxRefGasPrice == math.MinInt64 {
+		return 0, errors.New("no validators with valid gas price found")
+	}
+
+	return maxRefGasPrice, nil
+}
+
+// GetMeanRefGasPrice calculates the mean reference gas price among all validators.
+// If there are no validators or if all validators have an invalid gas price, it returns an error.
+func (validators Validators) GetMeanRefGasPrice() (int64, error) {
+	if len(validators) == 0 {
+		return 0, nil
+	}
+
+	var sumRefGasPrice int64
+
+	for _, validator := range validators {
+		validatorGasPrice, err := strconv.ParseInt(validator.NextEpochGasPrice, 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("unexpected metric value type for NextEpochGasPrice: %s", validator.NextEpochGasPrice)
+		}
+
+		sumRefGasPrice += validatorGasPrice
+	}
+
+	return sumRefGasPrice / int64(len(validators)), nil
+}
+
+// GetMedianRefGasPrice calculates the median reference gas price among all validators.
+// If there are no validators or if all validators have an invalid gas price, it returns an error.
+func (validators Validators) GetMedianRefGasPrice() (int64, error) {
+	if len(validators) == 0 {
+		return 0, nil
+	}
+
+	gasPrices := make([]int64, 0, len(validators))
+
+	for _, validator := range validators {
+		validatorGasPrice, err := strconv.ParseInt(validator.NextEpochGasPrice, 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("unexpected metric value type for NextEpochGasPrice: %s", validator.NextEpochGasPrice)
+		}
+
+		gasPrices = append(gasPrices, validatorGasPrice)
+	}
+
+	sort.Slice(gasPrices, func(left, right int) bool {
+		return gasPrices[left] < gasPrices[right]
+	})
+
+	if len(validators)%2 == 0 {
+		return (gasPrices[len(validators)/2-1] + gasPrices[len(validators)/2]) / 2, nil
+	}
+
+	return gasPrices[len(validators)/2], nil
+}
+
+func int64ToBigInt(x int64) *big.Int {
+	result := big.NewInt(x)
+	return result
+}
+
+// GetWeightedMeanRefGasPrice calculates the stake-weighted mean reference gas price among all validators.
+// If there are no validators or if all validators have an invalid gas price or stake, it returns an error.
+func (validators Validators) GetWeightedMeanRefGasPrice() (int64, error) {
+	if len(validators) == 0 {
+		return 0, nil
+	}
+
+	var totalDelegation int64
+
+	gasMultiples := new(big.Int)
+
+	for _, validator := range validators {
+		validatorGasPrice, err := strconv.ParseInt(validator.NextEpochGasPrice, 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("unexpected metric value type for NextEpochGasPrice: %s", validator.NextEpochGasPrice)
+		}
+
+		validatorTotalStake, err := strconv.ParseInt(validator.NextEpochStake, 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("unexpected metric value type for NextEpochStake: %s", validator.NextEpochStake)
+		}
+
+		totalDelegation += validatorTotalStake
+
+		mulResult := new(big.Int)
+		mulResult.Mul(int64ToBigInt(validatorGasPrice), int64ToBigInt(validatorTotalStake))
+
+		gasMultiples = gasMultiples.Add(gasMultiples, mulResult)
+	}
+
+	return gasMultiples.Div(gasMultiples, int64ToBigInt(totalDelegation)).Int64(), nil
+}
+
+// GetNextRefGasPrice calculates the next reference gas price for the Sui blockchain network.
+// The reference gas price is determined by sorting the validators by their gas prices and
+// selecting the gas price for which the cumulative voting power of validators exceeds
+// two-thirds of the total voting power. If there are no validators or if all validators
+// have an invalid gas price or voting power, it returns an error.
+func (validators Validators) GetNextRefGasPrice() (int64, error) {
+	if len(validators) == 0 {
+		return 0, nil
+	}
+
+	var (
+		quorum            int64 = 6667
+		cumulativePower   int64 = 0
+		referenceGasPrice int64 = 0
+	)
+
+	sort.SliceStable(validators, func(left, right int) bool {
+		validatorLeftGasPrice, err := strconv.ParseInt(validators[left].NextEpochGasPrice, 10, 64)
+		if err != nil {
+			return true
+		}
+
+		validatorRightGasPrice, err := strconv.ParseInt(validators[right].NextEpochGasPrice, 10, 64)
+		if err != nil {
+			return true
+		}
+
+		return validatorLeftGasPrice < validatorRightGasPrice
+	})
+
+	for _, validator := range validators {
+		if cumulativePower < quorum {
+			validatorGasPrice, err := strconv.ParseInt(validator.NextEpochGasPrice, 10, 64)
+			if err != nil {
+				return 0, fmt.Errorf("unexpected metric value type for NextEpochGasPrice: %s", validator.NextEpochGasPrice)
+			}
+
+			referenceGasPrice = validatorGasPrice
+
+			validatorVotingPower, err := strconv.ParseInt(validator.VotingPower, 10, 64)
+			if err != nil {
+				return 0, fmt.Errorf("unexpected metric value type for VotingPower: %s", validator.VotingPower)
+			}
+
+			cumulativePower += validatorVotingPower
+		}
+	}
+
+	return referenceGasPrice, nil
 }

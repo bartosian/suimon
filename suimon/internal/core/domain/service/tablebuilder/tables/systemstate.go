@@ -5,7 +5,6 @@ import (
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 )
 
 var (
@@ -40,6 +39,12 @@ var (
 		enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs:         NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemValidatorReportedName:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemValidatorReportedAddress:              NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemMinReferenceGasPrice:                  NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemMaxReferenceGasPrice:                  NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemMeanReferenceGasPrice:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemStakeWeightedMeanReferenceGasPrice:    NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemMedianReferenceGasPrice:               NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemEstimatedReferenceGasPrice:            NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 	}
 	RowsConfigSystemState = RowsConfig{
 		0: {
@@ -50,15 +55,21 @@ var (
 			enums.ColumnNameSystemTotalStake,
 			enums.ColumnNameSystemStorageFundTotalObjectStorageRebates,
 			enums.ColumnNameSystemStorageFundNonRefundableBalance,
-			enums.ColumnNameSystemReferenceGasPrice,
 			enums.ColumnNameSystemStakeSubsidyStartEpoch,
 			enums.ColumnNameSystemStakeSubsidyBalance,
 			enums.ColumnNameSystemStakeSubsidyDistributionCounter,
+			enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount,
 		},
 		1: {
-			enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount,
 			enums.ColumnNameSystemStakeSubsidyPeriodLength,
 			enums.ColumnNameSystemStakeSubsidyDecreaseRate,
+			enums.ColumnNameSystemReferenceGasPrice,
+			enums.ColumnNameSystemMinReferenceGasPrice,
+			enums.ColumnNameSystemMaxReferenceGasPrice,
+			enums.ColumnNameSystemMeanReferenceGasPrice,
+			enums.ColumnNameSystemStakeWeightedMeanReferenceGasPrice,
+			enums.ColumnNameSystemMedianReferenceGasPrice,
+			enums.ColumnNameSystemEstimatedReferenceGasPrice,
 		},
 	}
 	RowsConfigValidatorCounts = RowsConfig{
@@ -97,42 +108,31 @@ var (
 // GetSystemStateColumnValues returns a map of SystemColumnName values to corresponding values for the system state.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of SystemColumnName keys and corresponding values.
 // Returns a map of SystemColumnName keys to corresponding values.
-func GetSystemStateColumnValues(systemState *metrics.SuiSystemState) (map[enums.ColumnName]any, error) {
-	epochStart, err := utility.ParseEpochTime(systemState.EpochStartTimestampMs)
-	if err != nil {
-		return nil, err
-	}
-
-	epochDuration, err := utility.StringMsToDuration(systemState.EpochDurationMs)
-	if err != nil {
-		return nil, err
-	}
-
-	durationTillEpochEnd, err := utility.GetDurationTillTime(*epochStart, epochDuration)
-	if err != nil {
-		return nil, err
-	}
-
-	epochStartTimeUTC := utility.FormatDate(*epochStart, "America/New_York")
-	epochDurationHHMM := utility.DurationToHoursAndMinutes(epochDuration)
-	durationTillEpochEndHHMM := utility.DurationToHoursAndMinutes(durationTillEpochEnd)
+func GetSystemStateColumnValues(metrics *metrics.Metrics) (map[enums.ColumnName]any, error) {
+	systemState := metrics.SystemState
 
 	return map[enums.ColumnName]any{
 		enums.ColumnNameIndex:                                       1,
 		enums.ColumnNameSystemEpoch:                                 systemState.Epoch,
-		enums.ColumnNameSystemEpochStartTimestamp:                   epochStartTimeUTC,
-		enums.ColumnNameSystemEpochDuration:                         epochDurationHHMM,
-		enums.ColumnNameSystemTimeTillNextEpoch:                     durationTillEpochEndHHMM,
+		enums.ColumnNameSystemEpochStartTimestamp:                   metrics.EpochStartTimeUTC,
+		enums.ColumnNameSystemEpochDuration:                         metrics.EpochDurationHHMM,
+		enums.ColumnNameSystemTimeTillNextEpoch:                     metrics.DurationTillEpochEndHHMM,
 		enums.ColumnNameSystemTotalStake:                            systemState.TotalStake,
 		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  systemState.StorageFundTotalObjectStorageRebates,
 		enums.ColumnNameSystemStorageFundNonRefundableBalance:       systemState.StorageFundNonRefundableBalance,
-		enums.ColumnNameSystemReferenceGasPrice:                     systemState.ReferenceGasPrice,
 		enums.ColumnNameSystemStakeSubsidyStartEpoch:                systemState.StakeSubsidyStartEpoch,
 		enums.ColumnNameSystemStakeSubsidyBalance:                   systemState.StakeSubsidyBalance,
 		enums.ColumnNameSystemStakeSubsidyDistributionCounter:       systemState.StakeSubsidyDistributionCounter,
 		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: systemState.StakeSubsidyCurrentDistributionAmount,
 		enums.ColumnNameSystemStakeSubsidyPeriodLength:              systemState.StakeSubsidyPeriodLength,
 		enums.ColumnNameSystemStakeSubsidyDecreaseRate:              systemState.StakeSubsidyDecreaseRate,
+		enums.ColumnNameSystemReferenceGasPrice:                     systemState.ReferenceGasPrice,
+		enums.ColumnNameSystemMinReferenceGasPrice:                  metrics.MinReferenceGasPrice,
+		enums.ColumnNameSystemMaxReferenceGasPrice:                  metrics.MaxReferenceGasPrice,
+		enums.ColumnNameSystemMeanReferenceGasPrice:                 metrics.MeanReferenceGasPrice,
+		enums.ColumnNameSystemStakeWeightedMeanReferenceGasPrice:    metrics.StakeWeightedMeanReferenceGasPrice,
+		enums.ColumnNameSystemMedianReferenceGasPrice:               metrics.MedianReferenceGasPrice,
+		enums.ColumnNameSystemEstimatedReferenceGasPrice:            metrics.EstimatedNextReferenceGasPrice,
 	}, nil
 }
 

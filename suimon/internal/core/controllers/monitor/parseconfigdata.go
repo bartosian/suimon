@@ -22,11 +22,11 @@ func (c *Controller) ParseConfigData() error {
 	}
 
 	var systemTables = map[enums.TableType]bool{
-		enums.TableTypeActiveValidators: true,
-		enums.TableTypeValidatorReports: true,
-		enums.TableTypeValidatorsAtRisk: true,
-		enums.TableTypeSystemState:      true,
-		enums.TableTypeValidatorsCounts: true,
+		enums.TableTypeActiveValidators:   true,
+		enums.TableTypeValidatorReports:   true,
+		enums.TableTypeValidatorsAtRisk:   true,
+		enums.TableTypeGasPriceAndSubsidy: true,
+		enums.TableTypeValidatorsCounts:   true,
 	}
 
 	tablesToParse := make([]enums.TableType, 0, len(c.selectedTables))
@@ -40,7 +40,7 @@ func (c *Controller) ParseConfigData() error {
 			}
 
 			systemTableAdded = true
-			table = enums.TableTypeSystemState
+			table = enums.TableTypeGasPriceAndSubsidy
 		}
 
 		if table != enums.TableTypeRPC {
@@ -116,7 +116,7 @@ func (c *Controller) getHostsData(table enums.TableType) error {
 		err       error
 	)
 
-	if table == enums.TableTypeSystemState {
+	if table == enums.TableTypeGasPriceAndSubsidy {
 		if len(c.hosts.rpc) == 0 {
 			return errors.New("RPC host is not initialized")
 		}
@@ -140,7 +140,7 @@ func (c *Controller) getHostsData(table enums.TableType) error {
 // Returns an error if the specified table type is invalid or if there is an issue sorting the hosts based on their corresponding metric values.
 func (c *Controller) sortHosts(tableType enums.TableType) error {
 
-	if tableType == enums.TableTypeSystemState {
+	if tableType == enums.TableTypeGasPriceAndSubsidy {
 		return nil
 	}
 

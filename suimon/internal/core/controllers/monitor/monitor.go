@@ -28,7 +28,7 @@ func (c *Controller) Monitor() error {
 			string(enums.TableTypeNode),
 			string(enums.TableTypeValidator),
 			string(enums.TableTypePeers),
-			string(enums.TableTypeSystemState),
+			string(enums.TableTypeGasPriceAndSubsidy),
 			string(enums.TableTypeValidatorsCounts),
 			string(enums.TableTypeValidatorsAtRisk),
 			string(enums.TableTypeValidatorReports),
