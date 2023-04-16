@@ -263,12 +263,12 @@ func (metrics *Metrics) SetSystemStateValue(value any) error {
 	valueSystemState.AddressToValidatorName = addressToValidatorName
 
 	// Parse the validators at risk from the raw JSON data.
-	if err := parseValidatorsAtRisk(valueSystemState, addressToValidatorName); err != nil {
+	if err := parseValidatorsAtRisk(&valueSystemState, addressToValidatorName); err != nil {
 		return err
 	}
 
 	// Parse the validator reports from the raw JSON data.
-	if err := parseValidatorReports(valueSystemState, addressToValidatorName); err != nil {
+	if err := parseValidatorReports(&valueSystemState, addressToValidatorName); err != nil {
 		return err
 	}
 
@@ -285,7 +285,7 @@ func (metrics *Metrics) SetSystemStateValue(value any) error {
 }
 
 // parseValidatorsAtRisk is a helper function that parses the validators at risk from the raw JSON data
-func parseValidatorsAtRisk(systemState SuiSystemState, addressToValidatorName map[string]string) error {
+func parseValidatorsAtRisk(systemState *SuiSystemState, addressToValidatorName map[string]string) error {
 	if len(systemState.AtRiskValidators) == 0 {
 		return nil
 	}
@@ -314,7 +314,7 @@ func parseValidatorsAtRisk(systemState SuiSystemState, addressToValidatorName ma
 }
 
 // parseValidatorReports is a helper function that parses the validator reports from the raw JSON data
-func parseValidatorReports(valueSystemState SuiSystemState, addressToValidatorName map[string]string) error {
+func parseValidatorReports(valueSystemState *SuiSystemState, addressToValidatorName map[string]string) error {
 	validatorReports := make([]ValidatorReport, 0, len(valueSystemState.ValidatorReportRecords))
 
 	for _, report := range valueSystemState.ValidatorReportRecords {

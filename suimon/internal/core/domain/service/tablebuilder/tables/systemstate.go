@@ -39,6 +39,8 @@ var (
 		enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs:         NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemValidatorReportedName:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemValidatorReportedAddress:              NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemValidatorReporterName:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemValidatorReporterAddress:              NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemMinReferenceGasPrice:                  NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemMaxReferenceGasPrice:                  NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemMeanReferenceGasPrice:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
