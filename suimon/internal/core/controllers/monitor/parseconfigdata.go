@@ -68,10 +68,6 @@ func (c *Controller) ParseConfigData() error {
 			if err := c.setHostsHealth(table); err != nil {
 				errChan <- err
 			}
-
-			if err := c.sortHosts(table); err != nil {
-				errChan <- err
-			}
 		}(tableType)
 	}
 

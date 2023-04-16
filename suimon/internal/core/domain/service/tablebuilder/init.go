@@ -1,6 +1,10 @@
 package tablebuilder
 
 import (
+	"errors"
+	"sort"
+	"strconv"
+
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	domainhost "github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
@@ -11,6 +15,10 @@ import (
 // It processes the host data and calls the appropriate handler function for the specified table type.
 func (tb *Builder) Init() error {
 	hosts := tb.hosts
+
+	if len(hosts) == 0 {
+		return errors.New("hosts are not initialized")
+	}
 
 	switch tb.tableType {
 	case enums.TableTypeNode:
@@ -54,6 +62,18 @@ func (tb *Builder) Init() error {
 func (tb *Builder) handleNodeTable(hosts []domainhost.Host) {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeNode)
 
+	sort.SliceStable(hosts, func(left, right int) bool {
+		if hosts[left].Status != hosts[right].Status {
+			return hosts[left].Status > hosts[right].Status
+		}
+
+		if hosts[left].Metrics.TotalTransactionsBlocks != hosts[right].Metrics.TotalTransactionsBlocks {
+			return hosts[left].Metrics.TotalTransactionsBlocks > hosts[right].Metrics.TotalTransactionsBlocks
+		}
+
+		return hosts[left].Metrics.HighestSyncedCheckpoint != hosts[right].Metrics.HighestSyncedCheckpoint
+	})
+
 	for idx, host := range hosts {
 		if !host.Metrics.Updated {
 			continue
@@ -72,6 +92,14 @@ func (tb *Builder) handleNodeTable(hosts []domainhost.Host) {
 // handleRPCTable handles the configuration for the RPC table.
 func (tb *Builder) handleRPCTable(hosts []domainhost.Host) {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeRPC)
+
+	sort.SliceStable(hosts, func(left, right int) bool {
+		if hosts[left].Status != hosts[right].Status {
+			return hosts[left].Status > hosts[right].Status
+		}
+
+		return hosts[left].Metrics.TotalTransactionsBlocks > hosts[right].Metrics.TotalTransactionsBlocks
+	})
 
 	for idx, host := range hosts {
 		if !host.Metrics.Updated {
@@ -92,6 +120,14 @@ func (tb *Builder) handleRPCTable(hosts []domainhost.Host) {
 func (tb *Builder) handlePeersTable(hosts []domainhost.Host) {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypePeers)
 
+	sort.SliceStable(hosts, func(left, right int) bool {
+		if hosts[left].Status != hosts[right].Status {
+			return hosts[left].Status > hosts[right].Status
+		}
+
+		return hosts[left].Metrics.TotalTransactionsBlocks > hosts[right].Metrics.TotalTransactionsBlocks
+	})
+
 	for idx, host := range hosts {
 		if !host.Metrics.Updated {
 			continue
@@ -110,6 +146,18 @@ func (tb *Builder) handlePeersTable(hosts []domainhost.Host) {
 // handleValidatorTable handles the configuration for the Validator table.
 func (tb *Builder) handleValidatorTable(hosts []domainhost.Host) {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidator)
+
+	sort.SliceStable(hosts, func(left, right int) bool {
+		if hosts[left].Status != hosts[right].Status {
+			return hosts[left].Status > hosts[right].Status
+		}
+
+		if hosts[left].Metrics.CurrentRound != hosts[right].Metrics.CurrentRound {
+			return hosts[left].Metrics.CurrentRound > hosts[right].Metrics.CurrentRound
+		}
+
+		return hosts[left].Metrics.HighestSyncedCheckpoint > hosts[right].Metrics.HighestSyncedCheckpoint
+	})
 
 	for idx, host := range hosts {
 		if !host.Metrics.Updated {
@@ -164,6 +212,26 @@ func (tb *Builder) handleValidatorsAtRiskTable(systemState *metrics.SuiSystemSta
 
 	validatorsAtRisk := systemState.ValidatorsAtRiskParsed
 
+	const base = 10 // for strconv.ParseInt
+
+	sort.SliceStable(validatorsAtRisk, func(left, right int) bool {
+		epochsAtRiskLeft, err := strconv.ParseInt(validatorsAtRisk[left].EpochsAtRisk, base, 64)
+		if err != nil {
+			return true
+		}
+
+		epochsAtRiskRight, err := strconv.ParseInt(validatorsAtRisk[right].EpochsAtRisk, base, 64)
+		if err != nil {
+			return true
+		}
+
+		if epochsAtRiskLeft != epochsAtRiskRight {
+			return epochsAtRiskLeft > epochsAtRiskRight
+		}
+
+		return validatorsAtRisk[left].Name < validatorsAtRisk[right].Name
+	})
+
 	for idx, validator := range validatorsAtRisk {
 		columnValues := tables.GetValidatorAtRiskColumnValues(idx, validator)
 
@@ -184,6 +252,14 @@ func (tb *Builder) handleValidatorReportsTable(systemState *metrics.SuiSystemSta
 
 	validatorReports := systemState.ValidatorReportsParsed
 
+	sort.SliceStable(validatorReports, func(left, right int) bool {
+		if validatorReports[left].ReportedName != validatorReports[right].ReportedName {
+			return validatorReports[left].ReportedName < validatorReports[right].ReportedName
+		}
+
+		return validatorReports[left].ReporterName < validatorReports[right].ReporterName
+	})
+
 	for idx, report := range validatorReports {
 		columnValues := tables.GetValidatorReportColumnValues(idx, report)
 
@@ -203,6 +279,36 @@ func (tb *Builder) handleActiveValidatorsTable(systemState *metrics.SuiSystemSta
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeActiveValidators)
 
 	activeValidators := systemState.ActiveValidators
+
+	const base = 10 // for strconv.ParseInt
+
+	sort.SliceStable(activeValidators, func(left, right int) bool {
+		votingPowerLeft, err := strconv.ParseInt(activeValidators[left].VotingPower, base, 64)
+		if err != nil {
+			return true
+		}
+
+		votingPowerRight, err := strconv.ParseInt(activeValidators[right].VotingPower, base, 64)
+		if err != nil {
+			return false // right is considered greater
+		}
+
+		nextEpochStakeLeft, err := strconv.ParseInt(activeValidators[left].NextEpochStake, base, 64)
+		if err != nil {
+			return true
+		}
+
+		nextEpochStakeRight, err := strconv.ParseInt(activeValidators[right].NextEpochStake, base, 64)
+		if err != nil {
+			return false // right is considered greater
+		}
+
+		if votingPowerLeft != votingPowerRight {
+			return votingPowerLeft > votingPowerRight
+		}
+
+		return nextEpochStakeLeft > nextEpochStakeRight
+	})
 
 	for idx, validator := range activeValidators {
 		columnValues := tables.GetActiveValidatorColumnValues(idx, validator)
