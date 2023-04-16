@@ -19,6 +19,7 @@ const (
 	ErrUnsupportedValidatorsAtRiskAttr = "unsupported validatorsAtRisk attribute type: %v"
 	ErrUnsupportedValidatorsReportAttr = "unsupported validatorsReport attribute type: %v"
 	ErrUnsupportedSuiAddressAttr       = "unsupported suiAddress attribute type: %v"
+	utcTimeZone                        = "America/New_York"
 )
 
 // SetValue updates a metric with the given value, parsing it if necessary.
@@ -240,7 +241,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 	return nil
 }
 
-// SetSystemStateValue updates the Metrics struct with the data from a SystemState object.
+// SetSystemStateValue sets the SUI system state metrics based on the parsed data.
 func (metrics *Metrics) SetSystemStateValue(value any) error {
 	// Parse the JSON data of the SystemState object.
 	dataBytes, err := json.Marshal(value.(map[string]interface{}))
@@ -262,8 +263,36 @@ func (metrics *Metrics) SetSystemStateValue(value any) error {
 	valueSystemState.AddressToValidatorName = addressToValidatorName
 
 	// Parse the validators at risk from the raw JSON data.
-	validatorsAtRisk := make([]ValidatorAtRisk, 0, len(valueSystemState.AtRiskValidators))
-	for _, validator := range valueSystemState.AtRiskValidators {
+	if err := parseValidatorsAtRisk(valueSystemState, addressToValidatorName); err != nil {
+		return err
+	}
+
+	// Parse the validator reports from the raw JSON data.
+	if err := parseValidatorReports(valueSystemState, addressToValidatorName); err != nil {
+		return err
+	}
+
+	// Update the SystemState property of the Metrics struct with the parsed data.
+	metrics.SystemState = valueSystemState
+
+	// Calculate the epoch metrics.
+	if err := setEpochMetrics(metrics); err != nil {
+		return err
+	}
+
+	// Calculate the reference gas price metrics.
+	return setRefGasPriceMetrics(metrics)
+}
+
+// parseValidatorsAtRisk is a helper function that parses the validators at risk from the raw JSON data
+func parseValidatorsAtRisk(systemState SuiSystemState, addressToValidatorName map[string]string) error {
+	if len(systemState.AtRiskValidators) == 0 {
+		return nil
+	}
+
+	validatorsAtRisk := make([]ValidatorAtRisk, 0, len(systemState.AtRiskValidators))
+
+	for _, validator := range systemState.AtRiskValidators {
 		address, ok := validator[0].(string)
 		if !ok {
 			return fmt.Errorf(ErrUnsupportedValidatorsAtRiskAttr, validator)
@@ -272,15 +301,22 @@ func (metrics *Metrics) SetSystemStateValue(value any) error {
 		if !ok {
 			return fmt.Errorf(ErrUnsupportedValidatorsAtRiskAttr, validator)
 		}
+
 		validatorName := addressToValidatorName[address]
 		validatorAtRisk := NewValidatorAtRisk(validatorName, address, epochCount)
 
 		validatorsAtRisk = append(validatorsAtRisk, validatorAtRisk)
 	}
-	valueSystemState.ValidatorsAtRiskParsed = validatorsAtRisk
 
-	// Parse the validator reports from the raw JSON data.
+	systemState.ValidatorsAtRiskParsed = validatorsAtRisk
+
+	return nil
+}
+
+// parseValidatorReports is a helper function that parses the validator reports from the raw JSON data
+func parseValidatorReports(valueSystemState SuiSystemState, addressToValidatorName map[string]string) error {
 	validatorReports := make([]ValidatorReport, 0, len(valueSystemState.ValidatorReportRecords))
+
 	for _, report := range valueSystemState.ValidatorReportRecords {
 		reportedAddress, ok := report[0].(string)
 		if !ok {
@@ -290,12 +326,15 @@ func (metrics *Metrics) SetSystemStateValue(value any) error {
 		if !ok {
 			return fmt.Errorf(ErrUnsupportedValidatorsReportAttr, report)
 		}
+
 		reportedName := addressToValidatorName[reportedAddress]
+
 		for _, reporterAddress := range reporters {
 			reporter, ok := reporterAddress.(string)
 			if !ok {
 				return fmt.Errorf(ErrUnsupportedSuiAddressAttr, reporterAddress)
 			}
+
 			reporterName := addressToValidatorName[reporter]
 			validatorReport := NewValidatorReport(reportedName, reportedAddress, reporterName, reporter)
 
@@ -305,15 +344,19 @@ func (metrics *Metrics) SetSystemStateValue(value any) error {
 
 	valueSystemState.ValidatorReportsParsed = validatorReports
 
-	// Update the SystemState property of the Metrics struct with the parsed data.
-	metrics.SystemState = valueSystemState
+	return nil
+}
 
-	epochStart, err := utility.ParseEpochTime(valueSystemState.EpochStartTimestampMs)
+// setEpochMetrics is a helper function that sets the epoch-related metrics based on the parsed data
+func setEpochMetrics(metrics *Metrics) error {
+	systemState := metrics.SystemState
+
+	epochStart, err := utility.ParseEpochTime(systemState.EpochStartTimestampMs)
 	if err != nil {
 		return err
 	}
 
-	epochDuration, err := utility.StringMsToDuration(valueSystemState.EpochDurationMs)
+	epochDuration, err := utility.StringMsToDuration(systemState.EpochDurationMs)
 	if err != nil {
 		return err
 	}
@@ -323,11 +366,16 @@ func (metrics *Metrics) SetSystemStateValue(value any) error {
 		return err
 	}
 
-	metrics.EpochStartTimeUTC = utility.FormatDate(*epochStart, "America/New_York")
+	metrics.EpochStartTimeUTC = utility.FormatDate(*epochStart, utcTimeZone)
 	metrics.EpochDurationHHMM = utility.DurationToHoursAndMinutes(epochDuration)
 	metrics.DurationTillEpochEndHHMM = utility.DurationToHoursAndMinutes(durationTillEpochEnd)
 
-	activeValidators := valueSystemState.ActiveValidators
+	return nil
+}
+
+// setRefGasPriceMetrics is a helper function that sets the reference gas price metrics based on the parsed data
+func setRefGasPriceMetrics(metrics *Metrics) error {
+	activeValidators := metrics.SystemState.ActiveValidators
 
 	minRefGasPrice, err := activeValidators.GetMinRefGasPrice()
 	if err != nil {
