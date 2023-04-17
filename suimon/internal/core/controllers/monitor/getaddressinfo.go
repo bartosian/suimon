@@ -29,111 +29,144 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses
 
 	switch table {
 	case enums.TableTypeNode:
-		nodesConfig := c.config.FullNodes
-		if len(nodesConfig) == 0 {
-			return nil, errors.New("full-nodes not provided in config file")
-		}
-
-		for _, node := range nodesConfig {
-			addressRPC, addressMetrics := node.JSONRPCAddress, node.MetricsAddress
-
-			if addressRPC == "" && addressMetrics == "" {
-				return nil, errors.New("invalid format for full-nodes in config file")
-			}
-
-			var (
-				endpointRPC     *address.Endpoint
-				endpointMetrics *address.Endpoint
-			)
-
-			if addressRPC != "" {
-				if endpointRPC, err = parser(addressRPC); err != nil {
-					return nil, fmt.Errorf("invalid full-node json-rpc-address in config file: %s", err)
-				}
-			}
-
-			if addressMetrics != "" {
-				if endpointMetrics, err = parser(addressMetrics); err != nil {
-					return nil, fmt.Errorf("invalid full-node rpc-address in config file: %s", err)
-				}
-			}
-
-			addressInfo := host.AddressInfo{Endpoint: *endpointRPC, Ports: make(map[enums.PortType]string)}
-			if endpointRPC.Port != nil {
-				addressInfo.Ports[enums.PortTypeRPC] = *endpointRPC.Port
-			}
-
-			if endpointMetrics.Port != nil {
-				addressInfo.Ports[enums.PortTypeMetrics] = *endpointMetrics.Port
-			}
-
-			addresses = append(addresses, addressInfo)
-		}
+		return c.getNodeAddresses(parser)
 	case enums.TableTypeValidator:
-		validatorsConfig := c.config.Validators
-		if len(validatorsConfig) == 0 {
-			return nil, errors.New("validators not provided in config file")
-		}
-
-		for _, validator := range validatorsConfig {
-			addressMetrics := validator.MetricsAddress
-
-			if addressMetrics == "" {
-				return nil, errors.New("invalid format for validators in config file")
-			}
-
-			var endpointMetrics *address.Endpoint
-
-			if endpointMetrics, err = parser(addressMetrics); err != nil {
-				return nil, fmt.Errorf("invalid validator rpc-address in config file: %s", err)
-			}
-
-			addressInfo := host.AddressInfo{Endpoint: *endpointMetrics, Ports: make(map[enums.PortType]string)}
-
-			if endpointMetrics.Port != nil {
-				addressInfo.Ports[enums.PortTypeMetrics] = *endpointMetrics.Port
-			}
-
-			addresses = append(addresses, addressInfo)
-		}
+		return c.getValidatorAddresses(parser)
 	case enums.TableTypePeers:
-		peersConfig := c.config.SeedPeers
-		if len(peersConfig) == 0 {
-			return nil, errors.New("seed-peers not provided in config file")
-		}
-
-		for _, peer := range peersConfig {
-			endpoint, err := parser(peer)
-			if err != nil {
-				return nil, fmt.Errorf("invalid peer in config file: %s", peer)
-			}
-
-			addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}
-			if endpoint.Port != nil {
-				addressInfo.Ports[enums.PortTypePeer] = *endpoint.Port
-			}
-
-			addresses = append(addresses, addressInfo)
-		}
+		return c.getPeerAddresses(parser)
 	case enums.TableTypeRPC:
-		rpcConfig := c.config.PublicRPC
-		if len(rpcConfig) == 0 {
-			return nil, errors.New("public-rpc not found in config file")
+		return c.getRPCAddresses(parser)
+	}
+
+	return addresses, nil
+}
+
+// getNodeAddresses returns the list of addresses of full nodes.
+func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
+	nodesConfig := c.config.FullNodes
+	if len(nodesConfig) == 0 {
+		return nil, errors.New("full-nodes not provided in config file")
+	}
+
+	for _, node := range nodesConfig {
+		addressRPC, addressMetrics := node.JSONRPCAddress, node.MetricsAddress
+
+		if addressRPC == "" && addressMetrics == "" {
+			return nil, errors.New("invalid format for full-node in config file: at least one of json-rpc-address or metrics-address is required")
 		}
 
-		for _, rpc := range rpcConfig {
-			endpoint, err := parser(rpc)
-			if err != nil {
-				return nil, fmt.Errorf("invalid rpc url in config file: %s", rpc)
-			}
+		var (
+			endpointRPC     *address.Endpoint
+			endpointMetrics *address.Endpoint
+		)
 
-			addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}
-			if endpoint.Port != nil {
-				addressInfo.Ports[enums.PortTypeRPC] = *endpoint.Port
+		if addressRPC != "" {
+			if endpointRPC, err = parser(addressRPC); err != nil {
+				return nil, fmt.Errorf("invalid format for full-node json-rpc-address in config file: %w", err)
 			}
-
-			addresses = append(addresses, addressInfo)
 		}
+
+		if addressMetrics != "" {
+			if endpointMetrics, err = parser(addressMetrics); err != nil {
+				return nil, fmt.Errorf("invalid format for full-node metrics-address in config file: %w", err)
+			}
+		}
+
+		// Check if both endpoints are nil and return an error if so.
+		if endpointRPC == nil && endpointMetrics == nil {
+			return nil, errors.New("invalid format for full-node in config file: at least one of json-rpc-address or metrics-address is required")
+		}
+
+		addressInfo := host.AddressInfo{Endpoint: *endpointRPC, Ports: make(map[enums.PortType]string)}
+
+		if endpointRPC != nil && endpointRPC.Port != nil {
+			addressInfo.Ports[enums.PortTypeRPC] = *endpointRPC.Port
+		}
+
+		if endpointMetrics != nil && endpointMetrics.Port != nil {
+			addressInfo.Ports[enums.PortTypeMetrics] = *endpointMetrics.Port
+		}
+
+		addresses = append(addresses, addressInfo)
+	}
+
+	return addresses, nil
+}
+
+// getValidatorAddresses returns the list of addresses of validators.
+func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
+	validatorsConfig := c.config.Validators
+	if len(validatorsConfig) == 0 {
+		return nil, errors.New("validators not provided in config file")
+	}
+
+	for _, validator := range validatorsConfig {
+		addressMetrics := validator.MetricsAddress
+
+		if addressMetrics == "" {
+			return nil, errors.New("invalid format for validator in config file: metrics-address is required")
+		}
+
+		endpointMetrics, err := parser(addressMetrics)
+		if err != nil {
+			return nil, fmt.Errorf("invalid format for validator metrics-address in config file: %w", err)
+		}
+
+		addressInfo := host.AddressInfo{Endpoint: *endpointMetrics, Ports: make(map[enums.PortType]string)}
+
+		if endpointMetrics.Port != nil {
+			addressInfo.Ports[enums.PortTypeMetrics] = *endpointMetrics.Port
+		}
+
+		addresses = append(addresses, addressInfo)
+	}
+
+	return addresses, nil
+}
+
+// getPeerAddresses returns the list of seed peer addresses.
+func (c *Controller) getPeerAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
+	peersConfig := c.config.SeedPeers
+	if len(peersConfig) == 0 {
+		return nil, errors.New("seed-peers not provided in config file")
+	}
+
+	for _, peer := range peersConfig {
+		endpoint, err := parser(peer)
+		if err != nil {
+			return nil, fmt.Errorf("invalid format for seed-peer in config file: %w", err)
+		}
+
+		addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}
+		if endpoint.Port != nil {
+			addressInfo.Ports[enums.PortTypePeer] = *endpoint.Port
+		}
+
+		addresses = append(addresses, addressInfo)
+	}
+
+	return addresses, nil
+}
+
+// getRPCAddresses returns the list of public RPC addresses.
+func (c *Controller) getRPCAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
+	rpcConfig := c.config.PublicRPC
+	if len(rpcConfig) == 0 {
+		return nil, errors.New("public-rpc not provided in config file")
+	}
+
+	for _, rpc := range rpcConfig {
+		endpoint, err := parser(rpc)
+		if err != nil {
+			return nil, fmt.Errorf("invalid format for public-rpc in config file: %w", err)
+		}
+
+		addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}
+		if endpoint.Port != nil {
+			addressInfo.Ports[enums.PortTypeRPC] = *endpoint.Port
+		}
+
+		addresses = append(addresses, addressInfo)
 	}
 
 	return addresses, nil

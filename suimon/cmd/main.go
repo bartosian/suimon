@@ -13,6 +13,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/controllers"
@@ -24,6 +25,8 @@ import (
 
 func main() {
 	cliGateway := cligw.NewGateway()
+
+	defer handlePanic(cliGateway)
 
 	config, err := domainconfig.NewConfig()
 	if err != nil {
@@ -52,9 +55,10 @@ func main() {
 	rootCmdHandler.Start()
 }
 
-func handlePanic() {
+func handlePanic(cliGateway *cligw.Gateway) {
 	if r := recover(); r != nil {
-		//logger.Error("failed to execute suimon, please check an issue: ", r)
+		// Handle the panic by logging the error and exiting the program
+		cliGateway.Error(fmt.Sprintf("panic: %v", r))
 
 		os.Exit(1)
 	}

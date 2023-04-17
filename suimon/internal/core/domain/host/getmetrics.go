@@ -194,7 +194,7 @@ func (host *Host) GetMetrics() error {
 	}
 
 	if err := errGroup.Wait(); err != nil {
-		return err
+		return fmt.Errorf("failed to get metrics for table %s, host: %s: %w", host.TableType, host.Endpoint.Address, err)
 	}
 
 	return nil

@@ -20,6 +20,13 @@ type Endpoint struct {
 	SSL     bool
 }
 
+const (
+	errInvalidPeerFormatProvided = "invalid peer format provided: %s"
+	errInvalidPortProvided       = "invalid port provided: %s"
+	errInvalidIpProvided         = "invalid ip provided: %s"
+	errInvalidUrlProvided        = "invalid url provided: %s"
+)
+
 func (hp *Endpoint) GetHostWithPath() *string {
 	if hp.Host == nil {
 		return nil
@@ -41,7 +48,7 @@ func ParseIpPort(address string) (*Endpoint, error) {
 	}
 
 	if validation.IsInvalidPort(port) {
-		return nil, fmt.Errorf("invalid port provided: %s", address)
+		return nil, fmt.Errorf(errInvalidPortProvided, address)
 	}
 
 	if parsedIP := net.ParseIP(ip); parsedIP.IsLoopback() || parsedIP.IsUnspecified() {
@@ -59,20 +66,22 @@ func ParseIpPort(address string) (*Endpoint, error) {
 func ParsePeer(address string) (*Endpoint, error) {
 	components := strings.Split(address, "/")
 
-	validLength := len(components) == 5
-	validProtocol := components[3] == "udp"
+	if len(components) != 5 {
+		return nil, fmt.Errorf(errInvalidPeerFormatProvided, address)
+	}
 
+	validProtocol := components[3] == "udp"
 	validFirstComponent := components[0] == ""
 	validSecondComponent := components[1] == "ip4" || components[1] == "dns"
 
-	host, port := components[2], components[4]
-
-	if !validLength || !validProtocol || !validFirstComponent || !validSecondComponent {
-		return nil, fmt.Errorf("invalid peer provided: %s", address)
+	if !validProtocol || !validFirstComponent || !validSecondComponent {
+		return nil, fmt.Errorf(errInvalidPeerFormatProvided, address)
 	}
 
+	host, port := components[2], components[4]
+
 	if validation.IsInvalidPort(port) {
-		return nil, fmt.Errorf("invalid port provided: %s", address)
+		return nil, fmt.Errorf(errInvalidPortProvided, address)
 	}
 
 	endpoint := &Endpoint{
@@ -101,7 +110,7 @@ func ParseURL(address string) (*Endpoint, error) {
 
 	scheme, hostName, port, path := u.Scheme, u.Hostname(), u.Port(), u.Path
 	if hostName == "" {
-		return nil, fmt.Errorf("invalid url provided: %s", address)
+		return nil, fmt.Errorf(errInvalidUrlProvided, address)
 	}
 
 	endpoint := &Endpoint{
@@ -116,7 +125,7 @@ func ParseURL(address string) (*Endpoint, error) {
 
 	if port != "" {
 		if validation.IsInvalidPort(port) {
-			return nil, fmt.Errorf("invalid port provided: %s", address)
+			return nil, fmt.Errorf(errInvalidPortProvided, address)
 		}
 
 		endpoint.Port = &port
@@ -156,7 +165,7 @@ func ParseIP(address string) (*string, error) {
 		return &ipResult, nil
 	}
 
-	return nil, fmt.Errorf("invalid ip provided: %s", address)
+	return nil, fmt.Errorf(errInvalidIpProvided, address)
 }
 
 func GetPublicIP() net.IP {

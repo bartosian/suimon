@@ -17,10 +17,6 @@ import (
 // a channel. If an error is received from the channel, it is returned immediately. If no errors are received,
 // the function returns nil.
 func (c *Controller) ParseConfigData() error {
-	if err := c.ParseConfigRPC(); err != nil {
-		return err
-	}
-
 	var systemTables = map[enums.TableType]bool{
 		enums.TableTypeActiveValidators:   true,
 		enums.TableTypeValidatorReports:   true,
@@ -48,6 +44,10 @@ func (c *Controller) ParseConfigData() error {
 		}
 	}
 
+	if err := c.ParseConfigRPC(); err != nil {
+		return err
+	}
+
 	errChan := make(chan error, len(tablesToParse))
 	defer close(errChan)
 
@@ -58,6 +58,14 @@ func (c *Controller) ParseConfigData() error {
 
 		go func(table enums.TableType) {
 			defer wg.Done()
+
+			if table == enums.TableTypeGasPriceAndSubsidy {
+				if err := c.hosts.rpc[0].GetDataByMetric(enums.RPCMethodGetSuiSystemState); err != nil {
+					errChan <- err
+				}
+
+				return
+			}
 
 			if err := c.getHostsData(table); err != nil {
 				errChan <- err
@@ -88,6 +96,10 @@ func (c *Controller) ParseConfigRPC() error {
 		return err
 	}
 
+	if len(c.hosts.rpc) == 0 {
+		return errors.New("no public RPC provided")
+	}
+
 	if err := c.sortHosts(enums.TableTypeRPC); err != nil {
 		return err
 	}
@@ -111,14 +123,6 @@ func (c *Controller) getHostsData(table enums.TableType) error {
 		hosts     []host.Host
 		err       error
 	)
-
-	if table == enums.TableTypeGasPriceAndSubsidy {
-		if len(c.hosts.rpc) == 0 {
-			return errors.New("RPC host is not initialized")
-		}
-
-		return c.hosts.rpc[0].GetDataByMetric(enums.RPCMethodGetSuiSystemState)
-	}
 
 	if addresses, err = c.getAddressInfoByTableType(table); err != nil {
 		return err

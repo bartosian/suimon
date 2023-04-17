@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"github.com/hashicorp/go-multierror"
 	"sync"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
@@ -74,7 +75,7 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 				}
 			}
 
-			if err := createdHost.GetMetrics(); err != nil && table != enums.TableTypePeers {
+			if err := createdHost.GetMetrics(); err != nil {
 				result.err = err
 				respChan <- result
 
@@ -90,12 +91,20 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 		close(respChan)
 	}()
 
+	var mErr *multierror.Error
+
 	for result := range respChan {
 		if result.err != nil {
-			return nil, result.err
+			mErr = multierror.Append(mErr, result.err)
+
+			continue
 		}
 
 		hosts = append(hosts, *result.response)
+	}
+
+	if len(hosts) == 0 {
+		return nil, mErr.ErrorOrNil()
 	}
 
 	return hosts, nil
