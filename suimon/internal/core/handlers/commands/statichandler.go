@@ -41,8 +41,8 @@ func (h *StaticHandler) newCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "static",
 		Aliases: []string{"s"},
-		Short:   "suimon static",
-		Long:    "suimon static",
+		Short:   "Render static monitoring tables for the suimon monitoring tool",
+		Long:    "The suimon static subcommand renders static monitoring tables for the suimon monitoring tool. Use this command to view various statistics related to the running network, such as the number of validators, peers, and gas prices. You can select which tables to render using the command line interface.",
 		Run:     h.handleCommand,
 	}
 

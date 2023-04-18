@@ -41,8 +41,8 @@ func (h *VersionHandler) newCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "version",
 		Aliases: []string{"v"},
-		Short:   "suimon version",
-		Long:    "suimon version",
+		Short:   "Show version information for the suimon monitoring tool",
+		Long:    "The suimon version subcommand displays the version information for the suimon monitoring tool. This includes the version number and build date. Use this command to quickly check the version of suimon that you are running.",
 		Run:     h.handleCommand,
 	}
 

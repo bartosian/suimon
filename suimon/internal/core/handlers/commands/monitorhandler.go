@@ -42,8 +42,8 @@ func (h *MonitorHandler) newCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "monitor",
 		Aliases: []string{"m"},
-		Short:   "Render monitoring dashboards",
-		Long:    "Render monitoring dashboards",
+		Short:   "Monitor the running network with the suimon monitoring tool.",
+		Long:    "The suimon monitor subcommand allows you to monitor the running network with the suimon monitoring tool. This command provides options to render both static and dynamic dashboards. Static dashboards display various statistics related to the running network, such as the number of validators, peers, and gas prices. Dynamic dashboards provide real-time information about the network, such as block times and transaction throughput. You can select which dashboards to render using the command line interface. Use this command to keep an eye on the health and performance of your running network.",
 		Run:     h.handleCommand,
 	}
 

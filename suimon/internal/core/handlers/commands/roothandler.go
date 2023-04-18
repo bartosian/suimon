@@ -36,7 +36,7 @@ func (h *RootHandler) AddSubCommands(subcommands ...ports.Command) {
 func newCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "suimon",
-		Short: "Get real-time insights of SUI nodes and network performance.",
+		Short: "Get real-time insights of SUI nodes and network performance",
 		Long:  "A comprehensive monitoring tool designed to provide real-time performance for SUI nodes and networks.\nWith an easy-to-install and user-friendly YAML configuration file, users can easily monitor network traffic, checkpoints, transactions, uptime, network status, peers, remote RPC, and more.\nFor help, use 'suimon --help'",
 	}
 }
