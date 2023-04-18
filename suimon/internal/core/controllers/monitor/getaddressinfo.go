@@ -43,7 +43,7 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses
 
 // getNodeAddresses returns the list of addresses of full nodes.
 func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
-	nodesConfig := c.config.FullNodes
+	nodesConfig := c.selectedConfig.FullNodes
 	if len(nodesConfig) == 0 {
 		return nil, errors.New("full-nodes not provided in config file")
 	}
@@ -95,7 +95,7 @@ func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.Ad
 
 // getValidatorAddresses returns the list of addresses of validators.
 func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
-	validatorsConfig := c.config.Validators
+	validatorsConfig := c.selectedConfig.Validators
 	if len(validatorsConfig) == 0 {
 		return nil, errors.New("validators not provided in config file")
 	}
@@ -126,7 +126,7 @@ func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []ho
 
 // getPeerAddresses returns the list of seed peer addresses.
 func (c *Controller) getPeerAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
-	peersConfig := c.config.SeedPeers
+	peersConfig := c.selectedConfig.SeedPeers
 	if len(peersConfig) == 0 {
 		return nil, errors.New("seed-peers not provided in config file")
 	}
@@ -150,7 +150,7 @@ func (c *Controller) getPeerAddresses(parser addressParser) (addresses []host.Ad
 
 // getRPCAddresses returns the list of public RPC addresses.
 func (c *Controller) getRPCAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
-	rpcConfig := c.config.PublicRPC
+	rpcConfig := c.selectedConfig.PublicRPC
 	if len(rpcConfig) == 0 {
 		return nil, errors.New("public-rpc not provided in config file")
 	}

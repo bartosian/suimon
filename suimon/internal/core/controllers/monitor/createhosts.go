@@ -1,8 +1,9 @@
 package monitor
 
 import (
-	"github.com/hashicorp/go-multierror"
 	"sync"
+
+	"github.com/hashicorp/go-multierror"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
@@ -61,12 +62,12 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 			}
 
 			prometheusGateway := prometheusgw.NewGateway(c.gateways.cli, metricsUrl)
-			geoGateway := geogw.NewGateway(c.gateways.cli, c.config.IPLookup.AccessToken)
+			geoGateway := geogw.NewGateway(c.gateways.cli, c.selectedConfig.IPLookup.AccessToken)
 
 			createdHost := host.NewHost(table, addressInfo, rpcGateway, geoGateway, prometheusGateway, c.gateways.cli)
 			result.response = createdHost
 
-			if c.config.IPLookup.AccessToken != "" {
+			if c.selectedConfig.IPLookup.AccessToken != "" {
 				if err := createdHost.SetIPInfo(); err != nil {
 					result.err = err
 					respChan <- result

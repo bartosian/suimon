@@ -31,10 +31,11 @@ type (
 	Controller struct {
 		lock sync.RWMutex
 
+		selectedConfig     config.Config
 		selectedTables     []enums.TableType
 		selectedDashboards []enums.TableType
 
-		config   *config.Config
+		configs  map[string]config.Config
 		hosts    Hosts
 		gateways Gateways
 		builders Builders
@@ -42,11 +43,11 @@ type (
 )
 
 func NewController(
-	config *config.Config,
+	config map[string]config.Config,
 	cliGW *cligw.Gateway,
 ) *Controller {
 	return &Controller{
-		config: config,
+		configs: config,
 		gateways: Gateways{
 			cli: cliGW,
 		},
