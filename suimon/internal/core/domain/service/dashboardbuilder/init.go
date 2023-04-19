@@ -2,6 +2,7 @@ package dashboardbuilder
 
 import (
 	"fmt"
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
@@ -13,6 +14,14 @@ import (
 // and setting the dashboard configuration. If an error occurs during initialization,
 // it returns an error.
 func (db *Builder) Init() error {
+	switch db.tableType {
+	case enums.TableTypeNode:
+
+	case enums.TableTypeRPC:
+
+	case enums.TableTypeValidator:
+	}
+
 	builder := grid.New()
 	rows := config.Rows
 

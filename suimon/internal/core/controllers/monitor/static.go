@@ -3,6 +3,7 @@ package monitor
 import (
 	"fmt"
 
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/tablebuilder"
 )
 
@@ -10,7 +11,7 @@ import (
 // based on the configuration data.
 func (c *Controller) Static() error {
 	// Parse the configuration data.
-	if err := c.ParseConfigData(); err != nil {
+	if err := c.ParseConfigData(enums.MonitorTypeStatic); err != nil {
 		return err
 	}
 

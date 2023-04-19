@@ -1,9 +1,13 @@
 package monitor
 
 import (
+	"fmt"
+
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
 )
+
+const allTablesSelection = "🌐 ALL TABLES"
 
 // Monitor prompts the user to select the type of monitor to render, and then renders the monitor.
 // For static monitors, the user is prompted to select the tables to render. Only tables that are enabled
@@ -26,6 +30,8 @@ func (c *Controller) Monitor() error {
 		return err
 	}
 
+	c.selectedConfig = c.configs[selectedConfigName.Value]
+
 	// Select the monitor type.
 	monitorTypeChoiceList := cligw.NewSimpleSelectChoiceList(
 		string(enums.MonitorTypeStatic),
@@ -39,44 +45,119 @@ func (c *Controller) Monitor() error {
 		return err
 	}
 
-	if selectedMonitorType.Value == string(enums.MonitorTypeStatic) {
-		// Select the tables to render.
-		tableTypeChoiceList := cligw.NewSimpleSelectChoiceList(
-			string(enums.TableTypeRPC),
-			string(enums.TableTypeNode),
-			string(enums.TableTypeValidator),
-			string(enums.TableTypePeers),
-			string(enums.TableTypeGasPriceAndSubsidy),
-			string(enums.TableTypeValidatorsCounts),
-			string(enums.TableTypeValidatorsAtRisk),
-			string(enums.TableTypeValidatorReports),
-			string(enums.TableTypeActiveValidators),
-		)
-
-		selectedTableTypes, err := c.gateways.cli.SelectMany("Which tables do you want to render?", tableTypeChoiceList)
+	switch selectedMonitorType.Value {
+	case string(enums.MonitorTypeStatic):
+		tablesToRender, err := c.selectStaticTables()
 		if err != nil {
-			c.gateways.cli.Error("failed to parse user selection")
-
 			return err
 		}
 
-		if len(selectedTableTypes) == 0 {
-			c.gateways.cli.Error("no tables selected to render")
-
+		if tablesToRender == nil {
 			return nil
 		}
 
-		tablesToRender := make([]enums.TableType, 0, len(selectedTableTypes))
-
-		for _, selectedTable := range selectedTableTypes {
-			tablesToRender = append(tablesToRender, enums.TableType(selectedTable.Label))
-		}
-
-		c.selectedConfig = c.configs[selectedConfigName.Value]
 		c.selectedTables = tablesToRender
 
 		return c.Static()
+
+	case string(enums.MonitorTypeDynamic):
+		dashboardToRender, err := c.selectDynamicDashboard()
+		if err != nil {
+			return err
+		}
+
+		if dashboardToRender == nil {
+			return nil
+		}
+
+		c.selectedDashboard = dashboardToRender[0]
+
+		return c.Dynamic()
+
+	default:
+		return fmt.Errorf("not supported monitoring type provided %s", selectedMonitorType.Value)
+	}
+}
+
+// selectStaticTables prompts the user to select the static tables to render.
+// It returns a slice of enums.TableType representing the selected tables,
+// or an error if the user's selection cannot be parsed or no tables are selected.
+func (c *Controller) selectStaticTables() ([]enums.TableType, error) {
+	// Select the tables to render.
+	tableTypeChoiceList := cligw.NewSimpleSelectChoiceList(
+		allTablesSelection,
+		string(enums.TableTypeRPC),
+		string(enums.TableTypeNode),
+		string(enums.TableTypeValidator),
+		string(enums.TableTypePeers),
+		string(enums.TableTypeGasPriceAndSubsidy),
+		string(enums.TableTypeValidatorsCounts),
+		string(enums.TableTypeValidatorsAtRisk),
+		string(enums.TableTypeValidatorReports),
+		string(enums.TableTypeActiveValidators),
+	)
+
+	selectedTableTypes, err := c.gateways.cli.SelectMany("Which tables do you want to render?", tableTypeChoiceList)
+	if err != nil {
+		c.gateways.cli.Error("failed to parse user selection")
+
+		return nil, err
 	}
 
-	return nil
+	if len(selectedTableTypes) == 0 {
+		c.gateways.cli.Error("no tables selected to render")
+
+		return nil, nil
+	}
+
+	tablesToRender := make([]enums.TableType, 0, len(selectedTableTypes))
+
+	for _, selectedTable := range selectedTableTypes {
+		if selectedTable.Value == allTablesSelection {
+			tablesToRender = append(tablesToRender,
+				enums.TableTypeRPC,
+				enums.TableTypeNode,
+				enums.TableTypeValidator,
+				enums.TableTypePeers,
+				enums.TableTypeGasPriceAndSubsidy,
+				enums.TableTypeValidatorsCounts,
+				enums.TableTypeValidatorsAtRisk,
+				enums.TableTypeValidatorReports,
+				enums.TableTypeActiveValidators,
+			)
+
+			break
+		}
+
+		tablesToRender = append(tablesToRender, enums.TableType(selectedTable.Value))
+	}
+
+	return tablesToRender, nil
+}
+
+// selectDynamicDashboard prompts the user to select the dynamic dashboard to render.
+// It returns a slice of enums.TableType representing the selected dashboard,
+// or an error if the user's selection cannot be parsed or no dashboard is selected.
+func (c *Controller) selectDynamicDashboard() ([]enums.TableType, error) {
+	// Select the dashboard to render.
+	dashboardTypeChoiceList := cligw.NewSimpleSelectChoiceList(
+		string(enums.TableTypeRPC),
+		string(enums.TableTypeNode),
+		string(enums.TableTypeValidator),
+	)
+
+	selectedDashboardType, err := c.gateways.cli.SelectOne("Which dashboard do you want to render?", dashboardTypeChoiceList)
+	if err != nil {
+		c.gateways.cli.Error("failed to parse user selection")
+
+		return nil, err
+	}
+
+	if selectedDashboardType == nil {
+		c.gateways.cli.Error("no dashboard selected to render")
+
+		return nil, nil
+	}
+
+	return []enums.TableType{enums.TableType(selectedDashboardType.Value)}, nil
 }

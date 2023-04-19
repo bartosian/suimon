@@ -31,9 +31,9 @@ type (
 	Controller struct {
 		lock sync.RWMutex
 
-		selectedConfig     config.Config
-		selectedTables     []enums.TableType
-		selectedDashboards []enums.TableType
+		selectedConfig    config.Config
+		selectedTables    []enums.TableType
+		selectedDashboard enums.TableType
 
 		configs  map[string]config.Config
 		hosts    Hosts

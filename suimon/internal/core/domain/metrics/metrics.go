@@ -13,94 +13,6 @@ const (
 )
 
 type (
-	// Validators represents a validator nodes on the Sui blockchain network.
-	Validators []Validator
-	Validator  struct {
-		SuiAddress                   string      `json:"suiAddress"`
-		ProtocolPubkeyBytes          string      `json:"protocolPubkeyBytes"`
-		NetworkPubkeyBytes           string      `json:"networkPubkeyBytes"`
-		WorkerPubkeyBytes            string      `json:"workerPubkeyBytes"`
-		ProofOfPossessionBytes       string      `json:"proofOfPossessionBytes"`
-		Name                         string      `json:"name"`
-		Description                  string      `json:"description"`
-		ImageURL                     string      `json:"imageUrl"`
-		ProjectURL                   string      `json:"projectUrl"`
-		NetAddress                   string      `json:"netAddress"`
-		P2PAddress                   string      `json:"p2pAddress"`
-		PrimaryAddress               string      `json:"primaryAddress"`
-		WorkerAddress                string      `json:"workerAddress"`
-		NextEpochProtocolPubkeyBytes interface{} `json:"nextEpochProtocolPubkeyBytes"`
-		NextEpochProofOfPossession   interface{} `json:"nextEpochProofOfPossession"`
-		NextEpochNetworkPubkeyBytes  interface{} `json:"nextEpochNetworkPubkeyBytes"`
-		NextEpochWorkerPubkeyBytes   interface{} `json:"nextEpochWorkerPubkeyBytes"`
-		NextEpochNetAddress          interface{} `json:"nextEpochNetAddress"`
-		NextEpochP2PAddress          interface{} `json:"nextEpochP2pAddress"`
-		NextEpochPrimaryAddress      interface{} `json:"nextEpochPrimaryAddress"`
-		NextEpochWorkerAddress       interface{} `json:"nextEpochWorkerAddress"`
-		VotingPower                  string      `json:"votingPower"`
-		OperationCapID               string      `json:"operationCapId"`
-		GasPrice                     string      `json:"gasPrice"`
-		CommissionRate               string      `json:"commissionRate"`
-		NextEpochStake               string      `json:"nextEpochStake"`
-		NextEpochGasPrice            string      `json:"nextEpochGasPrice"`
-		NextEpochCommissionRate      string      `json:"nextEpochCommissionRate"`
-		StakingPoolID                string      `json:"stakingPoolId"`
-		StakingPoolActivationEpoch   string      `json:"stakingPoolActivationEpoch"`
-		StakingPoolDeactivationEpoch interface{} `json:"stakingPoolDeactivationEpoch"`
-		StakingPoolSuiBalance        string      `json:"stakingPoolSuiBalance"`
-		RewardsPool                  string      `json:"rewardsPool"`
-		PoolTokenBalance             string      `json:"poolTokenBalance"`
-		PendingStake                 string      `json:"pendingStake"`
-		PendingTotalSuiWithdraw      string      `json:"pendingTotalSuiWithdraw"`
-		PendingPoolTokenWithdraw     string      `json:"pendingPoolTokenWithdraw"`
-		ExchangeRatesID              string      `json:"exchangeRatesId"`
-		ExchangeRatesSize            string      `json:"exchangeRatesSize"`
-	}
-
-	// SuiSystemState represents the current state of the Sui blockchain system.
-	SuiSystemState struct {
-		Epoch                                 string          `json:"epoch"`
-		ProtocolVersion                       string          `json:"protocolVersion"`
-		SystemStateVersion                    string          `json:"systemStateVersion"`
-		StorageFundTotalObjectStorageRebates  string          `json:"storageFundTotalObjectStorageRebates"`
-		StorageFundNonRefundableBalance       string          `json:"storageFundNonRefundableBalance"`
-		ReferenceGasPrice                     string          `json:"referenceGasPrice"`
-		SafeMode                              bool            `json:"safeMode"`
-		SafeModeStorageRewards                string          `json:"safeModeStorageRewards"`
-		SafeModeComputationRewards            string          `json:"safeModeComputationRewards"`
-		SafeModeStorageRebates                string          `json:"safeModeStorageRebates"`
-		SafeModeNonRefundableStorageFee       string          `json:"safeModeNonRefundableStorageFee"`
-		EpochStartTimestampMs                 string          `json:"epochStartTimestampMs"`
-		EpochDurationMs                       string          `json:"epochDurationMs"`
-		StakeSubsidyStartEpoch                string          `json:"stakeSubsidyStartEpoch"`
-		MaxValidatorCount                     string          `json:"maxValidatorCount"`
-		MinValidatorJoiningStake              string          `json:"minValidatorJoiningStake"`
-		ValidatorLowStakeThreshold            string          `json:"validatorLowStakeThreshold"`
-		ValidatorVeryLowStakeThreshold        string          `json:"validatorVeryLowStakeThreshold"`
-		ValidatorLowStakeGracePeriod          string          `json:"validatorLowStakeGracePeriod"`
-		StakeSubsidyBalance                   string          `json:"stakeSubsidyBalance"`
-		StakeSubsidyDistributionCounter       string          `json:"stakeSubsidyDistributionCounter"`
-		StakeSubsidyCurrentDistributionAmount string          `json:"stakeSubsidyCurrentDistributionAmount"`
-		StakeSubsidyPeriodLength              string          `json:"stakeSubsidyPeriodLength"`
-		StakeSubsidyDecreaseRate              int             `json:"stakeSubsidyDecreaseRate"`
-		TotalStake                            string          `json:"totalStake"`
-		ActiveValidators                      Validators      `json:"activeValidators"`
-		PendingActiveValidatorsID             string          `json:"pendingActiveValidatorsId"`
-		PendingActiveValidatorsSize           string          `json:"pendingActiveValidatorsSize"`
-		PendingRemovals                       []interface{}   `json:"pendingRemovals"`
-		StakingPoolMappingsID                 string          `json:"stakingPoolMappingsId"`
-		StakingPoolMappingsSize               string          `json:"stakingPoolMappingsSize"`
-		InactivePoolsID                       string          `json:"inactivePoolsId"`
-		InactivePoolsSize                     string          `json:"inactivePoolsSize"`
-		ValidatorCandidatesID                 string          `json:"validatorCandidatesId"`
-		ValidatorCandidatesSize               string          `json:"validatorCandidatesSize"`
-		AtRiskValidators                      [][]interface{} `json:"atRiskValidators"`
-		ValidatorReportRecords                [][]interface{} `json:"validatorReportRecords"`
-		AddressToValidatorName                map[string]string
-		ValidatorsAtRiskParsed                []ValidatorAtRisk
-		ValidatorReportsParsed                []ValidatorReport
-	}
-
 	// Transactions represents information about transactions on the Sui blockchain network.
 	Transactions struct {
 		TotalTransactionsBlocks      int
@@ -155,21 +67,6 @@ type (
 	Errors struct {
 		SkippedConsensusTransactions int
 		TotalSignatureErrors         int
-	}
-
-	// ValidatorReport represents a report about a validator node on the Sui blockchain network.
-	ValidatorReport struct {
-		ReportedName    string
-		ReportedAddress string
-		ReporterName    string
-		ReporterAddress string
-	}
-
-	// ValidatorAtRisk represents a validator node at risk on the Sui blockchain network.
-	ValidatorAtRisk struct {
-		Name         string
-		Address      string
-		EpochsAtRisk string
 	}
 
 	// GasPrice represents the different reference gas prices used on the network.
@@ -246,24 +143,5 @@ func NewMetrics() *Metrics {
 			TotalSignatureErrors:         0,
 			SkippedConsensusTransactions: 0,
 		},
-	}
-}
-
-// NewValidatorReport returns a new ValidatorReport instance.
-func NewValidatorReport(reportedName, reportedAddress, reporterName, reporterAddress string) ValidatorReport {
-	return ValidatorReport{
-		ReportedName:    reportedName,
-		ReportedAddress: reportedAddress,
-		ReporterName:    reporterName,
-		ReporterAddress: reporterAddress,
-	}
-}
-
-// NewValidatorAtRisk returns a new ValidatorAtRisk instance.
-func NewValidatorAtRisk(name, address, epochsAtRisk string) ValidatorAtRisk {
-	return ValidatorAtRisk{
-		Name:         name,
-		Address:      address,
-		EpochsAtRisk: epochsAtRisk,
 	}
 }

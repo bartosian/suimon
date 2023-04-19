@@ -2,6 +2,7 @@ package tablebuilder
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 	"strconv"
 
@@ -252,20 +253,22 @@ func (tb *Builder) handleValidatorReportsTable(systemState *metrics.SuiSystemSta
 
 	validatorReports := systemState.ValidatorReportsParsed
 
-	sort.SliceStable(validatorReports, func(left, right int) bool {
-		if validatorReports[left].ReportedName != validatorReports[right].ReportedName {
-			return validatorReports[left].ReportedName < validatorReports[right].ReportedName
+	for _, report := range validatorReports {
+		for j, reporter := range report.Reporters {
+			reportedName := report.Name
+			slashingPct := fmt.Sprintf("%.2f", report.SlashingPercentage)
+
+			if j > 0 {
+				reportedName = " "
+				slashingPct = " "
+			}
+
+			columnValues := tables.GetValidatorReportColumnValues(reportedName, slashingPct, reporter)
+
+			tableConfig.Columns.SetColumnValues(columnValues)
+
+			tableConfig.RowsCount++
 		}
-
-		return validatorReports[left].ReporterName < validatorReports[right].ReporterName
-	})
-
-	for idx, report := range validatorReports {
-		columnValues := tables.GetValidatorReportColumnValues(idx, report)
-
-		tableConfig.Columns.SetColumnValues(columnValues)
-
-		tableConfig.RowsCount++
 	}
 
 	tb.config = tableConfig

@@ -1,7 +1,6 @@
 package tables
 
 import (
-	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
@@ -9,10 +8,6 @@ import (
 )
 
 var (
-	SortConfigActiveValidator = SortConfig{
-		{Name: string(enums.ColumnNameValidatorNextEpochStake), Mode: table.Asc},
-		{Name: string(enums.ColumnNameValidatorVotingPower), Mode: table.Asc},
-	}
 	ColumnsConfigActiveValidator = ColumnsConfig{
 		enums.ColumnNameIndex:                             NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameValidatorName:                     NewDefaultColumnConfig(text.AlignLeft, text.AlignCenter, false),
@@ -51,7 +46,7 @@ var (
 // GetActiveValidatorColumnValues returns a map of ActiveValidatorColumnName values to corresponding values for the specified active validator.
 // The function retrieves information about the active validator from the provided metrics.Validator object and formats it into a map of ActiveValidatorColumnName keys and corresponding values.
 // Returns a map of ActiveValidatorColumnName keys to corresponding values.
-func GetActiveValidatorColumnValues(idx int, validator metrics.Validator) ColumnValues {
+func GetActiveValidatorColumnValues(idx int, validator *metrics.Validator) ColumnValues {
 	return ColumnValues{
 		enums.ColumnNameIndex:                             idx + 1,
 		enums.ColumnNameValidatorName:                     validator.Name,

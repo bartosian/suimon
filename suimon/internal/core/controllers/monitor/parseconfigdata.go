@@ -16,32 +16,41 @@ import (
 // retrieves data from the hosts and sets their health. Any errors that occur during this process are sent to
 // a channel. If an error is received from the channel, it is returned immediately. If no errors are received,
 // the function returns nil.
-func (c *Controller) ParseConfigData() error {
-	var systemTables = map[enums.TableType]bool{
-		enums.TableTypeActiveValidators:   true,
-		enums.TableTypeValidatorReports:   true,
-		enums.TableTypeValidatorsAtRisk:   true,
-		enums.TableTypeGasPriceAndSubsidy: true,
-		enums.TableTypeValidatorsCounts:   true,
-	}
+func (c *Controller) ParseConfigData(monitorType enums.MonitorType) error {
+	var (
+		systemTables = map[enums.TableType]bool{
+			enums.TableTypeActiveValidators:   true,
+			enums.TableTypeValidatorReports:   true,
+			enums.TableTypeValidatorsAtRisk:   true,
+			enums.TableTypeGasPriceAndSubsidy: true,
+			enums.TableTypeValidatorsCounts:   true,
+		}
 
-	tablesToParse := make([]enums.TableType, 0, len(c.selectedTables))
+		tablesToParse []enums.TableType
+	)
 
-	var systemTableAdded bool
+	switch monitorType {
+	case enums.MonitorTypeStatic:
+		tablesToParse = make([]enums.TableType, 0, len(c.selectedTables))
 
-	for _, table := range c.selectedTables {
-		if _, ok := systemTables[table]; ok {
-			if systemTableAdded {
-				continue
+		var systemTableAdded bool
+
+		for _, table := range c.selectedTables {
+			if _, ok := systemTables[table]; ok {
+				if systemTableAdded {
+					continue
+				}
+
+				systemTableAdded = true
+				table = enums.TableTypeGasPriceAndSubsidy
 			}
 
-			systemTableAdded = true
-			table = enums.TableTypeGasPriceAndSubsidy
+			if table != enums.TableTypeRPC {
+				tablesToParse = append(tablesToParse, table)
+			}
 		}
-
-		if table != enums.TableTypeRPC {
-			tablesToParse = append(tablesToParse, table)
-		}
+	case enums.MonitorTypeDynamic:
+		tablesToParse = []enums.TableType{c.selectedDashboard}
 	}
 
 	if err := c.ParseConfigRPC(); err != nil {
@@ -49,7 +58,6 @@ func (c *Controller) ParseConfigData() error {
 	}
 
 	errChan := make(chan error, len(tablesToParse))
-	defer close(errChan)
 
 	var wg sync.WaitGroup
 
@@ -80,13 +88,15 @@ func (c *Controller) ParseConfigData() error {
 	}
 
 	wg.Wait()
+	close(errChan)
 
-	select {
-	case err := <-errChan:
-		return err
-	default:
-		return nil
+	for err := range errChan {
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 // ParseConfigRPC fetches hosts data for the RPC table, sorts the hosts in

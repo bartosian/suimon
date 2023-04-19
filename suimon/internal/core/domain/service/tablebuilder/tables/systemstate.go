@@ -38,7 +38,7 @@ var (
 		enums.ColumnNameSystemAtRiskValidatorAddress:                NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs:         NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemValidatorReportedName:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
-		enums.ColumnNameSystemValidatorReportedAddress:              NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
+		enums.ColumnNameSystemValidatorSlashingPercentage:           NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemValidatorReporterName:                 NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemValidatorReporterAddress:              NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemMinReferenceGasPrice:                  NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
@@ -98,9 +98,8 @@ var (
 	}
 	RowsConfigValidatorReports = RowsConfig{
 		0: {
-			enums.ColumnNameIndex,
 			enums.ColumnNameSystemValidatorReportedName,
-			enums.ColumnNameSystemValidatorReportedAddress,
+			enums.ColumnNameSystemValidatorSlashingPercentage,
 			enums.ColumnNameSystemValidatorReporterName,
 			enums.ColumnNameSystemValidatorReporterAddress,
 		},
@@ -160,19 +159,12 @@ func GetValidatorCountsColumnValues(systemState *metrics.SuiSystemState) map[enu
 // GetValidatorReportColumnValues returns a map of ColumnName values to corresponding values for the system state validator.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
-func GetValidatorReportColumnValues(idx int, report metrics.ValidatorReport) ColumnValues {
-	var indexValue any = idx + 1
-
-	if report.ReportedAddress == EmptyValue {
-		indexValue = EmptyValue
-	}
-
+func GetValidatorReportColumnValues(reportedName string, slashingPct string, reporter metrics.ValidatorReporter) ColumnValues {
 	return ColumnValues{
-		enums.ColumnNameIndex:                          indexValue,
-		enums.ColumnNameSystemValidatorReportedName:    report.ReportedName,
-		enums.ColumnNameSystemValidatorReportedAddress: report.ReportedAddress,
-		enums.ColumnNameSystemValidatorReporterName:    report.ReporterName,
-		enums.ColumnNameSystemValidatorReporterAddress: report.ReporterAddress,
+		enums.ColumnNameSystemValidatorReportedName:       reportedName,
+		enums.ColumnNameSystemValidatorSlashingPercentage: slashingPct,
+		enums.ColumnNameSystemValidatorReporterName:       reporter.Name,
+		enums.ColumnNameSystemValidatorReporterAddress:    reporter.Address,
 	}
 }
 

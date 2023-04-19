@@ -124,6 +124,8 @@ func (tb *Builder) setColors() {
 		bgWhite  = text.BgWhite
 		bgHiBlue = text.BgHiBlue
 		fgBlack  = text.FgBlack
+		bgRed    = text.BgRed
+		bgYellow = text.BgYellow
 	)
 
 	var painter = func() func(row table.Row) text.Colors {
@@ -132,25 +134,48 @@ func (tb *Builder) setColors() {
 		currentColor := 0
 
 		var handler = func(row table.Row) text.Colors {
-			for _, column := range row {
-				switch value := column.(type) {
-				case int:
+			switch tb.tableType {
+			case enums.TableTypeValidatorReports:
+				valueString, ok := row[1].(string)
+				if !ok {
 					return valuesRowFgColor
-				case string:
-					if _, err := strconv.Atoi(value); err == nil {
+				}
+
+				slashingPct, err := strconv.ParseFloat(valueString, 64)
+				if err != nil {
+					return valuesRowFgColor
+				}
+
+				if slashingPct > 100 {
+					return text.Colors{bgRed}
+				}
+
+				if slashingPct > 50 {
+					return text.Colors{bgYellow}
+				}
+
+				return valuesRowFgColor
+			default:
+				for _, column := range row {
+					switch value := column.(type) {
+					case int:
 						return valuesRowFgColor
+					case string:
+						if _, err := strconv.Atoi(value); err == nil {
+							return valuesRowFgColor
+						}
 					}
 				}
+
+				colors := text.Colors{fgBlack, bgColor[currentColor]}
+
+				currentColor++
+				if currentColor > 3 {
+					currentColor = 0
+				}
+
+				return colors
 			}
-
-			colors := text.Colors{fgBlack, bgColor[currentColor]}
-
-			currentColor++
-			if currentColor > 3 {
-				currentColor = 0
-			}
-
-			return colors
 		}
 
 		return handler

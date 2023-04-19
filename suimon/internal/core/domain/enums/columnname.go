@@ -77,7 +77,7 @@ const (
 	ColumnNameSystemValidatorReporterName                 ColumnName = "REPORTER NAME"
 	ColumnNameSystemValidatorReporterAddress              ColumnName = "REPORTER ADDRESS"
 	ColumnNameSystemValidatorReportedName                 ColumnName = "REPORTED NAME"
-	ColumnNameSystemValidatorReportedAddress              ColumnName = "REPORTED ADDRESS"
+	ColumnNameSystemValidatorSlashingPercentage           ColumnName = "SLASHING PCT"
 	ColumnNameSystemStakeSubsidyStartEpoch                ColumnName = "STAKE SUBSIDY\nSTART EPOCH"
 	ColumnNameSystemStakeSubsidyBalance                   ColumnName = "STAKE SUBSIDY\nBALANCE"
 	ColumnNameSystemStakeSubsidyDistributionCounter       ColumnName = "STAKE SUBSIDY\nDISTRIBUTION COUNTER"
