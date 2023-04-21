@@ -1,30 +1,48 @@
 package dashboardbuilder
 
 import (
+	"errors"
 	"fmt"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/dashboardbuilder/config"
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/dashboardbuilder/dashboards"
 )
 
-// Init initializes the Builder's dashboard by adding the rows to the grid builder
-// and setting the dashboard configuration. If an error occurs during initialization,
-// it returns an error.
+// Init initializes the dashboard by fetching the cells, columns, and rows
+// configurations from the `dashboards` package and using them to build a new
+// `grid` with the `grid.New()` method. It then uses the built grid to create a
+// new dashboard using the `container.New()` method. The dashboard instance is
+// stored in the `db.dashboard` field for later use.
 func (db *Builder) Init() error {
-	switch db.tableType {
-	case enums.TableTypeNode:
+	hosts := db.hosts
 
-	case enums.TableTypeRPC:
+	if len(hosts) == 0 {
+		return errors.New("hosts are not initialized")
+	}
 
-	case enums.TableTypeValidator:
+	cellsConfig := dashboards.GetCellsConfig(db.tableType)
+	cells, err := dashboards.GetCells(cellsConfig)
+	if err != nil {
+		return err
+	}
+
+	db.cells = cells
+
+	columnsConfig := dashboards.GetColumnsConfig(db.tableType)
+	columns, err := dashboards.GetColumns(columnsConfig, cells)
+	if err != nil {
+		return err
+	}
+
+	rowsConfig := dashboards.GetRowsConfig(db.tableType)
+	rows, err := dashboards.GetRows(rowsConfig, columns)
+	if err != nil {
+		return err
 	}
 
 	builder := grid.New()
-	rows := config.Rows
-
 	builder.Add(rows...)
 
 	options, err := builder.Build()
@@ -32,7 +50,7 @@ func (db *Builder) Init() error {
 		return err
 	}
 
-	dashboardConfig := append(config.DashboardConfigNode, options...)
+	dashboardConfig := append(dashboards.DashboardConfigDefault, options...)
 
 	dashboard, err := container.New(db.terminal, dashboardConfig...)
 	if err != nil {

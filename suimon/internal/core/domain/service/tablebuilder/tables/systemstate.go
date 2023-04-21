@@ -48,6 +48,7 @@ var (
 		enums.ColumnNameSystemMedianReferenceGasPrice:               NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameSystemEstimatedReferenceGasPrice:            NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 	}
+
 	RowsConfigSystemState = RowsConfig{
 		0: {
 			enums.ColumnNameSystemEpoch,
@@ -74,6 +75,7 @@ var (
 			enums.ColumnNameSystemEstimatedReferenceGasPrice,
 		},
 	}
+
 	RowsConfigValidatorCounts = RowsConfig{
 		0: {
 			enums.ColumnNameSystemMaxValidatorCount,
@@ -88,6 +90,7 @@ var (
 			enums.ColumnNameSystemValidatorLowStakeGracePeriod,
 		},
 	}
+
 	RowsConfigValidatorsAtRisk = RowsConfig{
 		0: {
 			enums.ColumnNameIndex,
@@ -96,6 +99,7 @@ var (
 			enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs,
 		},
 	}
+	
 	RowsConfigValidatorReports = RowsConfig{
 		0: {
 			enums.ColumnNameSystemValidatorReportedName,

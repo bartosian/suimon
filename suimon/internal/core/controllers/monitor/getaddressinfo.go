@@ -45,14 +45,14 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses
 func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
 	nodesConfig := c.selectedConfig.FullNodes
 	if len(nodesConfig) == 0 {
-		return nil, errors.New("full-nodes not provided in config file")
+		return nil, errors.New("full-nodes not provided in dashboards file")
 	}
 
 	for _, node := range nodesConfig {
 		addressRPC, addressMetrics := node.JSONRPCAddress, node.MetricsAddress
 
 		if addressRPC == "" && addressMetrics == "" {
-			return nil, errors.New("invalid format for full-node in config file: at least one of json-rpc-address or metrics-address is required")
+			return nil, errors.New("invalid format for full-node in dashboards file: at least one of json-rpc-address or metrics-address is required")
 		}
 
 		var (
@@ -62,19 +62,19 @@ func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.Ad
 
 		if addressRPC != "" {
 			if endpointRPC, err = parser(addressRPC); err != nil {
-				return nil, fmt.Errorf("invalid format for full-node json-rpc-address in config file: %w", err)
+				return nil, fmt.Errorf("invalid format for full-node json-rpc-address in dashboards file: %w", err)
 			}
 		}
 
 		if addressMetrics != "" {
 			if endpointMetrics, err = parser(addressMetrics); err != nil {
-				return nil, fmt.Errorf("invalid format for full-node metrics-address in config file: %w", err)
+				return nil, fmt.Errorf("invalid format for full-node metrics-address in dashboards file: %w", err)
 			}
 		}
 
 		// Check if both endpoints are nil and return an error if so.
 		if endpointRPC == nil && endpointMetrics == nil {
-			return nil, errors.New("invalid format for full-node in config file: at least one of json-rpc-address or metrics-address is required")
+			return nil, errors.New("invalid format for full-node in dashboards file: at least one of json-rpc-address or metrics-address is required")
 		}
 
 		addressInfo := host.AddressInfo{Endpoint: *endpointRPC, Ports: make(map[enums.PortType]string)}
@@ -97,19 +97,19 @@ func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.Ad
 func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
 	validatorsConfig := c.selectedConfig.Validators
 	if len(validatorsConfig) == 0 {
-		return nil, errors.New("validators not provided in config file")
+		return nil, errors.New("validators not provided in dashboards file")
 	}
 
 	for _, validator := range validatorsConfig {
 		addressMetrics := validator.MetricsAddress
 
 		if addressMetrics == "" {
-			return nil, errors.New("invalid format for validator in config file: metrics-address is required")
+			return nil, errors.New("invalid format for validator in dashboards file: metrics-address is required")
 		}
 
 		endpointMetrics, err := parser(addressMetrics)
 		if err != nil {
-			return nil, fmt.Errorf("invalid format for validator metrics-address in config file: %w", err)
+			return nil, fmt.Errorf("invalid format for validator metrics-address in dashboards file: %w", err)
 		}
 
 		addressInfo := host.AddressInfo{Endpoint: *endpointMetrics, Ports: make(map[enums.PortType]string)}
@@ -128,13 +128,13 @@ func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []ho
 func (c *Controller) getPeerAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
 	peersConfig := c.selectedConfig.SeedPeers
 	if len(peersConfig) == 0 {
-		return nil, errors.New("seed-peers not provided in config file")
+		return nil, errors.New("seed-peers not provided in dashboards file")
 	}
 
 	for _, peer := range peersConfig {
 		endpoint, err := parser(peer)
 		if err != nil {
-			return nil, fmt.Errorf("invalid format for seed-peer in config file: %w", err)
+			return nil, fmt.Errorf("invalid format for seed-peer in dashboards file: %w", err)
 		}
 
 		addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}
@@ -152,13 +152,13 @@ func (c *Controller) getPeerAddresses(parser addressParser) (addresses []host.Ad
 func (c *Controller) getRPCAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
 	rpcConfig := c.selectedConfig.PublicRPC
 	if len(rpcConfig) == 0 {
-		return nil, errors.New("public-rpc not provided in config file")
+		return nil, errors.New("public-rpc not provided in dashboards file")
 	}
 
 	for _, rpc := range rpcConfig {
 		endpoint, err := parser(rpc)
 		if err != nil {
-			return nil, fmt.Errorf("invalid format for public-rpc in config file: %w", err)
+			return nil, fmt.Errorf("invalid format for public-rpc in dashboards file: %w", err)
 		}
 
 		addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}

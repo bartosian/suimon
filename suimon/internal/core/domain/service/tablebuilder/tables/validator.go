@@ -38,6 +38,7 @@ var (
 		enums.ColumnNameTotalSignatureErrors:                    NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameHandleCertificateNonConsensusLatencySum: NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 	}
+
 	RowsConfigValidator = RowsConfig{
 		0: {
 			enums.ColumnNameIndex,

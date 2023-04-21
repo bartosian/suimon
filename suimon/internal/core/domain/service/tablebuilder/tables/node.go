@@ -33,6 +33,7 @@ var (
 		enums.ColumnNameCommit:                       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameCountry:                      NewDefaultColumnConfig(text.AlignCenter, text.AlignLeft, false),
 	}
+	
 	RowsConfigNode = RowsConfig{
 		0: {
 			enums.ColumnNameIndex,

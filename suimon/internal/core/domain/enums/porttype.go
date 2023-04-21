@@ -3,8 +3,7 @@ package enums
 type PortType int
 
 const (
-	PortTypeUndefined PortType = iota
-	PortTypeRPC
+	PortTypeRPC PortType = iota
 	PortTypeMetrics
 	PortTypePeer
 )

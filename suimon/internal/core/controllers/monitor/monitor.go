@@ -23,7 +23,7 @@ func (c *Controller) Monitor() error {
 
 	configsChoiceList := cligw.NewSimpleSelectChoiceList(configNames...)
 
-	selectedConfigName, err := c.gateways.cli.SelectOne("Which config would you like to use?", configsChoiceList)
+	selectedConfigName, err := c.gateways.cli.SelectOne("Which dashboards would you like to use?", configsChoiceList)
 	if err != nil {
 		c.gateways.cli.Error("failed to parse user selection")
 
@@ -141,7 +141,6 @@ func (c *Controller) selectStaticTables() ([]enums.TableType, error) {
 func (c *Controller) selectDynamicDashboard() ([]enums.TableType, error) {
 	// Select the dashboard to render.
 	dashboardTypeChoiceList := cligw.NewSimpleSelectChoiceList(
-		string(enums.TableTypeRPC),
 		string(enums.TableTypeNode),
 		string(enums.TableTypeValidator),
 	)

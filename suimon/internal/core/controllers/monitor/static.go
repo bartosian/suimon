@@ -20,13 +20,8 @@ func (c *Controller) Static() error {
 		return err
 	}
 
-	// Render the tables.
-	if err := c.RenderTables(); err != nil {
-		return err
-	}
-
-	// If everything ran successfully, return nil.
-	return nil
+	// Render the tables and return error if any
+	return c.RenderTables()
 }
 
 // InitTables initializes the enabled tables based on the display configuration.
@@ -44,8 +39,7 @@ func (c *Controller) InitTables() error {
 		builder := tablebuilder.NewBuilder(tableType, hosts, c.gateways.cli)
 		c.builders.static[tableType] = builder
 
-		err = builder.Init()
-		if err != nil {
+		if err = builder.Init(); err != nil {
 			return fmt.Errorf("error initializing table %s: %w", tableType, err)
 		}
 	}
