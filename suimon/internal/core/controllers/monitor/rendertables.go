@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"fmt"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
@@ -35,7 +36,9 @@ func (c *Controller) RenderTables() error {
 
 		builder := c.builders.static[tableType]
 
-		builder.Render()
+		if err := builder.Render(); err != nil {
+			return fmt.Errorf("error rendering table %s: %w", tableType, err)
+		}
 	}
 
 	return nil

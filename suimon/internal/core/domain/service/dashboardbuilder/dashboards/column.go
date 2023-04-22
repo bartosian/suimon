@@ -6,8 +6,20 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
+const (
+	TableNoData    = "no data"
+	EmptyValue     = ""
+	RpcPortDefault = "9000"
+)
+
 // ColumnsConfig is a type that maps column names to their respective widths.
 type ColumnsConfig map[enums.ColumnName]int
+
+// ColumnValues represents a mapping between column names and their corresponding values.
+type ColumnValues map[enums.ColumnName]any
+
+// ColumnOptions represents a mapping between column names and their corresponding configuration options.
+type ColumnOptions map[enums.ColumnName]any
 
 // Columns is a type that maps column names to their respective grid elements.
 type Columns map[enums.ColumnName]grid.Element

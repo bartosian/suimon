@@ -94,7 +94,7 @@ func GetColumns(columnsConfig ColumnsConfig, cells Cells) (Columns, error) {
 
 // GetRows returns a slice of Rows based on the given RowsConfig and Columns.
 func GetRows(rowsConfig RowsConfig, columns Columns) (Rows, error) {
-	rows := make(Rows, 0, len(rowsConfig))
+	rows := make(Rows, len(rowsConfig))
 
 	for rowIdx, rowConfig := range rowsConfig {
 		rowColumns := make([]grid.Element, len(rowConfig.Columns))

@@ -30,10 +30,17 @@ func (c *Controller) Dynamic() error {
 func (c *Controller) InitDashboard() error {
 	selectedDashboard := c.selectedDashboard
 
-	dashboard, err := dashboardbuilder.NewBuilder(selectedDashboard, c.gateways.cli)
+	host, err := c.selectHostForDashboard()
+	if err != nil {
+		return err
+	}
+
+	builder, err := dashboardbuilder.NewBuilder(selectedDashboard, *host, c.gateways.cli)
 	if err != nil {
 		return fmt.Errorf("error creating dashboard %s: %w", selectedDashboard, err)
 	}
 
-	return dashboard.Init()
+	c.builders.dynamic[selectedDashboard] = builder
+
+	return builder.Init()
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgetapi"
@@ -81,12 +80,14 @@ func writeToTextWidget(widget *text.Text, value any, options any) error {
 		return nil
 	}
 
-	optionsText, ok := options.([]cell.Option)
-	if !ok {
-		return fmt.Errorf("invalid options type for text widget: %T", options)
-	}
+	//optionsText, ok := options.([]cell.Option)
+	//if !ok {
+	//	return fmt.Errorf("invalid options type for text widget: %T", options)
+	//}
 
-	return widget.Write(valueString, text.WriteCellOpts(optionsText...))
+	return widget.Write(valueString)
+
+	//return widget.Write(valueString, text.WriteCellOpts(optionsText...))
 }
 
 // writeToGaugeWidget writes a value to a gauge widget.
@@ -99,12 +100,14 @@ func writeToGaugeWidget(widget *gauge.Gauge, value any, options any) error {
 		return fmt.Errorf("invalid value type for gauge widget: %T", value)
 	}
 
-	optionsGauge, ok := options.([]gauge.Option)
-	if !ok {
-		return fmt.Errorf("invalid options type for gauge widget: %T", options)
-	}
+	//optionsGauge, ok := options.([]gauge.Option)
+	//if !ok {
+	//	return fmt.Errorf("invalid options type for gauge widget: %T", options)
+	//}
 
-	return widget.Percent(valueInt, optionsGauge...)
+	return widget.Percent(valueInt)
+
+	//return widget.Percent(valueInt, optionsGauge...)
 }
 
 // writeToSegmentWidget writes a value to a segment display widget.
@@ -113,29 +116,35 @@ func writeToGaugeWidget(widget *gauge.Gauge, value any, options any) error {
 func writeToSegmentWidget(widget *segmentdisplay.SegmentDisplay, value any, options any) error {
 	var segments []*segmentdisplay.TextChunk
 
-	optionsSegment, ok := options.([]segmentdisplay.WriteOption)
-	if !ok {
-		return fmt.Errorf("invalid options type for segment widget: %T", options)
-	}
+	//optionsSegment, ok := options.([]segmentdisplay.WriteOption)
+	//if !ok {
+	//	return fmt.Errorf("invalid options type for segment widget: %T", options)
+	//}
 
 	switch v := value.(type) {
 	case int:
 		chunk := strconv.Itoa(v)
 
-		segments = append(segments, segmentdisplay.NewChunk(chunk, optionsSegment...))
+		segments = append(segments, segmentdisplay.NewChunk(chunk))
+
+		//segments = append(segments, segmentdisplay.NewChunk(chunk, optionsSegment...))
 	case string:
 		if v == "" {
 			v = DashboardLoadingBlinkValue()
 		}
 
-		segments = append(segments, segmentdisplay.NewChunk(v, optionsSegment...))
+		segments = append(segments, segmentdisplay.NewChunk(v))
+
+		//segments = append(segments, segmentdisplay.NewChunk(v, optionsSegment...))
 	case []string:
-		for idx, chunk := range v {
+		for _, chunk := range v {
 			if chunk == "" {
 				chunk = DashboardLoadingBlinkValue()
 			}
 
-			segments = append(segments, segmentdisplay.NewChunk(chunk, optionsSegment[idx]))
+			segments = append(segments, segmentdisplay.NewChunk(chunk))
+
+			//segments = append(segments, segmentdisplay.NewChunk(chunk, optionsSegment[idx]))
 		}
 	}
 

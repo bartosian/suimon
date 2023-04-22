@@ -1,8 +1,8 @@
 package dashboardbuilder
 
 import (
-	"errors"
 	"fmt"
+	"os"
 
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
@@ -15,12 +15,22 @@ import (
 // `grid` with the `grid.New()` method. It then uses the built grid to create a
 // new dashboard using the `container.New()` method. The dashboard instance is
 // stored in the `db.dashboard` field for later use.
-func (db *Builder) Init() error {
-	hosts := db.hosts
+func (db *Builder) Init() (err error) {
+	// Use a deferred function to call db.TearDown() if there were errors or panics
+	defer func() {
+		if err != nil {
+			db.tearDown()
+		}
 
-	if len(hosts) == 0 {
-		return errors.New("hosts are not initialized")
-	}
+		if err := recover(); err != nil {
+			// Handle the panic by logging the error and exiting the program
+			db.tearDown()
+
+			db.cliGateway.Error(fmt.Sprintf("panic: %v", err))
+
+			os.Exit(1)
+		}
+	}()
 
 	cellsConfig := dashboards.GetCellsConfig(db.tableType)
 	cells, err := dashboards.GetCells(cellsConfig)

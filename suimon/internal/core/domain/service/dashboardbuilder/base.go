@@ -22,7 +22,7 @@ type Builder struct {
 	cliGateway *cligw.Gateway
 	terminal   *termbox.Terminal
 	dashboard  *container.Container
-	hosts      []host.Host
+	host       host.Host
 	cells      dashboards.Cells
 	quitter    func(k *terminalapi.Keyboard)
 }
@@ -30,7 +30,7 @@ type Builder struct {
 // NewBuilder creates a new Builder instance with the provided CLI gateway.
 // It initializes the termbox terminal and dashboard, and sets up a context and quitter function.
 // If an error occurs during initialization, it returns an error.
-func NewBuilder(tableType enums.TableType, hosts []host.Host, cliGateway *cligw.Gateway) (*Builder, error) {
+func NewBuilder(tableType enums.TableType, host host.Host, cliGateway *cligw.Gateway) (*Builder, error) {
 	terminal, err := termbox.New()
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize termbox terminal: %w", err)
@@ -43,7 +43,7 @@ func NewBuilder(tableType enums.TableType, hosts []host.Host, cliGateway *cligw.
 		tableType:  tableType,
 		cliGateway: cliGateway,
 		terminal:   terminal,
-		hosts:      hosts,
+		host:       host,
 		quitter: func(k *terminalapi.Keyboard) {
 			if k.Key == 'q' || k.Key == 'Q' || k.Key == keyboard.KeyEsc {
 				terminal.Close()
@@ -52,4 +52,10 @@ func NewBuilder(tableType enums.TableType, hosts []host.Host, cliGateway *cligw.
 			}
 		},
 	}, nil
+}
+
+// The tearDown function closes the Builder's terminal and cancels its context.
+func (db *Builder) tearDown() {
+	db.ctx.Done()
+	db.terminal.Close()
 }

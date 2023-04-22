@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	domainhost "github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
 )
 
@@ -70,7 +71,7 @@ func (c *Controller) Monitor() error {
 			return nil
 		}
 
-		c.selectedDashboard = dashboardToRender[0]
+		c.selectedDashboard = *dashboardToRender
 
 		return c.Dynamic()
 
@@ -138,7 +139,7 @@ func (c *Controller) selectStaticTables() ([]enums.TableType, error) {
 // selectDynamicDashboard prompts the user to select the dynamic dashboard to render.
 // It returns a slice of enums.TableType representing the selected dashboard,
 // or an error if the user's selection cannot be parsed or no dashboard is selected.
-func (c *Controller) selectDynamicDashboard() ([]enums.TableType, error) {
+func (c *Controller) selectDynamicDashboard() (*enums.TableType, error) {
 	// Select the dashboard to render.
 	dashboardTypeChoiceList := cligw.NewSimpleSelectChoiceList(
 		string(enums.TableTypeNode),
@@ -158,5 +159,56 @@ func (c *Controller) selectDynamicDashboard() ([]enums.TableType, error) {
 		return nil, nil
 	}
 
-	return []enums.TableType{enums.TableType(selectedDashboardType.Value)}, nil
+	dashboardType := enums.TableType(selectedDashboardType.Value)
+
+	return &dashboardType, nil
+}
+
+// selectHostForDashboard selects a host to render a dashboard for, based on the selected dashboard.
+// It prompts the user to select a host from the list of hosts that support the selected dashboard,
+// and returns the selected host, or an error if the user's selection cannot be parsed or no host is selected.
+func (c *Controller) selectHostForDashboard() (*domainhost.Host, error) {
+	selectedDashboard := c.selectedDashboard
+
+	hosts, err := c.getHostsByTableType(selectedDashboard)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(hosts) == 0 {
+		return nil, nil
+	}
+
+	// Create a list of host addresses for the user to select from.
+	hostAddresses := make([]string, len(hosts))
+	for i, host := range hosts {
+		hostAddresses[i] = host.Endpoint.Address
+	}
+
+	// Select the host to render.
+	hostChoiceList := cligw.NewSimpleSelectChoiceList(hostAddresses...)
+
+	selectedHostAddress, err := c.gateways.cli.SelectOne("Which host do you want to render dashboard for?", hostChoiceList)
+	if err != nil {
+		c.gateways.cli.Error("failed to parse user selection")
+
+		return nil, err
+	}
+
+	if selectedHostAddress == nil {
+		c.gateways.cli.Error("no host selected to render for")
+
+		return nil, nil
+	}
+
+	hostAddress := selectedHostAddress.Value
+
+	// Get the selected host from the slice of pointers.
+	for _, host := range hosts {
+		if host.Endpoint.Address == hostAddress {
+			return &host, nil
+		}
+	}
+
+	return nil, fmt.Errorf("selected host not found")
 }
