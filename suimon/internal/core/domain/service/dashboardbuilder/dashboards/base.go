@@ -2,16 +2,13 @@ package dashboards
 
 import (
 	"fmt"
-	"strings"
-	"time"
 
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/mum4k/termdash/align"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/linestyle"
-
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
 const dashboardName = "💧 SUIMON: PRESS Q or ESC TO QUIT"
@@ -39,10 +36,6 @@ var (
 		container.FocusedColor(cell.ColorBlue),
 	}
 )
-
-type Element interface {
-	isElement()
-}
 
 // GetColumnsConfig returns the columns configuration based on the specified dashboard type.
 func GetColumnsConfig(dashboard enums.TableType) ColumnsConfig {
@@ -94,10 +87,10 @@ func GetColumns(columnsConfig ColumnsConfig, cells Cells) (Columns, error) {
 
 // GetRows returns a slice of Rows based on the given RowsConfig and Columns.
 func GetRows(rowsConfig RowsConfig, columns Columns) (Rows, error) {
-	rows := make(Rows, len(rowsConfig))
+	rows := make(Rows, len(rowsConfig)+1)
 
 	for rowIdx, rowConfig := range rowsConfig {
-		rowColumns := make([]grid.Element, len(rowConfig.Columns))
+		rowColumns := make([]grid.Element, len(rowConfig.Columns)+1)
 
 		for columnIdx, columnName := range rowConfig.Columns {
 			column, ok := columns[columnName]
@@ -111,10 +104,17 @@ func GetRows(rowsConfig RowsConfig, columns Columns) (Rows, error) {
 		rows[rowIdx] = NewRowPct(rowConfig.Height, rowColumns...)
 	}
 
+	// add empty row to limit last row height
+	rows = append(rows, NewRowPct(1))
+
 	return rows, nil
 }
 
-// GetCells returns a map of Cells based on the given CellsConfig.
+// GetCells creates a new set of cells based on the configuration provided.
+// It accepts a CellsConfig object that maps column names to cell names,
+// and a terminal object that represents the terminal where the cells will be displayed.
+// It returns a Cells object and an error. The Cells object is a map that maps
+// column names to cell objects.
 func GetCells(cellsConfig CellsConfig) (Cells, error) {
 	cells := make(Cells, len(cellsConfig))
 
@@ -133,15 +133,4 @@ func GetCells(cellsConfig CellsConfig) (Cells, error) {
 	}
 
 	return cells, nil
-}
-
-func DashboardLoadingBlinkValue() string {
-	inProgress := strings.Repeat("-", 50)
-	second := time.Now().Second() % 10
-
-	if second%2 == 0 {
-		inProgress = strings.Repeat("\u0020", 50)
-	}
-
-	return inProgress
 }

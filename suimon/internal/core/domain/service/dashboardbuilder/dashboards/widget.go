@@ -70,7 +70,7 @@ func newWidgetByColumnName(columnName enums.ColumnName) (widgetapi.Widget, error
 		displayWidget := widget.(*segmentdisplay.SegmentDisplay)
 
 		err = displayWidget.Write([]*segmentdisplay.TextChunk{
-			segmentdisplay.NewChunk(DashboardLoadingBlinkValue(), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite))),
+			segmentdisplay.NewChunk(dashboardLoadingBlinkValue(50), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite))),
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to set initial value for %s: %w", columnName, err)
@@ -84,7 +84,7 @@ func newWidgetByColumnName(columnName enums.ColumnName) (widgetapi.Widget, error
 // It returns the new widget and an error, if any.
 func newProgressWidget() (*gauge.Gauge, error) {
 	return gauge.New(
-		gauge.Height(5),
+		gauge.Height(4),
 		gauge.Border(linestyle.Light, cell.FgColor(cell.ColorGreen)),
 		gauge.Color(cell.ColorGreen),
 		gauge.FilledTextColor(cell.ColorBlack),
@@ -92,7 +92,6 @@ func newProgressWidget() (*gauge.Gauge, error) {
 		gauge.HorizontalTextAlign(align.HorizontalCenter),
 		gauge.VerticalTextAlign(align.VerticalMiddle),
 		gauge.Threshold(99, linestyle.Double, cell.FgColor(cell.ColorGreen), cell.Bold()),
-		gauge.TextLabel("RPC delta"),
 	)
 }
 
@@ -136,5 +135,6 @@ func newDisplayWidget() (*segmentdisplay.SegmentDisplay, error) {
 	return segmentdisplay.New(
 		segmentdisplay.AlignHorizontal(align.HorizontalCenter),
 		segmentdisplay.AlignVertical(align.VerticalMiddle),
+		segmentdisplay.MaximizeDisplayedText(),
 	)
 }

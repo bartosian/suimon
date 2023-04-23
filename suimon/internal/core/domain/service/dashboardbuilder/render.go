@@ -11,7 +11,10 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/dashboardbuilder/dashboards"
 )
 
-const renderInterval = 1 * time.Second
+const (
+	renderInterval = 500 * time.Millisecond
+	queryInterval  = 1 * time.Second
+)
 
 // Render displays the dashboard on the terminal and updates the cells with new data periodically.
 func (db *Builder) Render() (err error) {
@@ -31,27 +34,38 @@ func (db *Builder) Render() (err error) {
 		}
 	}()
 
-	// Set up a ticker to update the cells periodically
-	ticker := time.NewTicker(renderInterval)
-	defer ticker.Stop()
-
 	// Create a channel for error handling
-	errChan := make(chan error, 1)
+	errChan := make(chan error, 10)
 	defer close(errChan)
 
-	// Start a goroutine for the ticker loop
-	go func(host domainhost.Host) {
+	tickerQuery := time.NewTicker(queryInterval)
+	defer tickerQuery.Stop()
+
+	// Start a goroutine for the metric retrieval loop
+	go func(host *domainhost.Host) {
 		for {
 			select {
-			case <-ticker.C:
+			case <-tickerQuery.C:
 				if err := host.GetMetrics(); err != nil {
 					errChan <- err
 
 					return
 				}
+			case <-db.ctx.Done():
+				return
+			}
+		}
+	}(&db.host)
 
+	tickerRerender := time.NewTicker(renderInterval)
+	defer tickerRerender.Stop()
+
+	// Start a goroutine for the dashboard rendering loop
+	go func(host *domainhost.Host) {
+		for {
+			select {
+			case <-tickerRerender.C:
 				columns := dashboards.GetNodeColumnValues(host)
-				options := dashboards.GetNodeColumnOptions(host)
 
 				for columnName, cell := range db.cells {
 					columnValue, ok := columns[columnName]
@@ -61,15 +75,8 @@ func (db *Builder) Render() (err error) {
 						return
 					}
 
-					columnOptions, ok := options[columnName]
-					if !ok {
-						errChan <- fmt.Errorf("failed to get options for column %s", columnName)
-
-						return
-					}
-
 					// Write the new data to the cell
-					if err := cell.Write(columnValue, columnOptions); err != nil {
+					if err := cell.Write(columnValue); err != nil {
 						errChan <- err
 
 						return
@@ -79,10 +86,14 @@ func (db *Builder) Render() (err error) {
 				return
 			}
 		}
-	}(db.host)
+	}(&db.host)
 
 	// Display the dashboard on the terminal and handle errors
-	if err := termdash.Run(db.ctx, db.terminal, db.dashboard, termdash.KeyboardSubscriber(db.quitter)); err != nil {
+	if err := termdash.Run(
+		db.ctx, db.terminal, db.dashboard,
+		termdash.KeyboardSubscriber(db.quitter),
+		termdash.RedrawInterval(renderInterval),
+	); err != nil {
 		return fmt.Errorf("failed to run terminal dashboard: %w", err)
 	}
 

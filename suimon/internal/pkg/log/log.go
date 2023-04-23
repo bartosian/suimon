@@ -2,7 +2,6 @@ package log
 
 import (
 	"bufio"
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -10,7 +9,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/common-nighthawk/go-figure"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 )
@@ -161,27 +159,4 @@ func serviceExists(name string) bool {
 	status := strings.TrimSpace(string(out))
 
 	return status == "active"
-}
-
-func getPID(command string) (string, error) {
-	var (
-		cmd    = exec.Command("pgrep", command)
-		output bytes.Buffer
-		err    error
-	)
-
-	cmd.Stdout = &output
-
-	if err = cmd.Run(); err != nil {
-		return "", err
-	}
-
-	return output.String(), nil
-}
-
-func PrintLogo(text string, fontName string, color string) {
-	logo := figure.NewColorFigure(text, fontName, color, true)
-	fmt.Print("\n\n")
-	logo.Print()
-	fmt.Print("\n\n")
 }

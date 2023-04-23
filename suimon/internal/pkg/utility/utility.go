@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -217,4 +218,16 @@ func GetDurationTillTime(start time.Time, duration time.Duration) (time.Duration
 	timeLeft := endTime.Sub(currentTime)
 
 	return timeLeft, nil
+}
+
+// ParseIntFromString extracts the integer part from a string that may have a suffix.
+// The suffix can be any non-digit characters at the end of the string.
+// If the string cannot be parsed, an error is returned.
+func ParseIntFromString(str string) (int, error) {
+	re := regexp.MustCompile(`^\d+`)
+	match := re.FindString(str)
+	if match == "" {
+		return 0, fmt.Errorf("could not parse integer from string: %s", str)
+	}
+	return strconv.Atoi(match)
 }

@@ -310,7 +310,11 @@ func (tb *Builder) handleActiveValidatorsTable(systemState *metrics.SuiSystemSta
 			return votingPowerLeft > votingPowerRight
 		}
 
-		return nextEpochStakeLeft > nextEpochStakeRight
+		if nextEpochStakeLeft != nextEpochStakeRight {
+			return nextEpochStakeLeft > nextEpochStakeRight
+		}
+
+		return activeValidators[left].Name < activeValidators[right].Name
 	})
 
 	for idx, validator := range activeValidators {

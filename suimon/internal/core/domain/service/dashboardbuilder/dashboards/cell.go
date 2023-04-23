@@ -3,6 +3,8 @@ package dashboards
 import (
 	"fmt"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
@@ -13,6 +15,7 @@ import (
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
+	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 )
 
 // CellsConfig is a type that represents a mapping of column names to strings.
@@ -26,9 +29,6 @@ type Cell struct {
 	Widget  widgetapi.Widget
 	Options []container.Option
 }
-
-// isElement is a method attached to the Cell struct that is used to indicate that it is an Element (part of a grid).
-func (Cell) isElement() {}
 
 // NewCell is a function that creates a new Cell struct given a cellName and a widget. It returns a pointer to the new Cell and an error (if any).
 func NewCell(cellName string, widget widgetapi.Widget) (*Cell, error) {
@@ -48,28 +48,23 @@ func (c Cell) GetWidget() grid.Element {
 }
 
 // Write writes a value to the cell widget.
-// It accepts a value to write and a set of options.
-// The type of value and options must match the type expected by the cell widget.
+// It accepts a value to write.
+// The type of value must match the type expected by the cell widget.
 // If the widget type is not recognized, the function returns nil.
-func (c *Cell) Write(value any, options any) error {
+func (c *Cell) Write(value any) error {
 	switch widget := c.Widget.(type) {
 	case *text.Text:
-		return writeToTextWidget(widget, value, options)
+		return writeToTextWidget(widget, value)
 	case *gauge.Gauge:
-		return writeToGaugeWidget(widget, value, options)
+		return writeToGaugeWidget(widget, value)
 	case *segmentdisplay.SegmentDisplay:
-		return writeToSegmentWidget(widget, value, options)
+		return writeToSegmentWidget(widget, value)
 	}
 
 	return nil
 }
 
-// writeToTextWidget writes a value to a text widget.
-// It accepts a text widget, a value to write, and a set of options.
-// The value must be a string type, or an error will be returned.
-// Non-printable characters in the value string will be removed before writing to the widget.
-// The options must be of type []cell.Option, or an error will be returned.
-func writeToTextWidget(widget *text.Text, value any, options any) error {
+func writeToTextWidget(widget *text.Text, value any) error {
 	valueString, ok := value.(string)
 	if !ok {
 		return fmt.Errorf("invalid value type for text widget: %T", value)
@@ -80,73 +75,100 @@ func writeToTextWidget(widget *text.Text, value any, options any) error {
 		return nil
 	}
 
-	//optionsText, ok := options.([]cell.Option)
-	//if !ok {
-	//	return fmt.Errorf("invalid options type for text widget: %T", options)
-	//}
-
 	return widget.Write(valueString)
-
-	//return widget.Write(valueString, text.WriteCellOpts(optionsText...))
 }
 
 // writeToGaugeWidget writes a value to a gauge widget.
-// It accepts a gauge widget, a value to write, and a set of options.
-// The value must be an integer type, or an error will be returned.
-// The options must be of type []gauge.Option, or an error will be returned.
-func writeToGaugeWidget(widget *gauge.Gauge, value any, options any) error {
-	valueInt, ok := value.(int)
+// It accepts a gauge widget and a value to write.
+// The value must be a string representing an integer, or an error will be returned.
+func writeToGaugeWidget(widget *gauge.Gauge, value any) error {
+	valueString, ok := value.(string)
 	if !ok {
-		return fmt.Errorf("invalid value type for gauge widget: %T", value)
+		return fmt.Errorf("unexpected metric value type for gauge widget: %T", value)
 	}
 
-	//optionsGauge, ok := options.([]gauge.Option)
-	//if !ok {
-	//	return fmt.Errorf("invalid options type for gauge widget: %T", options)
-	//}
+	valueInt, err := utility.ParseIntFromString(valueString)
+	if err != nil {
+		return fmt.Errorf("unexpected metric value type for gauge widget: %T", value)
+	}
 
 	return widget.Percent(valueInt)
-
-	//return widget.Percent(valueInt, optionsGauge...)
 }
 
 // writeToSegmentWidget writes a value to a segment display widget.
-// It accepts a segment display widget, a value to write, and a set of options.
-// The options must be of type []segmentdisplay.WriteOption, or an error will be returned.
-func writeToSegmentWidget(widget *segmentdisplay.SegmentDisplay, value any, options any) error {
-	var segments []*segmentdisplay.TextChunk
+// It accepts a segment display widget and a value to write.
+// The value can be an integer, a string, or a slice of strings.
+// If the value is a string and it is empty, a blinking value will be used.
+// If a string in the slice is empty, a blinking value will be used for that chunk.
+func writeToSegmentWidget(widget *segmentdisplay.SegmentDisplay, value any) error {
+	capacity := widget.Capacity()
 
-	//optionsSegment, ok := options.([]segmentdisplay.WriteOption)
-	//if !ok {
-	//	return fmt.Errorf("invalid options type for segment widget: %T", options)
-	//}
+	var chunks []*segmentdisplay.TextChunk
 
 	switch v := value.(type) {
 	case int:
 		chunk := strconv.Itoa(v)
 
-		segments = append(segments, segmentdisplay.NewChunk(chunk))
+		chunk = centerOnDisplay(chunk, capacity)
 
-		//segments = append(segments, segmentdisplay.NewChunk(chunk, optionsSegment...))
+		chunks = append(chunks, segmentdisplay.NewChunk(chunk))
 	case string:
-		if v == "" {
-			v = DashboardLoadingBlinkValue()
+		chunk := v
+
+		if chunk == "" {
+			chunk = dashboardLoadingBlinkValue(capacity)
+		} else {
+			chunk = centerOnDisplay(chunk, capacity)
 		}
 
-		segments = append(segments, segmentdisplay.NewChunk(v))
-
-		//segments = append(segments, segmentdisplay.NewChunk(v, optionsSegment...))
+		chunks = append(chunks, segmentdisplay.NewChunk(chunk))
 	case []string:
 		for _, chunk := range v {
 			if chunk == "" {
-				chunk = DashboardLoadingBlinkValue()
+				chunk = dashboardLoadingBlinkValue(capacity)
 			}
 
-			segments = append(segments, segmentdisplay.NewChunk(chunk))
-
-			//segments = append(segments, segmentdisplay.NewChunk(chunk, optionsSegment[idx]))
+			chunks = append(chunks, segmentdisplay.NewChunk(chunk))
 		}
 	}
 
-	return widget.Write(segments)
+	return widget.Write(chunks)
+}
+
+// dashboardLoadingBlinkValue returns a string that represents a loading
+// animation that blinks every even second.
+//
+// The animation consists of a series of "-" characters that fill up the
+// capacity parameter, which represents the maximum length of the animation.
+// Every even second, the animation is replaced with spaces to create a
+// blinking effect.
+func dashboardLoadingBlinkValue(maxLength int) string {
+	inProgress := strings.Repeat("-", maxLength)
+	second := time.Now().Second()
+
+	if second%2 == 0 {
+		inProgress = strings.Repeat("\u0020", maxLength)
+	}
+
+	return inProgress
+}
+
+// centerOnDisplay takes a string and a number of characters and returns a centered string with empty spaces added at the end
+func centerOnDisplay(s string, numChars int) string {
+	if len(s) >= numChars {
+		return s
+	} else {
+		// Calculate the number of empty spaces to add on each side of the string
+		numSpaces := (numChars - len(s)) / 2
+		// Create the empty spaces string
+		spaces := strings.Repeat(" ", numSpaces)
+		// Concatenate the empty spaces and the original string
+		centeredString := spaces + s + spaces
+		// If the number of characters is odd, add one more space to the end
+		if (numChars - len(centeredString)) == 1 {
+			centeredString += " "
+		}
+
+		return centeredString
+	}
 }

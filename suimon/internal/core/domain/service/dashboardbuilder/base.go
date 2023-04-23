@@ -45,9 +45,10 @@ func NewBuilder(tableType enums.TableType, host host.Host, cliGateway *cligw.Gat
 		terminal:   terminal,
 		host:       host,
 		quitter: func(k *terminalapi.Keyboard) {
-			if k.Key == 'q' || k.Key == 'Q' || k.Key == keyboard.KeyEsc {
+			if k.Key == 'q' || k.Key == 'Q' || k.Key == keyboard.KeyEsc || k.Key == keyboard.KeyCtrlC {
 				terminal.Close()
 				cancel()
+
 				os.Exit(0)
 			}
 		},
