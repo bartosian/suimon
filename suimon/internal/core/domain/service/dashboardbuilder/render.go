@@ -6,13 +6,14 @@ import (
 	"time"
 
 	"github.com/mum4k/termdash"
+	termcell "github.com/mum4k/termdash/cell"
+	"golang.org/x/sync/errgroup"
 
-	domainhost "github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/dashboardbuilder/dashboards"
 )
 
 const (
-	renderInterval = 500 * time.Millisecond
+	renderInterval = 200 * time.Millisecond
 	queryInterval  = 1 * time.Second
 )
 
@@ -34,74 +35,58 @@ func (db *Builder) Render() (err error) {
 		}
 	}()
 
-	// Create a channel for error handling
-	errChan := make(chan error, 10)
-	defer close(errChan)
+	var errGroup errgroup.Group
 
 	tickerQuery := time.NewTicker(queryInterval)
 	defer tickerQuery.Stop()
 
 	// Start a goroutine for the metric retrieval loop
-	go func(host *domainhost.Host) {
+	errGroup.Go(func() error {
 		for {
 			select {
 			case <-tickerQuery.C:
-				if err := host.GetMetrics(); err != nil {
-					errChan <- err
-
-					return
+				if err := db.host.GetMetrics(); err != nil {
+					return err
 				}
 			case <-db.ctx.Done():
-				return
+				return nil
 			}
 		}
-	}(&db.host)
+	})
 
 	tickerRerender := time.NewTicker(renderInterval)
 	defer tickerRerender.Stop()
 
 	// Start a goroutine for the dashboard rendering loop
-	go func(host *domainhost.Host) {
+	errGroup.Go(func() error {
 		for {
 			select {
 			case <-tickerRerender.C:
-				columns := dashboards.GetNodeColumnValues(host)
+				columns := dashboards.GetNodeColumnValues(db.host)
 
 				for columnName, cell := range db.cells {
 					columnValue, ok := columns[columnName]
 					if !ok {
-						errChan <- fmt.Errorf("failed to get metric for column %s", columnName)
-
-						return
+						return fmt.Errorf("failed to get metric for column %s", columnName)
 					}
 
-					// Write the new data to the cell
-					if err := cell.Write(columnValue); err != nil {
-						errChan <- err
-
-						return
+					if err := cell.Write(columnValue, []termcell.Option{termcell.FgColor(termcell.ColorDefault)}); err != nil {
+						return err
 					}
 				}
 			case <-db.ctx.Done():
-				return
+				return nil
 			}
 		}
-	}(&db.host)
+	})
 
 	// Display the dashboard on the terminal and handle errors
 	if err := termdash.Run(
 		db.ctx, db.terminal, db.dashboard,
 		termdash.KeyboardSubscriber(db.quitter),
-		termdash.RedrawInterval(renderInterval),
 	); err != nil {
 		return fmt.Errorf("failed to run terminal dashboard: %w", err)
 	}
 
-	// Check for errors from the ticker loop
-	select {
-	case err := <-errChan:
-		return err
-	case <-db.ctx.Done():
-		return nil
-	}
+	return errGroup.Wait()
 }

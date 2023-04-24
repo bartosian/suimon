@@ -1,12 +1,11 @@
 package metrics
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
 	"strconv"
-
-	"encoding/json"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
@@ -33,18 +32,18 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 	case enums.MetricTypeSuiSystemState:
 		return metrics.SetSystemStateValue(value)
 	case enums.MetricTypeTotalTransactionBlocks:
-		switch v := value.(type) {
-		case string:
-			valueInt, err := strconv.Atoi(v)
-			if err != nil {
-				return err
-			}
-
-			metrics.TotalTransactionsBlocks = valueInt
-			metrics.CalculateTPS()
-		default:
+		v, ok := value.(string)
+		if !ok {
 			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
+
+		valueInt, err := strconv.Atoi(v)
+		if err != nil {
+			return err
+		}
+
+		metrics.TotalTransactionsBlocks = valueInt
+		metrics.CalculateTPS()
 	case enums.MetricTypeTotalTransactionCertificates:
 		valueFloat, ok := value.(float64)
 		if !ok {
@@ -360,7 +359,6 @@ func (metrics *Metrics) CalculateTPS() {
 		transactionsHistory = metrics.TransactionsHistory
 		transactionsStart   int
 		transactionsEnd     int
-		tps                 int
 	)
 
 	transactionsHistory = append(transactionsHistory, metrics.TotalTransactionsBlocks)
@@ -376,10 +374,9 @@ func (metrics *Metrics) CalculateTPS() {
 
 	transactionsStart = transactionsHistory[0]
 	transactionsEnd = transactionsHistory[TransactionsPerSecondWindow-1]
-	tps = (transactionsEnd - transactionsStart) / TransactionsPerSecondWindow
 
 	metrics.TransactionsHistory = transactionsHistory
-	metrics.TransactionsPerSecond = tps
+	metrics.TransactionsPerSecond = transactionsEnd - transactionsStart
 }
 
 // CalculateCPS calculates the current checkpoints per second (CPS) based on the number of checkpoints generated
@@ -389,7 +386,6 @@ func (metrics *Metrics) CalculateCPS() {
 		checkpointsHistory = metrics.CheckpointsHistory
 		checkpointsStart   int
 		checkpointsEnd     int
-		cps                int
 	)
 
 	checkpointsHistory = append(checkpointsHistory, metrics.HighestSyncedCheckpoint)
@@ -405,10 +401,9 @@ func (metrics *Metrics) CalculateCPS() {
 
 	checkpointsStart = checkpointsHistory[0]
 	checkpointsEnd = checkpointsHistory[CheckpointsPerSecondWindow-1]
-	cps = (checkpointsEnd - checkpointsStart) / CheckpointsPerSecondWindow
 
 	metrics.CheckpointsHistory = checkpointsHistory
-	metrics.CheckpointsPerSecond = cps
+	metrics.CheckpointsPerSecond = checkpointsEnd - checkpointsStart
 }
 
 // IsHealthy checks if the given metric's value satisfies the threshold defined for it.

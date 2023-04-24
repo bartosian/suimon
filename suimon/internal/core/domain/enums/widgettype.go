@@ -6,4 +6,5 @@ const (
 	WidgetTypeProgress WidgetType = iota
 	WidgetTypeTextNoScroll
 	WidgetTypeDisplay
+	WidgetTypeSparkLine
 )

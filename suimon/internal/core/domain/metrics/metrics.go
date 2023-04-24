@@ -1,8 +1,8 @@
 package metrics
 
 const (
-	TransactionsPerSecondWindow     = 10
-	CheckpointsPerSecondWindow      = 10
+	TransactionsPerSecondWindow     = 5
+	CheckpointsPerSecondWindow      = 5
 	TransactionsPerSecondLag        = 5
 	TotalTransactionsLag            = 100
 	CheckpointsPerSecondLag         = 10

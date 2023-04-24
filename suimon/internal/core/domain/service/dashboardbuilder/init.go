@@ -47,7 +47,7 @@ func (db *Builder) Init() (err error) {
 	}
 
 	rowsConfig := dashboards.GetRowsConfig(db.tableType)
-	rows, err := dashboards.GetRows(rowsConfig, columns)
+	rows, err := dashboards.GetRows(rowsConfig, cells, columns)
 	if err != nil {
 		return err
 	}

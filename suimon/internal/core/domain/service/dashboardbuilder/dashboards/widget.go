@@ -26,6 +26,8 @@ func newWidgetOfType(widgetType enums.WidgetType) (widgetapi.Widget, error) {
 		return newTextNoScrollWidget()
 	case enums.WidgetTypeDisplay:
 		return newDisplayWidget()
+	case enums.WidgetTypeSparkLine:
+		return newSparklineWidget()
 	default:
 		return nil, fmt.Errorf("invalid widget type: %d", widgetType)
 	}
@@ -61,6 +63,25 @@ func newWidgetByColumnName(columnName enums.ColumnName) (widgetapi.Widget, error
 		}
 
 		return widget, nil
+	case enums.ColumnNameCheckpointsPerSecond, enums.ColumnNameTransactionsPerSecond:
+		widget, err := newWidgetOfType(enums.WidgetTypeSparkLine)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize text widget for %s: %w", columnName, err)
+		}
+
+		sparkLineWidget := widget.(*sparkline.SparkLine)
+
+		color := cell.ColorGreen
+
+		if columnName == enums.ColumnNameTransactionsPerSecond {
+			color = cell.ColorBlue
+		}
+
+		if err = sparkLineWidget.Add([]int{100}, sparkline.Color(color)); err != nil {
+			return nil, fmt.Errorf("failed to set initial value for %s: %w", columnName, err)
+		}
+
+		return widget, nil
 	default:
 		widget, err := newWidgetOfType(enums.WidgetTypeDisplay)
 		if err != nil {
@@ -91,7 +112,7 @@ func newProgressWidget() (*gauge.Gauge, error) {
 		gauge.EmptyTextColor(cell.ColorWhite),
 		gauge.HorizontalTextAlign(align.HorizontalCenter),
 		gauge.VerticalTextAlign(align.VerticalMiddle),
-		gauge.Threshold(99, linestyle.Double, cell.FgColor(cell.ColorGreen), cell.Bold()),
+		gauge.Threshold(99, linestyle.Double, cell.FgColor(cell.ColorRed), cell.Bold()),
 	)
 }
 
@@ -110,23 +131,13 @@ func newTextNoScrollWidget() (*text.Text, error) {
 // newDonutWidget initializes a new donut widget with the given color.
 // It returns the new widget and an error, if any.
 func newDonutWidget(color cell.Color) (*donut.Donut, error) {
-	return donut.New(
-		donut.CellOpts(
-			cell.FgColor(color),
-			cell.Bold(),
-		),
-	)
+	return donut.New(donut.CellOpts(cell.FgColor(color), cell.Bold()))
 }
 
 // newSparklineWidget initializes a new sparkline widget with the given label and color.
 // It returns the new widget and an error, if any.
-func newSparklineWidget(label string, color cell.Color) (*sparkline.SparkLine, error) {
-	return sparkline.New(
-		sparkline.Label(
-			label,
-			cell.FgColor(color),
-		),
-	)
+func newSparklineWidget() (*sparkline.SparkLine, error) {
+	return sparkline.New()
 }
 
 // newDisplayWidget initializes a new segment display widget with default options.

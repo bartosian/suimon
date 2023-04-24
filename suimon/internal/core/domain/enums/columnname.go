@@ -2,51 +2,78 @@ package enums
 
 type ColumnName string
 
+// Overview section
 const (
-	ColumnNameIndex                                       ColumnName = "IDX"
-	ColumnNameHealth                                      ColumnName = "HEALTH"
-	ColumnNameAddress                                     ColumnName = "ADDRESS"
-	ColumnNamePortRPC                                     ColumnName = "RPC"
-	ColumnNameUptime                                      ColumnName = "UPTIME DAYS"
-	ColumnNameVersion                                     ColumnName = "VERSION"
-	ColumnNameCommit                                      ColumnName = "COMMIT"
-	ColumnNameCountry                                     ColumnName = "COUNTRY"
-	ColumnNameTotalTransactionBlocks                      ColumnName = "TOTAL TX\nBLOCKS"
-	ColumnNameTotalTransactionCertificates                ColumnName = "TOTAL TX\nCERTIFICATES"
-	ColumnNameTotalTransactionEffects                     ColumnName = "TOTAL TX\nEFFECTS"
-	ColumnNameTXSyncPercentage                            ColumnName = "TX SYNC PCT"
-	ColumnNameLatestCheckpoint                            ColumnName = "LATEST\nCHECKPOINT"
-	ColumnNameHighestKnownCheckpoint                      ColumnName = "HIGHEST KNOWN\nCHECKPOINT"
-	ColumnNameLastExecutedCheckpoint                      ColumnName = "LAST EXECUTED\nCHECKPOINT"
-	ColumnNameHighestSyncedCheckpoint                     ColumnName = "HIGHEST SYNCED\nCHECKPOINT"
-	ColumnNameCheckpointExecBacklog                       ColumnName = "CHECKPOINT\nEXEC BACKLOG"
-	ColumnNameCheckpointSyncBacklog                       ColumnName = "CHECKPOINT\nSYNC BACKLOG"
-	ColumnNameCheckSyncPercentage                         ColumnName = "CHECKPOINT\nSYNC PCT"
+	ColumnNameIndex   ColumnName = "IDX"
+	ColumnNameHealth  ColumnName = "HEALTH"
+	ColumnNameAddress ColumnName = "ADDRESS"
+	ColumnNamePortRPC ColumnName = "RPC"
+	ColumnNameUptime  ColumnName = "UPTIME DAYS"
+	ColumnNameVersion ColumnName = "VERSION"
+	ColumnNameCommit  ColumnName = "COMMIT"
+	ColumnNameCountry ColumnName = "COUNTRY"
+)
+
+// Transactions section
+const (
+	ColumnNameTotalTransactionBlocks                  ColumnName = "TOTAL TX\nBLOCKS"
+	ColumnNameTotalTransactionCertificates            ColumnName = "TOTAL TX\nCERTIFICATES"
+	ColumnNameTotalTransactionEffects                 ColumnName = "TOTAL TX\nEFFECTS"
+	ColumnNameTXSyncPercentage                        ColumnName = "TX SYNC PCT"
+	ColumnNameSkippedConsensusTransactions            ColumnName = "SKIPPED\nCONSENSUS TX"
+	ColumnNameCertificatesCreated                     ColumnName = "CERTIFICATES\nCREATED"
+	ColumnNameHandleCertificateNonConsensusLatencySum ColumnName = "CERTIFICATE\nNON CONSENSUS LATENCY"
+	ColumnNameTotalSignatureErrors                    ColumnName = "SIGNATURE\nERRORS"
+	ColumnNameTransactionsPerSecond                   ColumnName = "TRANSACTIONS PER SECOND"
+)
+
+// Checkpoints section
+const (
+	ColumnNameLatestCheckpoint        ColumnName = "LATEST\nCHECKPOINT"
+	ColumnNameHighestKnownCheckpoint  ColumnName = "HIGHEST KNOWN\nCHECKPOINT"
+	ColumnNameLastExecutedCheckpoint  ColumnName = "LAST EXECUTED\nCHECKPOINT"
+	ColumnNameHighestSyncedCheckpoint ColumnName = "HIGHEST SYNCED\nCHECKPOINT"
+	ColumnNameCheckpointExecBacklog   ColumnName = "CHECKPOINT\nEXEC BACKLOG"
+	ColumnNameCheckpointSyncBacklog   ColumnName = "CHECKPOINT\nSYNC BACKLOG"
+	ColumnNameCheckSyncPercentage     ColumnName = "CHECKPOINT\nSYNC PCT"
+	ColumnNameCheckpointsPerSecond    ColumnName = "CHECKPOINTS PER SECOND"
+)
+
+// Rounds section
+const (
+	ColumnNameCurrentRound          ColumnName = "CURRENT\nROUND"
+	ColumnNameHighestProcessedRound ColumnName = "HIGHEST\nPROCESSED ROUND"
+	ColumnNameLastCommittedRound    ColumnName = "LAST COMMITTED\nROUND"
+)
+
+// Peers section
+const (
+	ColumnNameNetworkPeers        ColumnName = "NETWORK\nPEERS"
+	ColumnNamePrimaryNetworkPeers ColumnName = "PRIMARY\nNETWORK PEERS"
+	ColumnNameWorkerNetworkPeers  ColumnName = "WORKER\nNETWORK PEERS"
+)
+
+// Validator section
+const (
+	ColumnNameValidatorName                     ColumnName = "NAME"
+	ColumnNameValidatorNetAddress               ColumnName = "NET ADDRESS"
+	ColumnNameValidatorVotingPower              ColumnName = "VOTING\nPOWER"
+	ColumnNameValidatorGasPrice                 ColumnName = "GAS\nPRICE"
+	ColumnNameValidatorCommissionRate           ColumnName = "COMMISSION\nRATE"
+	ColumnNameValidatorNextEpochStake           ColumnName = "NEXT EPOCH STAKE"
+	ColumnNameValidatorNextEpochGasPrice        ColumnName = "NEXT EPOCH GAS\nPRICE"
+	ColumnNameValidatorNextEpochCommissionRate  ColumnName = "NEXT EPOCH\nCOMMISSION RATE"
+	ColumnNameValidatorStakingPoolSuiBalance    ColumnName = "STAKING POOL SUI\nBALANCE"
+	ColumnNameValidatorRewardsPool              ColumnName = "REWARDS POOL"
+	ColumnNameValidatorPoolTokenBalance         ColumnName = "POOL TOKEN\nBALANCE"
+	ColumnNameValidatorPendingStake             ColumnName = "PENDING STAKE"
+	ColumnNameValidatorPendingTotalSuiWithdraw  ColumnName = "PENDING TOTAL\nSUI WITHDRAW"
+	ColumnNameValidatorPendingPoolTokenWithdraw ColumnName = "PENDING POOL\nTOKEN WITHDRAW"
+)
+
+// System State section
+const (
 	ColumnNameCurrentEpoch                                ColumnName = "CURRENT\nEPOCH"
-	ColumnNameNetworkPeers                                ColumnName = "NETWORK\nPEERS"
-	ColumnNamePrimaryNetworkPeers                         ColumnName = "PRIMARY\nNETWORK PEERS"
-	ColumnNameWorkerNetworkPeers                          ColumnName = "WORKER\nNETWORK PEERS"
-	ColumnNameCurrentRound                                ColumnName = "CURRENT\nROUND"
-	ColumnNameHighestProcessedRound                       ColumnName = "HIGHEST\nPROCESSED ROUND"
-	ColumnNameLastCommittedRound                          ColumnName = "LAST COMMITTED\nROUND"
-	ColumnNameSkippedConsensusTransactions                ColumnName = "SKIPPED\nCONSENSUS TX"
-	ColumnNameTotalSignatureErrors                        ColumnName = "SIGNATURE\nERRORS"
-	ColumnNameCertificatesCreated                         ColumnName = "CERTIFICATES\nCREATED"
-	ColumnNameHandleCertificateNonConsensusLatencySum     ColumnName = "CERTIFICATE\nNON CONSENSUS LATENCY"
-	ColumnNameValidatorName                               ColumnName = "NAME"
-	ColumnNameValidatorNetAddress                         ColumnName = "NET ADDRESS"
-	ColumnNameValidatorVotingPower                        ColumnName = "VOTING\nPOWER"
-	ColumnNameValidatorGasPrice                           ColumnName = "GAS\nPRICE"
-	ColumnNameValidatorCommissionRate                     ColumnName = "COMMISSION\nRATE"
-	ColumnNameValidatorNextEpochStake                     ColumnName = "NEXT EPOCH STAKE"
-	ColumnNameValidatorNextEpochGasPrice                  ColumnName = "NEXT EPOCH GAS\nPRICE"
-	ColumnNameValidatorNextEpochCommissionRate            ColumnName = "NEXT EPOCH\nCOMMISSION RATE"
-	ColumnNameValidatorStakingPoolSuiBalance              ColumnName = "STAKING POOL SUI\nBALANCE"
-	ColumnNameValidatorRewardsPool                        ColumnName = "REWARDS POOL"
-	ColumnNameValidatorPoolTokenBalance                   ColumnName = "POOL TOKEN\nBALANCE"
-	ColumnNameValidatorPendingStake                       ColumnName = "PENDING STAKE"
-	ColumnNameValidatorPendingTotalSuiWithdraw            ColumnName = "PENDING TOTAL\nSUI WITHDRAW"
-	ColumnNameValidatorPendingPoolTokenWithdraw           ColumnName = "PENDING POOL\nTOKEN WITHDRAW"
 	ColumnNameSystemEpoch                                 ColumnName = "EPOCH"
 	ColumnNameSystemEpochStartTimestamp                   ColumnName = "EPOCH START TIME UTC"
 	ColumnNameSystemEpochDuration                         ColumnName = "EPOCH\nDURATION"

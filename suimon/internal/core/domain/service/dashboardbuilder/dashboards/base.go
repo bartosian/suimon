@@ -3,15 +3,19 @@ package dashboards
 import (
 	"fmt"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/mum4k/termdash/align"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/linestyle"
+
+	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
-const dashboardName = "💧 SUIMON: PRESS Q or ESC TO QUIT"
+const (
+	dashboardName  = "💧 SUIMON: PRESS Q or ESC TO QUIT"
+	emptyRowHeight = 1
+)
 
 var (
 	DashboardConfigDefault = []container.Option{
@@ -33,7 +37,6 @@ var (
 		container.AlignHorizontal(align.HorizontalCenter),
 		container.TitleColor(cell.ColorRed),
 		container.FocusedColor(cell.ColorWhite),
-		container.FocusedColor(cell.ColorBlue),
 	}
 )
 
@@ -85,27 +88,32 @@ func GetColumns(columnsConfig ColumnsConfig, cells Cells) (Columns, error) {
 	return columns, nil
 }
 
-// GetRows returns a slice of Rows based on the given RowsConfig and Columns.
-func GetRows(rowsConfig RowsConfig, columns Columns) (Rows, error) {
-	rows := make(Rows, len(rowsConfig)+1)
+// GetRows creates a new set of rows based on the configuration provided.
+// It accepts a RowsConfig object that specifies the height and columns for each row,
+// a Cells object that maps cell names to cell objects,
+// and a Columns object that maps column names to column objects.
+// It returns a Rows object and an error. The Rows object is a slice of Row objects,
+// where each Row object represents a row in the terminal grid.
+func GetRows(rowsConfig RowsConfig, cells Cells, columns Columns) (Rows, error) {
+	rows := make(Rows, 0, len(rowsConfig))
 
-	for rowIdx, rowConfig := range rowsConfig {
-		rowColumns := make([]grid.Element, len(rowConfig.Columns)+1)
+	for _, rowConfig := range rowsConfig {
+		rowColumns := make([]grid.Element, 0, len(rowConfig.Columns))
 
-		for columnIdx, columnName := range rowConfig.Columns {
+		for _, columnName := range rowConfig.Columns {
 			column, ok := columns[columnName]
 			if !ok {
 				return nil, fmt.Errorf("failed to get column %s", columnName)
 			}
 
-			rowColumns[columnIdx] = column
+			rowColumns = append(rowColumns, column)
 		}
 
-		rows[rowIdx] = NewRowPct(rowConfig.Height, rowColumns...)
+		rows = append(rows, NewRowPct(rowConfig.Height, rowColumns...))
 	}
 
 	// add empty row to limit last row height
-	rows = append(rows, NewRowPct(1))
+	rows = append(rows, NewRowPct(emptyRowHeight))
 
 	return rows, nil
 }

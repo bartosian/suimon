@@ -6,12 +6,6 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 )
 
-const (
-	TableNoData    = "no data"
-	EmptyValue     = ""
-	RpcPortDefault = "9000"
-)
-
 // ColumnsConfig is a type that maps column names to their respective widths.
 type ColumnsConfig map[enums.ColumnName]int
 
