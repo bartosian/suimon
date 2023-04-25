@@ -1,6 +1,7 @@
 package tables
 
 import (
+	"fmt"
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
@@ -99,7 +100,7 @@ var (
 			enums.ColumnNameSystemAtRiskValidatorNumberOfEpochs,
 		},
 	}
-	
+
 	RowsConfigValidatorReports = RowsConfig{
 		0: {
 			enums.ColumnNameSystemValidatorReportedName,
@@ -121,7 +122,7 @@ func GetSystemStateColumnValues(metrics *metrics.Metrics) (map[enums.ColumnName]
 		enums.ColumnNameSystemEpoch:                                 systemState.Epoch,
 		enums.ColumnNameSystemEpochStartTimestamp:                   metrics.EpochStartTimeUTC,
 		enums.ColumnNameSystemEpochDuration:                         metrics.EpochDurationHHMM,
-		enums.ColumnNameSystemTimeTillNextEpoch:                     metrics.DurationTillEpochEndHHMM,
+		enums.ColumnNameSystemTimeTillNextEpoch:                     fmt.Sprintf("%s HH:MM", metrics.DurationTillEpochEndHHMM),
 		enums.ColumnNameSystemTotalStake:                            systemState.TotalStake,
 		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  systemState.StorageFundTotalObjectStorageRebates,
 		enums.ColumnNameSystemStorageFundNonRefundableBalance:       systemState.StorageFundNonRefundableBalance,

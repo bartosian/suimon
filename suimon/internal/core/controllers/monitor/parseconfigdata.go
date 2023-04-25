@@ -24,6 +24,7 @@ func (c *Controller) ParseConfigData(monitorType enums.MonitorType) error {
 			enums.TableTypeValidatorsAtRisk:   true,
 			enums.TableTypeGasPriceAndSubsidy: true,
 			enums.TableTypeValidatorsCounts:   true,
+			enums.TableTypeRPC:                true,
 		}
 
 		tablesToParse []enums.TableType
@@ -33,21 +34,12 @@ func (c *Controller) ParseConfigData(monitorType enums.MonitorType) error {
 	case enums.MonitorTypeStatic:
 		tablesToParse = make([]enums.TableType, 0, len(c.selectedTables))
 
-		var systemTableAdded bool
-
 		for _, table := range c.selectedTables {
 			if _, ok := systemTables[table]; ok {
-				if systemTableAdded {
-					continue
-				}
-
-				systemTableAdded = true
-				table = enums.TableTypeGasPriceAndSubsidy
+				continue
 			}
 
-			if table != enums.TableTypeRPC {
-				tablesToParse = append(tablesToParse, table)
-			}
+			tablesToParse = append(tablesToParse, table)
 		}
 	case enums.MonitorTypeDynamic:
 		tablesToParse = []enums.TableType{c.selectedDashboard}
@@ -62,18 +54,14 @@ func (c *Controller) ParseConfigData(monitorType enums.MonitorType) error {
 	var wg sync.WaitGroup
 
 	for _, tableType := range tablesToParse {
+		if tableType == enums.TableTypeGasPriceAndSubsidy {
+			continue
+		}
+
 		wg.Add(1)
 
 		go func(table enums.TableType) {
 			defer wg.Done()
-
-			if table == enums.TableTypeGasPriceAndSubsidy {
-				if err := c.hosts.rpc[0].GetDataByMetric(enums.RPCMethodGetSuiSystemState); err != nil {
-					errChan <- err
-				}
-
-				return
-			}
 
 			if err := c.getHostsData(table); err != nil {
 				errChan <- err

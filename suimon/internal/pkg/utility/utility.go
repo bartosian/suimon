@@ -203,7 +203,7 @@ func DurationToHoursAndMinutes(duration time.Duration) string {
 	hours := int64(duration.Hours())
 	minutes := int64(duration.Minutes()) % 60
 
-	return fmt.Sprintf("%02d:%02d HH:MM", hours, minutes)
+	return fmt.Sprintf("%02d:%02d", hours, minutes)
 }
 
 // GetDurationTillTime calculates the duration between a specified start time and the current time and returns it as a time.Duration value.

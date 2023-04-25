@@ -8,7 +8,7 @@ const (
 	TableTypeValidator          TableType = "🤖 VALIDATORS"
 	TableTypePeers              TableType = "🤝 PEERS"
 	TableTypeGasPriceAndSubsidy TableType = "💰 EPOCH, GAS PRICE AND SUBSIDY"
-	TableTypeValidatorsCounts   TableType = "📊 VALIDATORS STATISTICS"
+	TableTypeValidatorsCounts   TableType = "📊 VALIDATORS COUNTS AND THRESHOLDS"
 	TableTypeValidatorsAtRisk   TableType = "🚨 VALIDATORS AT RISK"
 	TableTypeValidatorReports   TableType = "📢 VALIDATORS REPORTS"
 	TableTypeActiveValidators   TableType = "✅ ACTIVE VALIDATORS"

@@ -15,6 +15,7 @@ var (
 		enums.ColumnNamePortRPC:                NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameTotalTransactionBlocks: NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameLatestCheckpoint:       NewDefaultColumnConfig(text.AlignLeft, text.AlignLeft, false),
+		enums.ColumnNameCurrentEpoch:           NewDefaultColumnConfig(text.AlignLeft, text.AlignLeft, false),
 	}
 	RowsConfigRPC = RowsConfig{
 		0: {
@@ -24,6 +25,7 @@ var (
 			enums.ColumnNamePortRPC,
 			enums.ColumnNameTotalTransactionBlocks,
 			enums.ColumnNameLatestCheckpoint,
+			enums.ColumnNameCurrentEpoch,
 		},
 	}
 )
@@ -46,5 +48,6 @@ func GetRPCColumnValues(idx int, host host.Host) ColumnValues {
 		enums.ColumnNamePortRPC:                port,
 		enums.ColumnNameTotalTransactionBlocks: host.Metrics.TotalTransactionsBlocks,
 		enums.ColumnNameLatestCheckpoint:       host.Metrics.LatestCheckpoint,
+		enums.ColumnNameCurrentEpoch:           host.Metrics.SystemState.Epoch,
 	}
 }

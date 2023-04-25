@@ -14,7 +14,7 @@ import (
 
 const (
 	renderInterval = 200 * time.Millisecond
-	queryInterval  = 1 * time.Second
+	queryInterval  = 2 * time.Second
 )
 
 // Render displays the dashboard on the terminal and updates the cells with new data periodically.

@@ -164,7 +164,7 @@ func (host *Host) GetPrometheusMetrics() error {
 func (host *Host) GetMetrics() error {
 	var errGroup errgroup.Group
 
-	rpcMethods := []enums.RPCMethod{enums.RPCMethodGetTotalTransactionBlocks, enums.RPCMethodGetLatestCheckpointSequenceNumber}
+	rpcMethods := []enums.RPCMethod{enums.RPCMethodGetTotalTransactionBlocks, enums.RPCMethodGetLatestCheckpointSequenceNumber, enums.RPCMethodGetSuiSystemState}
 
 	switch host.TableType {
 	case enums.TableTypeNode, enums.TableTypePeers:

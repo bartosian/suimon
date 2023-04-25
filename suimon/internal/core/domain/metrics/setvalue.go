@@ -291,19 +291,19 @@ func (metrics *Metrics) setEpochMetrics() error {
 		return err
 	}
 
+	metrics.EpochStartTimeUTC = utility.FormatDate(*epochStart, utcTimeZone)
+
 	epochDuration, err := utility.StringMsToDuration(systemState.EpochDurationMs)
 	if err != nil {
 		return err
 	}
 
-	durationTillEpochEnd, err := utility.GetDurationTillTime(*epochStart, epochDuration)
-	if err != nil {
-		return err
-	}
-
-	metrics.EpochStartTimeUTC = utility.FormatDate(*epochStart, utcTimeZone)
 	metrics.EpochDurationHHMM = utility.DurationToHoursAndMinutes(epochDuration)
-	metrics.DurationTillEpochEndHHMM = utility.DurationToHoursAndMinutes(durationTillEpochEnd)
+
+	durationTillEpochEnd, err := utility.GetDurationTillTime(*epochStart, epochDuration)
+	if err == nil {
+		metrics.DurationTillEpochEndHHMM = utility.DurationToHoursAndMinutes(durationTillEpochEnd)
+	}
 
 	return nil
 }
