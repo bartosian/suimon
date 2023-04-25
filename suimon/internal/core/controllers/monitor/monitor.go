@@ -144,6 +144,7 @@ func (c *Controller) selectDynamicDashboard() (*enums.TableType, error) {
 	dashboardTypeChoiceList := cligw.NewSimpleSelectChoiceList(
 		string(enums.TableTypeNode),
 		string(enums.TableTypeValidator),
+		string(enums.TableTypeRPC),
 	)
 
 	selectedDashboardType, err := c.gateways.cli.SelectOne("Which dashboard do you want to render?", dashboardTypeChoiceList)
