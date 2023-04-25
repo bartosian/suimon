@@ -18,16 +18,16 @@ import (
 
 // newWidgetOfType initializes a new widget of the given type.
 // It returns the new widget and an error, if any.
-func newWidgetOfType(widgetType enums.WidgetType) (widgetapi.Widget, error) {
+func newWidgetOfType(widgetType enums.WidgetType, color cell.Color) (widgetapi.Widget, error) {
 	switch widgetType {
 	case enums.WidgetTypeProgress:
-		return newProgressWidget()
+		return newProgressWidget(color)
 	case enums.WidgetTypeTextNoScroll:
 		return newTextNoScrollWidget()
 	case enums.WidgetTypeDisplay:
 		return newDisplayWidget()
 	case enums.WidgetTypeSparkLine:
-		return newSparklineWidget()
+		return newSparklineWidget(color)
 	default:
 		return nil, fmt.Errorf("invalid widget type: %d", widgetType)
 	}
@@ -35,10 +35,10 @@ func newWidgetOfType(widgetType enums.WidgetType) (widgetapi.Widget, error) {
 
 // newWidgetByColumnName initializes a new widget based on the given column name.
 // It returns the new widget and an error, if any.
-func newWidgetByColumnName(columnName enums.ColumnName) (widgetapi.Widget, error) {
+func newWidgetByColumnName(columnName enums.ColumnName, color cell.Color) (widgetapi.Widget, error) {
 	switch columnName {
 	case enums.ColumnNameTXSyncPercentage, enums.ColumnNameCheckSyncPercentage:
-		widget, err := newWidgetOfType(enums.WidgetTypeProgress)
+		widget, err := newWidgetOfType(enums.WidgetTypeProgress, color)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize gauge widget for %s: %w", columnName, err)
 		}
@@ -51,7 +51,7 @@ func newWidgetByColumnName(columnName enums.ColumnName) (widgetapi.Widget, error
 
 		return widget, nil
 	case enums.ColumnNameHealth:
-		widget, err := newWidgetOfType(enums.WidgetTypeTextNoScroll)
+		widget, err := newWidgetOfType(enums.WidgetTypeTextNoScroll, color)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize text widget for %s: %w", columnName, err)
 		}
@@ -64,33 +64,20 @@ func newWidgetByColumnName(columnName enums.ColumnName) (widgetapi.Widget, error
 
 		return widget, nil
 	case enums.ColumnNameCheckpointsPerSecond, enums.ColumnNameTransactionsPerSecond, enums.ColumnNameRoundsPerSecond, enums.ColumnNameCertificatesPerSecond:
-		widget, err := newWidgetOfType(enums.WidgetTypeSparkLine)
+		widget, err := newWidgetOfType(enums.WidgetTypeSparkLine, color)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize text widget for %s: %w", columnName, err)
 		}
 
 		sparkLineWidget := widget.(*sparkline.SparkLine)
 
-		var color cell.Color
-
-		switch columnName {
-		case enums.ColumnNameTransactionsPerSecond:
-			color = cell.ColorBlue
-		case enums.ColumnNameCheckpointsPerSecond:
-			color = cell.ColorYellow
-		case enums.ColumnNameRoundsPerSecond:
-			color = cell.ColorGreen
-		case enums.ColumnNameCertificatesPerSecond:
-			color = cell.ColorRed
-		}
-
-		if err = sparkLineWidget.Add([]int{0}, sparkline.Color(color)); err != nil {
+		if err = sparkLineWidget.Add([]int{0}); err != nil {
 			return nil, fmt.Errorf("failed to set initial value for %s: %w", columnName, err)
 		}
 
 		return widget, nil
 	default:
-		widget, err := newWidgetOfType(enums.WidgetTypeDisplay)
+		widget, err := newWidgetOfType(enums.WidgetTypeDisplay, color)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize segment display widget for %s: %w", columnName, err)
 		}
@@ -110,11 +97,11 @@ func newWidgetByColumnName(columnName enums.ColumnName) (widgetapi.Widget, error
 
 // newProgressWidget initializes a new progress widget with the given options.
 // It returns the new widget and an error, if any.
-func newProgressWidget() (*gauge.Gauge, error) {
+func newProgressWidget(color cell.Color) (*gauge.Gauge, error) {
 	return gauge.New(
 		gauge.Height(4),
-		gauge.Border(linestyle.Light, cell.FgColor(cell.ColorGreen)),
-		gauge.Color(cell.ColorGreen),
+		gauge.Border(linestyle.Light, cell.FgColor(color)),
+		gauge.Color(color),
 		gauge.FilledTextColor(cell.ColorBlack),
 		gauge.EmptyTextColor(cell.ColorWhite),
 		gauge.HorizontalTextAlign(align.HorizontalCenter),
@@ -143,8 +130,8 @@ func newDonutWidget(color cell.Color) (*donut.Donut, error) {
 
 // newSparklineWidget initializes a new sparkline widget with the given label and color.
 // It returns the new widget and an error, if any.
-func newSparklineWidget() (*sparkline.SparkLine, error) {
-	return sparkline.New()
+func newSparklineWidget(color cell.Color) (*sparkline.SparkLine, error) {
+	return sparkline.New(sparkline.Color(color))
 }
 
 // newDisplayWidget initializes a new segment display widget with default options.

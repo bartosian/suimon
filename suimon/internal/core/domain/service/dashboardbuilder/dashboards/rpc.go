@@ -3,6 +3,7 @@ package dashboards
 import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
+	"github.com/mum4k/termdash/cell"
 )
 
 var (
@@ -27,10 +28,10 @@ var (
 	}
 
 	CellsConfigRPC = CellsConfig{
-		enums.ColumnNameCurrentEpoch:            "CURRENT EPOCH",
-		enums.ColumnNameSystemTimeTillNextEpoch: "TIME TILL NEXT EPOCH",
-		enums.ColumnNameTotalTransactionBlocks:  "TOTAL TRANSACTION BLOCKS",
-		enums.ColumnNameLatestCheckpoint:        "LATEST CHECKPOINT",
+		enums.ColumnNameCurrentEpoch:            {"CURRENT EPOCH", cell.ColorGreen},
+		enums.ColumnNameSystemTimeTillNextEpoch: {"TIME TILL NEXT EPOCH", cell.ColorGreen},
+		enums.ColumnNameTotalTransactionBlocks:  {"TOTAL TRANSACTION BLOCKS", cell.ColorYellow},
+		enums.ColumnNameLatestCheckpoint:        {"LATEST CHECKPOINT", cell.ColorBlue},
 	}
 )
 

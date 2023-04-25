@@ -9,7 +9,7 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
 )
 
-const httpClientTimeout = 4 * time.Second
+const httpClientTimeout = 3 * time.Second
 
 type Gateway struct {
 	ctx        context.Context

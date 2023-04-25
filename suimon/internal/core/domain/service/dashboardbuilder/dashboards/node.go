@@ -3,6 +3,8 @@ package dashboards
 import (
 	"fmt"
 
+	"github.com/mum4k/termdash/cell"
+
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
 )
@@ -57,56 +59,56 @@ var (
 		2: {
 			Height: 14,
 			Columns: []enums.ColumnName{
-				enums.ColumnNameTotalTransactionBlocks,
-				enums.ColumnNameTotalTransactionCertificates,
-				enums.ColumnNameTotalTransactionEffects,
-			},
-		},
-		3: {
-			Height: 14,
-			Columns: []enums.ColumnName{
-				enums.ColumnNameTXSyncPercentage,
-				enums.ColumnNameTransactionsPerSecond,
-			},
-		},
-		4: {
-			Height: 14,
-			Columns: []enums.ColumnName{
 				enums.ColumnNameLatestCheckpoint,
 				enums.ColumnNameHighestKnownCheckpoint,
 				enums.ColumnNameHighestSyncedCheckpoint,
 				enums.ColumnNameLastExecutedCheckpoint,
 			},
 		},
-		5: {
+		3: {
 			Height: 14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameCheckSyncPercentage,
 				enums.ColumnNameCheckpointsPerSecond,
 			},
 		},
+		4: {
+			Height: 14,
+			Columns: []enums.ColumnName{
+				enums.ColumnNameTotalTransactionBlocks,
+				enums.ColumnNameTotalTransactionCertificates,
+				enums.ColumnNameTotalTransactionEffects,
+			},
+		},
+		5: {
+			Height: 14,
+			Columns: []enums.ColumnName{
+				enums.ColumnNameTXSyncPercentage,
+				enums.ColumnNameTransactionsPerSecond,
+			},
+		},
 	}
 
 	CellsConfigNode = CellsConfig{
-		enums.ColumnNameTotalTransactionBlocks:       "TOTAL TRANSACTION BLOCKS",
-		enums.ColumnNameLatestCheckpoint:             "LATEST CHECKPOINT",
-		enums.ColumnNameTotalTransactionCertificates: "TOTAL TRANSACTION CERTIFICATES",
-		enums.ColumnNameTotalTransactionEffects:      "TOTAL TRANSACTION EFFECTS",
-		enums.ColumnNameTransactionsPerSecond:        "TRANSACTIONS RATE",
-		enums.ColumnNameHighestKnownCheckpoint:       "HIGHEST KNOWN CHECKPOINT",
-		enums.ColumnNameHighestSyncedCheckpoint:      "HIGHEST SYNCED CHECKPOINT",
-		enums.ColumnNameLastExecutedCheckpoint:       "LAST EXECUTED CHECKPOINT",
-		enums.ColumnNameCheckpointExecBacklog:        "CHECKPOINT EXEC BACKLOG",
-		enums.ColumnNameCheckpointSyncBacklog:        "CHECKPOINT SYNC BACKLOG",
-		enums.ColumnNameCurrentEpoch:                 "CURRENT EPOCH",
-		enums.ColumnNameSystemTimeTillNextEpoch:      "TIME TILL NEXT EPOCH",
-		enums.ColumnNameTXSyncPercentage:             "TX SYNC PERCENTAGE",
-		enums.ColumnNameCheckSyncPercentage:          "CHECKPOINTS SYNC PERCENTAGE",
-		enums.ColumnNameCheckpointsPerSecond:         "CHECKPOINTS RATE",
-		enums.ColumnNameNetworkPeers:                 "NETWORK PEERS",
-		enums.ColumnNameUptime:                       "UPTIME",
-		enums.ColumnNameVersion:                      "VERSION",
-		enums.ColumnNameCommit:                       "COMMIT",
+		enums.ColumnNameNetworkPeers:                 {"NETWORK PEERS", cell.ColorGreen},
+		enums.ColumnNameUptime:                       {"UPTIME", cell.ColorGreen},
+		enums.ColumnNameVersion:                      {"VERSION", cell.ColorGreen},
+		enums.ColumnNameCommit:                       {"COMMIT", cell.ColorGreen},
+		enums.ColumnNameCurrentEpoch:                 {"CURRENT EPOCH", cell.ColorGreen},
+		enums.ColumnNameSystemTimeTillNextEpoch:      {"TIME TILL NEXT EPOCH", cell.ColorGreen},
+		enums.ColumnNameCheckpointExecBacklog:        {"CHECKPOINT EXEC BACKLOG", cell.ColorGreen},
+		enums.ColumnNameCheckpointSyncBacklog:        {"CHECKPOINT SYNC BACKLOG", cell.ColorGreen},
+		enums.ColumnNameHighestKnownCheckpoint:       {"HIGHEST KNOWN CHECKPOINT", cell.ColorBlue},
+		enums.ColumnNameHighestSyncedCheckpoint:      {"HIGHEST SYNCED CHECKPOINT", cell.ColorBlue},
+		enums.ColumnNameLastExecutedCheckpoint:       {"LAST EXECUTED CHECKPOINT", cell.ColorBlue},
+		enums.ColumnNameLatestCheckpoint:             {"LATEST CHECKPOINT", cell.ColorBlue},
+		enums.ColumnNameCheckSyncPercentage:          {"CHECKPOINTS SYNC PERCENTAGE", cell.ColorBlue},
+		enums.ColumnNameCheckpointsPerSecond:         {"CHECKPOINTS RATE", cell.ColorBlue},
+		enums.ColumnNameTotalTransactionBlocks:       {"TOTAL TRANSACTION BLOCKS", cell.ColorYellow},
+		enums.ColumnNameTotalTransactionCertificates: {"TOTAL TRANSACTION CERTIFICATES", cell.ColorYellow},
+		enums.ColumnNameTotalTransactionEffects:      {"TOTAL TRANSACTION EFFECTS", cell.ColorYellow},
+		enums.ColumnNameTransactionsPerSecond:        {"TRANSACTIONS RATE", cell.ColorYellow},
+		enums.ColumnNameTXSyncPercentage:             {"TX SYNC PERCENTAGE", cell.ColorYellow},
 	}
 )
 

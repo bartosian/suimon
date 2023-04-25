@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/mum4k/termdash"
-	termcell "github.com/mum4k/termdash/cell"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/dashboardbuilder/dashboards"
@@ -14,7 +13,7 @@ import (
 
 const (
 	renderInterval = 200 * time.Millisecond
-	queryInterval  = 2 * time.Second
+	queryInterval  = 3 * time.Second
 )
 
 // Render displays the dashboard on the terminal and updates the cells with new data periodically.
@@ -73,7 +72,7 @@ func (db *Builder) Render() (err error) {
 						return fmt.Errorf("failed to get metric for column %s", columnName)
 					}
 
-					if err := cell.Write(columnValue, []termcell.Option{termcell.FgColor(termcell.ColorDefault)}); err != nil {
+					if err := cell.Write(columnValue); err != nil {
 						return err
 					}
 				}

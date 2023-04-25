@@ -20,8 +20,14 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 )
 
-// CellsConfig is a type that represents a mapping of column names to strings.
-type CellsConfig map[enums.ColumnName]string
+// CellsConfig is a type that represents a mapping of column names to CellConfig.
+type (
+	CellsConfig map[enums.ColumnName]CellConfig
+	CellConfig  struct {
+		Title string
+		Color cell.Color
+	}
+)
 
 // Cells is a type that represents a mapping of column names to pointers to Cell structs.
 type Cells map[enums.ColumnName]*Cell
@@ -34,8 +40,8 @@ type Cell struct {
 }
 
 // NewCell is a function that creates a new Cell struct given a cellName and a widget. It returns a pointer to the new Cell and an error (if any).
-func NewCell(cellName string, widget widgetapi.Widget) (*Cell, error) {
-	options := append(CellConfigDefault, container.BorderTitle(cellName))
+func NewCell(cellName string, color cell.Color, widget widgetapi.Widget) (*Cell, error) {
+	options := append(CellConfigDefault, container.BorderTitle(cellName), container.BorderColor(color))
 
 	dashCell := Cell{
 		Widget:        widget,
@@ -55,16 +61,16 @@ func (c Cell) GetWidget() grid.Element {
 // It accepts a value to write.
 // The type of value must match the type expected by the cell widget.
 // If the widget type is not recognized, the function returns nil.
-func (c *Cell) Write(value any, options []cell.Option) error {
+func (c *Cell) Write(value any) error {
 	now := time.Now()
 
 	switch widget := c.Widget.(type) {
 	case *gauge.Gauge:
 		return writeToGaugeWidget(widget, value)
 	case *text.Text:
-		return writeToTextWidget(widget, options, value)
+		return writeToTextWidget(widget, value)
 	case *segmentdisplay.SegmentDisplay:
-		return writeToSegmentWidget(widget, options, value)
+		return writeToSegmentWidget(widget, value)
 	case *sparkline.SparkLine:
 		if now.Sub(c.LastUpdatedAt) < 2*time.Second {
 			return nil
@@ -85,13 +91,7 @@ func (c *Cell) Write(value any, options []cell.Option) error {
 // with the options converted to `text.WriteOption` using the `text.WriteCellOpts` function.
 // The function removes any non-printable characters from the string value before writing it
 // to the widget, and returns immediately if the resulting string has zero length.
-func writeToTextWidget(widget *text.Text, options []cell.Option, value any) error {
-	textOptions := make([]text.WriteOption, 0, len(options))
-
-	for _, option := range options {
-		textOptions = append(textOptions, text.WriteCellOpts(option))
-	}
-
+func writeToTextWidget(widget *text.Text, value any) error {
 	valueString, ok := value.(string)
 	if !ok {
 		return fmt.Errorf("invalid value type for text widget: %T", value)
@@ -102,7 +102,7 @@ func writeToTextWidget(widget *text.Text, options []cell.Option, value any) erro
 		return nil
 	}
 
-	return widget.Write(valueString, textOptions...)
+	return widget.Write(valueString)
 }
 
 // writeToGaugeWidget writes a value to a gauge widget.
@@ -140,13 +140,7 @@ func writeToSparkLineWidget(widget *sparkline.SparkLine, value any) error {
 // The value can be an integer, a string, or a slice of strings.
 // If the value is a string and it is empty, a blinking value will be used.
 // If a string in the slice is empty, a blinking value will be used for that chunk.
-func writeToSegmentWidget(widget *segmentdisplay.SegmentDisplay, options []cell.Option, value any) error {
-	segmentOptions := make([]segmentdisplay.WriteOption, 0, len(options))
-
-	for _, option := range options {
-		segmentOptions = append(segmentOptions, segmentdisplay.WriteCellOpts(option))
-	}
-
+func writeToSegmentWidget(widget *segmentdisplay.SegmentDisplay, value any) error {
 	capacity := widget.Capacity()
 
 	var chunks []*segmentdisplay.TextChunk
@@ -155,11 +149,11 @@ func writeToSegmentWidget(widget *segmentdisplay.SegmentDisplay, options []cell.
 	case int64:
 		chunk := strconv.FormatInt(v, 10)
 
-		chunks = append(chunks, segmentdisplay.NewChunk(chunk, segmentOptions...))
+		chunks = append(chunks, segmentdisplay.NewChunk(chunk))
 	case int:
 		chunk := strconv.Itoa(v)
 
-		chunks = append(chunks, segmentdisplay.NewChunk(chunk, segmentOptions...))
+		chunks = append(chunks, segmentdisplay.NewChunk(chunk))
 	case string:
 		chunk := v
 
@@ -167,14 +161,14 @@ func writeToSegmentWidget(widget *segmentdisplay.SegmentDisplay, options []cell.
 			chunk = dashboardLoadingBlinkValue(capacity)
 		}
 
-		chunks = append(chunks, segmentdisplay.NewChunk(chunk, segmentOptions...))
+		chunks = append(chunks, segmentdisplay.NewChunk(chunk))
 	case []string:
 		for _, chunk := range v {
 			if chunk == "" {
 				chunk = dashboardLoadingBlinkValue(capacity)
 			}
 
-			chunks = append(chunks, segmentdisplay.NewChunk(chunk, segmentOptions...))
+			chunks = append(chunks, segmentdisplay.NewChunk(chunk))
 		}
 	}
 

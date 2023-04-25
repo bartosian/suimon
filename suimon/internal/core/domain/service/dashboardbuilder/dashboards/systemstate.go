@@ -2,6 +2,7 @@ package dashboards
 
 import (
 	"fmt"
+	"github.com/mum4k/termdash/cell"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
@@ -29,12 +30,12 @@ var (
 		enums.ColumnNameSystemStakeSubsidyStartEpoch:                20,
 		enums.ColumnNameSystemStakeSubsidyBalance:                   49,
 		enums.ColumnNameSystemStakeSubsidyDistributionCounter:       33,
-		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: 33,
+		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: 49,
 		enums.ColumnNameSystemStakeSubsidyPeriodLength:              20,
 		enums.ColumnNameSystemStakeSubsidyDecreaseRate:              20,
 
 		// Stake section
-		enums.ColumnNameSystemTotalStake:                           50,
+		enums.ColumnNameSystemTotalStake:                           33,
 		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates: 33,
 		enums.ColumnNameSystemStorageFundNonRefundableBalance:      33,
 	}
@@ -58,7 +59,8 @@ var (
 			Height: 14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameSystemTotalStake,
-				enums.ColumnNameSystemStakeSubsidyBalance,
+				enums.ColumnNameSystemStorageFundTotalObjectStorageRebates,
+				enums.ColumnNameSystemStorageFundNonRefundableBalance,
 			},
 		},
 		3: {
@@ -84,34 +86,33 @@ var (
 		5: {
 			Height: 14,
 			Columns: []enums.ColumnName{
-				enums.ColumnNameSystemStorageFundTotalObjectStorageRebates,
-				enums.ColumnNameSystemStorageFundNonRefundableBalance,
 				enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount,
+				enums.ColumnNameSystemStakeSubsidyBalance,
 			},
 		},
 	}
 
 	CellsConfigSystemState = CellsConfig{
-		enums.ColumnNameCurrentEpoch:                                "CURRENT EPOCH",
-		enums.ColumnNameSystemEpochStartTimestamp:                   "EPOCH START TIME UTC",
-		enums.ColumnNameSystemEpochDuration:                         "EPOCH DURATION",
-		enums.ColumnNameSystemTimeTillNextEpoch:                     "TIME TILL NEXT EPOCH",
-		enums.ColumnNameSystemTotalStake:                            "TOTAL STAKE, SUI",
-		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  "STORAGE FUND TOTAL OBJECT REBATES, SUI",
-		enums.ColumnNameSystemStorageFundNonRefundableBalance:       "STORAGE FUND REFUNDABLE BALANCE, SUI",
-		enums.ColumnNameSystemReferenceGasPrice:                     "REFERENCE GAS PRICE",
-		enums.ColumnNameSystemMinReferenceGasPrice:                  "MIN REFERENCE GAS PRICE",
-		enums.ColumnNameSystemMaxReferenceGasPrice:                  "MAX REFERENCE GAS PRICE",
-		enums.ColumnNameSystemMeanReferenceGasPrice:                 "MEAN REFERENCE GAS PRICE",
-		enums.ColumnNameSystemStakeWeightedMeanReferenceGasPrice:    "STAKE WEIGHTED MEAN REFERENCE GAS PRICE",
-		enums.ColumnNameSystemMedianReferenceGasPrice:               "MEDIAN REFERENCE GAS PRICE",
-		enums.ColumnNameSystemEstimatedReferenceGasPrice:            "ESTIMATED REFERENCE GAS PRICE",
-		enums.ColumnNameSystemStakeSubsidyStartEpoch:                "STAKE SUBSIDY START EPOCH",
-		enums.ColumnNameSystemStakeSubsidyBalance:                   "STAKE SUBSIDY BALANCE, SUI",
-		enums.ColumnNameSystemStakeSubsidyDistributionCounter:       "STAKE SUBSIDY DISTRIBUTION COUNTER",
-		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: "STAKE SUBSIDY DISTRIBUTION AMOUNT, SUI",
-		enums.ColumnNameSystemStakeSubsidyPeriodLength:              "STAKE SUBSIDY PERIOD LENGTH",
-		enums.ColumnNameSystemStakeSubsidyDecreaseRate:              "STAKE SUBSIDY DECREASE RATE",
+		enums.ColumnNameCurrentEpoch:                                {"CURRENT EPOCH", cell.ColorGreen},
+		enums.ColumnNameSystemEpochStartTimestamp:                   {"EPOCH START TIME UTC", cell.ColorGreen},
+		enums.ColumnNameSystemEpochDuration:                         {"EPOCH DURATION", cell.ColorGreen},
+		enums.ColumnNameSystemTimeTillNextEpoch:                     {"TIME TILL NEXT EPOCH", cell.ColorGreen},
+		enums.ColumnNameSystemTotalStake:                            {"TOTAL STAKE, SUI", cell.ColorBlue},
+		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  {"STORAGE FUND TOTAL OBJECT REBATES, SUI", cell.ColorBlue},
+		enums.ColumnNameSystemStorageFundNonRefundableBalance:       {"STORAGE FUND REFUNDABLE BALANCE, SUI", cell.ColorBlue},
+		enums.ColumnNameSystemReferenceGasPrice:                     {"REFERENCE GAS PRICE", cell.ColorYellow},
+		enums.ColumnNameSystemMinReferenceGasPrice:                  {"MIN REFERENCE GAS PRICE", cell.ColorYellow},
+		enums.ColumnNameSystemMaxReferenceGasPrice:                  {"MAX REFERENCE GAS PRICE", cell.ColorYellow},
+		enums.ColumnNameSystemMeanReferenceGasPrice:                 {"MEAN REFERENCE GAS PRICE", cell.ColorYellow},
+		enums.ColumnNameSystemStakeWeightedMeanReferenceGasPrice:    {"STAKE WEIGHTED MEAN REFERENCE GAS PRICE", cell.ColorYellow},
+		enums.ColumnNameSystemMedianReferenceGasPrice:               {"MEDIAN REFERENCE GAS PRICE", cell.ColorYellow},
+		enums.ColumnNameSystemEstimatedReferenceGasPrice:            {"ESTIMATED REFERENCE GAS PRICE", cell.ColorYellow},
+		enums.ColumnNameSystemStakeSubsidyBalance:                   {"STAKE SUBSIDY BALANCE, SUI", cell.ColorRed},
+		enums.ColumnNameSystemStakeSubsidyStartEpoch:                {"STAKE SUBSIDY START EPOCH", cell.ColorRed},
+		enums.ColumnNameSystemStakeSubsidyDistributionCounter:       {"STAKE SUBSIDY DISTRIBUTION COUNTER", cell.ColorRed},
+		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: {"STAKE SUBSIDY DISTRIBUTION AMOUNT, SUI", cell.ColorRed},
+		enums.ColumnNameSystemStakeSubsidyPeriodLength:              {"STAKE SUBSIDY PERIOD LENGTH", cell.ColorRed},
+		enums.ColumnNameSystemStakeSubsidyDecreaseRate:              {"STAKE SUBSIDY DECREASE RATE", cell.ColorRed},
 	}
 )
 

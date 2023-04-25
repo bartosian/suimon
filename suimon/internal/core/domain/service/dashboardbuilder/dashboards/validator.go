@@ -2,6 +2,7 @@ package dashboards
 
 import (
 	"fmt"
+	"github.com/mum4k/termdash/cell"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
@@ -67,32 +68,32 @@ var (
 		2: {
 			Height: 14,
 			Columns: []enums.ColumnName{
-				enums.ColumnNameTotalTransactionCertificates,
-				enums.ColumnNameTotalTransactionEffects,
-				enums.ColumnNameCertificatesCreated,
-			},
-		},
-		3: {
-			Height: 14,
-			Columns: []enums.ColumnName{
-				enums.ColumnNameCurrentRound,
-				enums.ColumnNameHighestProcessedRound,
-				enums.ColumnNameLastCommittedRound,
-			},
-		},
-		4: {
-			Height: 14,
-			Columns: []enums.ColumnName{
 				enums.ColumnNameLastExecutedCheckpoint,
 				enums.ColumnNameHighestKnownCheckpoint,
 				enums.ColumnNameHighestSyncedCheckpoint,
 			},
 		},
-		5: {
+		3: {
 			Height: 14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameCheckSyncPercentage,
 				enums.ColumnNameCheckpointsPerSecond,
+			},
+		},
+		4: {
+			Height: 14,
+			Columns: []enums.ColumnName{
+				enums.ColumnNameTotalTransactionCertificates,
+				enums.ColumnNameTotalTransactionEffects,
+				enums.ColumnNameCertificatesCreated,
+			},
+		},
+		5: {
+			Height: 14,
+			Columns: []enums.ColumnName{
+				enums.ColumnNameCurrentRound,
+				enums.ColumnNameHighestProcessedRound,
+				enums.ColumnNameLastCommittedRound,
 			},
 		},
 		6: {
@@ -105,31 +106,31 @@ var (
 	}
 
 	CellsConfigValidator = CellsConfig{
-		enums.ColumnNameTotalTransactionCertificates:            "TOTAL TRANSACTION CERTIFICATES",
-		enums.ColumnNameTotalTransactionEffects:                 "TOTAL TRANSACTION EFFECTS",
-		enums.ColumnNameHighestKnownCheckpoint:                  "HIGHEST KNOWN CHECKPOINT",
-		enums.ColumnNameHighestSyncedCheckpoint:                 "HIGHEST SYNCED CHECKPOINT",
-		enums.ColumnNameLastExecutedCheckpoint:                  "LAST EXECUTED CHECKPOINT",
-		enums.ColumnNameCheckpointExecBacklog:                   "CHECKPOINT EXEC BACKLOG",
-		enums.ColumnNameCheckpointSyncBacklog:                   "CHECKPOINT SYNC BACKLOG",
-		enums.ColumnNameCurrentEpoch:                            "CURRENT EPOCH",
-		enums.ColumnNameCheckSyncPercentage:                     "CHECKPOINTS SYNC PERCENTAGE",
-		enums.ColumnNameCheckpointsPerSecond:                    "CHECKPOINTS RATE",
-		enums.ColumnNameUptime:                                  "UPTIME",
-		enums.ColumnNameVersion:                                 "VERSION",
-		enums.ColumnNameCommit:                                  "COMMIT",
-		enums.ColumnNameCurrentRound:                            "CURRENT ROUND",
-		enums.ColumnNameHighestProcessedRound:                   "HIGHEST PROCESSED ROUND",
-		enums.ColumnNameLastCommittedRound:                      "LAST COMMITTED ROUND",
-		enums.ColumnNameRoundsPerSecond:                         "ROUNDS RATIO",
-		enums.ColumnNameNetworkPeers:                            "SUI NETWORK PEERS",
-		enums.ColumnNamePrimaryNetworkPeers:                     "PRIMARY NETWORK PEERS",
-		enums.ColumnNameWorkerNetworkPeers:                      "WORKER NETWORK PEERS",
-		enums.ColumnNameSkippedConsensusTransactions:            "SKIPPED CONSENSUS TRANSACTIONS",
-		enums.ColumnNameTotalSignatureErrors:                    "TOTAL SIGNATURE ERRORS",
-		enums.ColumnNameCertificatesCreated:                     "CERTIFICATES CREATED",
-		enums.ColumnNameCertificatesPerSecond:                   "CERTIFICATES RATIO",
-		enums.ColumnNameHandleCertificateNonConsensusLatencySum: "CERTIFICATE NON CONSENSUS LATENCY",
+		enums.ColumnNameCurrentEpoch:                            {"CURRENT EPOCH", cell.ColorGreen},
+		enums.ColumnNameUptime:                                  {"UPTIME", cell.ColorGreen},
+		enums.ColumnNameVersion:                                 {"VERSION", cell.ColorGreen},
+		enums.ColumnNameCommit:                                  {"COMMIT", cell.ColorGreen},
+		enums.ColumnNameNetworkPeers:                            {"SUI NETWORK PEERS", cell.ColorGreen},
+		enums.ColumnNamePrimaryNetworkPeers:                     {"PRIMARY NETWORK PEERS", cell.ColorGreen},
+		enums.ColumnNameWorkerNetworkPeers:                      {"WORKER NETWORK PEERS", cell.ColorGreen},
+		enums.ColumnNameSkippedConsensusTransactions:            {"SKIPPED CONSENSUS TRANSACTIONS", cell.ColorGreen},
+		enums.ColumnNameTotalSignatureErrors:                    {"TOTAL SIGNATURE ERRORS", cell.ColorGreen},
+		enums.ColumnNameHighestKnownCheckpoint:                  {"HIGHEST KNOWN CHECKPOINT", cell.ColorBlue},
+		enums.ColumnNameHighestSyncedCheckpoint:                 {"HIGHEST SYNCED CHECKPOINT", cell.ColorBlue},
+		enums.ColumnNameLastExecutedCheckpoint:                  {"LAST EXECUTED CHECKPOINT", cell.ColorBlue},
+		enums.ColumnNameCheckpointExecBacklog:                   {"CHECKPOINT EXEC BACKLOG", cell.ColorBlue},
+		enums.ColumnNameCheckpointSyncBacklog:                   {"CHECKPOINT SYNC BACKLOG", cell.ColorBlue},
+		enums.ColumnNameCheckSyncPercentage:                     {"CHECKPOINTS SYNC PERCENTAGE", cell.ColorBlue},
+		enums.ColumnNameCheckpointsPerSecond:                    {"CHECKPOINTS RATE", cell.ColorBlue},
+		enums.ColumnNameTotalTransactionCertificates:            {"TOTAL TRANSACTION CERTIFICATES", cell.ColorYellow},
+		enums.ColumnNameTotalTransactionEffects:                 {"TOTAL TRANSACTION EFFECTS", cell.ColorYellow},
+		enums.ColumnNameCertificatesCreated:                     {"CERTIFICATES CREATED", cell.ColorYellow},
+		enums.ColumnNameCurrentRound:                            {"CURRENT ROUND", cell.ColorRed},
+		enums.ColumnNameHighestProcessedRound:                   {"HIGHEST PROCESSED ROUND", cell.ColorRed},
+		enums.ColumnNameLastCommittedRound:                      {"LAST COMMITTED ROUND", cell.ColorRed},
+		enums.ColumnNameRoundsPerSecond:                         {"ROUNDS RATIO", cell.ColorRed},
+		enums.ColumnNameCertificatesPerSecond:                   {"CERTIFICATES RATIO", cell.ColorYellow},
+		enums.ColumnNameHandleCertificateNonConsensusLatencySum: {"CERTIFICATE NON CONSENSUS LATENCY", cell.ColorRed},
 	}
 )
 

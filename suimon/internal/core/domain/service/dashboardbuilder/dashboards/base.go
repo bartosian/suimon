@@ -33,7 +33,6 @@ var (
 
 	CellConfigDefault = []container.Option{
 		container.Border(linestyle.Light),
-		container.BorderColor(cell.ColorGreen),
 		container.AlignVertical(align.VerticalMiddle),
 		container.AlignHorizontal(align.HorizontalCenter),
 		container.TitleColor(cell.ColorRed),
@@ -161,13 +160,13 @@ func GetRows(rowsConfig RowsConfig, cells Cells, columns Columns) (Rows, error) 
 func GetCells(cellsConfig CellsConfig) (Cells, error) {
 	cells := make(Cells, len(cellsConfig))
 
-	for columnName, cellName := range cellsConfig {
-		widget, err := newWidgetByColumnName(columnName)
+	for columnName, cellConfig := range cellsConfig {
+		widget, err := newWidgetByColumnName(columnName, cellConfig.Color)
 		if err != nil {
 			return nil, err
 		}
 
-		dashCell, err := NewCell(cellName, widget)
+		dashCell, err := NewCell(cellConfig.Title, cellConfig.Color, widget)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create new cell for %s: %w", columnName, err)
 		}
