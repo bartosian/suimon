@@ -19,6 +19,7 @@ var (
 		enums.ColumnNameTotalTransactionCertificates: 33,
 		enums.ColumnNameTotalTransactionEffects:      33,
 		enums.ColumnNameCertificatesCreated:          33,
+		enums.ColumnNameCertificatesPerSecond:        49,
 
 		// Checkpoints section
 		enums.ColumnNameLastExecutedCheckpoint:  33,
@@ -31,6 +32,7 @@ var (
 		enums.ColumnNameCurrentRound:          33,
 		enums.ColumnNameHighestProcessedRound: 33,
 		enums.ColumnNameLastCommittedRound:    33,
+		enums.ColumnNameRoundsPerSecond:       49,
 
 		// Peers section
 		enums.ColumnNameNetworkPeers:        19,
@@ -55,27 +57,22 @@ var (
 		1: {
 			Height: 14,
 			Columns: []enums.ColumnName{
-				enums.ColumnNameTotalTransactionCertificates,
-				enums.ColumnNameTotalTransactionEffects,
-				enums.ColumnNameCertificatesCreated,
+				enums.ColumnNameNetworkPeers,
+				enums.ColumnNamePrimaryNetworkPeers,
+				enums.ColumnNameWorkerNetworkPeers,
+				enums.ColumnNameSkippedConsensusTransactions,
+				enums.ColumnNameTotalSignatureErrors,
 			},
 		},
 		2: {
 			Height: 14,
 			Columns: []enums.ColumnName{
-				enums.ColumnNameLastExecutedCheckpoint,
-				enums.ColumnNameHighestKnownCheckpoint,
-				enums.ColumnNameHighestSyncedCheckpoint,
+				enums.ColumnNameTotalTransactionCertificates,
+				enums.ColumnNameTotalTransactionEffects,
+				enums.ColumnNameCertificatesCreated,
 			},
 		},
 		3: {
-			Height: 14,
-			Columns: []enums.ColumnName{
-				enums.ColumnNameCheckSyncPercentage,
-				enums.ColumnNameCheckpointsPerSecond,
-			},
-		},
-		4: {
 			Height: 14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameCurrentRound,
@@ -83,14 +80,26 @@ var (
 				enums.ColumnNameLastCommittedRound,
 			},
 		},
+		4: {
+			Height: 14,
+			Columns: []enums.ColumnName{
+				enums.ColumnNameLastExecutedCheckpoint,
+				enums.ColumnNameHighestKnownCheckpoint,
+				enums.ColumnNameHighestSyncedCheckpoint,
+			},
+		},
 		5: {
 			Height: 14,
 			Columns: []enums.ColumnName{
-				enums.ColumnNameNetworkPeers,
-				enums.ColumnNamePrimaryNetworkPeers,
-				enums.ColumnNameWorkerNetworkPeers,
-				enums.ColumnNameSkippedConsensusTransactions,
-				enums.ColumnNameTotalSignatureErrors,
+				enums.ColumnNameCheckSyncPercentage,
+				enums.ColumnNameCheckpointsPerSecond,
+			},
+		},
+		6: {
+			Height: 14,
+			Columns: []enums.ColumnName{
+				enums.ColumnNameCertificatesPerSecond,
+				enums.ColumnNameRoundsPerSecond,
 			},
 		},
 	}
@@ -112,12 +121,14 @@ var (
 		enums.ColumnNameCurrentRound:                            "CURRENT ROUND",
 		enums.ColumnNameHighestProcessedRound:                   "HIGHEST PROCESSED ROUND",
 		enums.ColumnNameLastCommittedRound:                      "LAST COMMITTED ROUND",
+		enums.ColumnNameRoundsPerSecond:                         "ROUNDS RATIO",
 		enums.ColumnNameNetworkPeers:                            "SUI NETWORK PEERS",
 		enums.ColumnNamePrimaryNetworkPeers:                     "PRIMARY NETWORK PEERS",
 		enums.ColumnNameWorkerNetworkPeers:                      "WORKER NETWORK PEERS",
 		enums.ColumnNameSkippedConsensusTransactions:            "SKIPPED CONSENSUS TRANSACTIONS",
 		enums.ColumnNameTotalSignatureErrors:                    "TOTAL SIGNATURE ERRORS",
 		enums.ColumnNameCertificatesCreated:                     "CERTIFICATES CREATED",
+		enums.ColumnNameCertificatesPerSecond:                   "CERTIFICATES RATIO",
 		enums.ColumnNameHandleCertificateNonConsensusLatencySum: "CERTIFICATE NON CONSENSUS LATENCY",
 	}
 )
@@ -144,11 +155,13 @@ func GetValidatorColumnValues(host host.Host) ColumnValues {
 		enums.ColumnNameCurrentRound:                            host.Metrics.CurrentRound,
 		enums.ColumnNameHighestProcessedRound:                   host.Metrics.HighestProcessedRound,
 		enums.ColumnNameLastCommittedRound:                      host.Metrics.LastCommittedRound,
+		enums.ColumnNameRoundsPerSecond:                         host.Metrics.RoundsPerSecond,
 		enums.ColumnNamePrimaryNetworkPeers:                     host.Metrics.PrimaryNetworkPeers,
 		enums.ColumnNameWorkerNetworkPeers:                      host.Metrics.WorkerNetworkPeers,
 		enums.ColumnNameSkippedConsensusTransactions:            host.Metrics.SkippedConsensusTransactions,
 		enums.ColumnNameTotalSignatureErrors:                    host.Metrics.TotalSignatureErrors,
 		enums.ColumnNameCertificatesCreated:                     host.Metrics.CertificatesCreated,
+		enums.ColumnNameCertificatesPerSecond:                   host.Metrics.CertificatesPerSecond,
 		enums.ColumnNameHandleCertificateNonConsensusLatencySum: host.Metrics.NonConsensusLatency,
 	}
 

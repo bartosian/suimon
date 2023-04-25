@@ -43,7 +43,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		}
 
 		metrics.TotalTransactionsBlocks = valueInt
-		metrics.CalculateTPS()
+		metrics.CalculateTransactionsRatio()
 	case enums.MetricTypeTotalTransactionCertificates:
 		valueFloat, ok := value.(float64)
 		if !ok {
@@ -84,7 +84,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 
 		metrics.HighestSyncedCheckpoint = convFToI(valueFloat)
 
-		metrics.CalculateCPS()
+		metrics.CalculateCheckpointsRatio()
 	case enums.MetricTypeLastExecutedCheckpoint:
 		valueFloat, ok := value.(float64)
 		if !ok {
@@ -170,6 +170,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		}
 
 		metrics.HighestProcessedRound = convFToI(valueFloat)
+		metrics.CalculateRoundsRatio()
 	case enums.MetricTypeLastCommittedRound:
 		valueFloat, ok := value.(float64)
 		if !ok {
@@ -205,6 +206,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		}
 
 		metrics.CertificatesCreated = convFToI(valueFloat)
+		metrics.CalculateCertificatesRatio()
 	case enums.MetricTypeTotalSignatureErrors:
 		valueFloat, ok := value.(float64)
 		if !ok {
@@ -352,9 +354,9 @@ func (metrics *Metrics) setRefGasPriceMetrics() error {
 	return nil
 }
 
-// CalculateTPS calculates the current transaction per second (TPS) based on the number of transactions processed
+// CalculateTransactionsRatio calculates the current transaction per second (TPS) based on the number of transactions processed
 // within the current period. The TPS value is then stored in the Metrics struct.
-func (metrics *Metrics) CalculateTPS() {
+func (metrics *Metrics) CalculateTransactionsRatio() {
 	var (
 		transactionsHistory = metrics.TransactionsHistory
 		transactionsStart   int
@@ -379,9 +381,9 @@ func (metrics *Metrics) CalculateTPS() {
 	metrics.TransactionsPerSecond = transactionsEnd - transactionsStart
 }
 
-// CalculateCPS calculates the current checkpoints per second (CPS) based on the number of checkpoints generated
+// CalculateCheckpointsRatio calculates the current checkpoints per second (CPS) based on the number of checkpoints generated
 // within the current period. The CPS value is then stored in the Metrics struct.
-func (metrics *Metrics) CalculateCPS() {
+func (metrics *Metrics) CalculateCheckpointsRatio() {
 	var (
 		checkpointsHistory = metrics.CheckpointsHistory
 		checkpointsStart   int
@@ -404,6 +406,60 @@ func (metrics *Metrics) CalculateCPS() {
 
 	metrics.CheckpointsHistory = checkpointsHistory
 	metrics.CheckpointsPerSecond = checkpointsEnd - checkpointsStart
+}
+
+// CalculateRoundsRatio calculates the current rounds per second (RPS) based on the number of rounds processed
+// within the current period. The RPS value is then stored in the Metrics struct.
+func (metrics *Metrics) CalculateRoundsRatio() {
+	var (
+		roundsHistory = metrics.RoundsHistory
+		roundsStart   int
+		roundsEnd     int
+	)
+
+	roundsHistory = append(roundsHistory, metrics.HighestProcessedRound)
+	if len(roundsHistory) < RoundsPerSecondWindow {
+		metrics.RoundsHistory = roundsHistory
+
+		return
+	}
+
+	if len(roundsHistory) > RoundsPerSecondWindow {
+		roundsHistory = roundsHistory[1:]
+	}
+
+	roundsStart = roundsHistory[0]
+	roundsEnd = roundsHistory[RoundsPerSecondWindow-1]
+
+	metrics.RoundsHistory = roundsHistory
+	metrics.RoundsPerSecond = roundsEnd - roundsStart
+}
+
+// CalculateCertificatesRatio calculates the current certificates per second (CPS) based on the number of certificates created
+// within the current period. The CPS value is then stored in the Metrics struct.
+func (metrics *Metrics) CalculateCertificatesRatio() {
+	var (
+		certificatesHistory = metrics.CertificatesHistory
+		certificatesStart   int
+		certificatesEnd     int
+	)
+
+	certificatesHistory = append(certificatesHistory, metrics.CertificatesCreated)
+	if len(certificatesHistory) < CertificatesPerSecondWindow {
+		metrics.CertificatesHistory = certificatesHistory
+
+		return
+	}
+
+	if len(certificatesHistory) > CertificatesPerSecondWindow {
+		certificatesHistory = certificatesHistory[1:]
+	}
+
+	certificatesStart = certificatesHistory[0]
+	certificatesEnd = certificatesHistory[CertificatesPerSecondWindow-1]
+
+	metrics.CertificatesHistory = certificatesHistory
+	metrics.CertificatesPerSecond = certificatesEnd - certificatesStart
 }
 
 // IsHealthy checks if the given metric's value satisfies the threshold defined for it.

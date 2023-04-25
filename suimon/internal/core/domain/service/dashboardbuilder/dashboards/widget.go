@@ -63,7 +63,7 @@ func newWidgetByColumnName(columnName enums.ColumnName) (widgetapi.Widget, error
 		}
 
 		return widget, nil
-	case enums.ColumnNameCheckpointsPerSecond, enums.ColumnNameTransactionsPerSecond:
+	case enums.ColumnNameCheckpointsPerSecond, enums.ColumnNameTransactionsPerSecond, enums.ColumnNameRoundsPerSecond, enums.ColumnNameCertificatesPerSecond:
 		widget, err := newWidgetOfType(enums.WidgetTypeSparkLine)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize text widget for %s: %w", columnName, err)
@@ -71,10 +71,17 @@ func newWidgetByColumnName(columnName enums.ColumnName) (widgetapi.Widget, error
 
 		sparkLineWidget := widget.(*sparkline.SparkLine)
 
-		color := cell.ColorGreen
+		var color cell.Color
 
-		if columnName == enums.ColumnNameTransactionsPerSecond {
+		switch columnName {
+		case enums.ColumnNameTransactionsPerSecond:
 			color = cell.ColorBlue
+		case enums.ColumnNameCheckpointsPerSecond:
+			color = cell.ColorYellow
+		case enums.ColumnNameRoundsPerSecond:
+			color = cell.ColorGreen
+		case enums.ColumnNameCertificatesPerSecond:
+			color = cell.ColorRed
 		}
 
 		if err = sparkLineWidget.Add([]int{0}, sparkline.Color(color)); err != nil {

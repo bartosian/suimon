@@ -25,6 +25,7 @@ const (
 	ColumnNameHandleCertificateNonConsensusLatencySum ColumnName = "CERTIFICATE\nNON CONSENSUS LATENCY"
 	ColumnNameTotalSignatureErrors                    ColumnName = "SIGNATURE\nERRORS"
 	ColumnNameTransactionsPerSecond                   ColumnName = "TRANSACTIONS PER SECOND"
+	ColumnNameCertificatesPerSecond                   ColumnName = "CERTIFICATES PER SECOND"
 )
 
 // Checkpoints section
@@ -44,6 +45,7 @@ const (
 	ColumnNameCurrentRound          ColumnName = "CURRENT\nROUND"
 	ColumnNameHighestProcessedRound ColumnName = "HIGHEST\nPROCESSED ROUND"
 	ColumnNameLastCommittedRound    ColumnName = "LAST COMMITTED\nROUND"
+	ColumnNameRoundsPerSecond       ColumnName = "ROUNDS PER SECOND"
 )
 
 // Peers section

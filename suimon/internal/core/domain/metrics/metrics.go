@@ -3,6 +3,8 @@ package metrics
 const (
 	TransactionsPerSecondWindow     = 5
 	CheckpointsPerSecondWindow      = 5
+	RoundsPerSecondWindow           = 5
+	CertificatesPerSecondWindow     = 5
 	TransactionsPerSecondLag        = 5
 	TotalTransactionsLag            = 100
 	CheckpointsPerSecondLag         = 10
@@ -18,11 +20,13 @@ type (
 		TotalTransactionsBlocks      int
 		TotalTransactionCertificates int
 		CertificatesCreated          int
+		CertificatesPerSecond        int
 		NonConsensusLatency          int
 		TotalTransactionEffects      int
 		TransactionsPerSecond        int
 		TxSyncPercentage             int
 		TransactionsHistory          []int
+		CertificatesHistory          []int
 	}
 
 	// Checkpoints represents information about checkpoints on the Sui blockchain network.
@@ -42,7 +46,9 @@ type (
 	Rounds struct {
 		CurrentRound          int
 		HighestProcessedRound int
+		RoundsPerSecond       int
 		LastCommittedRound    int
+		RoundsHistory         []int
 	}
 
 	// Peers represents information about peers on the Sui blockchain network.
