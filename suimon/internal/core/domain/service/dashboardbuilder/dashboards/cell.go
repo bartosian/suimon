@@ -155,16 +155,12 @@ func writeToSegmentWidget(widget *segmentdisplay.SegmentDisplay, options []cell.
 	case int:
 		chunk := strconv.Itoa(v)
 
-		chunk = centerOnDisplay(chunk, capacity)
-
 		chunks = append(chunks, segmentdisplay.NewChunk(chunk, segmentOptions...))
 	case string:
 		chunk := v
 
 		if chunk == "" {
 			chunk = dashboardLoadingBlinkValue(capacity)
-		} else {
-			chunk = centerOnDisplay(chunk, capacity)
 		}
 
 		chunks = append(chunks, segmentdisplay.NewChunk(chunk, segmentOptions...))
@@ -211,9 +207,9 @@ func centerOnDisplay(s string, numChars int) string {
 		// Concatenate the empty spaces and the original string
 		centeredString := spaces + s + spaces
 		// If the number of characters is odd, add one more space to the end
-		//if (numChars - len(centeredString)) == 1 {
-		//	centeredString += " "
-		//}
+		if (numChars - len(centeredString)) == 1 {
+			centeredString += " "
+		}
 
 		return centeredString
 	}

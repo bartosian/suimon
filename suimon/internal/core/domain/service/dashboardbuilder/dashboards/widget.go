@@ -77,7 +77,7 @@ func newWidgetByColumnName(columnName enums.ColumnName) (widgetapi.Widget, error
 			color = cell.ColorBlue
 		}
 
-		if err = sparkLineWidget.Add([]int{100}, sparkline.Color(color)); err != nil {
+		if err = sparkLineWidget.Add([]int{0}, sparkline.Color(color)); err != nil {
 			return nil, fmt.Errorf("failed to set initial value for %s: %w", columnName, err)
 		}
 
