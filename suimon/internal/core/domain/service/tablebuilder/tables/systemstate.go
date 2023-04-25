@@ -5,7 +5,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
+	domainmetrics "github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
 )
 
 var (
@@ -114,38 +114,55 @@ var (
 // GetSystemStateColumnValues returns a map of SystemColumnName values to corresponding values for the system state.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of SystemColumnName keys and corresponding values.
 // Returns a map of SystemColumnName keys to corresponding values.
-func GetSystemStateColumnValues(metrics *metrics.Metrics) (map[enums.ColumnName]any, error) {
-	systemState := metrics.SystemState
-
-	return map[enums.ColumnName]any{
+func GetSystemStateColumnValues(metrics *domainmetrics.Metrics) (map[enums.ColumnName]any, error) {
+	result := map[enums.ColumnName]any{
 		enums.ColumnNameIndex:                                       1,
-		enums.ColumnNameSystemEpoch:                                 systemState.Epoch,
+		enums.ColumnNameSystemEpoch:                                 metrics.SystemState.Epoch,
 		enums.ColumnNameSystemEpochStartTimestamp:                   metrics.EpochStartTimeUTC,
 		enums.ColumnNameSystemEpochDuration:                         metrics.EpochDurationHHMM,
 		enums.ColumnNameSystemTimeTillNextEpoch:                     fmt.Sprintf("%s HH:MM", metrics.DurationTillEpochEndHHMM),
-		enums.ColumnNameSystemTotalStake:                            systemState.TotalStake,
-		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  systemState.StorageFundTotalObjectStorageRebates,
-		enums.ColumnNameSystemStorageFundNonRefundableBalance:       systemState.StorageFundNonRefundableBalance,
-		enums.ColumnNameSystemStakeSubsidyStartEpoch:                systemState.StakeSubsidyStartEpoch,
-		enums.ColumnNameSystemStakeSubsidyBalance:                   systemState.StakeSubsidyBalance,
-		enums.ColumnNameSystemStakeSubsidyDistributionCounter:       systemState.StakeSubsidyDistributionCounter,
-		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: systemState.StakeSubsidyCurrentDistributionAmount,
-		enums.ColumnNameSystemStakeSubsidyPeriodLength:              systemState.StakeSubsidyPeriodLength,
-		enums.ColumnNameSystemStakeSubsidyDecreaseRate:              systemState.StakeSubsidyDecreaseRate,
-		enums.ColumnNameSystemReferenceGasPrice:                     systemState.ReferenceGasPrice,
+		enums.ColumnNameSystemTotalStake:                            metrics.SystemState.TotalStake,
+		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  metrics.SystemState.StorageFundTotalObjectStorageRebates,
+		enums.ColumnNameSystemStorageFundNonRefundableBalance:       metrics.SystemState.StorageFundNonRefundableBalance,
+		enums.ColumnNameSystemStakeSubsidyStartEpoch:                metrics.SystemState.StakeSubsidyStartEpoch,
+		enums.ColumnNameSystemStakeSubsidyBalance:                   metrics.SystemState.StakeSubsidyBalance,
+		enums.ColumnNameSystemStakeSubsidyDistributionCounter:       metrics.SystemState.StakeSubsidyDistributionCounter,
+		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: metrics.SystemState.StakeSubsidyCurrentDistributionAmount,
+		enums.ColumnNameSystemStakeSubsidyPeriodLength:              metrics.SystemState.StakeSubsidyPeriodLength,
+		enums.ColumnNameSystemStakeSubsidyDecreaseRate:              metrics.SystemState.StakeSubsidyDecreaseRate,
+		enums.ColumnNameSystemReferenceGasPrice:                     metrics.SystemState.ReferenceGasPrice,
 		enums.ColumnNameSystemMinReferenceGasPrice:                  metrics.MinReferenceGasPrice,
 		enums.ColumnNameSystemMaxReferenceGasPrice:                  metrics.MaxReferenceGasPrice,
 		enums.ColumnNameSystemMeanReferenceGasPrice:                 metrics.MeanReferenceGasPrice,
 		enums.ColumnNameSystemStakeWeightedMeanReferenceGasPrice:    metrics.StakeWeightedMeanReferenceGasPrice,
 		enums.ColumnNameSystemMedianReferenceGasPrice:               metrics.MedianReferenceGasPrice,
 		enums.ColumnNameSystemEstimatedReferenceGasPrice:            metrics.EstimatedNextReferenceGasPrice,
-	}, nil
+	}
+
+	mistValues := map[enums.ColumnName]string{
+		enums.ColumnNameSystemTotalStake:                            metrics.SystemState.TotalStake,
+		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  metrics.SystemState.StorageFundTotalObjectStorageRebates,
+		enums.ColumnNameSystemStorageFundNonRefundableBalance:       metrics.SystemState.StorageFundNonRefundableBalance,
+		enums.ColumnNameSystemStakeSubsidyBalance:                   metrics.SystemState.StakeSubsidyBalance,
+		enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount: metrics.SystemState.StakeSubsidyCurrentDistributionAmount,
+	}
+
+	for columnName, mistValue := range mistValues {
+		intValue, err := domainmetrics.MistToSui(mistValue)
+		if err != nil {
+			return nil, err
+		}
+
+		result[columnName] = intValue
+	}
+
+	return result, nil
 }
 
 // GetValidatorCountsColumnValues returns a map of ColumnName values to corresponding values for the system state validators.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
-func GetValidatorCountsColumnValues(systemState *metrics.SuiSystemState) map[enums.ColumnName]any {
+func GetValidatorCountsColumnValues(systemState *domainmetrics.SuiSystemState) map[enums.ColumnName]any {
 	return map[enums.ColumnName]any{
 		enums.ColumnNameIndex:                                1,
 		enums.ColumnNameSystemMaxValidatorCount:              systemState.MaxValidatorCount,
@@ -164,7 +181,7 @@ func GetValidatorCountsColumnValues(systemState *metrics.SuiSystemState) map[enu
 // GetValidatorReportColumnValues returns a map of ColumnName values to corresponding values for the system state validator.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
-func GetValidatorReportColumnValues(reportedName string, slashingPct string, reporter metrics.ValidatorReporter) ColumnValues {
+func GetValidatorReportColumnValues(reportedName string, slashingPct string, reporter domainmetrics.ValidatorReporter) ColumnValues {
 	return ColumnValues{
 		enums.ColumnNameSystemValidatorReportedName:       reportedName,
 		enums.ColumnNameSystemValidatorSlashingPercentage: slashingPct,
@@ -176,7 +193,7 @@ func GetValidatorReportColumnValues(reportedName string, slashingPct string, rep
 // GetValidatorAtRiskColumnValues returns a map of ColumnName values to corresponding values for the system state validators at risk.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
-func GetValidatorAtRiskColumnValues(idx int, validator metrics.ValidatorAtRisk) ColumnValues {
+func GetValidatorAtRiskColumnValues(idx int, validator domainmetrics.ValidatorAtRisk) ColumnValues {
 	return ColumnValues{
 		enums.ColumnNameIndex:                               idx + 1,
 		enums.ColumnNameSystemAtRiskValidatorName:           validator.Name,

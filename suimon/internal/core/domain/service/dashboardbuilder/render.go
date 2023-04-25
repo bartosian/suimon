@@ -83,13 +83,17 @@ func (db *Builder) Render() (err error) {
 		}
 	})
 
-	// Display the dashboard on the terminal and handle errors
-	if err := termdash.Run(
-		db.ctx, db.terminal, db.dashboard,
-		termdash.KeyboardSubscriber(db.quitter),
-	); err != nil {
-		return fmt.Errorf("failed to run terminal dashboard: %w", err)
-	}
+	errGroup.Go(func() error {
+		// Display the dashboard on the terminal and handle errors
+		if err := termdash.Run(
+			db.ctx, db.terminal, db.dashboard,
+			termdash.KeyboardSubscriber(db.quitter),
+		); err != nil {
+			return fmt.Errorf("failed to run terminal dashboard: %w", err)
+		}
+
+		return nil
+	})
 
 	return errGroup.Wait()
 }

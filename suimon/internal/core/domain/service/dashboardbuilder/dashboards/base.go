@@ -50,6 +50,8 @@ func GetColumnsConfig(dashboard enums.TableType) (ColumnsConfig, error) {
 		return ColumnsConfigValidator, nil
 	case enums.TableTypeRPC:
 		return ColumnsConfigRPC, nil
+	case enums.TableTypeGasPriceAndSubsidy:
+		return ColumnsConfigSystemState, nil
 	default:
 		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
@@ -64,6 +66,8 @@ func GetColumnsValues(dashboard enums.TableType, host domainhost.Host) (ColumnVa
 		return GetValidatorColumnValues(host), nil
 	case enums.TableTypeRPC:
 		return GetRPCColumnValues(host), nil
+	case enums.TableTypeGasPriceAndSubsidy:
+		return GeSystemStateColumnValues(host)
 	default:
 		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
@@ -78,6 +82,8 @@ func GetRowsConfig(dashboard enums.TableType) (RowsConfig, error) {
 		return RowsConfigValidator, nil
 	case enums.TableTypeRPC:
 		return RowsConfigRPC, nil
+	case enums.TableTypeGasPriceAndSubsidy:
+		return RowsConfigSystemState, nil
 	default:
 		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
@@ -92,6 +98,8 @@ func GetCellsConfig(dashboard enums.TableType) (CellsConfig, error) {
 		return CellsConfigValidator, nil
 	case enums.TableTypeRPC:
 		return CellsConfigRPC, nil
+	case enums.TableTypeGasPriceAndSubsidy:
+		return CellsConfigSystemState, nil
 	default:
 		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}

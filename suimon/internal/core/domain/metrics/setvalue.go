@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/big"
 	"strconv"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
@@ -17,6 +18,7 @@ const (
 	ErrUnsupportedValidatorsReportAttr = "unsupported validatorsReport attribute type: %v"
 	ErrUnsupportedSuiAddressAttr       = "unsupported suiAddress attribute type: %v"
 	utcTimeZone                        = "America/New_York"
+	suiRate                            = 1_000_000_000
 )
 
 // SetValue updates a metric with the given value, parsing it if necessary.
@@ -522,4 +524,24 @@ func (validators Validators) GetMinRefGasPrice() (int, error) {
 	}
 
 	return minRefGasPrice, nil
+}
+
+// MistToSui converts a string representing a value in "mist" units to its
+// equivalent value in "sui" units.
+//
+// mist: a string representing a value in "mist" units
+//
+// Returns: the equivalent value in "sui" units, and an error if the input
+// value cannot be converted to an integer.
+func MistToSui(mist string) (int64, error) {
+	// Convert the input string to an int64
+	mistInt, ok := new(big.Int).SetString(mist, 10)
+	if !ok {
+		// Return an error if the input value cannot be converted to an integer
+		return 0, fmt.Errorf("unexpected metric value type: %s", mist)
+	}
+
+	suiInt := new(big.Int).Div(mistInt, big.NewInt(suiRate))
+
+	return suiInt.Int64(), nil
 }

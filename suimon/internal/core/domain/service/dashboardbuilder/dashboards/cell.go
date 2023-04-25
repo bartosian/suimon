@@ -152,6 +152,10 @@ func writeToSegmentWidget(widget *segmentdisplay.SegmentDisplay, options []cell.
 	var chunks []*segmentdisplay.TextChunk
 
 	switch v := value.(type) {
+	case int64:
+		chunk := strconv.FormatInt(v, 10)
+
+		chunks = append(chunks, segmentdisplay.NewChunk(chunk, segmentOptions...))
 	case int:
 		chunk := strconv.Itoa(v)
 

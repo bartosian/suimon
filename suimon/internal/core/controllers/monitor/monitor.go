@@ -74,7 +74,6 @@ func (c *Controller) Monitor() error {
 		c.selectedDashboard = *dashboardToRender
 
 		return c.Dynamic()
-
 	default:
 		return fmt.Errorf("not supported monitoring type provided %s", selectedMonitorType.Value)
 	}
@@ -145,6 +144,7 @@ func (c *Controller) selectDynamicDashboard() (*enums.TableType, error) {
 		string(enums.TableTypeNode),
 		string(enums.TableTypeValidator),
 		string(enums.TableTypeRPC),
+		string(enums.TableTypeGasPriceAndSubsidy),
 	)
 
 	selectedDashboardType, err := c.gateways.cli.SelectOne("Which dashboard do you want to render?", dashboardTypeChoiceList)
@@ -178,6 +178,10 @@ func (c *Controller) selectHostForDashboard() (*domainhost.Host, error) {
 
 	if len(hosts) == 0 {
 		return nil, nil
+	}
+
+	if len(hosts) == 1 {
+		return &hosts[0], nil
 	}
 
 	// Create a list of host addresses for the user to select from.
