@@ -32,7 +32,11 @@ func (db *Builder) Init() (err error) {
 		}
 	}()
 
-	cellsConfig := dashboards.GetCellsConfig(db.tableType)
+	cellsConfig, err := dashboards.GetCellsConfig(db.tableType)
+	if err != nil {
+		return err
+	}
+
 	cells, err := dashboards.GetCells(cellsConfig)
 	if err != nil {
 		return err
@@ -40,13 +44,21 @@ func (db *Builder) Init() (err error) {
 
 	db.cells = cells
 
-	columnsConfig := dashboards.GetColumnsConfig(db.tableType)
+	columnsConfig, err := dashboards.GetColumnsConfig(db.tableType)
+	if err != nil {
+		return err
+	}
+
 	columns, err := dashboards.GetColumns(columnsConfig, cells)
 	if err != nil {
 		return err
 	}
 
-	rowsConfig := dashboards.GetRowsConfig(db.tableType)
+	rowsConfig, err := dashboards.GetRowsConfig(db.tableType)
+	if err != nil {
+		return err
+	}
+
 	rows, err := dashboards.GetRows(rowsConfig, cells, columns)
 	if err != nil {
 		return err

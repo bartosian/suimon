@@ -10,13 +10,12 @@ import (
 var (
 	ColumnsConfigNode = ColumnsConfig{
 		// Overview section
-		enums.ColumnNameCurrentEpoch:            19,
+		enums.ColumnNameCurrentEpoch:            20,
 		enums.ColumnNameSystemTimeTillNextEpoch: 25,
 		enums.ColumnNameNetworkPeers:            15,
 		enums.ColumnNameUptime:                  25,
 		enums.ColumnNameVersion:                 25,
 		enums.ColumnNameCommit:                  25,
-		enums.ColumnNameHealth:                  5,
 		enums.ColumnNameCheckpointExecBacklog:   24,
 		enums.ColumnNameCheckpointSyncBacklog:   24,
 
@@ -89,12 +88,11 @@ var (
 	}
 
 	CellsConfigNode = CellsConfig{
-		enums.ColumnNameHealth:                       "HEALTH",
 		enums.ColumnNameTotalTransactionBlocks:       "TOTAL TRANSACTION BLOCKS",
 		enums.ColumnNameLatestCheckpoint:             "LATEST CHECKPOINT",
 		enums.ColumnNameTotalTransactionCertificates: "TOTAL TRANSACTION CERTIFICATES",
 		enums.ColumnNameTotalTransactionEffects:      "TOTAL TRANSACTION EFFECTS",
-		enums.ColumnNameTransactionsPerSecond:        "TRANSACTIONS PER SECOND",
+		enums.ColumnNameTransactionsPerSecond:        "TRANSACTIONS RATE",
 		enums.ColumnNameHighestKnownCheckpoint:       "HIGHEST KNOWN CHECKPOINT",
 		enums.ColumnNameHighestSyncedCheckpoint:      "HIGHEST SYNCED CHECKPOINT",
 		enums.ColumnNameLastExecutedCheckpoint:       "LAST EXECUTED CHECKPOINT",
@@ -104,7 +102,7 @@ var (
 		enums.ColumnNameSystemTimeTillNextEpoch:      "TIME TILL NEXT EPOCH",
 		enums.ColumnNameTXSyncPercentage:             "TX SYNC PERCENTAGE",
 		enums.ColumnNameCheckSyncPercentage:          "CHECKPOINTS SYNC PERCENTAGE",
-		enums.ColumnNameCheckpointsPerSecond:         "CHECKPOINTS PER SECOND",
+		enums.ColumnNameCheckpointsPerSecond:         "CHECKPOINTS RATE",
 		enums.ColumnNameNetworkPeers:                 "NETWORK PEERS",
 		enums.ColumnNameUptime:                       "UPTIME",
 		enums.ColumnNameVersion:                      "VERSION",
@@ -112,15 +110,11 @@ var (
 	}
 )
 
-// GetNodeColumnValues returns a map of NodeColumnName values to corresponding values for a node at the specified index on the specified host.
+// GetNodeColumnValues returns a map of ColumnName values to corresponding values for a node at the specified index on the specified host.
 // The function retrieves information about the node from the host's internal state and formats it into a map of NodeColumnName keys and corresponding values.
 // The function also includes emoji values in the map if the specified flag is true.
-// Returns a map of NodeColumnName keys to corresponding values.
 func GetNodeColumnValues(host host.Host) ColumnValues {
-	status := host.Status.StatusToPlaceholder()
-
-	columnValues := ColumnValues{
-		enums.ColumnNameHealth:                       status,
+	return ColumnValues{
 		enums.ColumnNameTotalTransactionBlocks:       host.Metrics.TotalTransactionsBlocks,
 		enums.ColumnNameTotalTransactionCertificates: host.Metrics.TotalTransactionCertificates,
 		enums.ColumnNameTotalTransactionEffects:      host.Metrics.TotalTransactionEffects,
@@ -141,6 +135,4 @@ func GetNodeColumnValues(host host.Host) ColumnValues {
 		enums.ColumnNameVersion:                      host.Metrics.Version,
 		enums.ColumnNameCommit:                       host.Metrics.Commit,
 	}
-
-	return columnValues
 }

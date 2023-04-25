@@ -62,10 +62,13 @@ func (db *Builder) Render() (err error) {
 		for {
 			select {
 			case <-tickerRerender.C:
-				columns := dashboards.GetNodeColumnValues(db.host)
+				columnValues, err := dashboards.GetColumnsValues(db.tableType, db.host)
+				if err != nil {
+					return err
+				}
 
 				for columnName, cell := range db.cells {
-					columnValue, ok := columns[columnName]
+					columnValue, ok := columnValues[columnName]
 					if !ok {
 						return fmt.Errorf("failed to get metric for column %s", columnName)
 					}

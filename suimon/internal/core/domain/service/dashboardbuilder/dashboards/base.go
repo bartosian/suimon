@@ -10,6 +10,7 @@ import (
 	"github.com/mum4k/termdash/linestyle"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	domainhost "github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
 )
 
 const (
@@ -41,32 +42,50 @@ var (
 )
 
 // GetColumnsConfig returns the columns configuration based on the specified dashboard type.
-func GetColumnsConfig(dashboard enums.TableType) ColumnsConfig {
+func GetColumnsConfig(dashboard enums.TableType) (ColumnsConfig, error) {
 	switch dashboard {
 	case enums.TableTypeNode:
-		return ColumnsConfigNode
+		return ColumnsConfigNode, nil
+	case enums.TableTypeValidator:
+		return ColumnsConfigValidator, nil
 	default:
-		return nil
+		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
+	}
+}
+
+// GetColumnsValues returns the columns values based on the specified dashboard type and host.
+func GetColumnsValues(dashboard enums.TableType, host domainhost.Host) (ColumnValues, error) {
+	switch dashboard {
+	case enums.TableTypeNode:
+		return GetNodeColumnValues(host), nil
+	case enums.TableTypeValidator:
+		return GetValidatorColumnValues(host), nil
+	default:
+		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
 }
 
 // GetRowsConfig returns the rows configuration based on the specified dashboard type.
-func GetRowsConfig(dashboard enums.TableType) RowsConfig {
+func GetRowsConfig(dashboard enums.TableType) (RowsConfig, error) {
 	switch dashboard {
 	case enums.TableTypeNode:
-		return RowsConfigNode
+		return RowsConfigNode, nil
+	case enums.TableTypeValidator:
+		return RowsConfigValidator, nil
 	default:
-		return nil
+		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
 }
 
 // GetCellsConfig returns the cells configuration based on the specified dashboard type.
-func GetCellsConfig(dashboard enums.TableType) CellsConfig {
+func GetCellsConfig(dashboard enums.TableType) (CellsConfig, error) {
 	switch dashboard {
 	case enums.TableTypeNode:
-		return CellsConfigNode
+		return CellsConfigNode, nil
+	case enums.TableTypeValidator:
+		return CellsConfigValidator, nil
 	default:
-		return nil
+		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
 }
 
