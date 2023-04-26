@@ -1,4 +1,4 @@
-# SUIMON: A Command Line Tool for Monitoring the SUI Network
+# SUIMON: A Command Line Tool for Monitoring SUI Network
 
 <p align="center">
   <img src="static/images/suimon.png" alt="Image Description" width="1000"/>
@@ -159,10 +159,45 @@ ip-lookup:
 The Suimon tool provides several commands that can be used to interact with the SUI blockchain. Here is an overview of the main commands:
 
 - `suimon help`: Show help information about any command.
-
+  ![Screenshot of my app](static/images/suimon-help.png)
+  <br><br>
 - `suimon monitor`: Monitor the running network with the Suimon monitoring tool.
+  <br><br>
+  When you run the command, the monitoring tool will start and display a list of available configurations that have been added to the ``.suimon`` directory. Each item in the list corresponds to a configuration file, and you can select the configuration you want to use following instructions in the terminal.
+  For example, if you have two configuration files in your .suimon directory named ``suimon-testnet.yaml`` and ``suimon-mainnet.yaml``, the tool will display a list like this:
+  <br><br>
+  ![Screenshot of my app](static/images/suimon-monitor.png)
+  <br><br>
+  After selecting a configuration file to use with the suimon monitor command, you will be presented with another list of options to select the monitor type you want to use. There are two monitor types available: ``static`` and ``dynamic``.
 
+  The ``static`` monitor type displays tables that show detailed information about the network, such as block and transaction data, validator information, and network statistics. This type of monitor is useful for analyzing the network and getting a detailed view of its operations.
+
+  The ``dynamic`` monitor type displays real-time dashboards that show key metrics about the network. This type of monitor is useful for getting a quick overview of the network's current state and performance.
+  <br><br>
+  ![Screenshot of my app](static/images/suimon-monitor-type.png)
+  <br><br>
+  This will prompt you to select a table to render.
+  <br><br>
+  ![Screenshot of my app](static/images/suimon-table-type.png)
+  <br><br>
 - `suimon version`: Show version information for the Suimon monitoring tool.
+  ![Screenshot of my app](static/images/suimon-version.png)
+
+## Table Types
+
+The available table types for rendering are:
+
+| Table Type             | Description                                                                    |
+|------------------------|--------------------------------------------------------------------------------|
+| RPC                    | Displays detailed information about the network's RPC endpoints.               |
+| Node                   | Displays detailed information about the network's nodes.                       |
+| Validator              | Displays detailed information about the network's validators.                  |
+| Peers                  | Displays detailed information about the network's peers.                       |
+| GasPriceAndSubsidy     | Displays the current gas price and subsidy values for the network.             |
+| ValidatorsCounts       | Displays the validators related thresholds and counts on the network.          |
+| ValidatorsAtRisk       | Displays the number of validators that are currently at risk of being slashed. |
+| ValidatorReports       | Displays the latest reports submitted by validators.                           |
+| ActiveValidators       | Displays the current list of active validators on the network.                 |
 
 # License
 
