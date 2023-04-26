@@ -2,6 +2,7 @@ package dashboards
 
 import (
 	"fmt"
+
 	"github.com/mum4k/termdash/cell"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
@@ -121,7 +122,7 @@ var (
 		enums.ColumnNameCheckpointExecBacklog:                   {"CHECKPOINT EXEC BACKLOG", cell.ColorBlue},
 		enums.ColumnNameCheckpointSyncBacklog:                   {"CHECKPOINT SYNC BACKLOG", cell.ColorBlue},
 		enums.ColumnNameCheckSyncPercentage:                     {"CHECKPOINTS SYNC PERCENTAGE", cell.ColorBlue},
-		enums.ColumnNameCheckpointsPerSecond:                    {"CHECKPOINTS RATE", cell.ColorBlue},
+		enums.ColumnNameCheckpointsPerSecond:                    {"CHECKPOINTS VOLUME", cell.ColorBlue},
 		enums.ColumnNameTotalTransactionCertificates:            {"TOTAL TRANSACTION CERTIFICATES", cell.ColorYellow},
 		enums.ColumnNameTotalTransactionEffects:                 {"TOTAL TRANSACTION EFFECTS", cell.ColorYellow},
 		enums.ColumnNameCertificatesCreated:                     {"CERTIFICATES CREATED", cell.ColorYellow},

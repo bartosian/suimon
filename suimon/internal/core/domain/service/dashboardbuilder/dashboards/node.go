@@ -103,12 +103,12 @@ var (
 		enums.ColumnNameLastExecutedCheckpoint:       {"LAST EXECUTED CHECKPOINT", cell.ColorBlue},
 		enums.ColumnNameLatestCheckpoint:             {"LATEST CHECKPOINT", cell.ColorBlue},
 		enums.ColumnNameCheckSyncPercentage:          {"CHECKPOINTS SYNC PERCENTAGE", cell.ColorBlue},
-		enums.ColumnNameCheckpointsPerSecond:         {"CHECKPOINTS RATE", cell.ColorBlue},
+		enums.ColumnNameCheckpointsPerSecond:         {"CHECKPOINTS VOLUME", cell.ColorBlue},
 		enums.ColumnNameTotalTransactionBlocks:       {"TOTAL TRANSACTION BLOCKS", cell.ColorYellow},
 		enums.ColumnNameTotalTransactionCertificates: {"TOTAL TRANSACTION CERTIFICATES", cell.ColorYellow},
 		enums.ColumnNameTotalTransactionEffects:      {"TOTAL TRANSACTION EFFECTS", cell.ColorYellow},
-		enums.ColumnNameTransactionsPerSecond:        {"TRANSACTIONS RATE", cell.ColorYellow},
-		enums.ColumnNameTXSyncPercentage:             {"TX SYNC PERCENTAGE", cell.ColorYellow},
+		enums.ColumnNameTransactionsPerSecond:        {"TRANSACTIONS VOLUME", cell.ColorYellow},
+		enums.ColumnNameTXSyncPercentage:             {"TRANSACTIONS SYNC PERCENTAGE", cell.ColorYellow},
 	}
 )
 
