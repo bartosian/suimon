@@ -8,7 +8,7 @@ import (
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
 	domainhost "github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
+	domainmetrics "github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/tablebuilder/tables"
 )
 
@@ -37,7 +37,7 @@ func (tb *Builder) Init() error {
 	case enums.TableTypeValidatorsCounts:
 		systemState := hosts[0].Metrics.SystemState
 
-		tb.handleValidatorCountsTable(&systemState)
+		return tb.handleValidatorCountsTable(&systemState)
 	case enums.TableTypeValidatorsAtRisk:
 		systemState := hosts[0].Metrics.SystemState
 
@@ -53,7 +53,7 @@ func (tb *Builder) Init() error {
 	case enums.TableTypeActiveValidators:
 		systemState := hosts[0].Metrics.SystemState
 
-		tb.handleActiveValidatorsTable(&systemState)
+		return tb.handleActiveValidatorsTable(&systemState)
 	}
 
 	return nil
@@ -176,7 +176,7 @@ func (tb *Builder) handleValidatorTable(hosts []domainhost.Host) {
 }
 
 // handleSystemStateTable handles the configuration for the System State table.
-func (tb *Builder) handleSystemStateTable(metrics *metrics.Metrics) error {
+func (tb *Builder) handleSystemStateTable(metrics *domainmetrics.Metrics) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeGasPriceAndSubsidy)
 
 	columnValues, err := tables.GetSystemStateColumnValues(metrics)
@@ -194,21 +194,26 @@ func (tb *Builder) handleSystemStateTable(metrics *metrics.Metrics) error {
 }
 
 // handleValidatorCountsTable handles the configuration for the Validator Counts table.
-func (tb *Builder) handleValidatorCountsTable(systemState *metrics.SuiSystemState) {
+func (tb *Builder) handleValidatorCountsTable(systemState *domainmetrics.SuiSystemState) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidatorsCounts)
 
-	columnValues := tables.GetValidatorCountsColumnValues(systemState)
+	columnValues, err := tables.GetValidatorCountsColumnValues(systemState)
+	if err != nil {
+		return err
+	}
 
 	tableConfig.Columns.SetColumnValues(columnValues)
 
 	tableConfig.RowsCount++
 
 	tb.config = tableConfig
+
+	return nil
 }
 
 // handleValidatorsAtRiskTable handles the configuration for the Validators At Risk table.
 // It takes the system state, extracts the necessary data, and updates the table configuration.
-func (tb *Builder) handleValidatorsAtRiskTable(systemState *metrics.SuiSystemState) error {
+func (tb *Builder) handleValidatorsAtRiskTable(systemState *domainmetrics.SuiSystemState) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidatorsAtRisk)
 
 	validatorsAtRisk := systemState.ValidatorsAtRiskParsed
@@ -248,7 +253,7 @@ func (tb *Builder) handleValidatorsAtRiskTable(systemState *metrics.SuiSystemSta
 
 // handleValidatorReportsTable handles the configuration for the Validator Reports table.
 // It takes the system state, extracts the necessary data, and updates the table configuration.
-func (tb *Builder) handleValidatorReportsTable(systemState *metrics.SuiSystemState) error {
+func (tb *Builder) handleValidatorReportsTable(systemState *domainmetrics.SuiSystemState) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidatorReports)
 
 	validatorReports := systemState.ValidatorReportsParsed
@@ -278,7 +283,7 @@ func (tb *Builder) handleValidatorReportsTable(systemState *metrics.SuiSystemSta
 
 // handleActiveValidatorsTable handles the configuration for the Active Validators table.
 // It takes the system state, extracts the necessary data, and updates the table configuration.
-func (tb *Builder) handleActiveValidatorsTable(systemState *metrics.SuiSystemState) {
+func (tb *Builder) handleActiveValidatorsTable(systemState *domainmetrics.SuiSystemState) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeActiveValidators)
 
 	activeValidators := systemState.ActiveValidators
@@ -318,7 +323,10 @@ func (tb *Builder) handleActiveValidatorsTable(systemState *metrics.SuiSystemSta
 	})
 
 	for idx, validator := range activeValidators {
-		columnValues := tables.GetActiveValidatorColumnValues(idx, validator)
+		columnValues, err := tables.GetActiveValidatorColumnValues(idx, validator)
+		if err != nil {
+			return err
+		}
 
 		tableConfig.Columns.SetColumnValues(columnValues)
 
@@ -326,4 +334,6 @@ func (tb *Builder) handleActiveValidatorsTable(systemState *metrics.SuiSystemSta
 	}
 
 	tb.config = tableConfig
+
+	return nil
 }

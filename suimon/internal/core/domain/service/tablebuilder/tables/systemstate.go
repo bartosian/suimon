@@ -114,8 +114,8 @@ var (
 // GetSystemStateColumnValues returns a map of SystemColumnName values to corresponding values for the system state.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of SystemColumnName keys and corresponding values.
 // Returns a map of SystemColumnName keys to corresponding values.
-func GetSystemStateColumnValues(metrics *domainmetrics.Metrics) (map[enums.ColumnName]any, error) {
-	result := map[enums.ColumnName]any{
+func GetSystemStateColumnValues(metrics *domainmetrics.Metrics) (ColumnValues, error) {
+	result := ColumnValues{
 		enums.ColumnNameIndex:                                       1,
 		enums.ColumnNameSystemEpoch:                                 metrics.SystemState.Epoch,
 		enums.ColumnNameSystemEpochStartTimestamp:                   metrics.EpochStartTimeUTC,
@@ -162,20 +162,34 @@ func GetSystemStateColumnValues(metrics *domainmetrics.Metrics) (map[enums.Colum
 // GetValidatorCountsColumnValues returns a map of ColumnName values to corresponding values for the system state validators.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
-func GetValidatorCountsColumnValues(systemState *domainmetrics.SuiSystemState) map[enums.ColumnName]any {
-	return map[enums.ColumnName]any{
-		enums.ColumnNameIndex:                                1,
-		enums.ColumnNameSystemMaxValidatorCount:              systemState.MaxValidatorCount,
-		enums.ColumnNameSystemActiveValidatorCount:           len(systemState.ActiveValidators),
-		enums.ColumnNameSystemPendingActiveValidatorCount:    systemState.PendingActiveValidatorsSize,
-		enums.ColumnNameSystemValidatorCandidateCount:        systemState.ValidatorCandidatesSize,
-		enums.ColumnNameSystemPendingRemovalsCount:           len(systemState.PendingRemovals),
-		enums.ColumnNameSystemAtRiskValidatorCount:           len(systemState.AtRiskValidators),
+func GetValidatorCountsColumnValues(systemState *domainmetrics.SuiSystemState) (ColumnValues, error) {
+	result := ColumnValues{
+		enums.ColumnNameIndex:                              1,
+		enums.ColumnNameSystemMaxValidatorCount:            systemState.MaxValidatorCount,
+		enums.ColumnNameSystemActiveValidatorCount:         len(systemState.ActiveValidators),
+		enums.ColumnNameSystemPendingActiveValidatorCount:  systemState.PendingActiveValidatorsSize,
+		enums.ColumnNameSystemValidatorCandidateCount:      systemState.ValidatorCandidatesSize,
+		enums.ColumnNameSystemPendingRemovalsCount:         len(systemState.PendingRemovals),
+		enums.ColumnNameSystemAtRiskValidatorCount:         len(systemState.AtRiskValidators),
+		enums.ColumnNameSystemValidatorLowStakeGracePeriod: systemState.ValidatorLowStakeGracePeriod,
+	}
+
+	mistValues := map[enums.ColumnName]string{
 		enums.ColumnNameSystemMinValidatorJoiningStake:       systemState.MinValidatorJoiningStake,
 		enums.ColumnNameSystemValidatorLowStakeThreshold:     systemState.ValidatorLowStakeThreshold,
 		enums.ColumnNameSystemValidatorVeryLowStakeThreshold: systemState.ValidatorVeryLowStakeThreshold,
-		enums.ColumnNameSystemValidatorLowStakeGracePeriod:   systemState.ValidatorLowStakeGracePeriod,
 	}
+
+	for columnName, mistValue := range mistValues {
+		intValue, err := domainmetrics.MistToSui(mistValue)
+		if err != nil {
+			return nil, err
+		}
+
+		result[columnName] = intValue
+	}
+
+	return result, nil
 }
 
 // GetValidatorReportColumnValues returns a map of ColumnName values to corresponding values for the system state validator.

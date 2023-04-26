@@ -4,7 +4,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
+	domainmetrics "github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
 )
 
 var (
@@ -46,22 +46,36 @@ var (
 // GetActiveValidatorColumnValues returns a map of ActiveValidatorColumnName values to corresponding values for the specified active validator.
 // The function retrieves information about the active validator from the provided metrics.Validator object and formats it into a map of ActiveValidatorColumnName keys and corresponding values.
 // Returns a map of ActiveValidatorColumnName keys to corresponding values.
-func GetActiveValidatorColumnValues(idx int, validator *metrics.Validator) ColumnValues {
-	return ColumnValues{
+func GetActiveValidatorColumnValues(idx int, validator *domainmetrics.Validator) (ColumnValues, error) {
+	result := ColumnValues{
 		enums.ColumnNameIndex:                             idx + 1,
 		enums.ColumnNameValidatorName:                     validator.Name,
 		enums.ColumnNameValidatorNetAddress:               validator.NetAddress,
 		enums.ColumnNameValidatorVotingPower:              validator.VotingPower,
 		enums.ColumnNameValidatorGasPrice:                 validator.GasPrice,
 		enums.ColumnNameValidatorCommissionRate:           validator.CommissionRate,
-		enums.ColumnNameValidatorNextEpochStake:           validator.NextEpochStake,
 		enums.ColumnNameValidatorNextEpochGasPrice:        validator.NextEpochGasPrice,
 		enums.ColumnNameValidatorNextEpochCommissionRate:  validator.NextEpochCommissionRate,
-		enums.ColumnNameValidatorStakingPoolSuiBalance:    validator.StakingPoolSuiBalance,
-		enums.ColumnNameValidatorRewardsPool:              validator.RewardsPool,
-		enums.ColumnNameValidatorPoolTokenBalance:         validator.PoolTokenBalance,
-		enums.ColumnNameValidatorPendingStake:             validator.PendingStake,
 		enums.ColumnNameValidatorPendingTotalSuiWithdraw:  validator.PendingTotalSuiWithdraw,
 		enums.ColumnNameValidatorPendingPoolTokenWithdraw: validator.PendingPoolTokenWithdraw,
 	}
+
+	mistValues := map[enums.ColumnName]string{
+		enums.ColumnNameValidatorNextEpochStake:        validator.NextEpochStake,
+		enums.ColumnNameValidatorStakingPoolSuiBalance: validator.StakingPoolSuiBalance,
+		enums.ColumnNameValidatorRewardsPool:           validator.RewardsPool,
+		enums.ColumnNameValidatorPoolTokenBalance:      validator.PoolTokenBalance,
+		enums.ColumnNameValidatorPendingStake:          validator.PendingStake,
+	}
+
+	for columnName, mistValue := range mistValues {
+		intValue, err := domainmetrics.MistToSui(mistValue)
+		if err != nil {
+			return nil, err
+		}
+
+		result[columnName] = intValue
+	}
+
+	return result, nil
 }
