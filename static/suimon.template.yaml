@@ -1,9 +1,9 @@
-# update this section to add/remove rpc endpoints
+# This section lists the RPC endpoints that the client will use to interact with the SUI Testnet.
+# Please make sure to provide at least one working endpoint.
 public-rpc:
   - "https://wave3-rpc.testnet.sui.io:443"
-  - "https://rpcgw-ws-testnet-w3.suiscan.xyz:443"
-  - "https://sui-api.rpcpool.com:443"
-  - "https://wave3-rpc.synergynodes.com:443"
+  - "https://rpc-ws-testnet-w3.suiprovider.xyz:443"
+  - "https://sui-api.rpc.com:443"
 
 # if you wish to monitor the node, update this section with the node information
 full-nodes:
@@ -23,8 +23,6 @@ seed-peers:
   - "/ip4/178.18.250.62/udp/8080"
   - "/ip4/213.239.215.119/udp/8084"
   - "/ip4/65.109.32.171/udp/8084"
-  - "/ip4/65.108.44.149/udp/8084"
-  - "/ip4/95.214.54.28/udp/8080"
 
 # provider and country information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
 # which is free and gives you 50k requests per month, which is sufficient for individual usage.
