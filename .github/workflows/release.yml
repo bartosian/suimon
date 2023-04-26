@@ -1,0 +1,51 @@
+name: Build and Publish Suimon Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.17
+          check-latest: true
+
+      - name: Build Binary
+        run: go build -o suimon
+
+      - name: Read Release Notes
+        id: read_release_notes
+        run: echo "::set-output name=notes::$(cat static/release-notes.txt)"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Suimon Release ${{ github.ref }}
+          body: ${{ steps.read_release_notes.outputs.notes }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./suimon
+          asset_name: suimon
+          asset_content_type: application/octet-stream
