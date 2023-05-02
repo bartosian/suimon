@@ -147,11 +147,11 @@ func (tb *Builder) setColors() {
 				}
 
 				if slashingPct > 100 {
-					return text.Colors{bgRed}
+					return text.Colors{bgRed, fgWhite}
 				}
 
 				if slashingPct > 50 {
-					return text.Colors{bgYellow}
+					return text.Colors{bgYellow, fgBlack}
 				}
 
 				return valuesRowFgColor

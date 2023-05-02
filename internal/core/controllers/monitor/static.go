@@ -36,6 +36,10 @@ func (c *Controller) InitTables() error {
 			return err
 		}
 
+		if len(hosts) == 0 {
+			continue
+		}
+
 		builder := tablebuilder.NewBuilder(tableType, hosts, c.gateways.cli)
 		c.builders.static[tableType] = builder
 

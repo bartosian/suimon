@@ -45,7 +45,7 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses
 func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
 	nodesConfig := c.selectedConfig.FullNodes
 	if len(nodesConfig) == 0 {
-		return nil, errors.New("full-nodes not provided in dashboards file")
+		return
 	}
 
 	for _, node := range nodesConfig {
@@ -97,7 +97,7 @@ func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.Ad
 func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
 	validatorsConfig := c.selectedConfig.Validators
 	if len(validatorsConfig) == 0 {
-		return nil, errors.New("validators not provided in dashboards file")
+		return
 	}
 
 	for _, validator := range validatorsConfig {
@@ -128,7 +128,7 @@ func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []ho
 func (c *Controller) getPeerAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
 	peersConfig := c.selectedConfig.SeedPeers
 	if len(peersConfig) == 0 {
-		return nil, errors.New("seed-peers not provided in dashboards file")
+		return
 	}
 
 	for _, peer := range peersConfig {
