@@ -1,7 +1,6 @@
 package tables
 
 import (
-	"fmt"
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
@@ -77,7 +76,7 @@ var (
 		},
 	}
 
-	RowsConfigValidatorCounts = RowsConfig{
+	RowsConfigValidatorParams = RowsConfig{
 		0: {
 			enums.ColumnNameSystemMaxValidatorCount,
 			enums.ColumnNameSystemActiveValidatorCount,
@@ -120,7 +119,7 @@ func GetSystemStateColumnValues(metrics *domainmetrics.Metrics) (ColumnValues, e
 		enums.ColumnNameSystemEpoch:                                 metrics.SystemState.Epoch,
 		enums.ColumnNameSystemEpochStartTimestamp:                   metrics.EpochStartTimeUTC,
 		enums.ColumnNameSystemEpochDuration:                         metrics.EpochDurationHHMM,
-		enums.ColumnNameSystemTimeTillNextEpoch:                     fmt.Sprintf("%s HH:MM", metrics.DurationTillEpochEndHHMM),
+		enums.ColumnNameSystemTimeTillNextEpoch:                     metrics.DurationTillEpochEndHHMM,
 		enums.ColumnNameSystemTotalStake:                            metrics.SystemState.TotalStake,
 		enums.ColumnNameSystemStorageFundTotalObjectStorageRebates:  metrics.SystemState.StorageFundTotalObjectStorageRebates,
 		enums.ColumnNameSystemStorageFundNonRefundableBalance:       metrics.SystemState.StorageFundNonRefundableBalance,
@@ -159,10 +158,10 @@ func GetSystemStateColumnValues(metrics *domainmetrics.Metrics) (ColumnValues, e
 	return result, nil
 }
 
-// GetValidatorCountsColumnValues returns a map of ColumnName values to corresponding values for the system state validators.
+// GetValidatorParamsColumnValues returns a map of ColumnName values to corresponding values for the system state validators.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
-func GetValidatorCountsColumnValues(systemState *domainmetrics.SuiSystemState) (ColumnValues, error) {
+func GetValidatorParamsColumnValues(systemState *domainmetrics.SuiSystemState) (ColumnValues, error) {
 	result := ColumnValues{
 		enums.ColumnNameIndex:                              1,
 		enums.ColumnNameSystemMaxValidatorCount:            systemState.MaxValidatorCount,

@@ -1,7 +1,6 @@
 package dashboards
 
 import (
-	"fmt"
 	"github.com/mum4k/termdash/cell"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
@@ -124,7 +123,7 @@ func GeSystemStateColumnValues(host host.Host) (ColumnValues, error) {
 		enums.ColumnNameCurrentEpoch:                             host.Metrics.SystemState.Epoch,
 		enums.ColumnNameSystemEpochStartTimestamp:                host.Metrics.EpochStartTimeUTC,
 		enums.ColumnNameSystemEpochDuration:                      host.Metrics.EpochDurationHHMM,
-		enums.ColumnNameSystemTimeTillNextEpoch:                  fmt.Sprintf("%s HH:MM", host.Metrics.DurationTillEpochEndHHMM),
+		enums.ColumnNameSystemTimeTillNextEpoch:                  host.Metrics.DurationTillEpochEndHHMM,
 		enums.ColumnNameSystemStakeSubsidyStartEpoch:             host.Metrics.SystemState.StakeSubsidyStartEpoch,
 		enums.ColumnNameSystemStakeSubsidyDistributionCounter:    host.Metrics.SystemState.StakeSubsidyDistributionCounter,
 		enums.ColumnNameSystemStakeSubsidyPeriodLength:           host.Metrics.SystemState.StakeSubsidyPeriodLength,

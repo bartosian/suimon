@@ -37,7 +37,7 @@ func (tb *Builder) Init() error {
 	case enums.TableTypeValidatorsParams:
 		systemState := hosts[0].Metrics.SystemState
 
-		return tb.handleValidatorCountsTable(&systemState)
+		return tb.handleValidatorParamsTable(&systemState)
 	case enums.TableTypeValidatorsAtRisk:
 		systemState := hosts[0].Metrics.SystemState
 
@@ -193,11 +193,11 @@ func (tb *Builder) handleSystemStateTable(metrics *domainmetrics.Metrics) error 
 	return nil
 }
 
-// handleValidatorCountsTable handles the configuration for the Validator Counts table.
-func (tb *Builder) handleValidatorCountsTable(systemState *domainmetrics.SuiSystemState) error {
+// handleValidatorParamsTable handles the configuration for the Validator Counts table.
+func (tb *Builder) handleValidatorParamsTable(systemState *domainmetrics.SuiSystemState) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidatorsParams)
 
-	columnValues, err := tables.GetValidatorCountsColumnValues(systemState)
+	columnValues, err := tables.GetValidatorParamsColumnValues(systemState)
 	if err != nil {
 		return err
 	}

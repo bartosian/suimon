@@ -21,7 +21,7 @@ type (
 		validatorTable        Builder
 		rpcTable              Builder
 		systemStateTable      Builder
-		validatorCountsTable  Builder
+		validatorParamsTable  Builder
 		atRiskValidatorsTable Builder
 		validatorReportsTable Builder
 		activeValidatorsTable Builder

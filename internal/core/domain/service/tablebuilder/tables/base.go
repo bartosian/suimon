@@ -126,7 +126,7 @@ func GetRowsConfig(table enums.TableType) RowsConfig {
 	case enums.TableTypeGasPriceAndSubsidy:
 		return RowsConfigSystemState
 	case enums.TableTypeValidatorsParams:
-		return RowsConfigValidatorCounts
+		return RowsConfigValidatorParams
 	case enums.TableTypeValidatorsAtRisk:
 		return RowsConfigValidatorsAtRisk
 	case enums.TableTypeValidatorReports:
