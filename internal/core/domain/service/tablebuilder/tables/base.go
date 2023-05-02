@@ -103,7 +103,7 @@ func GetColumnsConfig(table enums.TableType) ColumnsConfig {
 	case enums.TableTypeNode:
 		return ColumnsConfigNode
 	case enums.TableTypeGasPriceAndSubsidy,
-		enums.TableTypeValidatorsCounts,
+		enums.TableTypeValidatorsParams,
 		enums.TableTypeValidatorsAtRisk,
 		enums.TableTypeValidatorReports:
 		return ColumnsConfigSystem
@@ -125,7 +125,7 @@ func GetRowsConfig(table enums.TableType) RowsConfig {
 		return RowsConfigValidator
 	case enums.TableTypeGasPriceAndSubsidy:
 		return RowsConfigSystemState
-	case enums.TableTypeValidatorsCounts:
+	case enums.TableTypeValidatorsParams:
 		return RowsConfigValidatorCounts
 	case enums.TableTypeValidatorsAtRisk:
 		return RowsConfigValidatorsAtRisk

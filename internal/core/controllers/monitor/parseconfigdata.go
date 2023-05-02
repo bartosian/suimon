@@ -23,7 +23,7 @@ func (c *Controller) ParseConfigData(monitorType enums.MonitorType) error {
 			enums.TableTypeValidatorReports:   true,
 			enums.TableTypeValidatorsAtRisk:   true,
 			enums.TableTypeGasPriceAndSubsidy: true,
-			enums.TableTypeValidatorsCounts:   true,
+			enums.TableTypeValidatorsParams:   true,
 			enums.TableTypeRPC:                true,
 		}
 

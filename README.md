@@ -1,4 +1,4 @@
-# SUIMON: A Command Line Tool for Monitoring SUI Network
+# SUIMON: Command Line Tool for Monitoring SUI Network
 
 <p align="center">
   <img src="static/images/suimon.png" alt="Image Description" width="1000"/>

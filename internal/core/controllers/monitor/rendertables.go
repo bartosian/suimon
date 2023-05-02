@@ -23,7 +23,7 @@ func (c *Controller) RenderTables() error {
 		enums.TableTypeValidator:          validatorProvided,
 		enums.TableTypePeers:              peersProvided,
 		enums.TableTypeGasPriceAndSubsidy: rpcProvided,
-		enums.TableTypeValidatorsCounts:   rpcProvided,
+		enums.TableTypeValidatorsParams:   rpcProvided,
 		enums.TableTypeValidatorsAtRisk:   rpcProvided,
 		enums.TableTypeValidatorReports:   rpcProvided,
 		enums.TableTypeActiveValidators:   rpcProvided,
