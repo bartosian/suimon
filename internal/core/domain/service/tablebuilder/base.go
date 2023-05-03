@@ -14,27 +14,13 @@ import (
 	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
 )
 
-type (
-	Builders struct {
-		peerTable             Builder
-		nodeTable             Builder
-		validatorTable        Builder
-		rpcTable              Builder
-		systemStateTable      Builder
-		validatorParamsTable  Builder
-		atRiskValidatorsTable Builder
-		validatorReportsTable Builder
-		activeValidatorsTable Builder
-	}
-
-	Builder struct {
-		tableType  enums.TableType
-		hosts      []host.Host
-		cliGateway *cligw.Gateway
-		writer     table.Writer
-		config     *tables.TableConfig
-	}
-)
+type Builder struct {
+	tableType  enums.TableType
+	hosts      []host.Host
+	cliGateway *cligw.Gateway
+	writer     table.Writer
+	config     *tables.TableConfig
+}
 
 // NewBuilder creates a new instance of the table builder, using the CLI gateway
 func NewBuilder(tableType enums.TableType, hosts []host.Host, cliGateway *cligw.Gateway) *Builder {

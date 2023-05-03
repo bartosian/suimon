@@ -12,14 +12,13 @@ import (
 var (
 	ColumnsConfigNode = ColumnsConfig{
 		// Overview section
-		enums.ColumnNameCurrentEpoch:            20,
-		enums.ColumnNameSystemTimeTillNextEpoch: 25,
-		enums.ColumnNameNetworkPeers:            15,
-		enums.ColumnNameUptime:                  25,
-		enums.ColumnNameVersion:                 25,
-		enums.ColumnNameCommit:                  25,
-		enums.ColumnNameCheckpointExecBacklog:   24,
-		enums.ColumnNameCheckpointSyncBacklog:   24,
+		enums.ColumnNameCurrentEpoch:          33,
+		enums.ColumnNameNetworkPeers:          15,
+		enums.ColumnNameUptime:                25,
+		enums.ColumnNameVersion:               25,
+		enums.ColumnNameCommit:                25,
+		enums.ColumnNameCheckpointExecBacklog: 33,
+		enums.ColumnNameCheckpointSyncBacklog: 33,
 
 		// Transactions section
 		enums.ColumnNameTotalTransactionBlocks:       33,
@@ -51,7 +50,6 @@ var (
 			Height: 14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameCurrentEpoch,
-				enums.ColumnNameSystemTimeTillNextEpoch,
 				enums.ColumnNameCheckpointExecBacklog,
 				enums.ColumnNameCheckpointSyncBacklog,
 			},
@@ -95,7 +93,6 @@ var (
 		enums.ColumnNameVersion:                      {"VERSION", cell.ColorGreen},
 		enums.ColumnNameCommit:                       {"COMMIT", cell.ColorGreen},
 		enums.ColumnNameCurrentEpoch:                 {"CURRENT EPOCH", cell.ColorGreen},
-		enums.ColumnNameSystemTimeTillNextEpoch:      {"TIME TILL NEXT EPOCH", cell.ColorGreen},
 		enums.ColumnNameCheckpointExecBacklog:        {"CHECKPOINT EXEC BACKLOG", cell.ColorGreen},
 		enums.ColumnNameCheckpointSyncBacklog:        {"CHECKPOINT SYNC BACKLOG", cell.ColorGreen},
 		enums.ColumnNameHighestKnownCheckpoint:       {"HIGHEST KNOWN CHECKPOINT", cell.ColorBlue},
@@ -128,7 +125,6 @@ func GetNodeColumnValues(host host.Host) ColumnValues {
 		enums.ColumnNameCheckpointExecBacklog:        host.Metrics.CheckpointExecBacklog,
 		enums.ColumnNameCheckpointSyncBacklog:        host.Metrics.CheckpointSyncBacklog,
 		enums.ColumnNameCurrentEpoch:                 host.Metrics.CurrentEpoch,
-		enums.ColumnNameSystemTimeTillNextEpoch:      host.Metrics.DurationTillEpochEndHHMM,
 		enums.ColumnNameTXSyncPercentage:             fmt.Sprintf("%v%%", host.Metrics.TxSyncPercentage),
 		enums.ColumnNameCheckSyncPercentage:          fmt.Sprintf("%v%%", host.Metrics.CheckSyncPercentage),
 		enums.ColumnNameCheckpointsPerSecond:         host.Metrics.CheckpointsPerSecond,

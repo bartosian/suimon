@@ -33,6 +33,8 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 	switch metric {
 	case enums.MetricTypeSuiSystemState:
 		return metrics.SetSystemStateValue(value)
+	case enums.MetricTypeValidatorsApy:
+		return metrics.SetValidatorsApyValue(value)
 	case enums.MetricTypeTotalTransactionBlocks:
 		v, ok := value.(string)
 		if !ok {
@@ -284,6 +286,31 @@ func (metrics *Metrics) SetSystemStateValue(value any) error {
 
 	// Calculate the reference gas price metrics.
 	return metrics.setRefGasPriceMetrics()
+}
+
+// SetValidatorsApyValue sets the validators apy metrics based on the parsed data.
+func (metrics *Metrics) SetValidatorsApyValue(value any) error {
+	// Parse the JSON data of the SystemState object.
+	dataBytes, err := json.Marshal(value.(map[string]interface{}))
+	if err != nil {
+		return fmt.Errorf(ErrUnexpectedMetricValueType, enums.MetricTypeValidatorsApy, value)
+	}
+
+	// Unmarshal the JSON data into a ValidatorsApy struct.
+	var validatorsApy ValidatorsApy
+	if err = json.Unmarshal(dataBytes, &validatorsApy); err != nil {
+		return fmt.Errorf(ErrUnexpectedMetricValueType, enums.MetricTypeValidatorsApy, value)
+	}
+
+	validatorsApyParsed := make(map[string]float64, len(validatorsApy.Apys))
+
+	for _, validatorApy := range validatorsApy.Apys {
+		validatorsApyParsed[validatorApy.Address] = validatorApy.Apy
+	}
+
+	metrics.ValidatorsApyParsed = validatorsApyParsed
+
+	return nil
 }
 
 // setEpochMetrics is a helper function that sets the epoch-related metrics based on the parsed data

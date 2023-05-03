@@ -53,6 +53,7 @@ type (
 		PendingPoolTokenWithdraw     string      `json:"pendingPoolTokenWithdraw"`
 		ExchangeRatesID              string      `json:"exchangeRatesId"`
 		ExchangeRatesSize            string      `json:"exchangeRatesSize"`
+		APY                          string
 	}
 )
 

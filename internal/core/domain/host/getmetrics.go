@@ -13,12 +13,14 @@ import (
 )
 
 var (
+	// rpcMethodToMetricMap maps an RPC method to a metric type.
 	rpcMethodToMetricMap = map[enums.RPCMethod]enums.MetricType{
 		enums.RPCMethodGetTotalTransactionBlocks:         enums.MetricTypeTotalTransactionBlocks,
 		enums.RPCMethodGetLatestCheckpointSequenceNumber: enums.MetricTypeLatestCheckpoint,
 		enums.RPCMethodGetSuiSystemState:                 enums.MetricTypeSuiSystemState,
+		enums.RPCMethodGetValidatorsApy:                  enums.MetricTypeValidatorsApy,
 	}
-
+	// prometheusToMetricMap maps a Prometheus metric name to a metric type.
 	prometheusToMetricMap = map[enums.PrometheusMetricName]enums.MetricType{
 		enums.PrometheusMetricNameTotalTransactionCertificates: enums.MetricTypeTotalTransactionCertificates,
 		enums.PrometheusMetricNameTotalTransactionEffects:      enums.MetricTypeTotalTransactionEffects,
@@ -38,6 +40,24 @@ var (
 		enums.PrometheusMetricNameUptime:                       enums.MetricTypeUptime,
 		enums.PrometheusMetricNameCertificatesCreated:          enums.MetricTypeCertificatesCreated,
 		enums.PrometheusMetricNameNonConsensusLatencySum:       enums.MetricTypeNonConsensusLatencySum,
+	}
+	// tableToRpcMethods maps a table type to a list of RPC methods.
+	tableToRpcMethods = map[enums.TableType][]enums.RPCMethod{
+		enums.TableTypeNode: {
+			enums.RPCMethodGetTotalTransactionBlocks,
+			enums.RPCMethodGetLatestCheckpointSequenceNumber,
+		},
+		enums.TableTypeRPC: {
+			enums.RPCMethodGetTotalTransactionBlocks,
+			enums.RPCMethodGetLatestCheckpointSequenceNumber,
+			enums.RPCMethodGetSuiSystemState,
+			enums.RPCMethodGetValidatorsApy,
+		},
+	}
+	// tablesToCallMetrics maps a table type to a boolean value indicating whether to call metrics for that table type.
+	tablesToCallMetrics = map[enums.TableType]bool{
+		enums.TableTypeNode:      true,
+		enums.TableTypeValidator: true,
 	}
 )
 
@@ -164,33 +184,19 @@ func (host *Host) GetPrometheusMetrics() error {
 func (host *Host) GetMetrics() error {
 	var errGroup errgroup.Group
 
-	rpcMethods := []enums.RPCMethod{enums.RPCMethodGetTotalTransactionBlocks, enums.RPCMethodGetLatestCheckpointSequenceNumber, enums.RPCMethodGetSuiSystemState}
+	rpcMethods := tableToRpcMethods[host.TableType]
+	for _, method := range rpcMethods {
+		method := method
 
-	switch host.TableType {
-	case enums.TableTypeNode, enums.TableTypePeers:
-		for _, method := range rpcMethods {
-			method := method
+		errGroup.Go(func() error {
+			return host.GetDataByMetric(method)
+		})
+	}
 
-			errGroup.Go(func() error {
-				return host.GetDataByMetric(method)
-			})
-		}
-
+	if ok := tablesToCallMetrics[host.TableType]; ok {
 		errGroup.Go(func() error {
 			return host.GetPrometheusMetrics()
 		})
-	case enums.TableTypeValidator:
-		errGroup.Go(func() error {
-			return host.GetPrometheusMetrics()
-		})
-	case enums.TableTypeRPC:
-		for _, method := range rpcMethods {
-			method := method
-
-			errGroup.Go(func() error {
-				return host.GetDataByMetric(method)
-			})
-		}
 	}
 
 	if err := errGroup.Wait(); err != nil {

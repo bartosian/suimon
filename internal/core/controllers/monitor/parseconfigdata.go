@@ -17,8 +17,12 @@ import (
 // a channel. If an error is received from the channel, it is returned immediately. If no errors are received,
 // the function returns nil.
 func (c *Controller) ParseConfigData(monitorType enums.MonitorType) error {
+	if err := c.ParseConfigRPC(); err != nil {
+		return err
+	}
+
 	var (
-		systemTables = map[enums.TableType]bool{
+		rpcTables = map[enums.TableType]bool{
 			enums.TableTypeActiveValidators:   true,
 			enums.TableTypeValidatorReports:   true,
 			enums.TableTypeValidatorsAtRisk:   true,
@@ -35,7 +39,7 @@ func (c *Controller) ParseConfigData(monitorType enums.MonitorType) error {
 		tablesToParse = make([]enums.TableType, 0, len(c.selectedTables))
 
 		for _, table := range c.selectedTables {
-			if _, ok := systemTables[table]; ok {
+			if _, ok := rpcTables[table]; ok {
 				continue
 			}
 
@@ -43,10 +47,6 @@ func (c *Controller) ParseConfigData(monitorType enums.MonitorType) error {
 		}
 	case enums.MonitorTypeDynamic:
 		tablesToParse = []enums.TableType{c.selectedDashboard}
-	}
-
-	if err := c.ParseConfigRPC(); err != nil {
-		return err
 	}
 
 	errChan := make(chan error, len(tablesToParse))

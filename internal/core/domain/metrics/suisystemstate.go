@@ -9,8 +9,8 @@ import (
 
 const validatorsQuorum = 6667
 
-// SuiSystemState represents the current state of the Sui blockchain system.
 type (
+	// SuiSystemState represents the current state of the Sui blockchain system.
 	SuiSystemState struct {
 		Epoch                                 string          `json:"epoch"`
 		ProtocolVersion                       string          `json:"protocolVersion"`
@@ -53,6 +53,16 @@ type (
 		ValidatorsAtRiskParsed                ValidatorsAtRisk
 		ValidatorReportsParsed                ValidatorsReports
 	}
+
+	// ValidatorsApy represents the APYs of validators.
+	ValidatorsApy struct {
+		Apys []struct {
+			Address string  `json:"address"`
+			Apy     float64 `json:"apy"`
+		} `json:"apys"`
+	}
+
+	ValidatorsApyParsed map[string]float64
 
 	// ValidatorsReports is a map where the key is the address of a validator and the value is a ValidatorReports instance
 	// containing all the reports for that validator

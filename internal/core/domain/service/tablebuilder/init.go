@@ -26,8 +26,6 @@ func (tb *Builder) Init() error {
 		tb.handleNodeTable(hosts)
 	case enums.TableTypeRPC:
 		tb.handleRPCTable(hosts)
-	case enums.TableTypePeers:
-		tb.handlePeersTable(hosts)
 	case enums.TableTypeValidator:
 		tb.handleValidatorTable(hosts)
 	case enums.TableTypeGasPriceAndSubsidy:
@@ -51,9 +49,9 @@ func (tb *Builder) Init() error {
 			return err
 		}
 	case enums.TableTypeActiveValidators:
-		systemState := hosts[0].Metrics.SystemState
+		metrics := hosts[0].Metrics
 
-		return tb.handleActiveValidatorsTable(&systemState)
+		return tb.handleActiveValidatorsTable(&metrics)
 	}
 
 	return nil
@@ -108,33 +106,6 @@ func (tb *Builder) handleRPCTable(hosts []domainhost.Host) {
 		}
 
 		columnValues := tables.GetRPCColumnValues(idx, host)
-
-		tableConfig.Columns.SetColumnValues(columnValues)
-
-		tableConfig.RowsCount++
-	}
-
-	tb.config = tableConfig
-}
-
-// handlePeersTable handles the configuration for the Peers table.
-func (tb *Builder) handlePeersTable(hosts []domainhost.Host) {
-	tableConfig := tables.NewDefaultTableConfig(enums.TableTypePeers)
-
-	sort.SliceStable(hosts, func(left, right int) bool {
-		if hosts[left].Status != hosts[right].Status {
-			return hosts[left].Status > hosts[right].Status
-		}
-
-		return hosts[left].Metrics.TotalTransactionsBlocks > hosts[right].Metrics.TotalTransactionsBlocks
-	})
-
-	for idx, host := range hosts {
-		if !host.Metrics.Updated {
-			continue
-		}
-
-		columnValues := tables.GetNodeColumnValues(idx, host)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
 
@@ -283,10 +254,11 @@ func (tb *Builder) handleValidatorReportsTable(systemState *domainmetrics.SuiSys
 
 // handleActiveValidatorsTable handles the configuration for the Active Validators table.
 // It takes the system state, extracts the necessary data, and updates the table configuration.
-func (tb *Builder) handleActiveValidatorsTable(systemState *domainmetrics.SuiSystemState) error {
+func (tb *Builder) handleActiveValidatorsTable(metrics *domainmetrics.Metrics) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeActiveValidators)
 
-	activeValidators := systemState.ActiveValidators
+	activeValidators := metrics.SystemState.ActiveValidators
+	validatorsApy := metrics.ValidatorsApyParsed
 
 	const base = 10 // for strconv.ParseInt
 
@@ -323,6 +295,13 @@ func (tb *Builder) handleActiveValidatorsTable(systemState *domainmetrics.SuiSys
 	})
 
 	for idx, validator := range activeValidators {
+		validatorApy, ok := validatorsApy[validator.SuiAddress]
+		if !ok {
+			return fmt.Errorf("failed to loookup validator apy by address: %s", validator.SuiAddress)
+		}
+
+		validator.APY = strconv.FormatFloat(validatorApy*100, 'f', 3, 64)
+
 		columnValues, err := tables.GetActiveValidatorColumnValues(idx, validator)
 		if err != nil {
 			return err

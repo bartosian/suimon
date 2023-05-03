@@ -24,8 +24,7 @@ type Config struct {
 	Validators []struct {
 		MetricsAddress string `yaml:"metrics-address"`
 	} `yaml:"validators"`
-	SeedPeers []string `yaml:"seed-peers"`
-	IPLookup  struct {
+	IPLookup struct {
 		AccessToken string `yaml:"access-token"`
 	} `yaml:"ip-lookup"`
 }

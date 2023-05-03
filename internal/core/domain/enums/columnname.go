@@ -62,8 +62,8 @@ const (
 	ColumnNameValidatorVotingPower              ColumnName = "VOTING\nPOWER"
 	ColumnNameValidatorGasPrice                 ColumnName = "GAS\nPRICE"
 	ColumnNameValidatorCommissionRate           ColumnName = "COMMISSION\nRATE"
-	ColumnNameValidatorNextEpochStake           ColumnName = "NEXT EPOCH STAKE, SUI"
-	ColumnNameValidatorNextEpochGasPrice        ColumnName = "NEXT EPOCH GAS\nPRICE"
+	ColumnNameValidatorNextEpochStake           ColumnName = "NEXT EPOCH\nSTAKE, SUI"
+	ColumnNameValidatorNextEpochGasPrice        ColumnName = "NEXT EPOCH\nGAS PRICE"
 	ColumnNameValidatorNextEpochCommissionRate  ColumnName = "NEXT EPOCH\nCOMMISSION RATE"
 	ColumnNameValidatorStakingPoolSuiBalance    ColumnName = "STAKING POOL SUI\nBALANCE, SUI"
 	ColumnNameValidatorRewardsPool              ColumnName = "REWARDS POOL, SUI"
@@ -71,6 +71,7 @@ const (
 	ColumnNameValidatorPendingStake             ColumnName = "PENDING STAKE, SUI"
 	ColumnNameValidatorPendingTotalSuiWithdraw  ColumnName = "PENDING TOTAL\nSUI WITHDRAW"
 	ColumnNameValidatorPendingPoolTokenWithdraw ColumnName = "PENDING POOL\nTOKEN WITHDRAW"
+	ColumnNameValidatorApy                      ColumnName = "APY, %"
 )
 
 // System State section

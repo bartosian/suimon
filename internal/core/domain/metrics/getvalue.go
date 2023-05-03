@@ -8,7 +8,6 @@ import (
 	"github.com/dariubs/percent"
 
 	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
 )
 
 type (
@@ -122,7 +121,7 @@ func (metrics *Metrics) GetTimeUntilNextEpochDisplay() []string {
 
 // GetEpochLabel returns a string representing the current epoch number.
 func (metrics *Metrics) GetEpochLabel() string {
-	return fmt.Sprintf("EPOCH %d", metrics.SystemState.Epoch)
+	return fmt.Sprintf("EPOCH %s", metrics.SystemState.Epoch)
 }
 
 // GetEpochProgress calculates and returns the percentage of current epoch progress.
@@ -136,24 +135,4 @@ func (metrics *Metrics) GetEpochProgress() (int, error) {
 	progressPercent := percent.PercentOf(int(epochCurrentLength), int(epochDurationMs))
 
 	return int(progressPercent), nil
-}
-
-// GetUsageDataForDonutChart returns a label and percentage for displaying data in a donut chart.
-// It takes in a metric unit and a function that returns a usage data and error.
-func GetUsageDataForDonutChart(unit enums.MetricUnit, option func() (*utility.UsageData, error)) (string, int) {
-	var (
-		usageLabel      = "LOADING..."
-		usagePercentage = 1
-	)
-
-	if usageDataResult, err := option(); err == nil {
-		usageLabel = fmt.Sprintf("TOTAL/USED: %d/%d%s", usageDataResult.Total, usageDataResult.Used, unit)
-		usagePercentage = usageDataResult.PercentageUsed
-
-		if usagePercentage == 0 {
-			usagePercentage = 1
-		}
-	}
-
-	return usageLabel, usagePercentage
 }

@@ -79,7 +79,7 @@ func (host *Host) SetStatus(rpc Host) {
 
 			return
 		}
-	case enums.TableTypeNode, enums.TableTypeRPC, enums.TableTypePeers:
+	case enums.TableTypeNode, enums.TableTypeRPC:
 		if !metricsHost.Updated || metricsHost.TotalTransactionsBlocks == 0 || metricsHost.LatestCheckpoint == 0 ||
 			metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == metrics.TransactionsPerSecondWindow ||
 			metricsHost.TxSyncPercentage == 0 || metricsHost.TxSyncPercentage > 110 || metricsHost.CheckSyncPercentage > 110 {

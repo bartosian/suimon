@@ -6,7 +6,6 @@ const (
 	TableTypeRPC                TableType = "📡 PUBLIC RPC"
 	TableTypeNode               TableType = "💻 FULL NODES"
 	TableTypeValidator          TableType = "🤖 VALIDATORS"
-	TableTypePeers              TableType = "🤝 PEERS"
 	TableTypeGasPriceAndSubsidy TableType = "💰 EPOCH, GAS AND SUBSIDY"
 	TableTypeValidatorsParams   TableType = "📊 VALIDATORS PARAMS"
 	TableTypeValidatorsAtRisk   TableType = "🚨 VALIDATORS AT RISK"

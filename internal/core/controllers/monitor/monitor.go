@@ -24,7 +24,7 @@ func (c *Controller) Monitor() error {
 
 	configsChoiceList := cligw.NewSimpleSelectChoiceList(configNames...)
 
-	selectedConfigName, err := c.gateways.cli.SelectOne("Which dashboards would you like to use?", configsChoiceList)
+	selectedConfigName, err := c.gateways.cli.SelectOne("Which configuration would you like to use?", configsChoiceList)
 	if err != nil {
 		c.gateways.cli.Error("failed to parse user selection")
 
@@ -89,7 +89,6 @@ func (c *Controller) selectStaticTables() ([]enums.TableType, error) {
 		string(enums.TableTypeRPC),
 		string(enums.TableTypeNode),
 		string(enums.TableTypeValidator),
-		string(enums.TableTypePeers),
 		string(enums.TableTypeGasPriceAndSubsidy),
 		string(enums.TableTypeValidatorsParams),
 		string(enums.TableTypeValidatorsAtRisk),
@@ -118,7 +117,6 @@ func (c *Controller) selectStaticTables() ([]enums.TableType, error) {
 				enums.TableTypeRPC,
 				enums.TableTypeNode,
 				enums.TableTypeValidator,
-				enums.TableTypePeers,
 				enums.TableTypeGasPriceAndSubsidy,
 				enums.TableTypeValidatorsParams,
 				enums.TableTypeValidatorsAtRisk,

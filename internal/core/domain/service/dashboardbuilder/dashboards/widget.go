@@ -7,7 +7,6 @@ import (
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/linestyle"
 	"github.com/mum4k/termdash/widgetapi"
-	"github.com/mum4k/termdash/widgets/donut"
 	"github.com/mum4k/termdash/widgets/gauge"
 	"github.com/mum4k/termdash/widgets/segmentdisplay"
 	"github.com/mum4k/termdash/widgets/sparkline"
@@ -110,22 +109,10 @@ func newProgressWidget(color cell.Color) (*gauge.Gauge, error) {
 	)
 }
 
-// newTextWidget initializes a new text widget that rolls its content and wraps at word boundaries.
-// It returns the new widget and an error, if any.
-func newTextWidget() (*text.Text, error) {
-	return text.New(text.RollContent(), text.WrapAtWords())
-}
-
 // newTextNoScrollWidget initializes a new text widget that disables scrolling and wraps at rune boundaries.
 // It returns the new widget and an error, if any.
 func newTextNoScrollWidget() (*text.Text, error) {
 	return text.New(text.DisableScrolling(), text.WrapAtRunes())
-}
-
-// newDonutWidget initializes a new donut widget with the given color.
-// It returns the new widget and an error, if any.
-func newDonutWidget(color cell.Color) (*donut.Donut, error) {
-	return donut.New(donut.CellOpts(cell.FgColor(color), cell.Bold()))
 }
 
 // newSparklineWidget initializes a new sparkline widget with the given label and color.

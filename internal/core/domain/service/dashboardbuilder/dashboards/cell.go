@@ -192,23 +192,3 @@ func dashboardLoadingBlinkValue(maxLength int) string {
 
 	return inProgress
 }
-
-// centerOnDisplay takes a string and a number of characters and returns a centered string with empty spaces added at the end
-func centerOnDisplay(s string, numChars int) string {
-	if len(s) >= numChars {
-		return s
-	} else {
-		// Calculate the number of empty spaces to add on each side of the string
-		numSpaces := (numChars - len(s)) / 2
-		// Create the empty spaces string
-		spaces := strings.Repeat(" ", numSpaces)
-		// Concatenate the empty spaces and the original string
-		centeredString := spaces + s + spaces
-		// If the number of characters is odd, add one more space to the end
-		if (numChars - len(centeredString)) == 1 {
-			centeredString += " "
-		}
-
-		return centeredString
-	}
-}

@@ -14,7 +14,6 @@ type addressParser func(string) (*address.Endpoint, error)
 var parserMap = map[enums.TableType]addressParser{
 	enums.TableTypeNode:      address.ParseURL,
 	enums.TableTypeValidator: address.ParseURL,
-	enums.TableTypePeers:     address.ParsePeer,
 	enums.TableTypeRPC:       address.ParseURL,
 }
 
@@ -32,8 +31,6 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses
 		return c.getNodeAddresses(parser)
 	case enums.TableTypeValidator:
 		return c.getValidatorAddresses(parser)
-	case enums.TableTypePeers:
-		return c.getPeerAddresses(parser)
 	case enums.TableTypeRPC:
 		return c.getRPCAddresses(parser)
 	}
@@ -41,11 +38,14 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses
 	return addresses, nil
 }
 
-// getNodeAddresses returns the list of addresses of full nodes.
+// getNodeAddresses extracts the JSON-RPC and metrics addresses from the selected config's full nodes and
+// returns an array of host.AddressInfo structs that include the endpoints and port numbers.
+// The parser argument is a function used to parse the address strings.
+// Returns an error if there is an invalid address format or if there is no JSON-RPC or metrics address provided for a full node.
 func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
 	nodesConfig := c.selectedConfig.FullNodes
 	if len(nodesConfig) == 0 {
-		return
+		return []host.AddressInfo{}, nil
 	}
 
 	for _, node := range nodesConfig {
@@ -58,11 +58,18 @@ func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.Ad
 		var (
 			endpointRPC     *address.Endpoint
 			endpointMetrics *address.Endpoint
+			addressInfo     *host.AddressInfo
 		)
 
 		if addressRPC != "" {
 			if endpointRPC, err = parser(addressRPC); err != nil {
 				return nil, fmt.Errorf("invalid format for full-node json-rpc-address in dashboards file: %w", err)
+			}
+
+			addressInfo = &host.AddressInfo{Endpoint: *endpointRPC, Ports: make(map[enums.PortType]string)}
+
+			if endpointRPC.Port != nil {
+				addressInfo.Ports[enums.PortTypeRPC] = *endpointRPC.Port
 			}
 		}
 
@@ -70,24 +77,17 @@ func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.Ad
 			if endpointMetrics, err = parser(addressMetrics); err != nil {
 				return nil, fmt.Errorf("invalid format for full-node metrics-address in dashboards file: %w", err)
 			}
+
+			if addressInfo == nil {
+				addressInfo = &host.AddressInfo{Endpoint: *endpointMetrics, Ports: make(map[enums.PortType]string)}
+			}
+
+			if endpointMetrics.Port != nil {
+				addressInfo.Ports[enums.PortTypeMetrics] = *endpointMetrics.Port
+			}
 		}
 
-		// Check if both endpoints are nil and return an error if so.
-		if endpointRPC == nil && endpointMetrics == nil {
-			return nil, errors.New("invalid format for full-node in dashboards file: at least one of json-rpc-address or metrics-address is required")
-		}
-
-		addressInfo := host.AddressInfo{Endpoint: *endpointRPC, Ports: make(map[enums.PortType]string)}
-
-		if endpointRPC != nil && endpointRPC.Port != nil {
-			addressInfo.Ports[enums.PortTypeRPC] = *endpointRPC.Port
-		}
-
-		if endpointMetrics != nil && endpointMetrics.Port != nil {
-			addressInfo.Ports[enums.PortTypeMetrics] = *endpointMetrics.Port
-		}
-
-		addresses = append(addresses, addressInfo)
+		addresses = append(addresses, *addressInfo)
 	}
 
 	return addresses, nil
@@ -116,30 +116,6 @@ func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []ho
 
 		if endpointMetrics.Port != nil {
 			addressInfo.Ports[enums.PortTypeMetrics] = *endpointMetrics.Port
-		}
-
-		addresses = append(addresses, addressInfo)
-	}
-
-	return addresses, nil
-}
-
-// getPeerAddresses returns the list of seed peer addresses.
-func (c *Controller) getPeerAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
-	peersConfig := c.selectedConfig.SeedPeers
-	if len(peersConfig) == 0 {
-		return
-	}
-
-	for _, peer := range peersConfig {
-		endpoint, err := parser(peer)
-		if err != nil {
-			return nil, fmt.Errorf("invalid format for seed-peer in dashboards file: %w", err)
-		}
-
-		addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}
-		if endpoint.Port != nil {
-			addressInfo.Ports[enums.PortTypePeer] = *endpoint.Port
 		}
 
 		addresses = append(addresses, addressInfo)

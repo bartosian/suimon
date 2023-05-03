@@ -142,12 +142,6 @@ validators:
    - metrics-address: https://sui-validator.testnet.com:9184/metrics
    - metrics-address: https://sui-validator.mainnet.com:9184/metrics
 
-# if you wish to monitor peers, update this section with the peers information
-seed-peers:
-   - "/ip4/178.18.250.62/udp/8080"
-   - "/ip4/213.239.215.119/udp/8084"
-   - "/ip4/65.109.32.171/udp/8084"
-
 # provider and country information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
 # which is free and gives you 50k requests per month, which is sufficient for individual usage.
 ip-lookup:
@@ -180,14 +174,6 @@ Examples:
 - metrics-address: 0.0.0.0:9184/metrics
 - metrics-address: https://sui-validator.testnet.com:9184/metrics
 - metrics-address: https://sui-validator.mainnet.com:9184/metrics
-
-#### Seed Peers
-The `seed-peers` section lists the seed peers available for monitoring the SUI Testnet. The user can update this section with information for any number of seed peers, following the example format provided. It is important to note that the address for each seed peer must be provided in a valid peer format, as demonstrated in the examples.
-
-Examples:
-- /ip4/178.18.250.62/udp/8080
-- /ip4/213.239.215.119/udp/8084
-- /ip4/65.109.32.171/udp/8084
 
 #### IP Lookup
 The `ip-lookup` section provides information on how to use the `ipinfo.io` public API to get provider and country information in tables. The user needs to obtain an access token on the website to use this feature. The current access token provided is temporary with a limited number of requests per month.
@@ -232,7 +218,6 @@ Tables are static monitors that provide a detailed snapshot of the network and i
 | 📡 PUBLIC RPC             | Displays detailed information about the network's RPC endpoints.               |
 | 💻 FULL NODES             | Displays detailed information about the network's nodes.                       |
 | 🤖 VALIDATORS             | Displays detailed information about the network's validators.                  |
-| 🤝 PEERS                  | Displays detailed information about the network's peers.                       |
 | 💰 EPOCH, GAS AND SUBSIDY | Displays the current gas price and subsidy values for the network.             |
 | 📊 VALIDATORS PARAMS      | Displays the validators related thresholds and counts on the network.          |
 | 🚨 VALIDATORS AT RISK     | Displays the number of validators that are currently at risk of being slashed. |

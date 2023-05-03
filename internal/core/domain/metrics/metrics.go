@@ -6,7 +6,6 @@ const (
 	RoundsPerSecondWindow           = 5
 	CertificatesPerSecondWindow     = 5
 	TransactionsPerSecondLag        = 5
-	TotalTransactionsLag            = 100
 	CheckpointsPerSecondLag         = 10
 	LatestCheckpointLag             = 30
 	HighestSyncedCheckpointLag      = 30
@@ -89,7 +88,8 @@ type (
 	Metrics struct {
 		Updated bool
 
-		SystemState SuiSystemState
+		SystemState         SuiSystemState
+		ValidatorsApyParsed ValidatorsApyParsed
 
 		Uptime  string
 		Version string

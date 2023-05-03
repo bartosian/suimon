@@ -96,8 +96,6 @@ func GetColumnsConfig(table enums.TableType) ColumnsConfig {
 	switch table {
 	case enums.TableTypeRPC:
 		return ColumnsConfigRPC
-	case enums.TableTypePeers:
-		return ColumnsConfigPeer
 	case enums.TableTypeValidator:
 		return ColumnsConfigValidator
 	case enums.TableTypeNode:
@@ -119,8 +117,6 @@ func GetRowsConfig(table enums.TableType) RowsConfig {
 	switch table {
 	case enums.TableTypeRPC:
 		return RowsConfigRPC
-	case enums.TableTypePeers:
-		return RowsConfigPeer
 	case enums.TableTypeValidator:
 		return RowsConfigValidator
 	case enums.TableTypeGasPriceAndSubsidy:

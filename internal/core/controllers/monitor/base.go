@@ -20,7 +20,6 @@ type (
 		rpc       []host.Host
 		node      []host.Host
 		validator []host.Host
-		peers     []host.Host
 	}
 
 	Builders struct {
@@ -58,12 +57,6 @@ func NewController(
 	}
 }
 
-// setBuilderForTable sets the builder for a given table type.
-// It updates the `static` map in `c.builders` with the given builder for the specified table type.
-func (c *Controller) setBuilderForTable(table enums.TableType, builder ports.Builder) {
-	c.builders.static[table] = builder
-}
-
 // getHostsByTableType returns the list of hosts for a given table type.
 // It acquires a read lock on the controller lock before accessing the hosts data.
 func (c *Controller) getHostsByTableType(table enums.TableType) (hosts []host.Host, err error) {
@@ -82,8 +75,6 @@ func (c *Controller) getHostsByTableType(table enums.TableType) (hosts []host.Ho
 		enums.TableTypeValidatorsAtRisk,
 		enums.TableTypeValidatorReports:
 		return c.hosts.rpc[:1], nil
-	case enums.TableTypePeers:
-		return c.hosts.peers, nil
 	case enums.TableTypeRPC:
 		return c.hosts.rpc, nil
 	default:
@@ -102,8 +93,6 @@ func (c *Controller) setHostsByTableType(table enums.TableType, hosts []host.Hos
 		c.hosts.node = hosts
 	case enums.TableTypeValidator:
 		c.hosts.validator = hosts
-	case enums.TableTypePeers:
-		c.hosts.peers = hosts
 	case enums.TableTypeRPC:
 		c.hosts.rpc = hosts
 	default:

@@ -18,12 +18,6 @@ validators:
   - metrics-address: https://sui-validator.testnet.com:9184/metrics
   - metrics-address: https://sui-validator.mainnet.com:9184/metrics
 
-# if you wish to monitor peers, update this section with the peers information
-seed-peers:
-  - "/ip4/178.18.250.62/udp/8080"
-  - "/ip4/213.239.215.119/udp/8084"
-  - "/ip4/65.109.32.171/udp/8084"
-
 # provider and country information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
 # which is free and gives you 50k requests per month, which is sufficient for individual usage.
 ip-lookup:

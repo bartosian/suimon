@@ -4,6 +4,7 @@ type MetricType string
 
 const (
 	MetricTypeSuiSystemState               MetricType = "SYSTEM_STATE"
+	MetricTypeValidatorsApy                MetricType = "VALIDATORS_APY"
 	MetricTypeTotalTransactionBlocks       MetricType = "TOTAL_TRANSACTION_BLOCKS"
 	MetricTypeTotalTransactionCertificates MetricType = "TOTAL_TRANSACTION_CERTIFICATES"
 	MetricTypeTotalTransactionEffects      MetricType = "TOTAL_TRANSACTION_EFFECTS"
