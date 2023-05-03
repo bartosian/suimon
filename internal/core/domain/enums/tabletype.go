@@ -7,7 +7,7 @@ const (
 	TableTypeNode               TableType = "💻 FULL NODES"
 	TableTypeValidator          TableType = "🤖 VALIDATORS"
 	TableTypePeers              TableType = "🤝 PEERS"
-	TableTypeGasPriceAndSubsidy TableType = "💰 EPOCH, GAS PRICE AND SUBSIDY"
+	TableTypeGasPriceAndSubsidy TableType = "💰 EPOCH, GAS AND SUBSIDY"
 	TableTypeValidatorsParams   TableType = "📊 VALIDATORS PARAMS"
 	TableTypeValidatorsAtRisk   TableType = "🚨 VALIDATORS AT RISK"
 	TableTypeValidatorReports   TableType = "📢 VALIDATORS REPORTS"

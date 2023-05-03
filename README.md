@@ -122,7 +122,7 @@ Here is an example file tree for the `~/.suimon` directory:
 ### Suimon Configuration Fields
 
 ```yaml
-# This section lists the RPC endpoints that the client will use to interact with the SUI Testnet.
+# This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators.
 # Please make sure to provide at least one working endpoint.
 public-rpc:
    - "https://wave3-rpc.testnet.sui.io:443"
@@ -154,6 +154,44 @@ ip-lookup:
    access-token: "55f30ce0213aa7" # temporary access token with requests limit
 ```
 
+The `public-rpc` field is required to request system metrics and to calculate the health of nodes and validators. The other fields are optional and can be updated if needed.
+
+#### Public RPC Endpoints
+The `public-rpc` section This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators. Therefore, it is essential to provide accurate and up-to-date endpoint information in this section.
+
+Examples:
+- https://wave3-rpc.testnet.sui.io:443
+- https://rpc-ws-testnet-w3.suiprovider.xyz:443
+- https://sui-api.rpc.com:443
+
+#### Full Nodes
+The `full-nodes` section lists the full nodes available for monitoring the SUI Testnet. The user can update this section with information for any number of nodes, following the example format provided. It is important to note that the RPC address is required to be provided for each node, while the metrics address is optional.
+
+Examples:
+- json-rpc-address: 0.0.0.0:9000 
+  metrics-address: 0.0.0.0:9184
+- json-rpc-address: https://sui-rpc.testnet.com  
+  metrics-address: https://sui-rpc.testnet.com/metrics
+
+#### Validators
+The `validators` section lists the validators to monitor. The user can update this section with information for any number of validators, following the example format provided. It is important to note that only the metrics endpoint is required to be provided for each validator.
+
+Examples:
+- metrics-address: 0.0.0.0:9184/metrics
+- metrics-address: https://sui-validator.testnet.com:9184/metrics
+- metrics-address: https://sui-validator.mainnet.com:9184/metrics
+
+#### Seed Peers
+The `seed-peers` section lists the seed peers available for monitoring the SUI Testnet. The user can update this section with information for any number of seed peers, following the example format provided. It is important to note that the address for each seed peer must be provided in a valid peer format, as demonstrated in the examples.
+
+Examples:
+- /ip4/178.18.250.62/udp/8080
+- /ip4/213.239.215.119/udp/8084
+- /ip4/65.109.32.171/udp/8084
+
+#### IP Lookup
+The `ip-lookup` section provides information on how to use the `ipinfo.io` public API to get provider and country information in tables. The user needs to obtain an access token on the website to use this feature. The current access token provided is temporary with a limited number of requests per month.
+
 ## Suimon Commands
 
 The Suimon tool provides several commands that can be used to interact with the SUI blockchain. Here is an overview of the main commands:
@@ -161,6 +199,7 @@ The Suimon tool provides several commands that can be used to interact with the 
 - `suimon help`: Show help information about any command.
   ![Screenshot of my app](static/images/suimon-help.png)
   <br><br>
+
 - `suimon monitor`: Monitor the running network with the Suimon monitoring tool.
   <br><br>
   When you run the command, the monitoring tool will start and display a list of available configurations that have been added to the ``.suimon`` directory. Each item in the list corresponds to a configuration file, and you can select the configuration you want to use following instructions in the terminal.
@@ -180,24 +219,88 @@ The Suimon tool provides several commands that can be used to interact with the 
   <br><br>
   ![Screenshot of my app](static/images/suimon-table-type.png)
   <br><br>
+
 - `suimon version`: Show version information for the Suimon monitoring tool.
   ![Screenshot of my app](static/images/suimon-version.png)
 
-## Table Types
+## Tables
 
-The available table types for rendering are:
+Tables are static monitors that provide a detailed snapshot of the network and its entities at a certain point in time.
 
-| Table Type             | Description                                                                    |
-|------------------------|--------------------------------------------------------------------------------|
-| RPC                    | Displays detailed information about the network's RPC endpoints.               |
-| Node                   | Displays detailed information about the network's nodes.                       |
-| Validator              | Displays detailed information about the network's validators.                  |
-| Peers                  | Displays detailed information about the network's peers.                       |
-| GasPriceAndSubsidy     | Displays the current gas price and subsidy values for the network.             |
-| ValidatorsCounts       | Displays the validators related thresholds and counts on the network.          |
-| ValidatorsAtRisk       | Displays the number of validators that are currently at risk of being slashed. |
-| ValidatorReports       | Displays the latest reports submitted by validators.                           |
-| ActiveValidators       | Displays the current list of active validators on the network.                 |
+| Table Type                | Description                                                                    |
+|---------------------------|--------------------------------------------------------------------------------|
+| 📡 PUBLIC RPC             | Displays detailed information about the network's RPC endpoints.               |
+| 💻 FULL NODES             | Displays detailed information about the network's nodes.                       |
+| 🤖 VALIDATORS             | Displays detailed information about the network's validators.                  |
+| 🤝 PEERS                  | Displays detailed information about the network's peers.                       |
+| 💰 EPOCH, GAS AND SUBSIDY | Displays the current gas price and subsidy values for the network.             |
+| 📊 VALIDATORS PARAMS      | Displays the validators related thresholds and counts on the network.          |
+| 🚨 VALIDATORS AT RISK     | Displays the number of validators that are currently at risk of being slashed. |
+| 📢 VALIDATORS REPORTS     | Displays the latest reports submitted by validators.                           |
+| ✅ ACTIVE VALIDATORS      |  Displays the current list of active validators on the network.                |
+
+### Table Examples
+
+- `💰 EPOCH, GAS AND SUBSIDY`
+  <br><br>
+  ![Screenshot of my app](static/images/table-system-state.png)
+  <br><br>
+
+- `📊 VALIDATORS PARAMS`
+  <br><br>
+  ![Screenshot of my app](static/images/table-validators-params.png)
+  <br><br>
+
+- `📡 PUBLIC RPC`
+  <br><br>
+  ![Screenshot of my app](static/images/table-public-rpc.png)
+  <br><br>
+
+- `🤖 VALIDATORS`
+  <br><br>
+  ![Screenshot of my app](static/images/table-validators.png)
+  <br><br>
+
+- `💻 FULL NODES`
+  <br><br>
+  ![Screenshot of my app](static/images/table-full-nodes.png)
+  <br><br>
+
+- `📢 VALIDATORS REPORTS`
+  <br><br>
+  ![Screenshot of my app](static/images/table-validators-reports.png)
+
+## Dashboards
+
+Dashboards are dynamic monitors that provide real-time information about the network and its entities. Unlike static tables, which provide a snapshot of the network at a specific point in time, dashboards continuously update and display data in real-time.
+
+| Dashboard Type            | Description                                                                    |
+|---------------------------|--------------------------------------------------------------------------------|
+| 📡 PUBLIC RPC             | Displays detailed information about the network's RPC endpoints.               |
+| 💻 FULL NODES             | Displays detailed information about the network's nodes.                       |
+| 🤖 VALIDATORS             | Displays detailed information about the network's validators.                  |
+| 💰 EPOCH, GAS AND SUBSIDY | Displays the current gas price and subsidy values for the network.             |
+
+### Dashboard Examples
+
+- `📡 PUBLIC RPC`
+  <br><br>
+  ![Screenshot of my app](static/images/dashboard-public-rpc.png)
+  <br><br>
+
+- `💻 FULL NODES`
+  <br><br>
+  ![Screenshot of my app](static/images/dashboard-full-nodes.png)
+  <br><br>
+
+- `🤖 VALIDATORS`
+  <br><br>
+  ![Screenshot of my app](static/images/dashboard-validators.png)
+  <br><br>
+
+- `💰 EPOCH, GAS AND SUBSIDY`
+  <br><br>
+  ![Screenshot of my app](static/images/dashboard-system-state.png)
 
 # License
 
