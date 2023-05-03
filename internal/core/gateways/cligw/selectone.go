@@ -8,11 +8,11 @@ import (
 
 type SelectOneOpts struct{ PageLimit *int }
 
-func (ucg *Gateway) SelectOne(question string, choices SelectChoiceList) (*SelectChoice, error) {
-	return ucg.SelectOneWithOpts(question, choices, SelectOneOpts{})
+func (gateway *Gateway) SelectOne(question string, choices SelectChoiceList) (*SelectChoice, error) {
+	return gateway.SelectOneWithOpts(question, choices, SelectOneOpts{})
 }
 
-func (ucg *Gateway) SelectOneWithOpts(
+func (gateway *Gateway) SelectOneWithOpts(
 	question string,
 	choices SelectChoiceList,
 	opts SelectOneOpts,
@@ -31,7 +31,7 @@ func (ucg *Gateway) SelectOneWithOpts(
 		PageSize: pageSize,
 	}
 
-	err := survey.AskOne(prompt, rawResult, ucg.surveyIcons)
+	err := survey.AskOne(prompt, rawResult, gateway.surveyIcons)
 	results := choices.GetByLabels(*rawResult)
 
 	if len(results) == 0 {

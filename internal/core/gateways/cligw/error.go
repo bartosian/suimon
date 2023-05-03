@@ -6,21 +6,23 @@ import (
 	"github.com/fatih/color"
 )
 
-func (ucg *Gateway) Error(msg string) {
-	ucg.ErrorWithOpts(msg, MsgOpts{})
+const errorIcon = "❗"
+
+func (gateway *Gateway) Error(msg string) {
+	gateway.ErrorWithOpts(msg, MsgOpts{})
 }
 
-func (ucg *Gateway) Errorf(msg string, vars ...interface{}) {
-	ucg.ErrorfWithOpts(msg, MsgOpts{}, vars)
+func (gateway *Gateway) Errorf(msg string, vars ...interface{}) {
+	gateway.ErrorfWithOpts(msg, MsgOpts{}, vars)
 }
 
-func (ucg *Gateway) ErrorfWithOpts(msg string, opts MsgOpts, vars ...interface{}) {
+func (gateway *Gateway) ErrorfWithOpts(msg string, opts MsgOpts, vars ...interface{}) {
 	msg = fmt.Sprintf(msg, vars)
-	ucg.ErrorWithOpts(msg, opts)
+	gateway.ErrorWithOpts(msg, opts)
 }
 
 func (Gateway) ErrorWithOpts(msg string, opts MsgOpts) {
-	icon := "❗"
+	icon := errorIcon
 	for i := opts.Indent; i > 0; i-- {
 		icon = fmt.Sprintf("  %s", icon)
 	}

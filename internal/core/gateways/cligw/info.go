@@ -6,33 +6,31 @@ import (
 	"github.com/fatih/color"
 )
 
+const infoIcon = "ℹ️ "
+
 type MsgOpts struct {
 	Indent int
 }
 
-func (ucg *Gateway) Info(label string, value string) {
-	ucg.InfoWithOpts(label, value, MsgOpts{})
+func (gateway *Gateway) Info(label string, value string) {
+	gateway.InfoWithOpts(label, value, MsgOpts{})
 }
 
-func (ucg *Gateway) InfoWithOpts(label string, value string, opts MsgOpts) {
-	// Build label line
-	labelLine := ucg.infoLabel(label, opts.Indent)
+func (gateway *Gateway) InfoWithOpts(label string, value string, opts MsgOpts) {
+	labelLine := gateway.infoLabel(label, opts.Indent)
 
-	// Build value line
 	valueLine := ""
 	if value != "" {
 		valueLine = fmt.Sprintf("%s %s", color.New(color.FgGreen, color.Bold).Sprint("->"), value)
 	}
 
-	// Combine
 	result := fmt.Sprintf("%s %s", labelLine, valueLine)
 
-	// Render
 	fmt.Println(result)
 }
 
 func (Gateway) infoLabel(label string, indent int) string {
-	icon := "ℹ️ "
+	icon := infoIcon
 	for i := indent; i > 0; i-- {
 		icon = fmt.Sprintf("  %s", icon)
 	}

@@ -6,21 +6,23 @@ import (
 	"github.com/fatih/color"
 )
 
-func (ucg *Gateway) Warn(msg string) {
-	ucg.WarnWithOpts(msg, MsgOpts{})
+const warnIcon = "⚠️"
+
+func (gateway *Gateway) Warn(msg string) {
+	gateway.WarnWithOpts(msg, MsgOpts{})
 }
 
-func (ucg *Gateway) Warnf(msg string, vars ...interface{}) {
-	ucg.WarnfWithOpts(msg, MsgOpts{}, vars)
+func (gateway *Gateway) Warnf(msg string, vars ...interface{}) {
+	gateway.WarnfWithOpts(msg, MsgOpts{}, vars)
 }
 
-func (ucg *Gateway) WarnfWithOpts(msg string, opts MsgOpts, vars ...interface{}) {
+func (gateway *Gateway) WarnfWithOpts(msg string, opts MsgOpts, vars ...interface{}) {
 	msg = fmt.Sprintf(msg, vars)
-	ucg.WarnWithOpts(msg, opts)
+	gateway.WarnWithOpts(msg, opts)
 }
 
 func (Gateway) WarnWithOpts(msg string, opts MsgOpts) {
-	icon := "⚠️"
+	icon := warnIcon
 	for i := opts.Indent; i > 0; i-- {
 		icon = fmt.Sprintf("  %s", icon)
 	}

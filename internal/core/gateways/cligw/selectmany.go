@@ -4,11 +4,11 @@ import "github.com/AlecAivazis/survey/v2"
 
 type SelectManyOpts struct{}
 
-func (ucg *Gateway) SelectMany(question string, choices SelectChoiceList) ([]SelectChoice, error) {
-	return ucg.SelectManyWithOpts(question, choices, SelectManyOpts{})
+func (gateway *Gateway) SelectMany(question string, choices SelectChoiceList) ([]SelectChoice, error) {
+	return gateway.SelectManyWithOpts(question, choices, SelectManyOpts{})
 }
 
-func (ucg *Gateway) SelectManyWithOpts(question string, choices SelectChoiceList, _ SelectManyOpts) ([]SelectChoice, error) {
+func (gateway *Gateway) SelectManyWithOpts(question string, choices SelectChoiceList, _ SelectManyOpts) ([]SelectChoice, error) {
 	rawResult := new([]string)
 	labels := choices.Labels()
 	prompt := &survey.MultiSelect{
@@ -17,7 +17,7 @@ func (ucg *Gateway) SelectManyWithOpts(question string, choices SelectChoiceList
 		PageSize: len(labels),
 	}
 
-	err := survey.AskOne(prompt, rawResult, ucg.surveyIcons)
+	err := survey.AskOne(prompt, rawResult, gateway.surveyIcons)
 
 	result := choices.GetByLabels(*rawResult...)
 
