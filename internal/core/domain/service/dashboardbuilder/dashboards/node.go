@@ -5,8 +5,8 @@ import (
 
 	"github.com/mum4k/termdash/cell"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/host"
 )
 
 var (

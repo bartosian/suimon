@@ -9,8 +9,8 @@ import (
 	ioPrometheusClient "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/ports"
 )
 
 type (

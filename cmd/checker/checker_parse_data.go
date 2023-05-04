@@ -8,9 +8,9 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/pkg/address"
-	"github.com/bartosian/sui_helpers/suimon/pkg/progress"
+	"github.com/bartosian/suimon/cmd/checker/enums"
+	"github.com/bartosian/suimon/pkg/address"
+	"github.com/bartosian/suimon/pkg/progress"
 )
 
 const (

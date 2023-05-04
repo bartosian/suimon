@@ -1,9 +1,9 @@
 # This section lists the RPC endpoints that the client will use to interact with the SUI Testnet.
 # Please make sure to provide at least one working endpoint.
 public-rpc:
-  - "https://fullnode.testnet.sui.io:443"
-  - "https://rpc-ws-testnet-w3.suiprovider.xyz:443"
-  - "https://sui-api.rpc.com:443"
+  - https://fullnode.testnet.sui.io:443
+  - https://rpc-ws-testnet-w3.suiprovider.xyz:443
+  - https://sui-api.rpc.com:443
 
 # if you wish to monitor the node, update this section with the node information
 full-nodes:
@@ -21,4 +21,4 @@ validators:
 # provider and country information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
 # which is free and gives you 50k requests per month, which is sufficient for individual usage.
 ip-lookup:
-  access-token: "55f30ce0213aa7" # temporary access token with requests limit
+  access-token: 55f30ce0213aa7 # temporary access token with requests limit

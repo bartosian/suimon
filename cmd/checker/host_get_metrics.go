@@ -18,9 +18,9 @@ import (
 	"github.com/mum4k/termdash/widgets/sparkline"
 	"github.com/ybbus/jsonrpc/v3"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/pkg/utility"
+	"github.com/bartosian/suimon/cmd/checker/dashboardbuilder/dashboards"
+	"github.com/bartosian/suimon/cmd/checker/enums"
+	"github.com/bartosian/suimon/pkg/utility"
 )
 
 func (host *Host) GetMetrics() {

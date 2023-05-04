@@ -3,9 +3,9 @@ package checker
 import (
 	"fmt"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder/tables"
+	"github.com/bartosian/suimon/cmd/checker/enums"
+	"github.com/bartosian/suimon/cmd/checker/tablebuilder"
+	"github.com/bartosian/suimon/cmd/checker/tablebuilder/tables"
 )
 
 func (checker *Checker) InitTables() {

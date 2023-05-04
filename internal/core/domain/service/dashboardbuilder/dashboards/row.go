@@ -3,7 +3,7 @@ package dashboards
 import (
 	"github.com/mum4k/termdash/container/grid"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
 )
 
 // RowsConfig is a type that represents the configuration for a set of rows in a grid.

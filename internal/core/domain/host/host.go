@@ -3,10 +3,10 @@ package host
 import (
 	"github.com/dariubs/percent"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/metrics"
+	"github.com/bartosian/suimon/internal/core/gateways/cligw"
+	"github.com/bartosian/suimon/internal/core/ports"
 )
 
 type (

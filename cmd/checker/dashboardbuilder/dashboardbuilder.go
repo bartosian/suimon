@@ -10,7 +10,7 @@ import (
 	"github.com/mum4k/termdash/terminal/termbox"
 	"github.com/mum4k/termdash/terminal/terminalapi"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
+	"github.com/bartosian/suimon/cmd/checker/dashboardbuilder/dashboards"
 )
 
 type DashboardBuilder struct {

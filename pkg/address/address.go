@@ -8,7 +8,7 @@ import (
 
 	externalIP "github.com/glendc/go-external-ip"
 
-	"github.com/bartosian/sui_helpers/suimon/pkg/validation"
+	"github.com/bartosian/suimon/pkg/validation"
 )
 
 type HostPort struct {

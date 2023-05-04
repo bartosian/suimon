@@ -3,9 +3,9 @@ package monitor
 import (
 	"fmt"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	domainhost "github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	domainhost "github.com/bartosian/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/core/gateways/cligw"
 )
 
 const allTablesSelection = "🌐 ALL TABLES"

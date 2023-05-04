@@ -29,7 +29,9 @@ jobs:
         run: go get -v -t -d ./...
 
       - name: Build Binary
-        run: go build -o suimon
+        run: |
+          cd cmd
+          go build -o suimon
 
       - name: Create Release
         id: create_release
@@ -50,6 +52,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./suimon
+          asset_path: ./cmd/suimon
           asset_name: suimon
-          asset_content_type: application/octet-stream
+          asset_content_type: application/x-executable

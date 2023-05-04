@@ -10,11 +10,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/common-nighthawk/go-figure"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/suimon/cmd/checker/enums"
 )
 
 type Logger struct{}

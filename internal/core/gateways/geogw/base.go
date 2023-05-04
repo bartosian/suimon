@@ -8,8 +8,8 @@ import (
 	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ipinfo/go/v2/ipinfo/cache"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
+	"github.com/bartosian/suimon/internal/core/gateways/cligw"
+	"github.com/bartosian/suimon/internal/core/ports"
 )
 
 const (

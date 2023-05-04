@@ -7,7 +7,7 @@ import (
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/dashboardbuilder/dashboards"
+	"github.com/bartosian/suimon/internal/core/domain/service/dashboardbuilder/dashboards"
 )
 
 // Init initializes the dashboard by fetching the cells, columns, and rows

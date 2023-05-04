@@ -8,10 +8,10 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/tablebuilder/tables"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/core/domain/service/tablebuilder/tables"
+	"github.com/bartosian/suimon/internal/core/gateways/cligw"
 )
 
 type Builder struct {

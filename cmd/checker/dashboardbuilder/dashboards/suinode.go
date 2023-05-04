@@ -17,8 +17,8 @@ import (
 	"github.com/mum4k/termdash/widgets/sparkline"
 	"github.com/mum4k/termdash/widgets/text"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/pkg/log"
+	"github.com/bartosian/suimon/cmd/checker/enums"
+	"github.com/bartosian/suimon/pkg/log"
 )
 
 const (

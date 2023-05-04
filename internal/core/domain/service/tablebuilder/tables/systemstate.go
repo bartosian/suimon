@@ -3,8 +3,8 @@ package tables
 import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	domainmetrics "github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	domainmetrics "github.com/bartosian/suimon/internal/core/domain/metrics"
 )
 
 var (

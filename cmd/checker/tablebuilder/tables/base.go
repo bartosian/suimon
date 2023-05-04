@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/jedib0t/go-pretty/v6/text"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/suimon/cmd/checker/enums"
 )
 
 const suiEmoji = "💧 "

@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/address"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/pkg/address"
 )
 
 type addressParser func(string) (*address.Endpoint, error)

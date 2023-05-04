@@ -3,8 +3,8 @@ package controllers
 import (
 	"fmt"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
+	"github.com/bartosian/suimon/internal/core/gateways/cligw"
+	"github.com/bartosian/suimon/internal/core/ports"
 )
 
 const version = "v1.0.0"

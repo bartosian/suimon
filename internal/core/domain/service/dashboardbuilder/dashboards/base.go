@@ -9,8 +9,8 @@ import (
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/linestyle"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	domainhost "github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	domainhost "github.com/bartosian/suimon/internal/core/domain/host"
 )
 
 const (

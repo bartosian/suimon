@@ -8,7 +8,7 @@ import (
 
 	externalIP "github.com/glendc/go-external-ip"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/validation"
+	"github.com/bartosian/suimon/internal/pkg/validation"
 )
 
 type Endpoint struct {

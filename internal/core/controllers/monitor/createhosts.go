@@ -5,11 +5,11 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/geogw"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/prometheusgw"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/rpcgw"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/core/gateways/geogw"
+	"github.com/bartosian/suimon/internal/core/gateways/prometheusgw"
+	"github.com/bartosian/suimon/internal/core/gateways/rpcgw"
 )
 
 type responseWithError struct {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
 )
 
 type responseWithError struct {

@@ -8,7 +8,7 @@ import (
 	"github.com/mum4k/termdash"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/dashboardbuilder/dashboards"
+	"github.com/bartosian/suimon/internal/core/domain/service/dashboardbuilder/dashboards"
 )
 
 const (

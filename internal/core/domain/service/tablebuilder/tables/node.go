@@ -5,8 +5,8 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/text"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/host"
 )
 
 var (
@@ -33,7 +33,7 @@ var (
 		enums.ColumnNameCommit:                       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameCountry:                      NewDefaultColumnConfig(text.AlignCenter, text.AlignLeft, false),
 	}
-	
+
 	RowsConfigNode = RowsConfig{
 		0: {
 			enums.ColumnNameIndex,

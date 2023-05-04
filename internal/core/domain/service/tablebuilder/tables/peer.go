@@ -3,7 +3,7 @@ package tables
 import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
 )
 
 var (
@@ -30,7 +30,7 @@ var (
 		enums.ColumnNameCommit:                       NewDefaultColumnConfig(text.AlignCenter, text.AlignCenter, false),
 		enums.ColumnNameCountry:                      NewDefaultColumnConfig(text.AlignLeft, text.AlignCenter, false),
 	}
-	
+
 	RowsConfigPeer = RowsConfig{
 		0: {
 			enums.ColumnNameIndex,

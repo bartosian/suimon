@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
+	"github.com/bartosian/suimon/internal/core/ports"
 )
 
 func (gateway *Gateway) CallFor(ip net.IP) (result *ports.IPResult, err error) {

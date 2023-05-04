@@ -2,7 +2,7 @@ package monitor
 
 import (
 	"fmt"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
 )
 
 // RenderTables renders the selected tables. The function checks whether data has been provided for each table

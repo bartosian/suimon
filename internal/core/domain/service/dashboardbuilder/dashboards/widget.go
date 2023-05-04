@@ -12,7 +12,7 @@ import (
 	"github.com/mum4k/termdash/widgets/sparkline"
 	"github.com/mum4k/termdash/widgets/text"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
 )
 
 // newWidgetOfType initializes a new widget of the given type.

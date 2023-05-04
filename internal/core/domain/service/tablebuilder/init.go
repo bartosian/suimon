@@ -6,10 +6,10 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	domainhost "github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
-	domainmetrics "github.com/bartosian/sui_helpers/suimon/internal/core/domain/metrics"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/tablebuilder/tables"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	domainhost "github.com/bartosian/suimon/internal/core/domain/host"
+	domainmetrics "github.com/bartosian/suimon/internal/core/domain/metrics"
+	"github.com/bartosian/suimon/internal/core/domain/service/tablebuilder/tables"
 )
 
 // Init initializes the table configuration based on the given table type and host data.

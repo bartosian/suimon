@@ -8,7 +8,7 @@ import (
 
 	"github.com/dariubs/percent"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
+	"github.com/bartosian/suimon/cmd/checker/enums"
 )
 
 const (

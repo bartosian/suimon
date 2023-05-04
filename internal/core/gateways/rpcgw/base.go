@@ -7,8 +7,8 @@ import (
 
 	"github.com/ybbus/jsonrpc/v3"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
+	"github.com/bartosian/suimon/internal/core/gateways/cligw"
+	"github.com/bartosian/suimon/internal/core/ports"
 )
 
 const rpcClientTimeout = 3 * time.Second

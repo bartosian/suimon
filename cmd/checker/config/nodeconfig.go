@@ -6,8 +6,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/bartosian/sui_helpers/suimon/pkg/env"
-	"github.com/bartosian/sui_helpers/suimon/pkg/log"
+	"github.com/bartosian/suimon/pkg/env"
+	"github.com/bartosian/suimon/pkg/log"
 )
 
 const (

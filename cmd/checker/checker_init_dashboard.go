@@ -1,7 +1,7 @@
 package checker
 
 import (
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder"
+	"github.com/bartosian/suimon/cmd/checker/dashboardbuilder"
 )
 
 func (checker *Checker) InitDashboard() error {

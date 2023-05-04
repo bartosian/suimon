@@ -5,9 +5,9 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/progress"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/pkg/progress"
 )
 
 // ParseConfigData retrieves data from hosts and sets their health based on the selected tables.

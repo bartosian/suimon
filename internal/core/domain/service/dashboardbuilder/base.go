@@ -10,10 +10,10 @@ import (
 	"github.com/mum4k/termdash/terminal/termbox"
 	"github.com/mum4k/termdash/terminal/terminalapi"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/dashboardbuilder/dashboards"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/core/domain/service/dashboardbuilder/dashboards"
+	"github.com/bartosian/suimon/internal/core/gateways/cligw"
 )
 
 type Builder struct {

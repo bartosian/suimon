@@ -3,7 +3,7 @@ package dashboards
 import (
 	"github.com/mum4k/termdash/container/grid"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
 )
 
 // ColumnsConfig is a type that maps column names to their respective widths.

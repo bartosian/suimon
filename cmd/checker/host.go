@@ -9,9 +9,9 @@ import (
 	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/ybbus/jsonrpc/v3"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/pkg/address"
-	"github.com/bartosian/sui_helpers/suimon/pkg/log"
+	"github.com/bartosian/suimon/cmd/checker/enums"
+	"github.com/bartosian/suimon/pkg/address"
+	"github.com/bartosian/suimon/pkg/log"
 )
 
 type requestType int

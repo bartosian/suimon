@@ -3,8 +3,8 @@ package monitor
 import (
 	"fmt"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/service/dashboardbuilder"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/service/dashboardbuilder"
 )
 
 // Dynamic is a method of the Controller struct, responsible for initializing and rendering dashboards

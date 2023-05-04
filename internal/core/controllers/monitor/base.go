@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/config"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/host"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/ports"
+	"github.com/bartosian/suimon/internal/core/domain/config"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/core/gateways/cligw"
+	"github.com/bartosian/suimon/internal/core/ports"
 )
 
 type (

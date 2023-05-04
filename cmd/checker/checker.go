@@ -10,12 +10,12 @@ import (
 	"github.com/mum4k/termdash"
 	"github.com/ybbus/jsonrpc/v3"
 
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/config"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/dashboardbuilder/dashboards"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/enums"
-	"github.com/bartosian/sui_helpers/suimon/cmd/checker/tablebuilder"
-	"github.com/bartosian/sui_helpers/suimon/pkg/log"
+	"github.com/bartosian/suimon/cmd/checker/config"
+	"github.com/bartosian/suimon/cmd/checker/dashboardbuilder"
+	"github.com/bartosian/suimon/cmd/checker/dashboardbuilder/dashboards"
+	"github.com/bartosian/suimon/cmd/checker/enums"
+	"github.com/bartosian/suimon/cmd/checker/tablebuilder"
+	"github.com/bartosian/suimon/pkg/log"
 )
 
 const ipInfoCacheExp = 5 * time.Minute

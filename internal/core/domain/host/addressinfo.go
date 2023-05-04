@@ -5,8 +5,8 @@ import (
 	"net"
 	"net/url"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/address"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/pkg/address"
 )
 
 const (

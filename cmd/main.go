@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/controllers"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/controllers/monitor"
-	domainconfig "github.com/bartosian/sui_helpers/suimon/internal/core/domain/config"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/gateways/cligw"
-	"github.com/bartosian/sui_helpers/suimon/internal/core/handlers/commands"
+	"github.com/bartosian/suimon/internal/core/controllers"
+	"github.com/bartosian/suimon/internal/core/controllers/monitor"
+	domainconfig "github.com/bartosian/suimon/internal/core/domain/config"
+	"github.com/bartosian/suimon/internal/core/gateways/cligw"
+	"github.com/bartosian/suimon/internal/core/handlers/commands"
 )
 
 func main() {

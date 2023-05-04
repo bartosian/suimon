@@ -15,9 +15,9 @@ import (
 	"github.com/mum4k/termdash/widgets/sparkline"
 	"github.com/mum4k/termdash/widgets/text"
 
-	"github.com/bartosian/sui_helpers/suimon/internal/core/domain/enums"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/log"
-	"github.com/bartosian/sui_helpers/suimon/internal/pkg/utility"
+	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/pkg/log"
+	"github.com/bartosian/suimon/internal/pkg/utility"
 )
 
 // CellsConfig is a type that represents a mapping of column names to CellConfig.
