@@ -1,8 +1,8 @@
 # SUIMON: Command Line Tool for Monitoring SUI Network
 
-<p align="center">
+<div style="text-align:center;">
   <img src="static/images/suimon.png" alt="Image Description" width="1000"/>
-</p>
+</div>
 
 `Suimon` is a powerful command line tool designed to provide detailed dashboards for monitoring the SUI network. With Suimon, you can easily monitor the health and performance of your nodes and validators, as well as track important system states and events in real-time.
 
@@ -151,7 +151,7 @@ Here is an example file tree for the `~/.suimon` directory:
 # This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators.
 # Please make sure to provide at least one working endpoint.
 public-rpc:
-  - "https://wave3-rpc.testnet.sui.io:443"
+  - "https://fullnode.testnet.sui.io:443"
   - "https://rpc-ws-testnet-w3.suiprovider.xyz:443"
   - "https://sui-api.rpc.com:443"
 
@@ -185,6 +185,14 @@ Examples:
 - https://wave3-rpc.testnet.sui.io:443
 - https://rpc-ws-testnet-w3.suiprovider.xyz:443
 - https://sui-api.rpc.com:443
+
+*These endpoints are additional RPC endpoints managed by the SUI team, which you can use alongside your own to monitor the relevant networks.*
+
+| Network | RPC Endpoint                          |
+|---------|---------------------------------------|
+| Devnet  | `https://fullnode.devnet.sui.io:443`  |
+| Testnet | `https://fullnode.testnet.sui.io:443` |
+| Mainnet | `https://fullnode.mainnet.sui.io:443` |
 
 #### Full Nodes
 

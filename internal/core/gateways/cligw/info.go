@@ -36,7 +36,7 @@ func (Gateway) infoLabel(label string, indent int) string {
 	}
 
 	bang := color.New(color.FgRed, color.Bold).Sprint(icon)
-	formattedlabel := color.New(color.FgWhite, color.Bold).Sprint(label)
+	formattedLabel := color.New(color.FgWhite, color.Bold).Sprint(label)
 
-	return fmt.Sprintf("%s %s", bang, formattedlabel)
+	return fmt.Sprintf("%s %s", bang, formattedLabel)
 }

@@ -1,7 +1,7 @@
 # This section lists the RPC endpoints that the client will use to interact with the SUI Testnet.
 # Please make sure to provide at least one working endpoint.
 public-rpc:
-  - "https://wave3-rpc.testnet.sui.io:443"
+  - "https://fullnode.testnet.sui.io:443"
   - "https://rpc-ws-testnet-w3.suiprovider.xyz:443"
   - "https://sui-api.rpc.com:443"
 
