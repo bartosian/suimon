@@ -1,4 +1,4 @@
-module github.com/bartosian/sui_helpers/suimon
+module github.com/bartosian/suimon
 
 go 1.19
 

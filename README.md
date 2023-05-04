@@ -18,19 +18,20 @@ So if you're looking for a powerful, reliable tool for monitoring the SUI networ
     - [MacOS](#macos)
     - [Windows](#windows)
   - [Build and Installation from Source](#build-and-installation-from-source)
-  - [Suimon Config Files](#suimon-config-files)
+  - [Suimon Configuration Files](#suimon-configuration-files)
     - [Example Suimon Config Directory](#example-suimon-config-directory)
     - [Suimon Configuration Fields](#suimon-configuration-fields)
-      - [Public RPC Endpoints](#public-rpc-endpoints)
-      - [Full Nodes](#full-nodes)
-      - [Validators](#validators)
-      - [IP Lookup](#ip-lookup)
+    - [Public RPC Endpoints](#public-rpc-endpoints)
+    - [Full Nodes](#full-nodes)
+    - [Validators](#validators)
+    - [IP Lookup](#ip-lookup)
   - [Suimon Commands](#suimon-commands)
   - [Tables](#tables)
     - [Table Examples](#table-examples)
   - [Dashboards](#dashboards)
     - [Dashboard Examples](#dashboard-examples)
-- [License](#license)
+  - [License](#license)
+- [Acknowledgments](#acknowledgments)
 
 ## Installation
 
@@ -122,7 +123,7 @@ Remove-Item $HOME\suimon_install.ps1
 
 ## Suimon Configuration Files
 
-`Suimon` uses configuration files to manage settings and defaults for different environments and networks. The default configuration file for the Suimon tool is suimon-testnet.yaml, which is located in the ~/.suimon directory. However, you can use multiple configuration files to manage settings for different networks and environments.
+`Suimon` uses configuration files to manage settings and defaults for different environments and networks. The default configuration file for the Suimon tool is `suimon-testnet.yaml`, which is located in the `~/.suimon` directory. However, you can use multiple configuration files to manage settings for different networks and environments.
 
 By properly configuring your Suimon configuration file, you can reduce the need for command-line interface (CLI) flags when running the tool. The configuration file can contain default values and settings that are automatically applied to the tool when it is executed. This can streamline your workflow and reduce the amount of time and effort required to run the tool.
 
@@ -136,7 +137,7 @@ Sure, here's an updated version with a header that clarifies that the file prefi
 
 The names for these configuration files is up to the user. In this example, we've used the naming convention `suimon-<network>.yaml` to provide an example of how to name configuration files for different networks.
 
-Here is an example file tree for the `~/.suimon` directory:
+Here is an example file tree for the `~/.suimon` directory with separate configuration files for all sui networks:
 
 ```
 ~/.suimon
@@ -151,18 +152,18 @@ Here is an example file tree for the `~/.suimon` directory:
 # This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators.
 # Please make sure to provide at least one working endpoint.
 public-rpc:
-  - "https://fullnode.testnet.sui.io:443"
-  - "https://rpc-ws-testnet-w3.suiprovider.xyz:443"
-  - "https://sui-api.rpc.com:443"
+  - https://fullnode.testnet.sui.io:443
+  - https://rpc-ws-testnet-w3.suiprovider.xyz:443
+  - https://sui-api.rpc.com:443
 
-# if you wish to monitor the node, update this section with the node information
+# if you wish to monitor the nodes, update this section with the nodes information
 full-nodes:
   - json-rpc-address: 0.0.0.0:9000
     metrics-address: 0.0.0.0:9184
   - json-rpc-address: https://sui-rpc.testnet.com
     metrics-address: https://sui-rpc.testnet.com/metrics
 
-# if you wish to monitor the validator, update this section with the validator information
+# if you wish to monitor the validators, update this section with the validators information
 validators:
   - metrics-address: 0.0.0.0:9184/metrics
   - metrics-address: https://sui-validator.testnet.com:9184/metrics
@@ -171,7 +172,7 @@ validators:
 # provider and country information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
 # which is free and gives you 50k requests per month, which is sufficient for individual usage.
 ip-lookup:
-  access-token: "55f30ce0213aa7" # temporary access token with requests limit
+  access-token: 55f30ce0213aa7 # temporary access token with requests limit
 ```
 
 ### Public RPC Endpoints
@@ -179,16 +180,17 @@ ip-lookup:
 The `public-rpc` section This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators. Therefore, it is essential to provide accurate and up-to-date endpoint information in this section.
 This field is required to request system metrics and to calculate the health of nodes and validators. The other fields are optional and can be updated if needed.
 
-Examples:
+```yaml
+public-rpc:
+  - https://wave3-rpc.testnet.sui.io:443"
+  - https://rpc-ws-testnet-w3.suiprovider.xyz:443
+  - https://sui-api.rpc.com:443
+```
 
-- https://wave3-rpc.testnet.sui.io:443
-- https://rpc-ws-testnet-w3.suiprovider.xyz:443
-- https://sui-api.rpc.com:443
-
-*These endpoints are additional RPC endpoints managed by the SUI team, which you can use alongside your own to monitor the relevant networks.*
+_These endpoints are additional RPC endpoints managed by the SUI team, which you can use alongside your own to monitor the relevant networks._
 
 | Network | RPC Endpoint                          |
-|---------|---------------------------------------|
+| ------- | ------------------------------------- |
 | Devnet  | `https://fullnode.devnet.sui.io:443`  |
 | Testnet | `https://fullnode.testnet.sui.io:443` |
 | Mainnet | `https://fullnode.mainnet.sui.io:443` |
@@ -197,36 +199,44 @@ Examples:
 
 The `full-nodes` section lists the full nodes available for monitoring the SUI Testnet. The user can update this section with information for any number of nodes, following the example format provided. It is important to note that the RPC address is required to be provided for each node, while the metrics address is optional.
 
-Examples:
-
-- json-rpc-address: 0.0.0.0:9000
-  metrics-address: 0.0.0.0:9184
-- json-rpc-address: https://sui-rpc.testnet.com  
-  metrics-address: https://sui-rpc.testnet.com/metrics
+```yaml
+full-nodes:
+  - json-rpc-address: 0.0.0.0:9000
+    metrics-address: 0.0.0.0:9184
+  - json-rpc-address: https://sui-rpc.testnet.com
+    metrics-address: https://sui-rpc.testnet.com/metrics
+```
 
 ### Validators
 
 The `validators` section lists the validators to monitor. The user can update this section with information for any number of validators, following the example format provided. It is important to note that only the metrics endpoint is required to be provided for each validator.
 
-Examples:
-
-- metrics-address: 0.0.0.0:9184/metrics
-- metrics-address: https://sui-validator.testnet.com:9184/metrics
-- metrics-address: https://sui-validator.mainnet.com:9184/metrics
+```yaml
+validators:
+  - metrics-address: 0.0.0.0:9184/metrics
+  - metrics-address: https://sui-validator.testnet.com:9184/metrics
+  - metrics-address: https://sui-validator.mainnet.com:9184/metrics
+```
 
 ### IP Lookup
 
 The `ip-lookup` section provides information on how to use the `ipinfo.io` public API to get provider and country information in tables. The user needs to obtain an access token on the website to use this feature. The current access token provided is temporary with a limited number of requests per month.
 
+```yaml
+ip-lookup:
+  access-token: 55f30ce0213aa7 # temporary access token with requests limit
+```
+
 ## Suimon Commands
 
-The Suimon tool provides several commands that can be used to interact with the SUI blockchain. Here is an overview of the main commands:
+The Suimon tool provides several commands that offer capabilities to monitor the SUI network and its entities. Here is an overview of the main commands:
 
-- `suimon help`: Show help information about any command.
+- `suimon help`: provides detailed information about how to use any of the available Suimon commands, including a brief description of what each command does and the syntax for using it. This command can be used to quickly learn how to use any of the other Suimon commands, making it an essential tool for getting started with Suimon monitoring.
+  <br><br>
   ![Screenshot of my app](static/images/suimon-help.png)
   <br><br>
 
-- `suimon monitor`: Monitor the running network with the Suimon monitoring tool.
+- `suimon monitor`: allows you to monitor the health of the running SUI network with the Suimon monitoring tool. This tool provides you with real-time updates on network statistics, including the number of nodes, validators, and their respective statuses. Additionally, the tool also provides you with insight into the health of the network, including any issues or errors that may be present. By running this command, you can ensure that the SUI network is running optimally and take corrective action in case of any issues.
   <br><br>
   When you run the command, the monitoring tool will start and display a list of available configurations that have been added to the `.suimon` directory. Each item in the list corresponds to a configuration file, and you can select the configuration you want to use following instructions in the terminal.
   For example, if you have two configuration files in your .suimon directory named `suimon-testnet.yaml` and `suimon-mainnet.yaml`, the tool will display a list like this:
@@ -246,7 +256,8 @@ The Suimon tool provides several commands that can be used to interact with the 
   ![Screenshot of my app](static/images/suimon-table-type.png)
   <br><br>
 
-- `suimon version`: Show version information for the Suimon monitoring tool.
+- `suimon version`: displays the version of the Suimon monitoring tool currently installed on your system. This is useful when verifying the installed version of Suimon or when reporting an issue to the Suimon development team.
+  <br><br>
   ![Screenshot of my app](static/images/suimon-version.png)
 
 ## Tables
