@@ -1,7 +1,5 @@
 #!/bin/bash
 
-suimon_version="latest"
-
 # Retrieve the latest stable version of Go from the official website
 go_version=$(curl -sSL "https://golang.org/VERSION?m=text")
 
@@ -41,9 +39,23 @@ else
   fi
 fi
 
-go install "github.com/bartosian/suimon@$suimon_version"
+# Get the latest tag from the GitHub API
+LATEST_TAG=$(curl -s https://api.github.com/repos/bartosian/suimon/releases/latest | grep tag_name | cut -d '"' -f 4)
 
-source $HOME/.bash_profile
+# Download the latest binary release from GitHub
+if ! wget "https://github.com/bartosian/suimon/releases/download/$LATEST_TAG/suimon"; then
+    echo "Error: Failed to download suimon binary"
+    exit 1
+fi
+
+# Make the binary executable
+chmod +x suimon
+
+# Move the binary to the executable directory
+if ! mv suimon /usr/local/bin/; then
+    echo "Error: Failed to move suimon binary to /usr/local/bin/"
+    exit 1
+fi
 
 echo
 echo "======================================"

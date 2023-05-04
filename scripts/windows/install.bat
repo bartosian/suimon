@@ -45,8 +45,20 @@ if exist "%ProgramFiles%\Go" (
     echo Go %go_version% has been installed successfully.
 )
 
-:: Install Suimon
+REM Install the suimon module
 go install "github.com/bartosian/suimon@%suimon_version%"
+
+REM Check for errors in the install command
+if %errorlevel% neq 0 (
+  REM Check if the error message says "module declares its path as"
+  findstr /C:"module declares its path as" suimon.out >nul
+  if %errorlevel% equ 0 (
+    echo Error: module path mismatch
+    echo Please update the import path for the suimon module
+  ) else (
+    echo Error: failed to install suimon
+  )
+)
 
 echo
 echo "======================================"

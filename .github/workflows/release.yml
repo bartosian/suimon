@@ -6,8 +6,10 @@ on:
       - 'v*'
 
 jobs:
-  release:
+  create_release:
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Check Tag Creator
         run: |
@@ -15,23 +17,6 @@ jobs:
             echo "Error: Tag must be created by ${{ github.repository_owner }}"
             exit 1
           fi
-
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.19
-          check-latest: true
-
-      - name: Get dependencies
-        run: go get -v -t -d ./...
-
-      - name: Build Binary
-        run: |
-          cd cmd
-          go build -o suimon
 
       - name: Create Release
         id: create_release
@@ -45,13 +30,57 @@ jobs:
           draft: false
           prerelease: false
 
+  upload_asset:
+    needs: create_release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          -
+            go-version: "1.19"
+            os: "ubuntu-latest"
+            arch: "arm64"
+            goos: "linux"
+            goarch: "arm64"
+          -
+            go-version: "1.19"
+            os: "windows-latest"
+            arch: "arm64"
+            goos: "windows"
+            goarch: "arm64"
+          -
+            go-version: "1.19"
+            os: "macOS-latest"
+            arch: "amd64"
+            goos: "darwin"
+            goarch: "amd64"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+          check-latest: true
+
+      - name: Get dependencies
+        run: go get -v -t -d ./...
+
+      - name: Build Binary
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          cd cmd
+          go build -o suimon
+
       - name: Upload Asset
-        id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ./cmd/suimon
-          asset_name: suimon
+          asset_name: suimon-${{ matrix.os }}-${{ matrix.arch }}
           asset_content_type: application/x-executable
