@@ -120,7 +120,7 @@ Remove-Item $HOME\suimon_install.ps1
      ```
    - For each network that you want to connect to, create a separate YAML file with the naming convention `suimon-<network>.yaml` and put it in the `.suimon` directory. For example, if you want to connect to the mainnet, you can create a file called `suimon-mainnet.yaml` and put it in the `.suimon` directory.
 
-## Suimon Config Files
+## Suimon Configuration Files
 
 `Suimon` uses configuration files to manage settings and defaults for different environments and networks. The default configuration file for the Suimon tool is suimon-testnet.yaml, which is located in the ~/.suimon directory. However, you can use multiple configuration files to manage settings for different networks and environments.
 
@@ -174,11 +174,10 @@ ip-lookup:
   access-token: "55f30ce0213aa7" # temporary access token with requests limit
 ```
 
-The `public-rpc` field is required to request system metrics and to calculate the health of nodes and validators. The other fields are optional and can be updated if needed.
-
-#### Public RPC Endpoints
+### Public RPC Endpoints
 
 The `public-rpc` section This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators. Therefore, it is essential to provide accurate and up-to-date endpoint information in this section.
+This field is required to request system metrics and to calculate the health of nodes and validators. The other fields are optional and can be updated if needed.
 
 Examples:
 
@@ -194,7 +193,7 @@ Examples:
 | Testnet | `https://fullnode.testnet.sui.io:443` |
 | Mainnet | `https://fullnode.mainnet.sui.io:443` |
 
-#### Full Nodes
+### Full Nodes
 
 The `full-nodes` section lists the full nodes available for monitoring the SUI Testnet. The user can update this section with information for any number of nodes, following the example format provided. It is important to note that the RPC address is required to be provided for each node, while the metrics address is optional.
 
@@ -205,7 +204,7 @@ Examples:
 - json-rpc-address: https://sui-rpc.testnet.com  
   metrics-address: https://sui-rpc.testnet.com/metrics
 
-#### Validators
+### Validators
 
 The `validators` section lists the validators to monitor. The user can update this section with information for any number of validators, following the example format provided. It is important to note that only the metrics endpoint is required to be provided for each validator.
 
@@ -215,7 +214,7 @@ Examples:
 - metrics-address: https://sui-validator.testnet.com:9184/metrics
 - metrics-address: https://sui-validator.mainnet.com:9184/metrics
 
-#### IP Lookup
+### IP Lookup
 
 The `ip-lookup` section provides information on how to use the `ipinfo.io` public API to get provider and country information in tables. The user needs to obtain an access token on the website to use this feature. The current access token provided is temporary with a limited number of requests per month.
 
@@ -332,6 +331,10 @@ Dashboards are dynamic monitors that provide real-time information about the net
   <br><br>
   ![Screenshot of my app](static/images/dashboard-system-state.png)
 
-# License
+## License
 
-This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the [MIT License](LICENSE). You are free to use, modify, and distribute this code, as long as you give credit to the original source.
+
+# Acknowledgments
+
+This project is based on the work of [bartosian](https://github.com/bartosian). If you use this code, please give credit to the original source.
