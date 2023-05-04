@@ -22,7 +22,7 @@ func (c *Controller) Monitor() error {
 		configNames = append(configNames, configName)
 	}
 
-	configsChoiceList := cligw.NewSimpleSelectChoiceList(configNames...)
+	configsChoiceList := cligw.NewSelectChoiceList(configNames...)
 
 	selectedConfigName, err := c.gateways.cli.SelectOne("Which configuration would you like to use?", configsChoiceList)
 	if err != nil {
@@ -34,7 +34,7 @@ func (c *Controller) Monitor() error {
 	c.selectedConfig = c.configs[selectedConfigName.Value]
 
 	// Select the monitor type.
-	monitorTypeChoiceList := cligw.NewSimpleSelectChoiceList(
+	monitorTypeChoiceList := cligw.NewSelectChoiceList(
 		string(enums.MonitorTypeStatic),
 		string(enums.MonitorTypeDynamic),
 	)
@@ -84,7 +84,7 @@ func (c *Controller) Monitor() error {
 // or an error if the user's selection cannot be parsed or no tables are selected.
 func (c *Controller) selectStaticTables() ([]enums.TableType, error) {
 	// Select the tables to render.
-	tableTypeChoiceList := cligw.NewSimpleSelectChoiceList(
+	tableTypeChoiceList := cligw.NewSelectChoiceList(
 		allTablesSelection,
 		string(enums.TableTypeRPC),
 		string(enums.TableTypeNode),
@@ -138,7 +138,7 @@ func (c *Controller) selectStaticTables() ([]enums.TableType, error) {
 // or an error if the user's selection cannot be parsed or no dashboard is selected.
 func (c *Controller) selectDynamicDashboard() (*enums.TableType, error) {
 	// Select the dashboard to render.
-	dashboardTypeChoiceList := cligw.NewSimpleSelectChoiceList(
+	dashboardTypeChoiceList := cligw.NewSelectChoiceList(
 		string(enums.TableTypeNode),
 		string(enums.TableTypeValidator),
 		string(enums.TableTypeRPC),
@@ -189,7 +189,7 @@ func (c *Controller) selectHostForDashboard() (*domainhost.Host, error) {
 	}
 
 	// Select the host to render.
-	hostChoiceList := cligw.NewSimpleSelectChoiceList(hostAddresses...)
+	hostChoiceList := cligw.NewSelectChoiceList(hostAddresses...)
 
 	selectedHostAddress, err := c.gateways.cli.SelectOne("Which host do you want to render dashboard for?", hostChoiceList)
 	if err != nil {

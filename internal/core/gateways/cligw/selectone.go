@@ -31,14 +31,16 @@ func (gateway *Gateway) SelectOneWithOpts(
 		PageSize: pageSize,
 	}
 
-	err := survey.AskOne(prompt, rawResult, gateway.surveyIcons)
+	err := survey.AskOne(prompt, rawResult, gateway.icons)
+	if err != nil {
+		return nil, err
+	}
+
 	results := choices.GetByLabels(*rawResult)
 
 	if len(results) == 0 {
 		return nil, errors.New("no result selected")
 	}
 
-	result := results[0]
-
-	return &result, err
+	return &results[0], nil
 }

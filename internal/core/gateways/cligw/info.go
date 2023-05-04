@@ -8,9 +8,10 @@ import (
 
 const infoIcon = "ℹ️ "
 
-type MsgOpts struct {
-	Indent int
-}
+var (
+	iconInfoColor    = color.New(color.FgGreen, color.Bold)
+	messageInfoColor = color.New(color.FgWhite, color.Bold)
+)
 
 func (gateway *Gateway) Info(label string, value string) {
 	gateway.InfoWithOpts(label, value, MsgOpts{})
@@ -30,13 +31,14 @@ func (gateway *Gateway) InfoWithOpts(label string, value string, opts MsgOpts) {
 }
 
 func (Gateway) infoLabel(label string, indent int) string {
-	icon := infoIcon
-	for i := indent; i > 0; i-- {
+	var icon string
+
+	for icon, i := infoIcon, indent; i > 0; i-- {
 		icon = fmt.Sprintf("  %s", icon)
 	}
 
-	bang := color.New(color.FgRed, color.Bold).Sprint(icon)
-	formattedLabel := color.New(color.FgWhite, color.Bold).Sprint(label)
+	bang := iconInfoColor.Sprint(icon)
+	formattedLabel := messageInfoColor.Sprint(label)
 
 	return fmt.Sprintf("%s %s", bang, formattedLabel)
 }

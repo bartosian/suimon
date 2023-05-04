@@ -17,9 +17,10 @@ func (gateway *Gateway) SelectManyWithOpts(question string, choices SelectChoice
 		PageSize: len(labels),
 	}
 
-	err := survey.AskOne(prompt, rawResult, gateway.surveyIcons)
+	err := survey.AskOne(prompt, rawResult, gateway.icons)
+	if err != nil {
+		return nil, err
+	}
 
-	result := choices.GetByLabels(*rawResult...)
-
-	return result, err
+	return choices.GetByLabels(*rawResult...), nil
 }

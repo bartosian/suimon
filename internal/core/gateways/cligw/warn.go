@@ -8,6 +8,11 @@ import (
 
 const warnIcon = "⚠️"
 
+var (
+	iconWarnColor    = color.New(color.FgYellow, color.Bold)
+	messageWarnColor = color.New(color.FgWhite, color.Bold)
+)
+
 func (gateway *Gateway) Warn(msg string) {
 	gateway.WarnWithOpts(msg, MsgOpts{})
 }
@@ -22,13 +27,15 @@ func (gateway *Gateway) WarnfWithOpts(msg string, opts MsgOpts, vars ...interfac
 }
 
 func (Gateway) WarnWithOpts(msg string, opts MsgOpts) {
-	icon := warnIcon
-	for i := opts.Indent; i > 0; i-- {
+	var icon string
+
+	for icon, i := warnIcon, opts.Indent; i > 0; i-- {
 		icon = fmt.Sprintf("  %s", icon)
 	}
 
-	formattedIcon := color.New(color.FgYellow, color.Bold).Sprint(icon)
-	formattedMsg := color.New(color.FgWhite, color.Bold).Sprint(msg)
+	formattedIcon := iconWarnColor.Sprint(icon)
+	formattedMsg := messageWarnColor.Sprint(msg)
+	
 	result := fmt.Sprintf("%s  %s", formattedIcon, formattedMsg)
 
 	fmt.Println(result)

@@ -1,54 +1,47 @@
 package cligw
 
 type (
-	SelectChoice struct {
+	SelectChoiceList []SelectChoice
+	SelectChoice     struct {
 		Label string
 		Value string
-		Data  interface{}
+		Data  any
 	}
-
-	SelectChoiceList []SelectChoice
 )
 
-func NewSelectChoice(label, value string, data interface{}) SelectChoice {
-	return SelectChoice{
-		Label: label,
-		Value: value,
-		Data:  data,
-	}
-}
+func NewSelectChoiceList(values ...string) SelectChoiceList {
+	options := make(SelectChoiceList, 0, len(values))
 
-func NewSimpleSelectChoiceList(vals ...string) SelectChoiceList {
-	list := SelectChoiceList{}
-
-	for _, val := range vals {
-		list = append(list, SelectChoice{
+	for _, val := range values {
+		option := SelectChoice{
 			Label: val,
 			Value: val,
-		})
+		}
+
+		options = append(options, option)
 	}
 
-	return list
+	return options
 }
 
-func (sc *SelectChoiceList) Labels() (result []string) {
-	for _, choice := range *sc {
-		result = append(result, choice.Label)
+func (choiceList *SelectChoiceList) Labels() (result []string) {
+	for _, option := range *choiceList {
+		result = append(result, option.Label)
 	}
 
 	return
 }
 
-func (sc *SelectChoiceList) GetByLabels(labels ...string) SelectChoiceList {
-	list := SelectChoiceList{}
+func (choiceList *SelectChoiceList) GetByLabels(labels ...string) SelectChoiceList {
+	options := make(SelectChoiceList, 0)
 
 	for _, label := range labels {
-		for _, choice := range *sc {
-			if choice.Label == label {
-				list = append(list, choice)
+		for _, option := range *choiceList {
+			if option.Label == label {
+				options = append(options, option)
 			}
 		}
 	}
 
-	return list
+	return options
 }

@@ -2,16 +2,20 @@ package cligw
 
 import "github.com/AlecAivazis/survey/v2"
 
+type MsgOpts struct {
+	Indent int
+}
+
 type Gateway struct {
-	surveyIcons survey.AskOpt
+	icons survey.AskOpt
 }
 
 func NewGateway() *Gateway {
-	surveyIcons := survey.WithIcons(func(icons *survey.IconSet) {
+	icons := survey.WithIcons(func(icons *survey.IconSet) {
 		icons.Question.Text = "❔"
 	})
 
 	return &Gateway{
-		surveyIcons: surveyIcons,
+		icons: icons,
 	}
 }
