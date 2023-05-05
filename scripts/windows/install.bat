@@ -46,7 +46,7 @@ if exist "%ProgramFiles%\Go" (
 )
 
 :: Get the latest tag from the GitHub API
-$LATEST_TAG=(Invoke-WebRequest -Uri https://api.github.com/repos/bartosian/suimon/releases/latest).content | ConvertFrom-Json | Select-Object -expand TagName
+$LATEST_TAG = ((Invoke-WebRequest -Uri https://api.github.com/repos/bartosian/suimon/releases/latest).Content | ConvertFrom-Json).TagName
 
 :: Download the latest binary release from GitHub
 $ErrorActionPreference = "Stop"
@@ -70,5 +70,6 @@ Set-Acl "C:\Windows\System32\suimon.exe" $newACL
 
 echo.
 echo ======================================
-echo Suimon has been installed and configured successfully.
-echo Before running Suimon, you will need to customize the 'suimon-testnet
+echo 🚀 Suimon has been installed and configured successfully. 🎉
+echo 📝 Before running Suimon, you will need to customize the 'suimon-testnet.yaml' file in the '$HOME/.suimon' directory with the values specific to your environment. 🛠️
+echo 👉 To get started, run 'suimon help'. 💡

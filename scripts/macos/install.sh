@@ -41,7 +41,7 @@ LATEST_TAG=$(curl -s https://api.github.com/repos/bartosian/suimon/releases/late
 
 # Download the latest binary release from GitHub
 if ! wget -O suimon "https://github.com/bartosian/suimon/releases/download/$LATEST_TAG/suimon-macOS-latest-arm64"; then
-    echo "Error: Failed to download suimon binary"
+    echo "⚠️ Error: Failed to download suimon binary"
     exit 1
 fi
 
@@ -50,12 +50,12 @@ chmod +x suimon
 
 # Move the binary to the executable directory
 if ! mv suimon /usr/local/bin/; then
-    echo "Error: Failed to move suimon binary to /usr/local/bin/"
+    echo "⚠️ Error: Failed to move suimon binary to /usr/local/bin/"
     exit 1
 fi
 
 echo
 echo "======================================"
-echo "Suimon has been installed and configured successfully."
-echo "Before running Suimon, you will need to customize the 'suimon-testnet.yaml' file in the '$HOME/.suimon' directory with the values specific to your environment."
-echo "To get started, run 'suimon help'."
+echo "🚀 Suimon has been installed and configured successfully. 🎉"
+echo "📝 Before running Suimon, you will need to customize the 'suimon-testnet.yaml' file in the '$HOME/.suimon' directory with the values specific to your environment. 🛠️"
+echo "👉 To get started, run 'suimon help'. 💡"
