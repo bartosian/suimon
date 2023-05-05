@@ -45,23 +45,30 @@ if exist "%ProgramFiles%\Go" (
     echo Go %go_version% has been installed successfully.
 )
 
-REM Install the suimon module
-go install "github.com/bartosian/suimon@%suimon_version%"
+:: Get the latest tag from the GitHub API
+$LATEST_TAG=(Invoke-WebRequest -Uri https://api.github.com/repos/bartosian/suimon/releases/latest).content | ConvertFrom-Json | Select-Object -expand TagName
 
-REM Check for errors in the install command
-if %errorlevel% neq 0 (
-  REM Check if the error message says "module declares its path as"
-  findstr /C:"module declares its path as" suimon.out >nul
-  if %errorlevel% equ 0 (
-    echo Error: module path mismatch
-    echo Please update the import path for the suimon module
-  ) else (
-    echo Error: failed to install suimon
-  )
-)
+:: Download the latest binary release from GitHub
+$ErrorActionPreference = "Stop"
+if (Invoke-WebRequest -Uri "https://github.com/bartosian/suimon/releases/download/$LATEST_TAG/suimon-windows-latest-arm64" -OutFile "suimon") {
+    Write-Host "Error: Failed to download suimon binary"
+    exit 1
+}
 
-echo
-echo "======================================"
-echo "Suimon has been installed and configured successfully."
-echo "Before running Suimon, you will need to customize the 'suimon-testnet.yaml' file in the '$HOME/.suimon' directory with the values specific to your environment."
-echo "To get started, run 'suimon help'."
+:: Move the binary to the executable directory
+Move-Item -Path ".\suimon" -Destination "C:\Windows\System32\" -Force
+
+# Make the binary executable
+$oldACL = Get-Acl "C:\Windows\System32\suimon.exe"
+$newACL = New-Object System.Security.AccessControl.FileSecurity
+$newACL.SetAccessRuleProtection($true, $false)
+$newACL.SetOwner([System.Security.Principal.NTAccount]::new("BUILTIN\Administrators"))
+$newACL.SetAccessRuleProtection($false, $true)
+$rule = New-Object System.Security.AccessControl.FileSystemAccessRule("BUILTIN\Users","ExecuteFile","Allow")
+$newACL.SetAccessRule($rule)
+Set-Acl "C:\Windows\System32\suimon.exe" $newACL
+
+echo.
+echo ======================================
+echo Suimon has been installed and configured successfully.
+echo Before running Suimon, you will need to customize the 'suimon-testnet

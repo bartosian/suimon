@@ -40,7 +40,7 @@ fi
 LATEST_TAG=$(curl -s https://api.github.com/repos/bartosian/suimon/releases/latest | grep tag_name | cut -d '"' -f 4)
 
 # Download the latest binary release from GitHub
-if ! wget "https://github.com/bartosian/suimon/releases/download/$LATEST_TAG/suimon"; then
+if ! wget -O suimon "https://github.com/bartosian/suimon/releases/download/$LATEST_TAG/suimon-macOS-latest-arm64"; then
     echo "Error: Failed to download suimon binary"
     exit 1
 fi
