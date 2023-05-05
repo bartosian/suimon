@@ -4,9 +4,9 @@
   <img src="static/images/suimon.png" alt="Image Description" width="1000"/>
 </div>
 
-`Suimon` is a powerful command line tool designed to provide detailed dashboards for monitoring the SUI network. With Suimon, you can easily monitor the health and performance of your nodes and validators, as well as track important system states and events in real-time.
+`Suimon` is a powerful command line tool designed to provide detailed dashboards for monitoring the SUI network. With Suimon, you can easily monitor your nodes' and validators' health and performance and track important system states and events in real time.
 
-Whether you're a network operator, validator, or simply a curious observer, Suimon offers a range of powerful monitoring capabilities that can help you stay on top of the SUI network. From node status and uptime monitoring, to detailed performance metrics and system state tracking, Suimon provides everything you need to ensure your network is running smoothly and efficiently.
+Whether you're a network operator, validator, or simply a curious observer, Suimon offers a range of powerful monitoring capabilities that can help you stay on top of the SUI network. From node status and uptime monitoring to detailed performance metrics and system state tracking, Suimon provides everything you need to ensure your network runs smoothly and efficiently.
 
 So if you're looking for a powerful, reliable tool for monitoring the SUI network, look no further than Suimon. Try it out today and start monitoring your network with confidence!
 
@@ -21,10 +21,6 @@ So if you're looking for a powerful, reliable tool for monitoring the SUI networ
   - [Suimon Configuration Files](#suimon-configuration-files)
     - [Example Suimon Config Directory](#example-suimon-config-directory)
     - [Suimon Configuration Fields](#suimon-configuration-fields)
-    - [Public RPC Endpoints](#public-rpc-endpoints)
-    - [Full Nodes](#full-nodes)
-    - [Validators](#validators)
-    - [IP Lookup](#ip-lookup)
   - [Suimon Commands](#suimon-commands)
   - [Tables](#tables)
     - [Table Examples](#table-examples)
@@ -35,7 +31,7 @@ So if you're looking for a powerful, reliable tool for monitoring the SUI networ
 
 ## Installation
 
-The scripts directory contains installation scripts for several common environments, including Ubuntu, Mac OS, and Windows. These scripts are provided for convenience only and do not provide any guarantees that Suimon will run without issues on your system.
+There are installation scripts for several common environments, including Ubuntu, Mac OS, and Windows. These scripts are provided for convenience only and do not guarantee that Suimon will run without issues on your system.
 
 ### Ubuntu
 
@@ -64,6 +60,8 @@ Remove-Item $HOME\suimon_install.ps1
 ```
 
 ## Build and Installation from Source
+
+Building and installing from the source is useful if you want to customize the code or if there is no pre-built binary available for your platform. It can also be a good learning experience if you are interested in how Suimon works.
 
 1. **Install Go**
 
@@ -113,12 +111,17 @@ Remove-Item $HOME\suimon_install.ps1
      ```
      mv suimon $HOME/bin/
      ```
-6. **Create a Suimon config directory and put config file there**
+6. **Create a Suimon config directory and put the config file there**
+
    - Create a directory for your Suimon config files by running the following command:
+
      ```
      mkdir $HOME/.suimon && \
      cp $HOME/suimon/main/static/suimon.template.yaml $HOME/.suimon/suimon-testnet.yaml
      ```
+
+     The 'suimon-testnet.yaml' file that you have just copied is a template file and must be customized with your specific environment data before running the Suimon tool. Make sure to modify this file with your own values before proceeding.
+
    - For each network that you want to connect to, create a separate YAML file with the naming convention `suimon-<network>.yaml` and put it in the `.suimon` directory. For example, if you want to connect to the mainnet, you can create a file called `suimon-mainnet.yaml` and put it in the `.suimon` directory.
 
 ## Suimon Configuration Files
@@ -131,11 +134,9 @@ You can also provide a different location for the configuration files by using t
 
 To manage settings for different networks and environments, create separate configuration files with the naming convention `suimon-<network>.yaml` and put them in the ~/.suimon directory. For example, if you want to connect to the mainnet, you can create a file called `suimon-mainnet.yaml` and put it in the `.suimon` directory.
 
-Sure, here's an updated version with a header that clarifies that the file prefixes are up to the user and the following is just an example of files in the ~/.suimon directory:
-
 ### Example Suimon Config Directory
 
-The names for these configuration files is up to the user. In this example, we've used the naming convention `suimon-<network>.yaml` to provide an example of how to name configuration files for different networks.
+The names for these configuration files are up to the user. In this example, we've used the naming convention `suimon-<network>.yaml` to provide an example of how to name configuration files for different networks.
 
 Here is an example file tree for the `~/.suimon` directory with separate configuration files for all sui networks:
 
@@ -147,6 +148,8 @@ Here is an example file tree for the `~/.suimon` directory with separate configu
 ```
 
 ### Suimon Configuration Fields
+
+`Suimon` configuration files contain fields that allow you to customize the behavior of the tool to fit your specific use case. These files also enable you to add or remove monitored network entities and specify how they should be monitored. The suimon-testnet.yaml file, for instance, is a template configuration file that you can use as a starting point to create your own configuration file for testnet network. Before using Suimon, be sure to modify the configuration file with your own data and settings.
 
 ```yaml
 # This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators.
@@ -175,9 +178,9 @@ ip-lookup:
   access-token: 55f30ce0213aa7 # temporary access token with requests limit
 ```
 
-### Public RPC Endpoints
+1. **public-rpc**
 
-The `public-rpc` section This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators. Therefore, it is essential to provide accurate and up-to-date endpoint information in this section.
+The `public-rpc` section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators. Therefore, it is essential to provide accurate and up-to-date endpoint information in this section.
 This field is required to request system metrics and to calculate the health of nodes and validators. The other fields are optional and can be updated if needed.
 
 ```yaml
@@ -187,7 +190,7 @@ public-rpc:
   - https://sui-api.rpc.com:443
 ```
 
-_These endpoints are additional RPC endpoints managed by the SUI team, which you can use alongside your own to monitor the relevant networks._
+These endpoints are additional RPC endpoints managed by the SUI team, which you can use alongside your own to monitor the relevant networks.
 
 | Network | RPC Endpoint                          |
 | ------- | ------------------------------------- |
@@ -195,9 +198,9 @@ _These endpoints are additional RPC endpoints managed by the SUI team, which you
 | Testnet | `https://fullnode.testnet.sui.io:443` |
 | Mainnet | `https://fullnode.mainnet.sui.io:443` |
 
-### Full Nodes
+2. **full-nodes**
 
-The `full-nodes` section lists the full nodes available for monitoring the SUI Testnet. The user can update this section with information for any number of nodes, following the example format provided. It is important to note that the RPC address is required to be provided for each node, while the metrics address is optional.
+The `full-nodes` section lists the full nodes for monitoring in the SUI network. The user can update this section with information for any number of nodes, following the example format provided. It is important to note that the RPC address is required to be provided for each node, while the metrics address is optional.
 
 ```yaml
 full-nodes:
@@ -207,7 +210,7 @@ full-nodes:
     metrics-address: https://sui-rpc.testnet.com/metrics
 ```
 
-### Validators
+3. **validators**
 
 The `validators` section lists the validators to monitor. The user can update this section with information for any number of validators, following the example format provided. It is important to note that only the metrics endpoint is required to be provided for each validator.
 
@@ -218,7 +221,7 @@ validators:
   - metrics-address: https://sui-validator.mainnet.com:9184/metrics
 ```
 
-### IP Lookup
+4. **ip-lookup**
 
 The `ip-lookup` section provides information on how to use the `ipinfo.io` public API to get provider and country information in tables. The user needs to obtain an access token on the website to use this feature. The current access token provided is temporary with a limited number of requests per month.
 
@@ -233,32 +236,27 @@ The Suimon tool provides several commands that offer capabilities to monitor the
 
 - `suimon help`: provides detailed information about how to use any of the available Suimon commands, including a brief description of what each command does and the syntax for using it. This command can be used to quickly learn how to use any of the other Suimon commands, making it an essential tool for getting started with Suimon monitoring.
   <br><br>
-  ![Screenshot of my app](static/images/suimon-help.png)
+  ![Screenshot of my app](static/images/suimon-help.gif)
   <br><br>
 
 - `suimon monitor`: allows you to monitor the health of the running SUI network with the Suimon monitoring tool. This tool provides you with real-time updates on network statistics, including the number of nodes, validators, and their respective statuses. Additionally, the tool also provides you with insight into the health of the network, including any issues or errors that may be present. By running this command, you can ensure that the SUI network is running optimally and take corrective action in case of any issues.
   <br><br>
-  When you run the command, the monitoring tool will start and display a list of available configurations that have been added to the `.suimon` directory. Each item in the list corresponds to a configuration file, and you can select the configuration you want to use following instructions in the terminal.
-  For example, if you have two configuration files in your .suimon directory named `suimon-testnet.yaml` and `suimon-mainnet.yaml`, the tool will display a list like this:
-  <br><br>
-  ![Screenshot of my app](static/images/suimon-monitor.png)
-  <br><br>
-  After selecting a configuration file to use with the suimon monitor command, you will be presented with another list of options to select the monitor type you want to use. There are two monitor types available: `static` and `dynamic`.
+  When you run the command, the monitoring tool will start and display a list of available configurations that have been added to the `.suimon` directory. Each item in the list corresponds to a configuration file, and you can select the configuration you want to use following the instructions in the terminal.
+
+  After selecting a configuration file to use with the suimon monitor command, you will be presented with another list of options to select the monitor type you want to use. There are two monitor types available: static and dynamic.
 
   The `static` monitor type displays tables that show detailed information about the network, such as block and transaction data, validator information, and network statistics. This type of monitor is useful for analyzing the network and getting a detailed view of its operations.
 
   The `dynamic` monitor type displays real-time dashboards that show key metrics about the network. This type of monitor is useful for getting a quick overview of the network's current state and performance.
+
+  After choosing the monitor type suimon will prompt you to select a table to render.
   <br><br>
-  ![Screenshot of my app](static/images/suimon-monitor-type.png)
-  <br><br>
-  This will prompt you to select a table to render.
-  <br><br>
-  ![Screenshot of my app](static/images/suimon-table-type.png)
+  ![Screenshot of my app](static/images/suimon-monitor.gif)
   <br><br>
 
 - `suimon version`: displays the version of the Suimon monitoring tool currently installed on your system. This is useful when verifying the installed version of Suimon or when reporting an issue to the Suimon development team.
   <br><br>
-  ![Screenshot of my app](static/images/suimon-version.png)
+  ![Screenshot of my app](static/images/suimon-version.gif)
 
 ## Tables
 
@@ -277,36 +275,50 @@ Tables are static monitors that provide a detailed snapshot of the network and i
 
 ### Table Examples
 
+- `📡 PUBLIC RPC`
+  <br><br>
+  The table is a valuable resource for obtaining detailed information about a network’s RPC (Remote Procedure Call) endpoints. This table provides detailed information about the network’s RPC endpoints, such as their addresses, port numbers, health, total transaction blocks, latest checkpoints, and other ones.
+  <br><br>
+  ![Screenshot of my app](static/images/table-public-rpc.png)
+  <br><br>
+
+- `💻 FULL NODES`
+  <br><br>
+  This table provides information about the full nodes, such as their addresses, port numbers, health, transactions, checkpoints, uptime, and many others. The table is designed to display detailed information that can be useful for developers and network administrators who need to monitor the full nodes.
+  <br><br>
+  ![Screenshot of my app](static/images/table-full-nodes.png)
+  <br><br>
+
+- `🤖 VALIDATORS`
+  <br><br>
+  This table is especially useful for developers and network administrators who need to keep track of the network’s validators and ensure that they are functioning correctly. By using the information provided in the table, developers and administrators can quickly identify any issues with the validators and take the necessary steps to resolve them.
+  <br><br>
+  ![Screenshot of my app](static/images/table-validators.png)
+  <br><br>
+
 - `💰 EPOCH, GAS AND SUBSIDY`
+  <br><br>
+  This table is a valuable resource for obtaining metrics about the current epoch, reference gas prices, and subsidies in a network. This table provides information about the current epoch, such as its number, start, and end time, and total duration. The table also provides information about the reference gas price and subsidies, such as their current values and estimated values for the next epoch.
   <br><br>
   ![Screenshot of my app](static/images/table-system-state.png)
   <br><br>
 
 - `📊 VALIDATORS PARAMS`
   <br><br>
+  This table provides information about network thresholds and parameters for validators. This table provides information about the number of validators in various states, such as active, pending, and at risk, as well as the minimum stake threshold required for validation, and other system-wide metrics.
+  <br><br>
   ![Screenshot of my app](static/images/table-validators-params.png)
-  <br><br>
-
-- `📡 PUBLIC RPC`
-  <br><br>
-  ![Screenshot of my app](static/images/table-public-rpc.png)
-  <br><br>
-
-- `🤖 VALIDATORS`
-  <br><br>
-  ![Screenshot of my app](static/images/table-validators.png)
-  <br><br>
-
-- `💻 FULL NODES`
-  <br><br>
-  ![Screenshot of my app](static/images/table-full-nodes.png)
   <br><br>
 
 - `📢 VALIDATORS REPORTS`
   <br><br>
+  The table provides information about the latest reports submitted by validators, which can influence tallying rule decisions. This table provides a quick and easy way to monitor the latest reports submitted by validators and identify any that may have an impact on the network.
+  <br><br>
   ![Screenshot of my app](static/images/table-validators-reports.png)
 
 - `✅ ACTIVE VALIDATORS`
+  <br><br>
+  This table provides valuable information about the current list of active validators on the network. This table displays important metrics such as APY, stake, commission, rewards, and other relevant information that can help network administrators monitor the performance of active validators.
   <br><br>
   ![Screenshot of my app](static/images/table-active-validators.png)
 
@@ -325,22 +337,31 @@ Dashboards are dynamic monitors that provide real-time information about the net
 
 - `📡 PUBLIC RPC`
   <br><br>
+  The table is a valuable resource for obtaining detailed information about a network’s RPC (Remote Procedure Call) endpoints. This table provides detailed information about the network’s RPC endpoints, such as their addresses, port numbers, health, total transaction blocks, latest checkpoints, and other ones.
+  <br><br>
   ![Screenshot of my app](static/images/dashboard-public-rpc.png)
   <br><br>
 
 - `💻 FULL NODES`
+  <br><br>
+  This table provides information about the full nodes, such as their addresses, port numbers, health, transactions, checkpoints, uptime, and many others. The table is designed to display detailed information that can be useful for developers and network administrators who need to monitor the full nodes.
   <br><br>
   ![Screenshot of my app](static/images/dashboard-full-nodes.png)
   <br><br>
 
 - `🤖 VALIDATORS`
   <br><br>
+  This table is especially useful for developers and network administrators who need to keep track of the network’s validators and ensure that they are functioning correctly. By using the information provided in the table, developers and administrators can quickly identify any issues with the validators and take the necessary steps to resolve them.
+  <br><br>
   ![Screenshot of my app](static/images/dashboard-validators.png)
   <br><br>
 
 - `💰 EPOCH, GAS AND SUBSIDY`
   <br><br>
+  This table is a valuable resource for obtaining metrics about the current epoch, reference gas prices, and subsidies in a network. This table provides information about the current epoch, such as its number, start, and end time, and total duration. The table also provides information about the reference gas price and subsidies, such as their current values and estimated values for the next epoch.
+  <br><br>
   ![Screenshot of my app](static/images/dashboard-system-state.png)
+  <br><br>
 
 ## License
 
