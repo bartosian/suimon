@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
-	"github.com/bartosian/suimon/internal/core/domain/host"
 	"github.com/bartosian/suimon/internal/pkg/progress"
 )
 
@@ -116,17 +115,13 @@ func (c *Controller) getHostsData(table enums.TableType) error {
 	progressChan := progress.NewProgressBar("PARSING DATA FOR "+string(table), progress.ColorBlue)
 	defer func() { progressChan <- struct{}{} }()
 
-	var (
-		addresses []host.AddressInfo
-		hosts     []host.Host
-		err       error
-	)
-
-	if addresses, err = c.getAddressInfoByTableType(table); err != nil {
+	addresses, err := c.getAddressInfoByTableType(table)
+	if err != nil {
 		return err
 	}
 
-	if hosts, err = c.createHosts(table, addresses); err != nil {
+	hosts, err := c.createHosts(table, addresses)
+	if err != nil {
 		return err
 	}
 

@@ -90,6 +90,7 @@ type (
 
 		SystemState         SuiSystemState
 		ValidatorsApyParsed ValidatorsApyParsed
+		EpochsHistory       []EpochInfo
 
 		Uptime  string
 		Version string

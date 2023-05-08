@@ -74,6 +74,27 @@ const (
 	ColumnNameValidatorApy                      ColumnName = "APY, %"
 )
 
+// Epoch section
+const (
+	ColumnNameEpoch                             ColumnName = "EPOCH"
+	ColumnNameEpochTotalTransactions            ColumnName = "TOTAL\nTRANSACTIONS"
+	ColumnNameEpochStartTimestamp               ColumnName = "EPOCH START TIME UTC"
+	ColumnNameEpochEndTimestamp                 ColumnName = "EPOCH END TIME UTC"
+	ColumnNameEpochFirstCheckpointId            ColumnName = "FIRST\nCHECKPOINT ID"
+	ColumnNameEpochLastCheckpointId             ColumnName = "LAST\nCHECKPOINT ID"
+	ColumnNameEpochProtocolVersion              ColumnName = "PROTOCOL\nVERSION"
+	ColumnNameEpochReferenceGasPrice            ColumnName = "REFERENCE\nGAS PRICE"
+	ColumnNameEpochTotalStake                   ColumnName = "TOTAL STAKE,\nSUI"
+	ColumnNameEpochStorageFundReinvestment      ColumnName = "STORAGE FUND\nREINVESTMENT, SUI"
+	ColumnNameEpochStorageCharge                ColumnName = "STORAGE\nCHARGE, SUI"
+	ColumnNameEpochStorageRebate                ColumnName = "STORAGE\nREBATE, SUI"
+	ColumnNameEpochStorageFundBalance           ColumnName = "STORAGE FUND\nBALANCE, SUI"
+	ColumnNameEpochStakeSubsidyAmount           ColumnName = "STORAGE SUBSIDY\nAMOUNT, SUI"
+	ColumnNameEpochTotalGasFees                 ColumnName = "TOTAL GAS\nFEES, SUI"
+	ColumnNameEpochTotalStakeRewardsDistributed ColumnName = "TOTAL STAKE REWARDS\nDISTRIBUTED, SUI"
+	ColumnNameEpochLeftoverStorageFundInflow    ColumnName = "LEFTOVER STORAGE FUND\nINFLOW, SUI"
+)
+
 // System State section
 const (
 	ColumnNameCurrentEpoch                                ColumnName = "CURRENT\nEPOCH"

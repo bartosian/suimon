@@ -12,7 +12,7 @@ sudo apt install wget jq git libclang-dev libpq-dev cmake -y
 
 cd $HOME && \
 mkdir -p $HOME/.suimon; \
-  wget -O $HOME/.suimon/suimon-testnet.yaml https://raw.githubusercontent.com/bartosian/suimon/main/static/suimon.template.yaml
+  wget -O $HOME/.suimon/suimon-testnet.yaml https://raw.githubusercontent.com/bartosian/suimon/main/static/templates/suimon-testnet.yaml
 
 if go version | grep -q "$go_version"; then
   echo "Go $go_version is already installed."

@@ -12,9 +12,10 @@ import (
 type addressParser func(string) (*address.Endpoint, error)
 
 var parserMap = map[enums.TableType]addressParser{
-	enums.TableTypeNode:      address.ParseURL,
-	enums.TableTypeValidator: address.ParseURL,
-	enums.TableTypeRPC:       address.ParseURL,
+	enums.TableTypeNode:          address.ParseURL,
+	enums.TableTypeValidator:     address.ParseURL,
+	enums.TableTypeRPC:           address.ParseURL,
+	enums.TableTypeEpochsHistory: address.ParseURL,
 }
 
 // getAddressInfoByTableType retrieves the list of addresses for hosts that support the specified table type from the CheckerController's internal state.
@@ -33,6 +34,8 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses
 		return c.getValidatorAddresses(parser)
 	case enums.TableTypeRPC:
 		return c.getRPCAddresses(parser)
+	case enums.TableTypeEpochsHistory:
+		return c.getExtendedRPCAddresses(parser)
 	}
 
 	return addresses, nil
@@ -63,7 +66,7 @@ func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.Ad
 
 		if addressRPC != "" {
 			if endpointRPC, err = parser(addressRPC); err != nil {
-				return nil, fmt.Errorf("invalid format for full-node json-rpc-address in dashboards file: %w", err)
+				return nil, fmt.Errorf("invalid format for full-node json-rpc-address in config file: %w", err)
 			}
 
 			addressInfo = &host.AddressInfo{Endpoint: *endpointRPC, Ports: make(map[enums.PortType]string)}
@@ -75,7 +78,7 @@ func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.Ad
 
 		if addressMetrics != "" {
 			if endpointMetrics, err = parser(addressMetrics); err != nil {
-				return nil, fmt.Errorf("invalid format for full-node metrics-address in dashboards file: %w", err)
+				return nil, fmt.Errorf("invalid format for full-node metrics-address in config file: %w", err)
 			}
 
 			if addressInfo == nil {
@@ -109,7 +112,7 @@ func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []ho
 
 		endpointMetrics, err := parser(addressMetrics)
 		if err != nil {
-			return nil, fmt.Errorf("invalid format for validator metrics-address in dashboards file: %w", err)
+			return nil, fmt.Errorf("invalid format for validator metrics-address in config file: %w", err)
 		}
 
 		addressInfo := host.AddressInfo{Endpoint: *endpointMetrics, Ports: make(map[enums.PortType]string)}
@@ -128,13 +131,37 @@ func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []ho
 func (c *Controller) getRPCAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
 	rpcConfig := c.selectedConfig.PublicRPC
 	if len(rpcConfig) == 0 {
-		return nil, errors.New("public-rpc not provided in dashboards file")
+		return nil, errors.New("public-rpc not provided in config file")
 	}
 
 	for _, rpc := range rpcConfig {
 		endpoint, err := parser(rpc)
 		if err != nil {
-			return nil, fmt.Errorf("invalid format for public-rpc in dashboards file: %w", err)
+			return nil, fmt.Errorf("invalid format for public-rpc in config file: %w", err)
+		}
+
+		addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}
+		if endpoint.Port != nil {
+			addressInfo.Ports[enums.PortTypeRPC] = *endpoint.Port
+		}
+
+		addresses = append(addresses, addressInfo)
+	}
+
+	return addresses, nil
+}
+
+// getExtendedRPCAddresses returns the list of public extended RPC addresses.
+func (c *Controller) getExtendedRPCAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
+	rpcConfig := c.selectedConfig.PublicExtendedRPC
+	if len(rpcConfig) == 0 {
+		return nil, errors.New("public-extended-rpc not provided in config file")
+	}
+
+	for _, rpc := range rpcConfig {
+		endpoint, err := parser(rpc)
+		if err != nil {
+			return nil, fmt.Errorf("invalid format for public-extended-rpc in config file: %w", err)
 		}
 
 		addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}

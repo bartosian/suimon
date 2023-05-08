@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"fmt"
+
 	"github.com/bartosian/suimon/internal/core/domain/enums"
 )
 
@@ -12,12 +13,14 @@ import (
 func (c *Controller) RenderTables() error {
 	selectedTables := c.selectedTables
 
+	extendedRPCProvided := len(c.hosts.extendedRPC) > 0
 	rpcProvided := len(c.hosts.rpc) > 0
 	nodeProvided := len(c.hosts.node) > 0
 	validatorProvided := len(c.hosts.validator) > 0
 
 	tableTypeEnabled := map[enums.TableType]bool{
 		enums.TableTypeRPC:                rpcProvided,
+		enums.TableTypeEpochsHistory:      extendedRPCProvided,
 		enums.TableTypeNode:               nodeProvided,
 		enums.TableTypeValidator:          validatorProvided,
 		enums.TableTypeGasPriceAndSubsidy: rpcProvided,

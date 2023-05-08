@@ -16,8 +16,9 @@ const (
 )
 
 type Config struct {
-	PublicRPC []string `yaml:"public-rpc"`
-	FullNodes []struct {
+	PublicExtendedRPC []string `yaml:"public-extended-rpc"`
+	PublicRPC         []string `yaml:"public-rpc"`
+	FullNodes         []struct {
 		JSONRPCAddress string `yaml:"json-rpc-address"`
 		MetricsAddress string `yaml:"metrics-address"`
 	} `yaml:"full-nodes"`

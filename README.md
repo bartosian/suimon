@@ -117,10 +117,10 @@ Building and installing from the source is useful if you want to customize the c
 
      ```
      mkdir $HOME/.suimon && \
-     cp $HOME/suimon/main/static/suimon.template.yaml $HOME/.suimon/suimon-testnet.yaml
+     cp $HOME/suimon/main/static/templates/suimon-testnet.yaml $HOME/.suimon/suimon-testnet.yaml
      ```
 
-     The 'suimon-testnet.yaml' file that you have just copied is a template file and must be customized with your specific environment data before running the Suimon tool. Make sure to modify this file with your own values before proceeding.
+     The 'suimon-testnet.yaml' file that you have just copied is a template file and must be customized with your specific environment data before running the Suimon tool.
 
    - For each network that you want to connect to, create a separate YAML file with the naming convention `suimon-<network>.yaml` and put it in the `.suimon` directory. For example, if you want to connect to the mainnet, you can create a file called `suimon-mainnet.yaml` and put it in the `.suimon` directory.
 
@@ -152,6 +152,11 @@ Here is an example file tree for the `~/.suimon` directory with separate configu
 `Suimon` configuration files contain fields that allow you to customize the behavior of the tool to fit your specific use case. These files also enable you to add or remove monitored network entities and specify how they should be monitored. The suimon-testnet.yaml file, for instance, is a template configuration file that you can use as a starting point to create your own configuration file for testnet network. Before using Suimon, be sure to modify the configuration file with your own data and settings.
 
 ```yaml
+# This SUI API endpoint exposes an extended set of functionalities beyond what is typically available in a standard public RPC.
+# In addition to providing extended functionality, the public-extended-rpc API may also be required for some tables that rely on the methods provided by this API.
+public-extended-rpc:
+  - https://explorer-rpc.testnet.sui.io
+
 # This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators.
 # Please make sure to provide at least one working endpoint.
 public-rpc:
@@ -170,7 +175,7 @@ full-nodes:
 validators:
   - metrics-address: 0.0.0.0:9184/metrics
   - metrics-address: https://sui-validator.testnet.com:9184/metrics
-  - metrics-address: https://sui-validator.mainnet.com:9184/metrics
+  - metrics-address: https://sui-validator.testnet.com:9184/metrics
 
 # provider and country information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
 # which is free and gives you 50k requests per month, which is sufficient for individual usage.
@@ -178,7 +183,24 @@ ip-lookup:
   access-token: 55f30ce0213aa7 # temporary access token with requests limit
 ```
 
-1. **public-rpc**
+1. **public-extended-rpc**
+
+The `public-extended-rpc` section lists the public extended RPC endpoints that provide extended set of functionalities beyond what is typically available in a standard public RPC. The public-extended-rpc API may also be required for some tables that rely on the methods provided by this API.
+
+```yaml
+public-extended-rpc:
+  - https://explorer-rpc.testnet.sui.io
+```
+
+These endpoints are managed by the SUI team, which you can use alongside your own to monitor the relevant networks.
+
+| Network | RPC Endpoint                          |
+| ------- |---------------------------------------|
+| Devnet  | `https://explorer-rpc.devnet.sui.io`  |
+| Testnet | `https://explorer-rpc.testnet.sui.io` |
+| Mainnet | `https://explorer-rpc.mainnet.sui.io` |
+
+2. **public-rpc**
 
 The `public-rpc` section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators. Therefore, it is essential to provide accurate and up-to-date endpoint information in this section.
 This field is required to request system metrics and to calculate the health of nodes and validators. The other fields are optional and can be updated if needed.
@@ -190,15 +212,15 @@ public-rpc:
   - https://sui-api.rpc.com:443
 ```
 
-These endpoints are additional RPC endpoints managed by the SUI team, which you can use alongside your own to monitor the relevant networks.
+These endpoints are managed by the SUI team, which you can use alongside your own to monitor the relevant networks.
 
-| Network | RPC Endpoint                          |
-| ------- | ------------------------------------- |
-| Devnet  | `https://fullnode.devnet.sui.io:443`  |
-| Testnet | `https://fullnode.testnet.sui.io:443` |
-| Mainnet | `https://fullnode.mainnet.sui.io:443` |
+| Network | RPC Endpoint                      |
+| ------- | --------------------------------- |
+| Devnet  | `https://fullnode.devnet.sui.io`  |
+| Testnet | `https://fullnode.testnet.sui.io` |
+| Mainnet | `https://fullnode.mainnet.sui.io` |
 
-2. **full-nodes**
+3. **full-nodes**
 
 The `full-nodes` section lists the full nodes for monitoring in the SUI network. The user can update this section with information for any number of nodes, following the example format provided. It is important to note that the RPC address is required to be provided for each node, while the metrics address is optional.
 
@@ -210,7 +232,7 @@ full-nodes:
     metrics-address: https://sui-rpc.testnet.com/metrics
 ```
 
-3. **validators**
+4. **validators**
 
 The `validators` section lists the validators to monitor. The user can update this section with information for any number of validators, following the example format provided. It is important to note that only the metrics endpoint is required to be provided for each validator.
 
@@ -221,7 +243,7 @@ validators:
   - metrics-address: https://sui-validator.mainnet.com:9184/metrics
 ```
 
-4. **ip-lookup**
+5. **ip-lookup**
 
 The `ip-lookup` section provides information on how to use the `ipinfo.io` public API to get provider and country information in tables. The user needs to obtain an access token on the website to use this feature. The current access token provided is temporary with a limited number of requests per month.
 
@@ -262,16 +284,17 @@ The Suimon tool provides several commands that offer capabilities to monitor the
 
 Tables are static monitors that provide a detailed snapshot of the network and its entities at a certain point in time.
 
-| Table Type                | Description                                                                    |
-| ------------------------- | ------------------------------------------------------------------------------ |
-| 📡 PUBLIC RPC             | Displays detailed information about the network's RPC endpoints.               |
-| 💻 FULL NODES             | Displays detailed information about the network's nodes.                       |
-| 🤖 VALIDATORS             | Displays detailed information about the network's validators.                  |
-| 💰 EPOCH, GAS AND SUBSIDY | Displays the current gas price and subsidy values for the network.             |
-| 📊 VALIDATORS PARAMS      | Displays the validators related thresholds and counts on the network.          |
+| Table Type                | Description                                                                   |
+|---------------------------|-------------------------------------------------------------------------------|
+| 📡 PUBLIC RPC             | Displays detailed information about the network's RPC endpoints.              |
+| 💻 FULL NODES             | Displays detailed information about the network's nodes.                      |
+| 🤖 VALIDATORS             | Displays detailed information about the network's validators.                 |
+| 💰 EPOCH, GAS AND SUBSIDY | Displays the current gas price and subsidy values for the network.            |
+| ⏳ EPOCHS HISTORY          | Displays epoch info for the last 100 epochs.                                  |
+| 📊 VALIDATORS PARAMS      | Displays the validators related thresholds and counts on the network.         |
 | 🚨 VALIDATORS AT RISK     | Displays the number of validators that are currently at risk of being slashed. |
-| 📢 VALIDATORS REPORTS     | Displays the latest reports submitted by validators.                           |
-| ✅ ACTIVE VALIDATORS      | Displays the current list of active validators on the network.                 |
+| 📢 VALIDATORS REPORTS     | Displays the latest reports submitted by validators.                          |
+| ✅ ACTIVE VALIDATORS       | Displays the current list of active validators on the network.                |
 
 ### Table Examples
 
@@ -303,6 +326,13 @@ Tables are static monitors that provide a detailed snapshot of the network and i
   ![Screenshot of my app](static/images/table-system-state.png)
   <br><br>
 
+- `⏳ EPOCHS HISTORY`
+  <br><br>
+  This table provides information about the last 100 epochs.  The table is designed to display detailed information that can be useful for developers and network administrators for the monitoring of historical data.
+  <br><br>
+  ![Screenshot of my app](static/images/table-epochs-history.png)
+  <br><br>
+
 - `📊 VALIDATORS PARAMS`
   <br><br>
   This table provides information about network thresholds and parameters for validators. This table provides information about the number of validators in various states, such as active, pending, and at risk, as well as the minimum stake threshold required for validation, and other system-wide metrics.
@@ -315,6 +345,7 @@ Tables are static monitors that provide a detailed snapshot of the network and i
   The table provides information about the latest reports submitted by validators, which can influence tallying rule decisions. This table provides a quick and easy way to monitor the latest reports submitted by validators and identify any that may have an impact on the network.
   <br><br>
   ![Screenshot of my app](static/images/table-validators-reports.png)
+  <br><br>
 
 - `✅ ACTIVE VALIDATORS`
   <br><br>

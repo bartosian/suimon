@@ -35,6 +35,8 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		return metrics.SetSystemStateValue(value)
 	case enums.MetricTypeValidatorsApy:
 		return metrics.SetValidatorsApyValue(value)
+	case enums.MetricTypeEpochsHistory:
+		return metrics.SetEpochsHistoryValue(value)
 	case enums.MetricTypeTotalTransactionBlocks:
 		v, ok := value.(string)
 		if !ok {
@@ -290,7 +292,7 @@ func (metrics *Metrics) SetSystemStateValue(value any) error {
 
 // SetValidatorsApyValue sets the validators apy metrics based on the parsed data.
 func (metrics *Metrics) SetValidatorsApyValue(value any) error {
-	// Parse the JSON data of the SystemState object.
+	// Parse the JSON data of the ValidatorsAPY object.
 	dataBytes, err := json.Marshal(value.(map[string]interface{}))
 	if err != nil {
 		return fmt.Errorf(ErrUnexpectedMetricValueType, enums.MetricTypeValidatorsApy, value)
@@ -309,6 +311,25 @@ func (metrics *Metrics) SetValidatorsApyValue(value any) error {
 	}
 
 	metrics.ValidatorsApyParsed = validatorsApyParsed
+
+	return nil
+}
+
+// SetEpochsHistoryValue sets the epochs history based on the parsed data.
+func (metrics *Metrics) SetEpochsHistoryValue(value any) error {
+	// Parse the JSON data of the EpochsHistory object.
+	dataBytes, err := json.Marshal(value.(map[string]interface{}))
+	if err != nil {
+		return fmt.Errorf(ErrUnexpectedMetricValueType, enums.MetricTypeEpochsHistory, value)
+	}
+
+	// Unmarshal the JSON data into a EpochsHistory struct.
+	var epochsHistory EpochsHistory
+	if err = json.Unmarshal(dataBytes, &epochsHistory); err != nil {
+		return fmt.Errorf(ErrUnexpectedMetricValueType, enums.MetricTypeEpochsHistory, value)
+	}
+
+	metrics.EpochsHistory = epochsHistory.Data[1:]
 
 	return nil
 }
