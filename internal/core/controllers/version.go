@@ -7,7 +7,7 @@ import (
 	"github.com/bartosian/suimon/internal/core/ports"
 )
 
-const version = "v1.0.0"
+const version = "v1.1.0"
 
 type VersionController struct {
 	cliGateway *cligw.Gateway
