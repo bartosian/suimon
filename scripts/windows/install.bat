@@ -27,7 +27,7 @@ set "Path=%Path%;C:\Program Files (x86)\LLVM\bin;%GOPATH%\bin"
 
 cd %USERPROFILE% && (
     mkdir .suimon
-    wget -O .suimon\suimon-testnet.yaml https://raw.githubusercontent.com/bartosian/suimon/main/static/suimon.template.yaml
+    wget -O .suimon\suimon-testnet.yaml https://raw.githubusercontent.com/bartosian/suimon/main/static/templates/suimon-testnet.yaml
 )
 
 :: Install Go

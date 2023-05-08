@@ -13,15 +13,20 @@ import (
 )
 
 var (
-	// rpcMethodToMetricMap maps an RPC method to a metric type.
-	rpcMethodToMetricMap = map[enums.RPCMethod]enums.MetricType{
+	// rpcMethodToMetric maps an RPC method to a metric type.
+	rpcMethodToMetric = map[enums.RPCMethod]enums.MetricType{
 		enums.RPCMethodGetTotalTransactionBlocks:         enums.MetricTypeTotalTransactionBlocks,
 		enums.RPCMethodGetLatestCheckpointSequenceNumber: enums.MetricTypeLatestCheckpoint,
 		enums.RPCMethodGetSuiSystemState:                 enums.MetricTypeSuiSystemState,
 		enums.RPCMethodGetValidatorsApy:                  enums.MetricTypeValidatorsApy,
+		enums.RPCMethodGetEpochs:                         enums.MetricTypeEpochsHistory,
 	}
-	// prometheusToMetricMap maps a Prometheus metric name to a metric type.
-	prometheusToMetricMap = map[enums.PrometheusMetricName]enums.MetricType{
+	// rpcMethodToParams maps an RPC method to a params list.
+	rpcMethodToParams = map[enums.RPCMethod][]any{
+		enums.RPCMethodGetEpochs: {nil, 100, true},
+	}
+	// prometheusToMetric maps a Prometheus metric name to a metric type.
+	prometheusToMetric = map[enums.PrometheusMetricName]enums.MetricType{
 		enums.PrometheusMetricNameTotalTransactionCertificates: enums.MetricTypeTotalTransactionCertificates,
 		enums.PrometheusMetricNameTotalTransactionEffects:      enums.MetricTypeTotalTransactionEffects,
 		enums.PrometheusMetricNameHighestKnownCheckpoint:       enums.MetricTypeHighestKnownCheckpoint,
@@ -52,6 +57,9 @@ var (
 			enums.RPCMethodGetLatestCheckpointSequenceNumber,
 			enums.RPCMethodGetSuiSystemState,
 			enums.RPCMethodGetValidatorsApy,
+		},
+		enums.TableTypeEpochsHistory: {
+			enums.RPCMethodGetEpochs,
 		},
 	}
 	// tablesToCallMetrics maps a table type to a boolean value indicating whether to call metrics for that table type.
@@ -142,7 +150,7 @@ func (host *Host) GetPrometheusMetrics() error {
 	}
 
 	for metricName, metricValue := range result {
-		metricType, ok := prometheusToMetricMap[metricName]
+		metricType, ok := prometheusToMetric[metricName]
 		if !ok {
 			// ignore unused metric
 			delete(result, metricName)
@@ -210,12 +218,14 @@ func (host *Host) GetMetrics() error {
 // and stores it as a metric in the Metrics struct. It takes an RPCMethod input parameter and
 // returns an error if the method is not supported.
 func (host *Host) GetDataByMetric(method enums.RPCMethod) error {
-	metric, ok := rpcMethodToMetricMap[method]
+	metric, ok := rpcMethodToMetric[method]
 	if !ok {
 		return fmt.Errorf("unsupported RPC method: %v", method)
 	}
 
-	result, err := host.gateways.rpc.CallFor(method)
+	params := rpcMethodToParams[method]
+
+	result, err := host.gateways.rpc.CallFor(method, params...)
 	if err != nil {
 		return err
 	}

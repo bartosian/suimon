@@ -9,7 +9,7 @@ import (
 )
 
 type RPCGateway interface {
-	CallFor(method enums.RPCMethod) (result any, err error)
+	CallFor(method enums.RPCMethod, params ...interface{}) (result any, err error)
 }
 
 type PrometheusGateway interface {

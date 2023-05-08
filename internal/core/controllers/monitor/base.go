@@ -17,9 +17,10 @@ type (
 	}
 
 	Hosts struct {
-		rpc       []host.Host
-		node      []host.Host
-		validator []host.Host
+		extendedRPC []host.Host
+		rpc         []host.Host
+		node        []host.Host
+		validator   []host.Host
 	}
 
 	Builders struct {
@@ -77,6 +78,8 @@ func (c *Controller) getHostsByTableType(table enums.TableType) (hosts []host.Ho
 		return c.hosts.rpc[:1], nil
 	case enums.TableTypeRPC:
 		return c.hosts.rpc, nil
+	case enums.TableTypeEpochsHistory:
+		return c.hosts.extendedRPC[:1], nil
 	default:
 		return nil, fmt.Errorf("unknown table type: %v", table)
 	}
@@ -95,6 +98,8 @@ func (c *Controller) setHostsByTableType(table enums.TableType, hosts []host.Hos
 		c.hosts.validator = hosts
 	case enums.TableTypeRPC:
 		c.hosts.rpc = hosts
+	case enums.TableTypeEpochsHistory:
+		c.hosts.extendedRPC = hosts
 	default:
 		return fmt.Errorf("unknown table type: %v", table)
 	}

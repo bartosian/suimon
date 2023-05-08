@@ -1,7 +1,11 @@
-# This section lists the RPC endpoints that the client will use to interact with the SUI Testnet.
-# Please make sure to provide at least one working endpoint.
+# This SUI API endpoint exposes an extended set of functionalities beyond what is typically available in a standard public RPC.
+# In addition to providing extended functionality, the public-extended-rpc API may also be required for some tables that rely on the methods provided by this API.
+public-extended-rpc:
+  - https://explorer-rpc.testnet.sui.io
+
+# This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators.
+# Please make sure to have at least one working endpoint.
 public-rpc:
-  - https://fullnode.testnet.sui.io:443
   - https://rpc-ws-testnet-w3.suiprovider.xyz:443
   - https://sui-api.rpc.com:443
 
@@ -16,7 +20,6 @@ full-nodes:
 validators:
   - metrics-address: 0.0.0.0:9184/metrics
   - metrics-address: https://sui-validator.testnet.com:9184/metrics
-  - metrics-address: https://sui-validator.mainnet.com:9184/metrics
 
 # provider and country information in tables is requested from https://ipinfo.io/ public API. To use it, you need to obtain an access token on the website,
 # which is free and gives you 50k requests per month, which is sufficient for individual usage.
