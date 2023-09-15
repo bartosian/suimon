@@ -2,6 +2,10 @@
 
 <div style="text-align:center;">
   <img src="static/images/suimon.png" alt="Image Description" width="1000"/>
+  <p align="center">
+    <a href="https://github.com/scraly/gophersay/releases/latest"><img alt="GitHub release" src="https://img.shields.io/github/v/release/scraly/gophersay.svg?logo=github&style=flat-square"></a>
+    <a href="https://goreportcard.com/report/github.com/scraly/gophersay"><img src="https://goreportcard.com/badge/github.com/scraly/gophersay" alt="Code Status" /></a>
+  </p>
 </div>
 
 `Suimon` is a powerful command line tool designed to provide detailed dashboards for monitoring the SUI network. With Suimon, you can easily monitor your nodes' and validators' health and performance and track important system states and events in real time.
