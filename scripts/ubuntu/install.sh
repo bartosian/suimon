@@ -8,7 +8,7 @@ echo "======================================"
 echo
 
 sudo apt update && sudo apt upgrade -y && \
-sudo apt install wget jq git libclang-dev libpq-dev cmake -y
+sudo apt install wget jq git libclang-dev libpq-dev cmake tar -y
 
 cd $HOME && \
 mkdir -p $HOME/.suimon; \
@@ -39,12 +39,18 @@ else
   fi
 fi
 
-# Get the latest tag from the GitHub API
-LATEST_TAG=$(curl -s https://api.github.com/repos/bartosian/suimon/releases/latest | grep tag_name | cut -d '"' -f 4)
+# Define the file name for the release based on the new naming format
+RELEASE_FILE="suimon_Linux_x86_64.tar.gz"
 
 # Download the latest binary release from GitHub
-if ! wget -O suimon "https://github.com/bartosian/suimon/releases/download/$LATEST_TAG/suimon-ubuntu-latest-amd64"; then
-    echo "⚠️ Error: Failed to download suimon binary"
+if ! wget -O $RELEASE_FILE "https://github.com/bartosian/suimon/releases/download/$LATEST_TAG/$RELEASE_FILE"; then
+    echo "⚠️ Error: Failed to download suimon release"
+    exit 1
+fi
+
+# Extract the binary from the .tar.gz
+if ! tar -xzf $RELEASE_FILE; then
+    echo "⚠️ Error: Failed to extract suimon binary from $RELEASE_FILE"
     exit 1
 fi
 

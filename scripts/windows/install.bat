@@ -48,17 +48,35 @@ if exist "%ProgramFiles%\Go" (
 :: Get the latest tag from the GitHub API
 $LATEST_TAG = ((Invoke-WebRequest -Uri https://api.github.com/repos/bartosian/suimon/releases/latest).Content | ConvertFrom-Json).TagName
 
+:: Define the file name for the release based on the new naming format
+$RELEASE_FILE = "suimon_Windows_x86_64.zip"
+
 :: Download the latest binary release from GitHub
 $ErrorActionPreference = "Stop"
-if (Invoke-WebRequest -Uri "https://github.com/bartosian/suimon/releases/download/$LATEST_TAG/suimon-windows-latest-arm64" -OutFile "suimon") {
-    Write-Host "Error: Failed to download suimon binary"
+try {
+    Invoke-WebRequest -Uri "https://github.com/bartosian/suimon/releases/download/$LATEST_TAG/$RELEASE_FILE" -OutFile $RELEASE_FILE
+} catch {
+    Write-Host "Error: Failed to download suimon release"
+    exit 1
+}
+
+:: Extract the binary from the .zip file
+try {
+    Expand-Archive -Path $RELEASE_FILE -DestinationPath ".\"
+} catch {
+    Write-Host "Error: Failed to extract suimon binary from $RELEASE_FILE"
     exit 1
 }
 
 :: Move the binary to the executable directory
-Move-Item -Path ".\suimon" -Destination "C:\Windows\System32\" -Force
+try {
+    Move-Item -Path ".\suimon.exe" -Destination "C:\Windows\System32\" -Force
+} catch {
+    Write-Host "Error: Failed to move suimon binary to C:\Windows\System32\"
+    exit 1
+}
 
-# Make the binary executable
+:: Make the binary executable
 $oldACL = Get-Acl "C:\Windows\System32\suimon.exe"
 $newACL = New-Object System.Security.AccessControl.FileSecurity
 $newACL.SetAccessRuleProtection($true, $false)
