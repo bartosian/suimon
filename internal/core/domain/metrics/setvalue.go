@@ -554,7 +554,7 @@ func (validators Validators) GetMinRefGasPrice() (int, error) {
 		return 0, nil
 	}
 
-	var minRefGasPrice int = math.MaxInt64
+	var minRefGasPrice int = math.MaxInt
 
 	for _, validator := range validators {
 		validatorGasPrice, err := strconv.Atoi(validator.NextEpochGasPrice)
@@ -567,7 +567,7 @@ func (validators Validators) GetMinRefGasPrice() (int, error) {
 		}
 	}
 
-	if minRefGasPrice == math.MaxInt64 {
+	if minRefGasPrice == math.MaxInt {
 		return 0, errors.New("no validators with valid gas price found")
 	}
 

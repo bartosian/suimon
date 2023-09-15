@@ -77,7 +77,7 @@ func (validators Validators) GetMaxRefGasPrice() (int, error) {
 		}
 	}
 
-	if maxRefGasPrice == math.MinInt64 {
+	if maxRefGasPrice == math.MinInt {
 		return 0, errors.New("no validators with valid gas price found")
 	}
 
