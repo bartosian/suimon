@@ -38,3 +38,21 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+
+brews:
+  - name: suimon
+    tap:
+      owner: bartosian
+      name: homebrew-tools
+      branch: main
+
+    url_template: "https://github.com/bartosian/suimon/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    homepage: "https://github.com/bartosian/homebrew-tools"
+    commit_author:
+      name: bartosian
+      email: official@bartestnet.com
+
+release:
+  github:
+    owner: bartosian
+    name: suimon
