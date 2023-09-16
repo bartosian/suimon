@@ -45,6 +45,7 @@ brews:
       owner: bartosian
       name: homebrew-tools
       branch: main
+      token: "{{ .Env.GITHUB_TOKEN }}"
 
     url_template: "https://github.com/bartosian/suimon/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
     homepage: "https://github.com/bartosian/homebrew-tools"
