@@ -2,8 +2,6 @@ module github.com/bartosian/suimon
 
 go 1.21
 
-toolchain go1.21.1
-
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/dariubs/percent v1.0.0
