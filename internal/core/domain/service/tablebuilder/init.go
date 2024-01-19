@@ -17,62 +17,66 @@ const utcTimeZone = "America/New_York"
 // Init initializes the table configuration based on the given table type and host data.
 // It processes the host data and calls the appropriate handler function for the specified table type.
 func (tb *Builder) Init() error {
-	hosts := tb.hosts
-
-	if len(hosts) == 0 {
+	if len(tb.hosts) == 0 {
 		return errors.New("hosts are not initialized")
 	}
 
-	switch tb.tableType {
-	case enums.TableTypeNode:
-		tb.handleNodeTable(hosts)
-	case enums.TableTypeRPC:
-		tb.handleRPCTable(hosts)
-	case enums.TableTypeValidator:
-		tb.handleValidatorTable(hosts)
-	case enums.TableTypeGasPriceAndSubsidy:
-		metrics := hosts[0].Metrics
+	handlerMap := map[enums.TableType]func([]domainhost.Host) error{
+		enums.TableTypeNode:               tb.handleNodeTable,
+		enums.TableTypeRPC:                tb.handleRPCTable,
+		enums.TableTypeValidator:          tb.handleValidatorTable,
+		enums.TableTypeGasPriceAndSubsidy: tb.handleSystemStateTableWrapper,
+		enums.TableTypeValidatorsParams:   tb.handleValidatorParamsTableWrapper,
+		enums.TableTypeValidatorsAtRisk:   tb.handleValidatorsAtRiskTableWrapper,
+		enums.TableTypeValidatorReports:   tb.handleValidatorReportsTableWrapper,
+		enums.TableTypeActiveValidators:   tb.handleActiveValidatorsTableWrapper,
+	}
 
-		return tb.handleSystemStateTable(&metrics)
-	case enums.TableTypeValidatorsParams:
-		systemState := hosts[0].Metrics.SystemState
-
-		return tb.handleValidatorParamsTable(&systemState)
-	case enums.TableTypeValidatorsAtRisk:
-		systemState := hosts[0].Metrics.SystemState
-
-		if err := tb.handleValidatorsAtRiskTable(&systemState); err != nil {
-			return err
-		}
-	case enums.TableTypeValidatorReports:
-		systemState := hosts[0].Metrics.SystemState
-
-		if err := tb.handleValidatorReportsTable(&systemState); err != nil {
-			return err
-		}
-	case enums.TableTypeActiveValidators:
-		metrics := hosts[0].Metrics
-
-		return tb.handleActiveValidatorsTable(&metrics)
+	if handler, ok := handlerMap[tb.tableType]; ok {
+		return handler(tb.hosts)
 	}
 
 	return nil
 }
 
+func (tb *Builder) handleSystemStateTableWrapper(hosts []domainhost.Host) error {
+	metrics := hosts[0].Metrics
+	return tb.handleSystemStateTable(&metrics)
+}
+
+func (tb *Builder) handleValidatorParamsTableWrapper(hosts []domainhost.Host) error {
+	systemState := hosts[0].Metrics.SystemState
+	return tb.handleValidatorParamsTable(&systemState)
+}
+
+func (tb *Builder) handleValidatorsAtRiskTableWrapper(hosts []domainhost.Host) error {
+	systemState := hosts[0].Metrics.SystemState
+	return tb.handleValidatorsAtRiskTable(&systemState)
+}
+
+func (tb *Builder) handleValidatorReportsTableWrapper(hosts []domainhost.Host) error {
+	systemState := hosts[0].Metrics.SystemState
+	return tb.handleValidatorReportsTable(&systemState)
+}
+
+func (tb *Builder) handleActiveValidatorsTableWrapper(hosts []domainhost.Host) error {
+	metrics := hosts[0].Metrics
+	return tb.handleActiveValidatorsTable(&metrics)
+}
+
 // handleNodeTable handles the configuration for the Node table.
-func (tb *Builder) handleNodeTable(hosts []domainhost.Host) {
+func (tb *Builder) handleNodeTable(hosts []domainhost.Host) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeNode)
 
-	sort.SliceStable(hosts, func(left, right int) bool {
-		if hosts[left].Status != hosts[right].Status {
-			return hosts[left].Status > hosts[right].Status
+	sort.SliceStable(hosts, func(i, j int) bool {
+		left, right := hosts[i], hosts[j]
+		if left.Status != right.Status {
+			return left.Status > right.Status
 		}
-
-		if hosts[left].Metrics.TotalTransactionsBlocks != hosts[right].Metrics.TotalTransactionsBlocks {
-			return hosts[left].Metrics.TotalTransactionsBlocks > hosts[right].Metrics.TotalTransactionsBlocks
+		if left.Metrics.TotalTransactionsBlocks != right.Metrics.TotalTransactionsBlocks {
+			return left.Metrics.TotalTransactionsBlocks > right.Metrics.TotalTransactionsBlocks
 		}
-
-		return hosts[left].Metrics.HighestSyncedCheckpoint != hosts[right].Metrics.HighestSyncedCheckpoint
+		return left.Metrics.HighestSyncedCheckpoint > right.Metrics.HighestSyncedCheckpoint
 	})
 
 	for idx, host := range hosts {
@@ -83,23 +87,24 @@ func (tb *Builder) handleNodeTable(hosts []domainhost.Host) {
 		columnValues := tables.GetNodeColumnValues(idx, host)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
-
 		tableConfig.RowsCount++
 	}
 
 	tb.config = tableConfig
+
+	return nil
 }
 
 // handleRPCTable handles the configuration for the RPC table.
-func (tb *Builder) handleRPCTable(hosts []domainhost.Host) {
+func (tb *Builder) handleRPCTable(hosts []domainhost.Host) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeRPC)
 
-	sort.SliceStable(hosts, func(left, right int) bool {
-		if hosts[left].Status != hosts[right].Status {
-			return hosts[left].Status > hosts[right].Status
+	sort.SliceStable(hosts, func(i, j int) bool {
+		left, right := hosts[i], hosts[j]
+		if left.Status != right.Status {
+			return left.Status > right.Status
 		}
-
-		return hosts[left].Metrics.TotalTransactionsBlocks > hosts[right].Metrics.TotalTransactionsBlocks
+		return left.Metrics.TotalTransactionsBlocks > right.Metrics.TotalTransactionsBlocks
 	})
 
 	for idx, host := range hosts {
@@ -110,27 +115,27 @@ func (tb *Builder) handleRPCTable(hosts []domainhost.Host) {
 		columnValues := tables.GetRPCColumnValues(idx, host)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
-
 		tableConfig.RowsCount++
 	}
 
 	tb.config = tableConfig
+
+	return nil
 }
 
 // handleValidatorTable handles the configuration for the Validator table.
-func (tb *Builder) handleValidatorTable(hosts []domainhost.Host) {
+func (tb *Builder) handleValidatorTable(hosts []domainhost.Host) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidator)
 
-	sort.SliceStable(hosts, func(left, right int) bool {
-		if hosts[left].Status != hosts[right].Status {
-			return hosts[left].Status > hosts[right].Status
+	sort.SliceStable(hosts, func(i, j int) bool {
+		left, right := hosts[i], hosts[j]
+		if left.Status != right.Status {
+			return left.Status > right.Status
 		}
-
-		if hosts[left].Metrics.CurrentRound != hosts[right].Metrics.CurrentRound {
-			return hosts[left].Metrics.CurrentRound > hosts[right].Metrics.CurrentRound
+		if left.Metrics.CurrentRound != right.Metrics.CurrentRound {
+			return left.Metrics.CurrentRound > right.Metrics.CurrentRound
 		}
-
-		return hosts[left].Metrics.HighestSyncedCheckpoint > hosts[right].Metrics.HighestSyncedCheckpoint
+		return left.Metrics.HighestSyncedCheckpoint > right.Metrics.HighestSyncedCheckpoint
 	})
 
 	for idx, host := range hosts {
@@ -141,11 +146,12 @@ func (tb *Builder) handleValidatorTable(hosts []domainhost.Host) {
 		columnValues := tables.GetValidatorColumnValues(idx, host)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
-
 		tableConfig.RowsCount++
 	}
 
 	tb.config = tableConfig
+
+	return nil
 }
 
 // handleSystemStateTable handles the configuration for the System State table.
@@ -190,32 +196,28 @@ func (tb *Builder) handleValidatorsAtRiskTable(systemState *domainmetrics.SuiSys
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidatorsAtRisk)
 
 	validatorsAtRisk := systemState.ValidatorsAtRiskParsed
+	const base = 10
 
-	const base = 10 // for strconv.ParseInt
+	// Optimized sorting logic
+	sort.SliceStable(validatorsAtRisk, func(i, j int) bool {
+		leftEpochs, leftErr := strconv.ParseInt(validatorsAtRisk[i].EpochsAtRisk, base, 64)
+		rightEpochs, rightErr := strconv.ParseInt(validatorsAtRisk[j].EpochsAtRisk, base, 64)
 
-	sort.SliceStable(validatorsAtRisk, func(left, right int) bool {
-		epochsAtRiskLeft, err := strconv.ParseInt(validatorsAtRisk[left].EpochsAtRisk, base, 64)
-		if err != nil {
-			return true
+		if leftErr != nil || rightErr != nil {
+			return leftErr == nil
 		}
 
-		epochsAtRiskRight, err := strconv.ParseInt(validatorsAtRisk[right].EpochsAtRisk, base, 64)
-		if err != nil {
-			return true
+		if leftEpochs != rightEpochs {
+			return leftEpochs > rightEpochs
 		}
 
-		if epochsAtRiskLeft != epochsAtRiskRight {
-			return epochsAtRiskLeft > epochsAtRiskRight
-		}
-
-		return validatorsAtRisk[left].Name < validatorsAtRisk[right].Name
+		return validatorsAtRisk[i].Name < validatorsAtRisk[j].Name
 	})
 
 	for idx, validator := range validatorsAtRisk {
 		columnValues := tables.GetValidatorAtRiskColumnValues(idx, validator)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
-
 		tableConfig.RowsCount++
 	}
 
@@ -262,44 +264,44 @@ func (tb *Builder) handleActiveValidatorsTable(metrics *domainmetrics.Metrics) e
 	activeValidators := metrics.SystemState.ActiveValidators
 	validatorsApy := metrics.ValidatorsApyParsed
 
-	const base = 10 // for strconv.ParseInt
+	const base = 10
 
-	sort.SliceStable(activeValidators, func(left, right int) bool {
-		votingPowerLeft, err := strconv.ParseInt(activeValidators[left].VotingPower, base, 64)
-		if err != nil {
+	sort.SliceStable(activeValidators, func(i, j int) bool {
+		leftVotingPower, leftErr := strconv.ParseInt(activeValidators[i].VotingPower, base, 64)
+		rightVotingPower, rightErr := strconv.ParseInt(activeValidators[j].VotingPower, base, 64)
+
+		if leftErr != nil {
+			return false
+		}
+		if rightErr != nil {
 			return true
 		}
 
-		votingPowerRight, err := strconv.ParseInt(activeValidators[right].VotingPower, base, 64)
-		if err != nil {
-			return false // right is considered greater
-		}
+		leftNextEpochStake, leftStakeErr := strconv.ParseInt(activeValidators[i].NextEpochStake, base, 64)
+		rightNextEpochStake, rightStakeErr := strconv.ParseInt(activeValidators[j].NextEpochStake, base, 64)
 
-		nextEpochStakeLeft, err := strconv.ParseInt(activeValidators[left].NextEpochStake, base, 64)
-		if err != nil {
+		if leftStakeErr != nil {
+			return false
+		}
+		if rightStakeErr != nil {
 			return true
 		}
 
-		nextEpochStakeRight, err := strconv.ParseInt(activeValidators[right].NextEpochStake, base, 64)
-		if err != nil {
-			return false // right is considered greater
+		if leftVotingPower != rightVotingPower {
+			return leftVotingPower > rightVotingPower
 		}
 
-		if votingPowerLeft != votingPowerRight {
-			return votingPowerLeft > votingPowerRight
+		if leftNextEpochStake != rightNextEpochStake {
+			return leftNextEpochStake > rightNextEpochStake
 		}
 
-		if nextEpochStakeLeft != nextEpochStakeRight {
-			return nextEpochStakeLeft > nextEpochStakeRight
-		}
-
-		return activeValidators[left].Name < activeValidators[right].Name
+		return activeValidators[i].Name < activeValidators[j].Name
 	})
 
 	for idx, validator := range activeValidators {
 		validatorApy, ok := validatorsApy[validator.SuiAddress]
 		if !ok {
-			return fmt.Errorf("failed to loookup validator apy by address: %s", validator.SuiAddress)
+			return fmt.Errorf("failed to lookup validator APY by address: %s", validator.SuiAddress)
 		}
 
 		validator.APY = strconv.FormatFloat(validatorApy*100, 'f', 3, 64)

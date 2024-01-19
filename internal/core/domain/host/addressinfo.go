@@ -86,6 +86,7 @@ func (addr *AddressInfo) GetUrlPrometheus() (string, error) {
 	return hostUrl.String(), nil
 }
 
+// getProtocol returns the protocol based on the secure flag.
 func getProtocol(secure bool) string {
 	protocol := protocolHTTP
 	if secure {
