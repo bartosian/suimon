@@ -68,6 +68,8 @@ func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) error {
 	return host.Metrics.SetValue(metricType, percentage)
 }
 
+// SetStatus updates the status of the Host based on the provided RPC Host.
+// It compares the metrics of the Host and RPC Host and sets the status to Red, Yellow, or Green based on specific conditions.
 func (host *Host) SetStatus(rpc Host) {
 	metricsHost := host.Metrics
 	metricsRPC := rpc.Metrics

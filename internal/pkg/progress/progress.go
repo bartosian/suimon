@@ -18,6 +18,17 @@ const (
 	ColorGreen Color = "[green]"
 )
 
+// NewProgressBar creates a new progress bar with the specified action and color.
+// It takes the action string and color as input and returns a channel for controlling the progress bar.
+// The progress bar is updated at regular intervals and can be stopped by closing the returned channel.
+// The color parameter specifies the color of the progress bar.
+// Example usage:
+//
+//	progressChan := NewProgressBar("Downloading", ColorBlue)
+//	// Perform download operation
+//	close(progressChan) // Stop the progress bar
+//
+// Note: It is important to close the returned channel to stop the progress bar and free resources.
 func NewProgressBar(action string, color Color) chan<- struct{} {
 	progressTicker := time.NewTicker(100 * time.Millisecond)
 	progressChan := make(chan struct{})
@@ -38,6 +49,8 @@ func NewProgressBar(action string, color Color) chan<- struct{} {
 		}))
 
 	go func() {
+		defer progressTicker.Stop()
+
 		for {
 			select {
 			case <-progressChan:

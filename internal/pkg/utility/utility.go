@@ -19,19 +19,21 @@ import (
 
 const gb = 1024 * 1024 * 1024
 
-type (
-	UsageData struct {
-		Total          int
-		Free           int
-		Used           int
-		PercentageUsed int
-	}
-	NetworkUsage struct {
-		Recv float64
-		Sent float64
-	}
-)
+type UsageData struct {
+	Total          int
+	Free           int
+	Used           int
+	PercentageUsed int
+}
 
+type NetworkUsage struct {
+	Recv float64
+	Sent float64
+}
+
+// GetDiskUsage returns the disk usage information for the root directory.
+// It calculates the total, free, used, and percentage used space on the disk.
+// It returns a pointer to UsageData and an error if any.
 func GetDiskUsage() (*UsageData, error) {
 	var (
 		stat *disk.UsageStat
@@ -55,6 +57,10 @@ func GetDiskUsage() (*UsageData, error) {
 	}, nil
 }
 
+// GetDirSize returns the size of the directory at the specified path.
+// It takes the path of the directory as input and returns the size of the directory in gigabytes and an error if any.
+// It walks through the directory and sums up the size of all the files within it.
+// If an error occurs during the process, it returns the error.
 func GetDirSize(path string) (float64, error) {
 	var size float64
 
@@ -75,6 +81,10 @@ func GetDirSize(path string) (float64, error) {
 	return size, err
 }
 
+// GetVolumeSize returns the size of the specified volume.
+// It takes the volumeName as input and returns the size of the volume in gigabytes and an error if any.
+// It uses the Docker client to inspect the volume and retrieve its size.
+// If the volume does not exist or if there is an error during the process, it returns the error.
 func GetVolumeSize(volumeName string) (float64, error) {
 	var size float64
 
@@ -95,6 +105,10 @@ func GetVolumeSize(volumeName string) (float64, error) {
 	return float64(volume.UsageData.Size) / gb, nil
 }
 
+// GetNetworkUsage returns the network usage statistics.
+// It retrieves the number of bytes received and sent over the network interface.
+// It returns a pointer to NetworkUsage and an error if any.
+// It uses the net package to fetch the network I/O counters.
 func GetNetworkUsage() (*NetworkUsage, error) {
 	stat, err := net.IOCounters(false)
 	if err != nil {
@@ -110,6 +124,10 @@ func GetNetworkUsage() (*NetworkUsage, error) {
 	}, nil
 }
 
+// GetMemoryUsage returns the memory usage statistics.
+// It retrieves the total, free, used memory in gigabytes, and the percentage of memory used.
+// It returns a pointer to UsageData and an error if any.
+// It uses the mem package to fetch the virtual memory statistics.
 func GetMemoryUsage() (*UsageData, error) {
 	var (
 		stat *mem.VirtualMemoryStat
@@ -133,6 +151,9 @@ func GetMemoryUsage() (*UsageData, error) {
 	}, nil
 }
 
+// GetCPUUsage returns the CPU usage statistics.
+// It retrieves the total number of CPU cores and the percentage of CPU usage.
+// It returns a pointer to UsageData and an error if any.
 func GetCPUUsage() (*UsageData, error) {
 	var (
 		cores      int

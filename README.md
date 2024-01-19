@@ -21,11 +21,13 @@ So if you're looking for a powerful, reliable tool for monitoring the SUI networ
 ## Table of Contents
 
 - [SUIMON: Command Line Tool for Monitoring SUI Network](#suimon-command-line-tool-for-monitoring-sui-network)
+  - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
     - [Ubuntu](#ubuntu)
     - [MacOS](#macos)
     - [Windows](#windows)
   - [Build and Installation from Source](#build-and-installation-from-source)
+  - [Installation using Homebrew](#installation-using-homebrew)
   - [Suimon Configuration Files](#suimon-configuration-files)
     - [Example Suimon Config Directory](#example-suimon-config-directory)
     - [Suimon Configuration Fields](#suimon-configuration-fields)
@@ -183,11 +185,6 @@ Here is an example file tree for the `~/.suimon` directory with separate configu
 `Suimon` configuration files contain fields that allow you to customize the behavior of the tool to fit your specific use case. These files also enable you to add or remove monitored network entities and specify how they should be monitored. The suimon-testnet.yaml file, for instance, is a template configuration file that you can use as a starting point to create your own configuration file for testnet network. Before using Suimon, be sure to modify the configuration file with your own data and settings.
 
 ```yaml
-# This SUI API endpoint exposes an extended set of functionalities beyond what is typically available in a standard public RPC.
-# In addition to providing extended functionality, the public-extended-rpc API may also be required for some tables that rely on the methods provided by this API.
-public-extended-rpc:
-  - https://explorer-rpc.testnet.sui.io
-
 # This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators.
 # Please make sure to provide at least one working endpoint.
 public-rpc:
@@ -214,24 +211,7 @@ ip-lookup:
   access-token: 55f30ce0213aa7 # temporary access token with requests limit
 ```
 
-1. **public-extended-rpc**
-
-The `public-extended-rpc` section lists the public extended RPC endpoints that provide extended set of functionalities beyond what is typically available in a standard public RPC. The public-extended-rpc API may also be required for some tables that rely on the methods provided by this API.
-
-```yaml
-public-extended-rpc:
-  - https://explorer-rpc.testnet.sui.io
-```
-
-These endpoints are managed by the SUI team, which you can use alongside your own to monitor the relevant networks.
-
-| Network | RPC Endpoint                          |
-| ------- |---------------------------------------|
-| Devnet  | `https://explorer-rpc.devnet.sui.io`  |
-| Testnet | `https://explorer-rpc.testnet.sui.io` |
-| Mainnet | `https://explorer-rpc.mainnet.sui.io` |
-
-2. **public-rpc**
+1. **public-rpc**
 
 The `public-rpc` section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators. Therefore, it is essential to provide accurate and up-to-date endpoint information in this section.
 This field is required to request system metrics and to calculate the health of nodes and validators. The other fields are optional and can be updated if needed.
@@ -321,11 +301,10 @@ Tables are static monitors that provide a detailed snapshot of the network and i
 | 💻 FULL NODES             | Displays detailed information about the network's nodes.                      |
 | 🤖 VALIDATORS             | Displays detailed information about the network's validators.                 |
 | 💰 EPOCH, GAS AND SUBSIDY | Displays the current gas price and subsidy values for the network.            |
-| ⏳ EPOCHS HISTORY          | Displays epoch info for the last 100 epochs.                                  |
 | 📊 VALIDATORS PARAMS      | Displays the validators related thresholds and counts on the network.         |
-| 🚨 VALIDATORS AT RISK     | Displays the number of validators that are currently at risk of being slashed. |
+| 🚨 VALIDATORS AT RISK     | Displays the number of validators that are currently at risk of being slashed.|
 | 📢 VALIDATORS REPORTS     | Displays the latest reports submitted by validators.                          |
-| ✅ ACTIVE VALIDATORS       | Displays the current list of active validators on the network.                |
+| ✅ ACTIVE VALIDATORS       | Displays the current list of active validators on the network.               |
 
 ### Table Examples
 
@@ -355,13 +334,6 @@ Tables are static monitors that provide a detailed snapshot of the network and i
   This table is a valuable resource for obtaining metrics about the current epoch, reference gas prices, and subsidies in a network. This table provides information about the current epoch, such as its number, start, and end time, and total duration. The table also provides information about the reference gas price and subsidies, such as their current values and estimated values for the next epoch.
   <br><br>
   ![Screenshot of my app](static/images/table-system-state.png)
-  <br><br>
-
-- `⏳ EPOCHS HISTORY`
-  <br><br>
-  This table provides information about the last 100 epochs.  The table is designed to display detailed information that can be useful for developers and network administrators for the monitoring of historical data.
-  <br><br>
-  ![Screenshot of my app](static/images/table-epochs-history.png)
   <br><br>
 
 - `📊 VALIDATORS PARAMS`

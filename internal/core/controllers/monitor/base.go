@@ -11,37 +11,52 @@ import (
 	"github.com/bartosian/suimon/internal/core/ports"
 )
 
-type (
-	Gateways struct {
-		cli *cligw.Gateway
-	}
+type Gateways struct {
+	cli *cligw.Gateway
+}
 
-	Hosts struct {
-		extendedRPC []host.Host
-		rpc         []host.Host
-		node        []host.Host
-		validator   []host.Host
-	}
+type Hosts struct {
+	rpc       []host.Host
+	node      []host.Host
+	validator []host.Host
+}
 
-	Builders struct {
-		static  map[enums.TableType]ports.Builder
-		dynamic map[enums.TableType]ports.Builder
-	}
+type Builders struct {
+	static  map[enums.TableType]ports.Builder
+	dynamic map[enums.TableType]ports.Builder
+}
 
-	Controller struct {
-		lock sync.RWMutex
+type Controller struct {
+	lock sync.RWMutex
 
-		selectedConfig    config.Config
-		selectedTables    []enums.TableType
-		selectedDashboard enums.TableType
+	// selectedConfig represents the currently selected configuration.
+	selectedConfig config.Config
 
-		configs  map[string]config.Config
-		hosts    Hosts
-		gateways Gateways
-		builders Builders
-	}
-)
+	// selectedTables stores the selected table types.
+	selectedTables []enums.TableType
 
+	// selectedDashboard represents the selected dashboard type.
+	selectedDashboard enums.TableType
+
+	// configs is a map of named configurations.
+	configs map[string]config.Config
+
+	// hosts stores different types of hosts.
+	hosts Hosts
+
+	// gateways represent the available gateways.
+	gateways Gateways
+
+	// builders contain static and dynamic builders.
+	builders Builders
+}
+
+// NewController creates a new instance of the Controller.
+// It takes a map of configuration and a CLI gateway as input and returns a pointer to the Controller.
+// The map of configuration is used to initialize the Controller's configs field.
+// The CLI gateway is used to initialize the Controller's gateways field.
+// The static and dynamic maps in the Builders field are initialized with empty maps.
+// The newly created Controller instance is returned.
 func NewController(
 	config map[string]config.Config,
 	cliGW *cligw.Gateway,
@@ -59,7 +74,9 @@ func NewController(
 }
 
 // getHostsByTableType returns the list of hosts for a given table type.
-// It acquires a read lock on the controller lock before accessing the hosts data.
+// It acquires a read lock on the controller lock before retrieving the hosts data.
+// If the table type is unknown, it returns an error.
+// The list of hosts and an error are returned.
 func (c *Controller) getHostsByTableType(table enums.TableType) (hosts []host.Host, err error) {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
@@ -78,15 +95,15 @@ func (c *Controller) getHostsByTableType(table enums.TableType) (hosts []host.Ho
 		return c.hosts.rpc[:1], nil
 	case enums.TableTypeRPC:
 		return c.hosts.rpc, nil
-	case enums.TableTypeEpochsHistory:
-		return c.hosts.extendedRPC[:1], nil
 	default:
 		return nil, fmt.Errorf("unknown table type: %v", table)
 	}
 }
 
-// setHostsByTableType updates the list of hosts for a given table type.
+// setHostsByTableType sets the list of hosts for a given table type.
 // It acquires a write lock on the controller lock before updating the hosts data.
+// If the table type is unknown, it returns an error.
+// The error is returned if the table type is unknown or if there is an error acquiring the lock.
 func (c *Controller) setHostsByTableType(table enums.TableType, hosts []host.Host) error {
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -98,8 +115,6 @@ func (c *Controller) setHostsByTableType(table enums.TableType, hosts []host.Hos
 		c.hosts.validator = hosts
 	case enums.TableTypeRPC:
 		c.hosts.rpc = hosts
-	case enums.TableTypeEpochsHistory:
-		c.hosts.extendedRPC = hosts
 	default:
 		return fmt.Errorf("unknown table type: %v", table)
 	}
