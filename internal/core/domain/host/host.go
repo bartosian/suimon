@@ -78,25 +78,29 @@ func (host *Host) SetStatus(rpc Host) {
 	case enums.TableTypeValidator:
 		if !metricsHost.Updated || metricsHost.Uptime == "" {
 			host.Status = enums.StatusRed
-
 			return
 		}
+
 	case enums.TableTypeNode, enums.TableTypeRPC:
-		if !metricsHost.Updated || metricsHost.TotalTransactionsBlocks == 0 || metricsHost.LatestCheckpoint == 0 ||
-			metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == metrics.TransactionsPerSecondWindow ||
-			metricsHost.TxSyncPercentage == 0 || metricsHost.TxSyncPercentage > 110 || metricsHost.CheckSyncPercentage > 110 {
-
+		if !metricsHost.Updated {
 			host.Status = enums.StatusRed
+			return
+		}
 
+		if metricsHost.TotalTransactionsBlocks == 0 ||
+			metricsHost.LatestCheckpoint == 0 ||
+			(metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == metrics.TransactionsPerSecondWindow) ||
+			metricsHost.TxSyncPercentage == 0 ||
+			metricsHost.TxSyncPercentage > 110 ||
+			metricsHost.CheckSyncPercentage > 110 {
+			host.Status = enums.StatusRed
 			return
 		}
 
 		if metricsHost.IsUnhealthy(enums.MetricTypeTransactionsPerSecond, metricsRPC.TransactionsPerSecond) ||
 			metricsHost.IsUnhealthy(enums.MetricTypeTotalTransactionBlocks, metricsRPC.TotalTransactionsBlocks) ||
 			metricsHost.IsUnhealthy(enums.MetricTypeLatestCheckpoint, metricsRPC.LatestCheckpoint) {
-
 			host.Status = enums.StatusYellow
-
 			return
 		}
 	}

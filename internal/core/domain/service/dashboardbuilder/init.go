@@ -16,7 +16,6 @@ import (
 // new dashboard using the `container.New()` method. The dashboard instance is
 // stored in the `db.dashboard` field for later use.
 func (db *Builder) Init() (err error) {
-	// Use a deferred function to call db.TearDown() if there were errors or panics
 	defer func() {
 		if err != nil {
 			db.tearDown()
