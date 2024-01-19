@@ -17,9 +17,9 @@ type responseWithError struct {
 	err      error
 }
 
-// createHosts creates a list of Host objects based on the specified table type and address information.
-// The function creates a new Host object for each address in the specified list and sets the Host's internal state based on the specified table type.
-// Returns a slice of Host objects and an error value if the creation process fails for any reason.
+// createHosts creates hosts based on the provided table type and addresses.
+// It initializes the hosts, processes the addresses, and sets up the necessary gateways for each host.
+// It returns the created hosts and any error encountered during the process.
 func (c *Controller) createHosts(table enums.TableType, addresses []host.AddressInfo) ([]host.Host, error) {
 	hosts := make([]host.Host, 0, len(addresses))
 	processedAddresses := make(map[string]struct{})

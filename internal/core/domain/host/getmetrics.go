@@ -19,7 +19,6 @@ var (
 		enums.RPCMethodGetLatestCheckpointSequenceNumber: enums.MetricTypeLatestCheckpoint,
 		enums.RPCMethodGetSuiSystemState:                 enums.MetricTypeSuiSystemState,
 		enums.RPCMethodGetValidatorsApy:                  enums.MetricTypeValidatorsApy,
-		enums.RPCMethodGetEpochs:                         enums.MetricTypeEpochsHistory,
 	}
 	// rpcMethodToParams maps an RPC method to a params list.
 	rpcMethodToParams = map[enums.RPCMethod][]any{
@@ -57,9 +56,6 @@ var (
 			enums.RPCMethodGetLatestCheckpointSequenceNumber,
 			enums.RPCMethodGetSuiSystemState,
 			enums.RPCMethodGetValidatorsApy,
-		},
-		enums.TableTypeEpochsHistory: {
-			enums.RPCMethodGetEpochs,
 		},
 	}
 	// tablesToCallMetrics maps a table type to a boolean value indicating whether to call metrics for that table type.
@@ -134,50 +130,64 @@ func getPrometheusMetricsForTableType(table enums.TableType) ports.Metrics {
 	return metrics
 }
 
-// GetPrometheusMetrics fetches Prometheus metrics for the host and sends the metric values to the host's Metrics field.
-// The function constructs a URL using the host's HostPort and Ports fields, sends an HTTP GET request to the URL, and parses the response as a Prometheus text format.
-// Returns an error if the HTTP request fails or if the response cannot be parsed as Prometheus text format.
+// GetPrometheusMetrics retrieves the Prometheus metrics for the host
+// and processes them accordingly.
+// It calls Prometheus for metrics, processes the result, and sets the values in the host's Metrics.
+// Returns an error if there is an issue calling Prometheus or processing the metrics.
 func (host *Host) GetPrometheusMetrics() error {
 	metricsDef := getPrometheusMetricsForTableType(host.TableType)
 
 	result, err := host.gateways.prometheus.CallFor(metricsDef)
 	if err != nil {
-		return err
+		return fmt.Errorf("error calling Prometheus for metrics: %w", err)
 	}
 
 	if result == nil {
 		return errors.New("failed to get metrics from Prometheus")
 	}
 
+	// Process metrics and labels
+	if err := host.processPrometheusMetrics(result); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// processPrometheusMetrics processes the Prometheus metrics result and sets the values in the host's Metrics.
+// It iterates through the result map, sets the metric values, and handles specific cases for certain metric types.
+// Returns an error if there is an issue setting the metric values or handling specific cases.
+// The function also updates the version and commit metrics if the metric type is uptime.
+// Parameters:
+// - result: The Prometheus metrics result to be processed.
+func (host *Host) processPrometheusMetrics(result ports.MetricsResult) error {
 	for metricName, metricValue := range result {
 		metricType, ok := prometheusToMetric[metricName]
 		if !ok {
-			// ignore unused metric
+			// Ignore unused metric
 			delete(result, metricName)
 			continue
 		}
 
 		if err := host.Metrics.SetValue(metricType, metricValue.Value); err != nil {
-			return err
+			return fmt.Errorf("error setting metric %s: %w", metricType, err)
 		}
 
-		// delete processed metric from result map
+		// Delete processed metric from result map
 		delete(result, metricName)
 
-		if metricType != enums.MetricTypeUptime {
-			continue
-		}
+		if metricType == enums.MetricTypeUptime {
+			if value, ok := metricValue.Labels["version"]; ok {
+				versionInfo := strings.SplitN(value, "-", 2)
 
-		if value, ok := metricValue.Labels["version"]; ok {
-			versionInfo := strings.SplitN(value, "-", 2)
-
-			if err := host.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0]); err != nil {
-				return err
-			}
-
-			if len(versionInfo) == 2 {
-				if err := host.Metrics.SetValue(enums.MetricTypeCommit, versionInfo[1]); err != nil {
+				if err := host.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0]); err != nil {
 					return err
+				}
+
+				if len(versionInfo) == 2 {
+					if err := host.Metrics.SetValue(enums.MetricTypeCommit, versionInfo[1]); err != nil {
+						return err
+					}
 				}
 			}
 		}

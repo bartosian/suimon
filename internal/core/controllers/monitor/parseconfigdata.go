@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 	"sync"
 
@@ -63,13 +64,12 @@ func (c *Controller) ParseConfigData(monitorType enums.MonitorType) error {
 			defer wg.Done()
 
 			if err := c.getHostsData(table); err != nil {
-				errChan <- err
-
+				errChan <- fmt.Errorf("error processing table %s: %w", table, err)
 				return
 			}
 
 			if err := c.setHostsHealth(table); err != nil {
-				errChan <- err
+				errChan <- fmt.Errorf("error setting hosts health for table %s: %w", table, err)
 			}
 		}(tableType)
 	}
@@ -161,7 +161,7 @@ func (c *Controller) sortHosts(tableType enums.TableType) error {
 func (c *Controller) setHostsHealth(tableType enums.TableType) error {
 	hosts, err := c.getHostsByTableType(tableType)
 	if err != nil {
-		return err
+		return fmt.Errorf("error fetching hosts for table %s: %w", tableType, err)
 	}
 
 	rpcHost := c.hosts.rpc[0]
@@ -172,22 +172,27 @@ func (c *Controller) setHostsHealth(tableType enums.TableType) error {
 		checkpointExecBacklog := metrics.HighestKnownCheckpoint - metrics.LastExecutedCheckpoint
 		checkpointSyncBacklog := metrics.HighestKnownCheckpoint - metrics.HighestSyncedCheckpoint
 
-		if err = hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, rpcHost); err != nil {
-			return err
+		// Set transaction sync percentage.
+		if err := hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, rpcHost); err != nil {
+			return fmt.Errorf("error setting transaction sync percentage for host: %w", err)
 		}
 
-		if err = hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, rpcHost); err != nil {
-			return err
+		// Set checkpoint sync percentage.
+		if err := hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, rpcHost); err != nil {
+			return fmt.Errorf("error setting checkpoint sync percentage for host: %w", err)
 		}
 
-		if err = hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointExecBacklog, checkpointExecBacklog); err != nil {
-			return err
+		// Set checkpoint execution backlog.
+		if err := hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointExecBacklog, checkpointExecBacklog); err != nil {
+			return fmt.Errorf("error setting checkpoint execution backlog for host: %w", err)
 		}
 
-		if err = hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointSyncBacklog, checkpointSyncBacklog); err != nil {
-			return err
+		// Set checkpoint sync backlog.
+		if err := hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointSyncBacklog, checkpointSyncBacklog); err != nil {
+			return fmt.Errorf("error setting checkpoint sync backlog for host: %w", err)
 		}
 
+		// Set host status.
 		hosts[idx].SetStatus(rpcHost)
 	}
 

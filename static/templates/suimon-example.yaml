@@ -1,8 +1,3 @@
-# This SUI API endpoint exposes an extended set of functionalities beyond what is typically available in a standard public RPC.
-# In addition to providing extended functionality, the public-extended-rpc API may also be required for some tables that rely on the methods provided by this API.
-public-extended-rpc:
-  - https://explorer-rpc.testnet.sui.io
-
 # This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators.
 # Please make sure to have at least one working endpoint.
 public-rpc:

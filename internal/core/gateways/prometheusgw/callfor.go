@@ -13,14 +13,20 @@ import (
 	"github.com/bartosian/suimon/internal/core/ports"
 )
 
-type (
-	MetricsData map[string]*ioPrometheusClient.MetricFamily
+type MetricsData map[string]*ioPrometheusClient.MetricFamily
 
-	responseWithError struct {
-		response *http.Response
-		err      error
-	}
-)
+type responseWithError struct {
+	response *http.Response
+	err      error
+}
+
+var extractMetricValue = map[enums.PrometheusMetricType]func(metric *ioPrometheusClient.Metric) float64{
+	enums.PrometheusMetricTypeGauge:     func(metric *ioPrometheusClient.Metric) float64 { return metric.GetGauge().GetValue() },
+	enums.PrometheusMetricTypeCounter:   func(metric *ioPrometheusClient.Metric) float64 { return metric.GetCounter().GetValue() },
+	enums.PrometheusMetricTypeSummary:   func(metric *ioPrometheusClient.Metric) float64 { return metric.GetSummary().GetSampleSum() },
+	enums.PrometheusMetricTypeHistogram: func(metric *ioPrometheusClient.Metric) float64 { return metric.GetHistogram().GetSampleSum() },
+	enums.PrometheusMetricTypeUntyped:   func(metric *ioPrometheusClient.Metric) float64 { return metric.GetUntyped().GetValue() },
+}
 
 // CallFor makes an HTTP request to the specified gateway URL to fetch metrics.
 // It returns the metrics result or an error if something goes wrong.
@@ -39,7 +45,7 @@ func (gateway *Gateway) CallFor(metrics ports.Metrics) (result ports.MetricsResu
 
 	req = req.WithContext(ctx)
 
-	respChan := make(chan responseWithError)
+	respChan := make(chan responseWithError, 1)
 
 	go func() {
 		resp, err := gateway.client.Do(req)
@@ -56,11 +62,17 @@ func (gateway *Gateway) CallFor(metrics ports.Metrics) (result ports.MetricsResu
 		}
 
 		response := result.response
-		defer func() {
-			if closeErr := response.Body.Close(); closeErr != nil {
-				err = fmt.Errorf("failed to close response body: %w", closeErr)
-			}
-		}()
+		if response != nil {
+			defer func() {
+				if closeErr := response.Body.Close(); closeErr != nil {
+					err = fmt.Errorf("failed to close response body: %w", closeErr)
+				}
+			}()
+		}
+
+		if response.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("unexpected status code: %d", response.StatusCode)
+		}
 
 		parser := expfmt.TextParser{}
 		data, err := parser.TextToMetricFamilies(response.Body)
@@ -91,60 +103,48 @@ func getMetricValueWithLabelFiltering(metrics MetricsData, metricName string, me
 		return result, fmt.Errorf("no metrics provided")
 	}
 
-	metricType := metricConfig.MetricType
-	labels := metricConfig.Labels
+	metricType, labels := metricConfig.MetricType, metricConfig.Labels
 
-	metricFamily := metrics[metricName]
-	if metricFamily == nil {
-		return result, fmt.Errorf("no metric family found for metric: %s", metricName)
+	if _, validType := extractMetricValue[metricType]; !validType {
+		return result, fmt.Errorf("invalid metric type: %v", metricType)
 	}
 
-	extractMetricValue := map[enums.PrometheusMetricType]func(metric *ioPrometheusClient.Metric) float64{
-		enums.PrometheusMetricTypeGauge:     func(metric *ioPrometheusClient.Metric) float64 { return metric.GetGauge().GetValue() },
-		enums.PrometheusMetricTypeCounter:   func(metric *ioPrometheusClient.Metric) float64 { return metric.GetCounter().GetValue() },
-		enums.PrometheusMetricTypeSummary:   func(metric *ioPrometheusClient.Metric) float64 { return metric.GetSummary().GetSampleSum() },
-		enums.PrometheusMetricTypeHistogram: func(metric *ioPrometheusClient.Metric) float64 { return metric.GetHistogram().GetSampleSum() },
-		enums.PrometheusMetricTypeUntyped:   func(metric *ioPrometheusClient.Metric) float64 { return metric.GetUntyped().GetValue() },
+	metricFamily, found := metrics[metricName]
+	if !found {
+		return result, fmt.Errorf("no metric family found for metric: %s with type: %v", metricName, metricType)
 	}
 
-	foundMetric := false
 	for _, metric := range metricFamily.Metric {
-		matchLabels := true
-
-		for key, value := range labels {
-			if !labelMatches(key, value, metric.Label) {
-				matchLabels = false
-
-				break
-			}
-		}
-
-		if !matchLabels {
-			continue
-		}
-
-		foundMetric = true
-
-		labelsResult := make(prometheus.Labels, len(metric.Label))
-
-		for _, label := range metric.Label {
-			labelsResult[label.GetName()] = label.GetValue()
-		}
-
-		result.Labels = labelsResult
-
-		if extractValue := extractMetricValue[metricType]; extractValue != nil {
-			result.Value = extractValue(metric)
+		if matchLabels(labels, metric.Label) {
+			result.Labels = extractLabels(metric.Label)
+			result.Value = extractMetricValue[metricType](metric)
+			return result, nil // Return immediately upon finding the first matching metric
 		}
 	}
 
-	if !foundMetric {
-		return result, fmt.Errorf("no metric found matching labels")
-	}
-
-	return result, nil
+	return result, fmt.Errorf("no metric found matching labels: %v", labels)
 }
 
+// matchLabels checks if all labels match.
+func matchLabels(expected prometheus.Labels, actual []*ioPrometheusClient.LabelPair) bool {
+	for key, value := range expected {
+		if !labelMatches(key, value, actual) {
+			return false
+		}
+	}
+	return true
+}
+
+// extractLabels extracts labels from the metric.
+func extractLabels(labels []*ioPrometheusClient.LabelPair) prometheus.Labels {
+	labelsResult := make(prometheus.Labels, len(labels))
+	for _, label := range labels {
+		labelsResult[label.GetName()] = label.GetValue()
+	}
+	return labelsResult
+}
+
+// labelMatches checks if the key-value pair exists in the given labels
 func labelMatches(key string, value string, labels []*ioPrometheusClient.LabelPair) bool {
 	for _, label := range labels {
 		if label.GetName() == key && label.GetValue() == value {

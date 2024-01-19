@@ -96,8 +96,6 @@ func GetColumnsConfig(table enums.TableType) ColumnsConfig {
 	switch table {
 	case enums.TableTypeRPC:
 		return ColumnsConfigRPC
-	case enums.TableTypeEpochsHistory:
-		return ColumnsConfigEpoch
 	case enums.TableTypeValidator:
 		return ColumnsConfigValidator
 	case enums.TableTypeNode:
@@ -119,8 +117,6 @@ func GetRowsConfig(table enums.TableType) RowsConfig {
 	switch table {
 	case enums.TableTypeRPC:
 		return RowsConfigRPC
-	case enums.TableTypeEpochsHistory:
-		return RowsConfigEpoch
 	case enums.TableTypeValidator:
 		return RowsConfigValidator
 	case enums.TableTypeGasPriceAndSubsidy:
@@ -143,7 +139,7 @@ func GetRowsConfig(table enums.TableType) RowsConfig {
 // GetTableColor returns the color configuration based on the specified table type.
 func GetTableColor(table enums.TableType) text.Colors {
 	switch table {
-	case enums.TableTypeRPC, enums.TableTypeValidator, enums.TableTypeEpochsHistory, enums.TableTypeValidatorsAtRisk, enums.TableTypeActiveValidators:
+	case enums.TableTypeRPC, enums.TableTypeValidator, enums.TableTypeValidatorsAtRisk, enums.TableTypeActiveValidators:
 		return text.Colors{text.BgHiBlue, text.FgBlack}
 	default:
 		return text.Colors{text.BgHiGreen, text.FgBlack}

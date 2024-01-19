@@ -20,35 +20,34 @@ type GeoGateway interface {
 	CallFor(ip net.IP) (result *IPResult, err error)
 }
 
-type (
-	MetricResult struct {
-		Value  float64
-		Labels prometheus.Labels
-	}
-	MetricsResult map[enums.PrometheusMetricName]MetricResult
+type MetricResult struct {
+	Value  float64
+	Labels prometheus.Labels
+}
 
-	MetricConfig struct {
-		MetricType enums.PrometheusMetricType
-		Labels     prometheus.Labels
-	}
-	Metrics map[enums.PrometheusMetricName]MetricConfig
-)
+type MetricsResult map[enums.PrometheusMetricName]MetricResult
 
-type (
-	Company struct {
-		Name   string
-		Domain string
-		Type   string
-	}
-	IPResult struct {
-		IP           net.IP
-		Hostname     string
-		City         string
-		Region       string
-		Country      string
-		CountryName  string
-		CountryEmoji string
-		Location     string
-		Company      *Company
-	}
-)
+type MetricConfig struct {
+	MetricType enums.PrometheusMetricType
+	Labels     prometheus.Labels
+}
+
+type Metrics map[enums.PrometheusMetricName]MetricConfig
+
+type Company struct {
+	Name   string
+	Domain string
+	Type   string
+}
+
+type IPResult struct {
+	IP           net.IP
+	Hostname     string
+	City         string
+	Region       string
+	Country      string
+	CountryName  string
+	CountryEmoji string
+	Location     string
+	Company      *Company
+}

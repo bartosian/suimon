@@ -10,7 +10,6 @@ import (
 	domainhost "github.com/bartosian/suimon/internal/core/domain/host"
 	domainmetrics "github.com/bartosian/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/suimon/internal/core/domain/service/tablebuilder/tables"
-	"github.com/bartosian/suimon/internal/pkg/utility"
 )
 
 const utcTimeZone = "America/New_York"
@@ -29,10 +28,6 @@ func (tb *Builder) Init() error {
 		tb.handleNodeTable(hosts)
 	case enums.TableTypeRPC:
 		tb.handleRPCTable(hosts)
-	case enums.TableTypeEpochsHistory:
-		metrics := hosts[0].Metrics
-
-		return tb.handleEpochsHistoryTable(&metrics)
 	case enums.TableTypeValidator:
 		tb.handleValidatorTable(hosts)
 	case enums.TableTypeGasPriceAndSubsidy:
@@ -120,45 +115,6 @@ func (tb *Builder) handleRPCTable(hosts []domainhost.Host) {
 	}
 
 	tb.config = tableConfig
-}
-
-// handleEpochsHistoryTable handles the configuration for the Epochs History table.
-func (tb *Builder) handleEpochsHistoryTable(metrics *domainmetrics.Metrics) error {
-	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeEpochsHistory)
-	epochsHistory := metrics.EpochsHistory
-
-	for idx, epoch := range epochsHistory {
-		if epoch.EndOfEpochInfo == nil {
-			continue
-		}
-
-		epochStart, err := utility.ParseEpochTime(epoch.EpochStartTimestamp)
-		if err != nil {
-			return err
-		}
-
-		epoch.EpochStartTimestamp = utility.FormatDate(*epochStart, utcTimeZone)
-
-		epochEnd, err := utility.ParseEpochTime(epoch.EndOfEpochInfo.EpochEndTimestamp)
-		if err != nil {
-			return err
-		}
-
-		epoch.EndOfEpochInfo.EpochEndTimestamp = utility.FormatDate(*epochEnd, utcTimeZone)
-
-		columnValues, err := tables.GetEpochColumnValues(idx, &epoch)
-		if err != nil {
-			return err
-		}
-
-		tableConfig.Columns.SetColumnValues(columnValues)
-
-		tableConfig.RowsCount++
-	}
-
-	tb.config = tableConfig
-
-	return nil
 }
 
 // handleValidatorTable handles the configuration for the Validator table.

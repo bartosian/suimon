@@ -15,6 +15,13 @@ import (
 
 type Logger struct{}
 
+// StreamFromService streams logs from the specified service to the provided channel.
+// It takes the service name and a channel for streaming logs as input and returns an error if any.
+// If the service does not exist, it returns an error indicating that the service was not found.
+// If an error occurs while streaming logs, it returns the corresponding error.
+// If the streaming is successful, it returns nil.
+// The logs are streamed using the 'journalctl' command with the specified service name.
+// The logs are read line by line and sent to the provided channel for further processing.
 func (logger *Logger) StreamFromService(serviceName string, stream chan string) error {
 	var (
 		cmdUnitLogs = "sudo journalctl -f -u %s -o cat"
@@ -53,6 +60,11 @@ func (logger *Logger) StreamFromService(serviceName string, stream chan string) 
 	return nil
 }
 
+// StreamFromContainer streams logs from the running containers with the specified image name to the provided channel.
+// It takes the image name and a channel for streaming logs as input and returns an error if any.
+// If the container with the specified image name is not found or no running containers are found with the specified image name, it returns an error indicating that the container was not found.
+// If an error occurs while streaming logs, it returns the corresponding error.
+// If the streaming is successful, it returns nil.
 func (logger *Logger) StreamFromContainer(imageName string, stream chan string) error {
 	var (
 		cli        *client.Client
@@ -104,6 +116,12 @@ func (logger *Logger) StreamFromContainer(imageName string, stream chan string) 
 	return fmt.Errorf("container with the image %s not found", imageName)
 }
 
+// StreamFromScreen streams the output from a screen session to the provided channel.
+// It takes the sessionName as input and the stream channel to send the output to.
+// It returns an error if there was an issue streaming the output.
+// The function uses the 'script' command to attach to and detach from the screen session.
+// It reads the output from the attached session and sends it to the provided channel.
+// If there is an error during the process, it returns the error.
 func (logger *Logger) StreamFromScreen(sessionName string, stream chan string) error {
 	var (
 		stdout    io.ReadCloser
@@ -112,7 +130,6 @@ func (logger *Logger) StreamFromScreen(sessionName string, stream chan string) e
 		err       error
 	)
 
-	// attach screen for the logs piping
 	cmdAttach = exec.Command("script", "-q", "-c", "screen -r "+sessionName, "/dev/null")
 
 	if stdout, err = cmdAttach.StdoutPipe(); err != nil {
@@ -132,7 +149,6 @@ func (logger *Logger) StreamFromScreen(sessionName string, stream chan string) e
 		}
 	}
 
-	// detach screen back
 	cmdDetach = exec.Command("script", "-q", "-c", "screen -d "+sessionName, "/dev/null")
 	if err = cmdDetach.Run(); err != nil {
 		return err
@@ -145,11 +161,21 @@ func (logger *Logger) StreamFromScreen(sessionName string, stream chan string) e
 	return nil
 }
 
+// RemoveNonPrintableChars removes non-printable characters from the input string.
+// It takes a string as input and returns a new string with non-printable characters removed.
+// Non-printable characters are defined as any characters that are not visible when printed.
+// The function uses a regular expression to replace non-printable characters with an empty string.
+// It returns the modified string with only printable characters.
 func RemoveNonPrintableChars(str string) string {
 	reg := regexp.MustCompile("[^[:print:]\n]")
 	return reg.ReplaceAllString(str, "")
 }
 
+// serviceExists checks if the specified service exists and is active.
+// It takes the service name as input and returns true if the service exists and is active, otherwise returns false.
+// If an error occurs while checking the service status, it returns false.
+// It uses the 'systemctl is-active' command to check the status of the service.
+// Returns true if the service is active, false otherwise.
 func serviceExists(name string) bool {
 	out, err := exec.Command("systemctl", "is-active", name).Output()
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 	"github.com/bartosian/suimon/internal/core/controllers/monitor"
 	domainconfig "github.com/bartosian/suimon/internal/core/domain/config"
 	"github.com/bartosian/suimon/internal/core/gateways/cligw"
-	"github.com/bartosian/suimon/internal/core/handlers/commands"
+	cmdhandlers "github.com/bartosian/suimon/internal/core/handlers/commands"
 )
 
 func main() {

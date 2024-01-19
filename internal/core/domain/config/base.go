@@ -2,10 +2,11 @@ package config
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -16,9 +17,8 @@ const (
 )
 
 type Config struct {
-	PublicExtendedRPC []string `yaml:"public-extended-rpc"`
-	PublicRPC         []string `yaml:"public-rpc"`
-	FullNodes         []struct {
+	PublicRPC []string `yaml:"public-rpc"`
+	FullNodes []struct {
 		JSONRPCAddress string `yaml:"json-rpc-address"`
 		MetricsAddress string `yaml:"metrics-address"`
 	} `yaml:"full-nodes"`
@@ -54,29 +54,38 @@ func NewConfig() (map[string]Config, error) {
 func readConfigs(dirPath string) (map[string]Config, error) {
 	configs := make(map[string]Config)
 
-	ymlFiles, _ := filepath.Glob(filepath.Join(dirPath, ymlPattern))
-	yamlFiles, _ := filepath.Glob(filepath.Join(dirPath, yamlPattern))
-
-	if len(ymlFiles)+len(yamlFiles) == 0 {
-		return nil, fmt.Errorf("no suimon configuration files found in %s", dirPath)
+	// Retrieve .yml files
+	ymlFiles, err := filepath.Glob(filepath.Join(dirPath, "*.yml"))
+	if err != nil {
+		return nil, err
 	}
 
-	for _, file := range append(ymlFiles, yamlFiles...) {
+	// Retrieve .yaml files
+	yamlFiles, err := filepath.Glob(filepath.Join(dirPath, "*.yaml"))
+	if err != nil {
+		return nil, err
+	}
+
+	// Combine file lists
+	files := append(ymlFiles, yamlFiles...)
+
+	if len(files) == 0 {
+		return nil, fmt.Errorf("no Suimon configuration files found in %s", dirPath)
+	}
+
+	for _, file := range files {
 		fileData, err := os.ReadFile(file)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error reading file %s: %w", file, err)
 		}
 
 		var config Config
-		err = yaml.Unmarshal(fileData, &config)
-		if err != nil {
-			return nil, err
+		if err := yaml.Unmarshal(fileData, &config); err != nil {
+			return nil, fmt.Errorf("error unmarshaling YAML in file %s: %w", file, err)
 		}
 
-		filename := filepath.Base(file)
+		filename := strings.TrimSuffix(filepath.Base(file), filepath.Ext(file))
 		filename = strings.TrimPrefix(filename, "suimon-")
-		filename = strings.TrimSuffix(filename, ".yml")
-		filename = strings.TrimSuffix(filename, ".yaml")
 		filename = strings.ToUpper(filename)
 
 		configs[filename] = config
