@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const releseApiUrl = "https://api.github.com/repos/MystenLabs/sui/releases"
+const releseApiUrl = "https://api.github.com/repos/MystenLabs/sui/releases?per_page=50"
 
 // Release represents a GitHub release
 type Release struct {
