@@ -7,7 +7,6 @@ const (
 	RPCMethodGetSuiSystemState                 RPCMethod = "suix_getLatestSuiSystemState"
 	RPCMethodGetLatestCheckpointSequenceNumber RPCMethod = "sui_getLatestCheckpointSequenceNumber"
 	RPCMethodGetValidatorsApy                  RPCMethod = "suix_getValidatorsApy"
-	RPCMethodGetEpochs                         RPCMethod = "suix_getEpochs"
 )
 
 func (e RPCMethod) String() string {

@@ -9,26 +9,24 @@ import (
 	"github.com/bartosian/suimon/internal/core/ports"
 )
 
-type (
-	Gateways struct {
-		rpc        ports.RPCGateway
-		geo        ports.GeoGateway
-		prometheus ports.PrometheusGateway
-		cli        *cligw.Gateway
-	}
+type Gateways struct {
+	rpc        ports.RPCGateway
+	geo        ports.GeoGateway
+	prometheus ports.PrometheusGateway
+	cli        *cligw.Gateway
+}
 
-	Host struct {
-		AddressInfo
+type Host struct {
+	AddressInfo
 
-		TableType enums.TableType
+	TableType enums.TableType
 
-		Status  enums.Status
-		IPInfo  *ports.IPResult
-		Metrics metrics.Metrics
+	Status  enums.Status
+	IPInfo  *ports.IPResult
+	Metrics metrics.Metrics
 
-		gateways Gateways
-	}
-)
+	gateways Gateways
+}
 
 func NewHost(
 	tableType enums.TableType,

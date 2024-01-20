@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/core/domain/release"
 	"github.com/bartosian/suimon/internal/core/domain/service/tablebuilder"
 )
 
@@ -28,25 +30,32 @@ func (c *Controller) Static() error {
 // It retrieves the corresponding hosts for each table and initializes the table builder.
 // If an error occurs during table initialization, it returns an error.
 func (c *Controller) InitTables() error {
-	selectedTables := c.selectedTables
+	for _, tableType := range c.selectedTables {
+		hosts, releases := c.getDataByTable(tableType)
 
-	for _, tableType := range selectedTables {
-		hosts, err := c.getHostsByTableType(tableType)
-		if err != nil {
-			return err
-		}
-
-		if len(hosts) == 0 {
+		if len(hosts) == 0 && len(releases) == 0 {
 			continue
 		}
 
-		builder := tablebuilder.NewBuilder(tableType, hosts, c.gateways.cli)
+		builder := tablebuilder.NewBuilder(tableType, hosts, releases, c.gateways.cli)
 		c.builders.static[tableType] = builder
 
-		if err = builder.Init(); err != nil {
+		if err := builder.Init(); err != nil {
 			return fmt.Errorf("error initializing table %s: %w", tableType, err)
 		}
 	}
 
 	return nil
+}
+
+// getDataByTable is a method of the Controller struct, responsible for retrieving the data
+// corresponding to a specific table type. It checks if the table type is 'Releases', and if so,
+// it returns the releases data. Otherwise, it retrieves the hosts data for the given table type.
+// It returns a slice of hosts and a slice of releases.
+func (c *Controller) getDataByTable(tableType enums.TableType) ([]host.Host, []release.Release) {
+	if tableType == enums.TableTypeReleases {
+		return nil, c.releases
+	}
+	hosts, _ := c.getHostsByTableType(tableType)
+	return hosts, nil
 }

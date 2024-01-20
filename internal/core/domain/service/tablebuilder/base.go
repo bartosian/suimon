@@ -10,6 +10,7 @@ import (
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
 	"github.com/bartosian/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/core/domain/release"
 	"github.com/bartosian/suimon/internal/core/domain/service/tablebuilder/tables"
 	"github.com/bartosian/suimon/internal/core/gateways/cligw"
 )
@@ -17,18 +18,20 @@ import (
 type Builder struct {
 	tableType  enums.TableType
 	hosts      []host.Host
+	Releases   []release.Release
 	cliGateway *cligw.Gateway
 	writer     table.Writer
 	config     *tables.TableConfig
 }
 
 // NewBuilder creates a new instance of the table builder, using the CLI gateway
-func NewBuilder(tableType enums.TableType, hosts []host.Host, cliGateway *cligw.Gateway) *Builder {
+func NewBuilder(tableType enums.TableType, hosts []host.Host, releases []release.Release, cliGateway *cligw.Gateway) *Builder {
 	tableWR := table.NewWriter()
 	tableWR.SetOutputMirror(os.Stdout)
 
 	return &Builder{
 		tableType:  tableType,
+		Releases:   releases,
 		hosts:      hosts,
 		cliGateway: cliGateway,
 		writer:     tableWR,

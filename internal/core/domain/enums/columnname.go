@@ -137,6 +137,19 @@ const (
 	ColumnNameSystemStakeSubsidyDecreaseRate              ColumnName = "STAKE SUBSIDY\nDECREASE RATE"
 )
 
+// Release section
+const (
+	ColumnNameTagName     ColumnName = "TAG"
+	ColumnNameCommitHash  ColumnName = "TARGET"
+	ColumnNameReleaseName ColumnName = "RELEASE"
+	ColumnNameDraft       ColumnName = "DRAFT"
+	ColumnNamePreRelease  ColumnName = "PRERELEASE"
+	ColumnNameCreatedAt   ColumnName = "CREATED AT"
+	ColumnNamePublishedAt ColumnName = "PUBLISHED AT"
+	ColumnNameAuthor      ColumnName = "AUTHOR"
+	ColumnNameURL         ColumnName = "RELEASE URL"
+)
+
 func (e ColumnName) ToString() string {
 	return string(e)
 }

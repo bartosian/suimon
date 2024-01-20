@@ -11,6 +11,7 @@ const (
 	TableTypeValidatorsAtRisk   TableType = "🚨 VALIDATORS AT RISK"
 	TableTypeValidatorReports   TableType = "📢 VALIDATORS REPORTS"
 	TableTypeActiveValidators   TableType = "✅ ACTIVE VALIDATORS"
+	TableTypeReleases           TableType = "📈 RELEASE HISTORY"
 )
 
 func (e TableType) ToString() string {

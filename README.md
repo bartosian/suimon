@@ -304,7 +304,7 @@ Tables are static monitors that provide a detailed snapshot of the network and i
 | 📊 VALIDATORS PARAMS      | Displays the validators related thresholds and counts on the network.         |
 | 🚨 VALIDATORS AT RISK     | Displays the number of validators that are currently at risk of being slashed.|
 | 📢 VALIDATORS REPORTS     | Displays the latest reports submitted by validators.                          |
-| ✅ ACTIVE VALIDATORS       | Displays the current list of active validators on the network.               |
+| ✅ ACTIVE VALIDATORS      | Displays the current list of active validators on the network.                |
 
 ### Table Examples
 

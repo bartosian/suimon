@@ -20,10 +20,7 @@ var (
 		enums.RPCMethodGetSuiSystemState:                 enums.MetricTypeSuiSystemState,
 		enums.RPCMethodGetValidatorsApy:                  enums.MetricTypeValidatorsApy,
 	}
-	// rpcMethodToParams maps an RPC method to a params list.
-	rpcMethodToParams = map[enums.RPCMethod][]any{
-		enums.RPCMethodGetEpochs: {nil, 100, true},
-	}
+
 	// prometheusToMetric maps a Prometheus metric name to a metric type.
 	prometheusToMetric = map[enums.PrometheusMetricName]enums.MetricType{
 		enums.PrometheusMetricNameTotalTransactionCertificates: enums.MetricTypeTotalTransactionCertificates,
@@ -233,9 +230,7 @@ func (host *Host) GetDataByMetric(method enums.RPCMethod) error {
 		return fmt.Errorf("unsupported RPC method: %v", method)
 	}
 
-	params := rpcMethodToParams[method]
-
-	result, err := host.gateways.rpc.CallFor(method, params...)
+	result, err := host.gateways.rpc.CallFor(method)
 	if err != nil {
 		return err
 	}

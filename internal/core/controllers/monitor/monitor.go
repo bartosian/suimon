@@ -32,6 +32,7 @@ func (c *Controller) Monitor() error {
 	}
 
 	c.selectedConfig = c.configs[selectedConfigName.Value]
+	c.network = selectedConfigName.Value
 
 	// Select the monitor type.
 	monitorTypeChoiceList := cligw.NewSelectChoiceList(
@@ -94,6 +95,7 @@ func (c *Controller) selectStaticTables() ([]enums.TableType, error) {
 		string(enums.TableTypeValidatorsAtRisk),
 		string(enums.TableTypeValidatorReports),
 		string(enums.TableTypeActiveValidators),
+		string(enums.TableTypeReleases),
 	)
 
 	selectedTableTypes, err := c.gateways.cli.SelectMany("Which tables do you want to render?", tableTypeChoiceList)
@@ -122,6 +124,7 @@ func (c *Controller) selectStaticTables() ([]enums.TableType, error) {
 				enums.TableTypeValidatorsAtRisk,
 				enums.TableTypeValidatorReports,
 				enums.TableTypeActiveValidators,
+				enums.TableTypeReleases,
 			)
 
 			break
