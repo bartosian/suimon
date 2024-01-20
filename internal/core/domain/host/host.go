@@ -1,6 +1,8 @@
 package host
 
 import (
+	"fmt"
+
 	"github.com/dariubs/percent"
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
@@ -91,6 +93,14 @@ func (host *Host) SetStatus(rpc Host) {
 			metricsHost.TxSyncPercentage == 0 ||
 			metricsHost.TxSyncPercentage > 110 ||
 			metricsHost.CheckSyncPercentage > 110 {
+
+			fmt.Println("=-=-=-= 1", metricsHost.TotalTransactionsBlocks == 0)
+			fmt.Println("=-=-=-= 2", metricsHost.LatestCheckpoint == 0)
+			fmt.Println("=-=-=-= 3", (metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == metrics.TransactionsPerSecondWindow))
+			fmt.Println("=-=-=-= 4", metricsHost.TxSyncPercentage == 0)
+			fmt.Println("=-=-=-= 5", metricsHost.TxSyncPercentage > 110)
+			fmt.Println("=-=-=-= 6", metricsHost.CheckSyncPercentage > 110)
+
 			host.Status = enums.StatusRed
 			return
 		}

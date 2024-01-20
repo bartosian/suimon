@@ -62,66 +62,42 @@ var (
 	}
 )
 
-// getPrometheusMetricsForTableType returns a list of Prometheus metrics that should be collected for a table type.
+// newMetricConfig creates a new MetricConfig with the provided metric type and optional labels.
+func newMetricConfig(metricType enums.PrometheusMetricType, labels ...prometheus.Labels) ports.MetricConfig {
+	var label prometheus.Labels
+	if len(labels) > 0 {
+		label = labels[0]
+	}
+
+	return ports.MetricConfig{
+		MetricType: metricType,
+		Labels:     label,
+	}
+}
+
+// getPrometheusMetricsForTableType returns a set of Prometheus metrics configurations based on the specified table type.
 func getPrometheusMetricsForTableType(table enums.TableType) ports.Metrics {
 	metrics := ports.Metrics{
-		enums.PrometheusMetricNameTotalTransactionCertificates: {
-			MetricType: enums.PrometheusMetricTypeCounter,
-		},
-		enums.PrometheusMetricNameTotalTransactionEffects: {
-			MetricType: enums.PrometheusMetricTypeCounter,
-		},
-		enums.PrometheusMetricNameHighestKnownCheckpoint: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameHighestSyncedCheckpoint: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameLastExecutedCheckpoint: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameCurrentEpoch: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameEpochTotalDuration: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameSuiNetworkPeers: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameUptime: {
-			MetricType: enums.PrometheusMetricTypeCounter,
-		},
+		enums.PrometheusMetricNameTotalTransactionCertificates: newMetricConfig(enums.PrometheusMetricTypeCounter),
+		enums.PrometheusMetricNameTotalTransactionEffects:      newMetricConfig(enums.PrometheusMetricTypeCounter),
+		enums.PrometheusMetricNameHighestKnownCheckpoint:       newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameHighestSyncedCheckpoint:      newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameLastExecutedCheckpoint:       newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameCurrentEpoch:                 newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameEpochTotalDuration:           newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameSuiNetworkPeers:              newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameUptime:                       newMetricConfig(enums.PrometheusMetricTypeCounter),
 	}
 
 	if table == enums.TableTypeValidator {
-		metrics[enums.PrometheusMetricNameLastCommittedRound] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeGauge,
-		}
-		metrics[enums.PrometheusMetricNamePrimaryNetworkPeers] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeGauge,
-		}
-		metrics[enums.PrometheusMetricNameHighestProcessedRound] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeGauge,
-			Labels: prometheus.Labels{
-				"source": "own",
-			},
-		}
-		metrics[enums.PrometheusMetricNameWorkerNetworkPeers] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeGauge,
-		}
-		metrics[enums.PrometheusMetricNameTotalSignatureErrors] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeCounter,
-		}
-		metrics[enums.PrometheusMetricNameSkippedConsensusTransactions] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeCounter,
-		}
-		metrics[enums.PrometheusMetricNameCurrentRound] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeGauge,
-		}
-		metrics[enums.PrometheusMetricNameCertificatesCreated] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeCounter,
-		}
+		metrics[enums.PrometheusMetricNameLastCommittedRound] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNamePrimaryNetworkPeers] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNameHighestProcessedRound] = newMetricConfig(enums.PrometheusMetricTypeGauge, prometheus.Labels{"source": "own"})
+		metrics[enums.PrometheusMetricNameWorkerNetworkPeers] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNameTotalSignatureErrors] = newMetricConfig(enums.PrometheusMetricTypeCounter)
+		metrics[enums.PrometheusMetricNameSkippedConsensusTransactions] = newMetricConfig(enums.PrometheusMetricTypeCounter)
+		metrics[enums.PrometheusMetricNameCurrentRound] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNameCertificatesCreated] = newMetricConfig(enums.PrometheusMetricTypeCounter)
 	}
 
 	return metrics

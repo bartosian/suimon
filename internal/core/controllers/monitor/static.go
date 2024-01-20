@@ -31,7 +31,14 @@ func (c *Controller) Static() error {
 // If an error occurs during table initialization, it returns an error.
 func (c *Controller) InitTables() error {
 	for _, tableType := range c.selectedTables {
-		hosts, releases := c.getDataByTable(tableType)
+		var hosts []host.Host
+		var releases []release.Release
+
+		if tableType == enums.TableTypeReleases {
+			releases = c.releases
+		} else {
+			hosts, _ = c.getHostsByTableType(tableType)
+		}
 
 		if len(hosts) == 0 && len(releases) == 0 {
 			continue
@@ -46,16 +53,4 @@ func (c *Controller) InitTables() error {
 	}
 
 	return nil
-}
-
-// getDataByTable is a method of the Controller struct, responsible for retrieving the data
-// corresponding to a specific table type. It checks if the table type is 'Releases', and if so,
-// it returns the releases data. Otherwise, it retrieves the hosts data for the given table type.
-// It returns a slice of hosts and a slice of releases.
-func (c *Controller) getDataByTable(tableType enums.TableType) ([]host.Host, []release.Release) {
-	if tableType == enums.TableTypeReleases {
-		return nil, c.releases
-	}
-	hosts, _ := c.getHostsByTableType(tableType)
-	return hosts, nil
 }

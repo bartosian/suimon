@@ -10,9 +10,7 @@ import (
 	"github.com/bartosian/suimon/internal/core/domain/enums"
 )
 
-type (
-	MetricValue interface{}
-)
+type MetricValue interface{}
 
 // GetValue returns the metric value for the given metric type.
 func (metrics *Metrics) GetValue(metric enums.MetricType) MetricValue {

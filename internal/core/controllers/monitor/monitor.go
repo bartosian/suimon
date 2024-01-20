@@ -15,69 +15,99 @@ const allTablesSelection = "🌐 ALL TABLES"
 // in the configuration file are displayed in the list of choices. If no tables are enabled, an error is
 // displayed and the function returns without rendering any tables.
 func (c *Controller) Monitor() error {
-	// List available configurations.
-	configNames := make([]string, 0, len(c.configs))
-
-	for configName := range c.configs {
-		configNames = append(configNames, configName)
-	}
-
-	configsChoiceList := cligw.NewSelectChoiceList(configNames...)
-
-	selectedConfigName, err := c.gateways.cli.SelectOne("Which configuration would you like to use?", configsChoiceList)
-	if err != nil {
-		c.gateways.cli.Error("failed to parse user selection")
-
+	if err := c.chooseConfiguration(); err != nil {
 		return err
 	}
 
-	c.selectedConfig = c.configs[selectedConfigName.Value]
-	c.network = selectedConfigName.Value
-
-	// Select the monitor type.
-	monitorTypeChoiceList := cligw.NewSelectChoiceList(
-		string(enums.MonitorTypeStatic),
-		string(enums.MonitorTypeDynamic),
-	)
-
-	selectedMonitorType, err := c.gateways.cli.SelectOne("Which monitors would you like to render?", monitorTypeChoiceList)
+	selectedMonitorType, err := c.chooseMonitorType()
 	if err != nil {
-		c.gateways.cli.Error("failed to parse user selection")
-
 		return err
 	}
 
 	switch selectedMonitorType.Value {
 	case string(enums.MonitorTypeStatic):
-		tablesToRender, err := c.selectStaticTables()
-		if err != nil {
-			return err
-		}
-
-		if tablesToRender == nil {
-			return nil
-		}
-
-		c.selectedTables = tablesToRender
-
-		return c.Static()
+		return c.configureAndRunStaticMonitor()
 
 	case string(enums.MonitorTypeDynamic):
-		dashboardToRender, err := c.selectDynamicDashboard()
-		if err != nil {
-			return err
-		}
+		return c.configureAndRunDynamicMonitor()
 
-		if dashboardToRender == nil {
-			return nil
-		}
-
-		c.selectedDashboard = *dashboardToRender
-
-		return c.Dynamic()
 	default:
 		return fmt.Errorf("not supported monitoring type provided %s", selectedMonitorType.Value)
 	}
+}
+
+// chooseConfiguration prompts the user to select a configuration from the available options.
+// It then sets the selected configuration and network for the controller.
+// If the user selection fails, it logs an error and returns the error.
+func (c *Controller) chooseConfiguration() error {
+	configNames := make([]string, 0, len(c.configs))
+	for configName := range c.configs {
+		configNames = append(configNames, configName)
+	}
+
+	selectedConfigName, err := c.gateways.cli.SelectOne("Which configuration would you like to use?", cligw.NewSelectChoiceList(configNames...))
+	if err != nil {
+		c.gateways.cli.Error("failed to parse user selection: " + err.Error())
+		return err
+	}
+
+	c.selectedConfig = c.configs[selectedConfigName.Value]
+	c.network = selectedConfigName.Value
+	return nil
+}
+
+// chooseMonitorType prompts the user to select the type of monitor to render.
+// It returns a SelectChoice representing the selected monitor type,
+// or an error if the user's selection cannot be parsed.
+func (c *Controller) chooseMonitorType() (*cligw.SelectChoice, error) {
+	monitorTypeChoiceList := cligw.NewSelectChoiceList(
+		string(enums.MonitorTypeStatic),
+		string(enums.MonitorTypeDynamic),
+	)
+
+	return c.gateways.cli.SelectOne("Which monitors would you like to render?", monitorTypeChoiceList)
+}
+
+// configureAndRunStaticMonitor is a method of the Controller struct that configures and runs a static monitor.
+// It first calls the selectStaticTables method to prompt the user to select the static tables to render.
+// If an error occurs during this process, it returns the error.
+// If no tables are selected (i.e., tablesToRender is nil), it returns nil.
+// Otherwise, it sets the selected tables to the Controller's selectedTables field and calls the Static method.
+// It returns any error that occurs during the execution of the Static method.
+func (c *Controller) configureAndRunStaticMonitor() error {
+	tablesToRender, err := c.selectStaticTables()
+	if err != nil {
+		return err
+	}
+
+	if tablesToRender == nil {
+		return nil
+	}
+
+	c.selectedTables = tablesToRender
+
+	return c.Static()
+}
+
+// configureAndRunDynamicMonitor is a method of the Controller struct that configures and runs a dynamic monitor.
+// It first calls the selectDynamicDashboard method to prompt the user to select the dynamic dashboard to render.
+// If an error occurs during this process, it returns the error.
+// If no dashboard is selected (i.e., dashboardToRender is nil), it returns nil.
+// Otherwise, it sets the selected dashboard to the Controller's selectedDashboard field and calls the Dynamic method.
+// It returns any error that occurs during the execution of the Dynamic method.
+func (c *Controller) configureAndRunDynamicMonitor() error {
+	dashboardToRender, err := c.selectDynamicDashboard()
+	if err != nil {
+		return err
+	}
+
+	if dashboardToRender == nil {
+		return nil
+	}
+
+	c.selectedDashboard = *dashboardToRender
+
+	return c.Dynamic()
 }
 
 // selectStaticTables prompts the user to select the static tables to render.

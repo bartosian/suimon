@@ -1,7 +1,6 @@
 package tablebuilder
 
 import (
-	"fmt"
 	"sort"
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
@@ -27,8 +26,6 @@ func (tb *Builder) handleRPCTable(hosts []domainhost.Host) error {
 		}
 
 		columnValues := tables.GetRPCColumnValues(idx, host)
-
-		fmt.Printf("-=--=- %+v", columnValues)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
 		tableConfig.RowsCount++

@@ -138,8 +138,8 @@ var (
 // GetValidatorColumnValues returns a map of ColumnName values to corresponding values for a node at the specified index on the specified host.
 // The function retrieves information about the node from the host's internal state and formats it into a map of NodeColumnName keys and corresponding values.
 // The function also includes emoji values in the map if the specified flag is true.
-func GetValidatorColumnValues(host host.Host) ColumnValues {
-	columnValues := ColumnValues{
+func GetValidatorColumnValues(host host.Host) (ColumnValues, error) {
+	return ColumnValues{
 		enums.ColumnNameTotalTransactionCertificates:            host.Metrics.TotalTransactionCertificates,
 		enums.ColumnNameTotalTransactionEffects:                 host.Metrics.TotalTransactionEffects,
 		enums.ColumnNameHighestKnownCheckpoint:                  host.Metrics.HighestKnownCheckpoint,
@@ -165,7 +165,5 @@ func GetValidatorColumnValues(host host.Host) ColumnValues {
 		enums.ColumnNameCertificatesCreated:                     host.Metrics.CertificatesCreated,
 		enums.ColumnNameCertificatesPerSecond:                   host.Metrics.CertificatesPerSecond,
 		enums.ColumnNameHandleCertificateNonConsensusLatencySum: host.Metrics.NonConsensusLatency,
-	}
-
-	return columnValues
+	}, nil
 }

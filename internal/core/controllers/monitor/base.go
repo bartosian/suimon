@@ -82,10 +82,6 @@ func NewController(
 	}
 }
 
-// getHostsByTableType returns the list of hosts for a given table type.
-// It acquires a read lock on the controller lock before retrieving the hosts data.
-// If the table type is unknown, it returns an error.
-// The list of hosts and an error are returned.
 func (c *Controller) getHostsByTableType(table enums.TableType) (hosts []host.Host, err error) {
 	c.lock.RLock()
 	defer c.lock.RUnlock()

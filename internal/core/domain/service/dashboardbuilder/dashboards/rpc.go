@@ -39,11 +39,11 @@ var (
 // GetRPCColumnValues returns a map of ColumnName values to corresponding values for a node at the specified index on the specified host.
 // The function retrieves information about the node from the host's internal state and formats it into a map of NodeColumnName keys and corresponding values.
 // The function also includes emoji values in the map if the specified flag is true.
-func GetRPCColumnValues(host host.Host) ColumnValues {
+func GetRPCColumnValues(host host.Host) (ColumnValues, error) {
 	return ColumnValues{
 		enums.ColumnNameTotalTransactionBlocks:  host.Metrics.TotalTransactionsBlocks,
 		enums.ColumnNameLatestCheckpoint:        host.Metrics.LatestCheckpoint,
 		enums.ColumnNameCurrentEpoch:            host.Metrics.SystemState.Epoch,
 		enums.ColumnNameSystemTimeTillNextEpoch: host.Metrics.DurationTillEpochEndHHMM,
-	}
+	}, nil
 }
