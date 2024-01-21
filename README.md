@@ -381,6 +381,13 @@ Tables are static monitors that provide a detailed snapshot of the network and i
   ![Screenshot of my app](static/images/table-system-state.png)
   <br><br>
 
+- `🌐 PROTOCOL`
+  <br><br>
+  This table provides a detailed view of the protocol configuration for the latest version of the software. It includes key information such as version number, release date, and a comprehensive list of settings and parameters defined in the current version.
+  <br><br>
+  ![Screenshot of my app](static/images/table-protocol.png)
+  <br><br>  
+
 - `📊 VALIDATORS PARAMS`
   <br><br>
   This table provides information about network thresholds and parameters for validators. This table provides information about the number of validators in various states, such as active, pending, and at risk, as well as the minimum stake threshold required for validation, and other system-wide metrics.
