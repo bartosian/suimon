@@ -115,11 +115,11 @@ type TableConfig struct {
 
 // NewDefaultTableConfig returns a new default table configuration based on the specified table type.
 // It sets the table name, style, sort, rows, columns, column count, and auto-index.
-func NewDefaultTableConfig(table enums.TableType) *TableConfig {
-	tableName := fmt.Sprintf("%s [ %s ]", suiEmoji, table)
-	columnsConfig := GetColumnsConfig(table)
-	rowsConfig := GetRowsConfig(table)
-	tableColor := GetTableColor(table)
+func NewDefaultTableConfig(domainTable enums.TableType) *TableConfig {
+	tableName := fmt.Sprintf("%s [ %s ]", suiEmoji, domainTable)
+	columnsConfig := GetColumnsConfig(domainTable)
+	rowsConfig := GetRowsConfig(domainTable)
+	tableColor := GetTableColor(domainTable)
 
 	tableStyle := tableStyleDefault
 	tableStyle.Title.Colors = tableColor
@@ -135,28 +135,31 @@ func NewDefaultTableConfig(table enums.TableType) *TableConfig {
 }
 
 // GetColumnsConfig returns the ColumnsConfig based on the provided table type.
-func GetColumnsConfig(table enums.TableType) ColumnsConfig {
-	config, ok := columnsConfigMap[table]
+func GetColumnsConfig(domainTable enums.TableType) ColumnsConfig {
+	config, ok := columnsConfigMap[domainTable]
 	if !ok {
 		return nil
 	}
+
 	return config
 }
 
 // GetRowsConfig returns the rows configuration based on the specified table type.
-func GetRowsConfig(table enums.TableType) RowsConfig {
-	config, ok := rowsConfigMap[table]
+func GetRowsConfig(domainTable enums.TableType) RowsConfig {
+	config, ok := rowsConfigMap[domainTable]
 	if !ok {
 		return nil
 	}
+
 	return config
 }
 
 // GetTableColor returns the color configuration based on the specified table type.
-func GetTableColor(table enums.TableType) text.Colors {
-	color, ok := tableColorMap[table]
+func GetTableColor(domainTable enums.TableType) text.Colors {
+	color, ok := tableColorMap[domainTable]
 	if !ok {
 		return defaultTableColor
 	}
+
 	return color
 }

@@ -35,7 +35,7 @@ func (c *Controller) InitDashboard() error {
 		return err
 	}
 
-	builder, err := dashboardbuilder.NewBuilder(selectedDashboard, *host, c.gateways.cli)
+	builder, err := dashboardbuilder.NewBuilder(selectedDashboard, host, c.gateways.cli)
 	if err != nil {
 		return fmt.Errorf("error creating dashboard %s: %w", selectedDashboard, err)
 	}

@@ -12,6 +12,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const versionInfoParts = 2
+
 var (
 	// rpcMethodToMetric maps an RPC method to a metric type.
 	rpcMethodToMetric = map[enums.RPCMethod]enums.MetricType{
@@ -44,7 +46,7 @@ var (
 		enums.PrometheusMetricNameNonConsensusLatencySum:       enums.MetricTypeNonConsensusLatencySum,
 	}
 	// tableToRpcMethods maps a table type to a list of RPC methods.
-	tableToRpcMethods = map[enums.TableType][]enums.RPCMethod{
+	tableToRPCMethods = map[enums.TableType][]enums.RPCMethod{
 		enums.TableTypeNode: {
 			enums.RPCMethodGetTotalTransactionBlocks,
 			enums.RPCMethodGetLatestCheckpointSequenceNumber,
@@ -153,13 +155,13 @@ func (host *Host) processPrometheusMetrics(result ports.MetricsResult) error {
 
 		if metricType == enums.MetricTypeUptime {
 			if value, ok := metricValue.Labels["version"]; ok {
-				versionInfo := strings.SplitN(value, "-", 2)
+				versionInfo := strings.SplitN(value, "-", versionInfoParts)
 
 				if err := host.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0]); err != nil {
 					return err
 				}
 
-				if len(versionInfo) == 2 {
+				if len(versionInfo) == versionInfoParts {
 					if err := host.Metrics.SetValue(enums.MetricTypeCommit, versionInfo[1]); err != nil {
 						return err
 					}
@@ -177,7 +179,7 @@ func (host *Host) processPrometheusMetrics(result ports.MetricsResult) error {
 func (host *Host) GetMetrics() error {
 	var errGroup errgroup.Group
 
-	rpcMethods := tableToRpcMethods[host.TableType]
+	rpcMethods := tableToRPCMethods[host.TableType]
 	for _, method := range rpcMethods {
 		method := method
 

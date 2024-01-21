@@ -8,8 +8,6 @@ import (
 	domainmetrics "github.com/bartosian/suimon/internal/core/domain/metrics"
 )
 
-const utcTimeZone = "America/New_York"
-
 // Init initializes the table configuration based on the given table type and host data.
 // It processes the host data and calls the appropriate handler function for the specified table type.
 func (tb *Builder) Init() error {
@@ -42,6 +40,7 @@ func (tb *Builder) handleTableWithMetrics(hosts []domainhost.Host, handlerFunc f
 	if len(hosts) == 0 {
 		return errors.New("no hosts available")
 	}
+
 	return handlerFunc(&hosts[0].Metrics)
 }
 
@@ -50,5 +49,6 @@ func (tb *Builder) handleTableWithSystemState(hosts []domainhost.Host, handlerFu
 	if len(hosts) == 0 {
 		return errors.New("no hosts available")
 	}
+
 	return handlerFunc(&hosts[0].Metrics.SystemState)
 }

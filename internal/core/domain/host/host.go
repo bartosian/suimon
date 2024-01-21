@@ -11,6 +11,8 @@ import (
 	"github.com/bartosian/suimon/internal/core/ports"
 )
 
+const percentage100 = 100
+
 type Gateways struct {
 	rpc        ports.RPCGateway
 	geo        ports.GeoGateway
@@ -55,14 +57,23 @@ func NewHost(
 // SetPctProgress updates the value of the specified metric type for the Host instance with a percentage that reflects the Host's progress relative to the progress of the RPC Host.
 // The function obtains the current metric value for the Host and RPC Host, calculates the percentage using the percent.PercentOf function, and sets the new percentage value for the Host's Metrics instance for the specified metric type.
 // The second argument is the RPC Host to compare the progress against.
-func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) error {
+func (host *Host) SetPctProgress(metricType enums.MetricType, rpc *Host) error {
 	hostMetric := host.Metrics.GetValue(metricType)
 	rpcMetric := rpc.Metrics.GetValue(metricType)
-	hostMetricInt, rpcMetricInt := hostMetric.(int), rpcMetric.(int)
+
+	hostMetricInt, ok := hostMetric.(int)
+	if !ok {
+		return fmt.Errorf("failed to convert metric to INT")
+	}
+
+	rpcMetricInt, ok := rpcMetric.(int)
+	if !ok {
+		return fmt.Errorf("failed to convert metric to INT")
+	}
 
 	percentage := int(percent.PercentOf(hostMetricInt, rpcMetricInt))
-	if percentage > 100 {
-		percentage = 100
+	if percentage > percentage100 {
+		percentage = percentage100
 	}
 
 	return host.Metrics.SetValue(metricType, percentage)
@@ -70,18 +81,18 @@ func (host *Host) SetPctProgress(metricType enums.MetricType, rpc Host) error {
 
 // SetStatus updates the status of the Host based on the provided RPC Host.
 // It compares the metrics of the Host and RPC Host and sets the status to Red, Yellow, or Green based on specific conditions.
-func (host *Host) SetStatus(rpc Host) {
+func (host *Host) SetStatus(rpc *Host) {
 	metricsHost := host.Metrics
 	metricsRPC := rpc.Metrics
 
-	switch host.TableType {
-	case enums.TableTypeValidator:
+	if host.TableType == enums.TableTypeValidator {
 		if !metricsHost.Updated || metricsHost.Uptime == "" {
 			host.Status = enums.StatusRed
 			return
 		}
+	}
 
-	case enums.TableTypeNode, enums.TableTypeRPC:
+	if host.TableType == enums.TableTypeNode || host.TableType == enums.TableTypeRPC {
 		if !metricsHost.Updated {
 			host.Status = enums.StatusRed
 			return
@@ -93,15 +104,8 @@ func (host *Host) SetStatus(rpc Host) {
 			metricsHost.TxSyncPercentage == 0 ||
 			metricsHost.TxSyncPercentage > 110 ||
 			metricsHost.CheckSyncPercentage > 110 {
-
-			fmt.Println("=-=-=-= 1", metricsHost.TotalTransactionsBlocks == 0)
-			fmt.Println("=-=-=-= 2", metricsHost.LatestCheckpoint == 0)
-			fmt.Println("=-=-=-= 3", (metricsHost.TransactionsPerSecond == 0 && len(metricsHost.TransactionsHistory) == metrics.TransactionsPerSecondWindow))
-			fmt.Println("=-=-=-= 4", metricsHost.TxSyncPercentage == 0)
-			fmt.Println("=-=-=-= 5", metricsHost.TxSyncPercentage > 110)
-			fmt.Println("=-=-=-= 6", metricsHost.CheckSyncPercentage > 110)
-
 			host.Status = enums.StatusRed
+
 			return
 		}
 

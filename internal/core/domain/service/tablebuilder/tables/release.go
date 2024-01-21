@@ -4,7 +4,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
-	"github.com/bartosian/suimon/internal/core/domain/release"
+	domainrelease "github.com/bartosian/suimon/internal/core/domain/metrics"
 )
 
 var (
@@ -37,7 +37,7 @@ var (
 // GetReleaseColumnValues returns a map of ColumnName keys to corresponding values for the specified release.
 // The function retrieves information about the release from the provided metrics.Release object and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
-func GetReleaseColumnValues(idx int, release release.Release) ColumnValues {
+func GetReleaseColumnValues(idx int, release *domainrelease.Release) ColumnValues {
 	return ColumnValues{
 		enums.ColumnNameIndex:       idx + 1,
 		enums.ColumnNameReleaseName: release.Name,

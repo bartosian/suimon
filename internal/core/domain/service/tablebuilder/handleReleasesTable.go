@@ -2,7 +2,7 @@ package tablebuilder
 
 import (
 	"github.com/bartosian/suimon/internal/core/domain/enums"
-	"github.com/bartosian/suimon/internal/core/domain/release"
+	"github.com/bartosian/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/suimon/internal/core/domain/service/tablebuilder/tables"
 )
 
@@ -12,11 +12,13 @@ import (
 // If an error occurs while getting the column values, the function returns the error.
 // At the end, the built table configuration is set as the builder's configuration.
 // The function returns nil if it completes successfully.
-func (tb *Builder) handleReleasesTable(releases []release.Release) error {
+func (tb *Builder) handleReleasesTable(releases []metrics.Release) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeReleases)
 
-	for idx, release := range releases {
-		columnValues := tables.GetReleaseColumnValues(idx, release)
+	for idx := range releases {
+		release := releases[idx]
+
+		columnValues := tables.GetReleaseColumnValues(idx, &release)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
 		tableConfig.RowsCount++

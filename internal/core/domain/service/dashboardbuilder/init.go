@@ -58,7 +58,7 @@ func (db *Builder) Init() (err error) {
 		return err
 	}
 
-	rows, err := dashboards.GetRows(rowsConfig, cells, columns)
+	rows, err := dashboards.GetRows(rowsConfig, columns)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (db *Builder) Init() (err error) {
 		return err
 	}
 
-	dashboardConfig := append(dashboards.DashboardConfigDefault, options...)
+	var dashboardConfig = append(dashboards.DashboardConfigDefault, options...)
 
 	dashboard, err := container.New(db.terminal, dashboardConfig...)
 	if err != nil {

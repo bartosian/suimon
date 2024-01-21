@@ -5,7 +5,7 @@ import (
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
 	"github.com/bartosian/suimon/internal/core/domain/host"
-	"github.com/bartosian/suimon/internal/core/domain/release"
+	"github.com/bartosian/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/suimon/internal/core/domain/service/tablebuilder"
 )
 
@@ -32,7 +32,8 @@ func (c *Controller) Static() error {
 func (c *Controller) InitTables() error {
 	for _, tableType := range c.selectedTables {
 		var hosts []host.Host
-		var releases []release.Release
+
+		var releases []metrics.Release
 
 		if tableType == enums.TableTypeReleases {
 			releases = c.releases

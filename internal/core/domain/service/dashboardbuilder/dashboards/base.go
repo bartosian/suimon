@@ -51,12 +51,13 @@ func GetColumnsConfig(dashboard enums.TableType) (ColumnsConfig, error) {
 	if !ok {
 		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
+
 	return config, nil
 }
 
 // GetColumnsValues returns the columns values based on the specified dashboard type and host.
-func GetColumnsValues(dashboard enums.TableType, host domainhost.Host) (ColumnValues, error) {
-	columnsValuesFuncMap := map[enums.TableType]func(domainhost.Host) (ColumnValues, error){
+func GetColumnsValues(dashboard enums.TableType, host *domainhost.Host) (ColumnValues, error) {
+	columnsValuesFuncMap := map[enums.TableType]func(*domainhost.Host) (ColumnValues, error){
 		enums.TableTypeNode:               GetNodeColumnValues,
 		enums.TableTypeValidator:          GetValidatorColumnValues,
 		enums.TableTypeRPC:                GetRPCColumnValues,
@@ -83,6 +84,7 @@ func GetRowsConfig(dashboard enums.TableType) (RowsConfig, error) {
 	if !ok {
 		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
+
 	return config, nil
 }
 
@@ -99,6 +101,7 @@ func GetCellsConfig(dashboard enums.TableType) (CellsConfig, error) {
 	if !ok {
 		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
+
 	return config, nil
 }
 
@@ -126,7 +129,7 @@ func GetColumns(columnsConfig ColumnsConfig, cells Cells) (Columns, error) {
 // and a Columns object that maps column names to column objects.
 // It returns a Rows object and an error. The Rows object is a slice of Row objects,
 // where each Row object represents a row in the terminal grid.
-func GetRows(rowsConfig RowsConfig, cells Cells, columns Columns) (Rows, error) {
+func GetRows(rowsConfig RowsConfig, columns Columns) (Rows, error) {
 	rows := make(Rows, 0, len(rowsConfig))
 
 	for _, rowConfig := range rowsConfig {

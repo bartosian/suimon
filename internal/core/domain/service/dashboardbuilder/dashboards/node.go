@@ -6,39 +6,39 @@ import (
 	"github.com/mum4k/termdash/cell"
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
-	"github.com/bartosian/suimon/internal/core/domain/host"
+	domainhost "github.com/bartosian/suimon/internal/core/domain/host"
 )
 
 var (
 	ColumnsConfigNode = ColumnsConfig{
 		// Overview section
-		enums.ColumnNameCurrentEpoch:          33,
-		enums.ColumnNameNetworkPeers:          15,
-		enums.ColumnNameUptime:                25,
-		enums.ColumnNameVersion:               25,
-		enums.ColumnNameCommit:                25,
-		enums.ColumnNameCheckpointExecBacklog: 33,
-		enums.ColumnNameCheckpointSyncBacklog: 33,
+		enums.ColumnNameCurrentEpoch:          ColumnWidth33,
+		enums.ColumnNameNetworkPeers:          ColumnWidth15,
+		enums.ColumnNameUptime:                ColumnWidth25,
+		enums.ColumnNameVersion:               ColumnWidth25,
+		enums.ColumnNameCommit:                ColumnWidth25,
+		enums.ColumnNameCheckpointExecBacklog: ColumnWidth33,
+		enums.ColumnNameCheckpointSyncBacklog: ColumnWidth33,
 
 		// Transactions section
-		enums.ColumnNameTotalTransactionBlocks:       33,
-		enums.ColumnNameTotalTransactionCertificates: 33,
-		enums.ColumnNameTotalTransactionEffects:      33,
-		enums.ColumnNameTXSyncPercentage:             49,
-		enums.ColumnNameTransactionsPerSecond:        49,
+		enums.ColumnNameTotalTransactionBlocks:       ColumnWidth33,
+		enums.ColumnNameTotalTransactionCertificates: ColumnWidth33,
+		enums.ColumnNameTotalTransactionEffects:      ColumnWidth33,
+		enums.ColumnNameTXSyncPercentage:             ColumnWidth49,
+		enums.ColumnNameTransactionsPerSecond:        ColumnWidth49,
 
 		// Checkpoints section
-		enums.ColumnNameLatestCheckpoint:        24,
-		enums.ColumnNameHighestKnownCheckpoint:  24,
-		enums.ColumnNameHighestSyncedCheckpoint: 24,
-		enums.ColumnNameLastExecutedCheckpoint:  24,
-		enums.ColumnNameCheckSyncPercentage:     49,
-		enums.ColumnNameCheckpointsPerSecond:    49,
+		enums.ColumnNameLatestCheckpoint:        ColumnWidth24,
+		enums.ColumnNameHighestKnownCheckpoint:  ColumnWidth24,
+		enums.ColumnNameHighestSyncedCheckpoint: ColumnWidth24,
+		enums.ColumnNameLastExecutedCheckpoint:  ColumnWidth24,
+		enums.ColumnNameCheckSyncPercentage:     ColumnWidth49,
+		enums.ColumnNameCheckpointsPerSecond:    ColumnWidth49,
 	}
 
 	RowsConfigNode = RowsConfig{
 		0: {
-			Height: 14,
+			Height: RowHeight14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameNetworkPeers,
 				enums.ColumnNameUptime,
@@ -47,7 +47,7 @@ var (
 			},
 		},
 		1: {
-			Height: 14,
+			Height: RowHeight14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameCurrentEpoch,
 				enums.ColumnNameCheckpointExecBacklog,
@@ -55,7 +55,7 @@ var (
 			},
 		},
 		2: {
-			Height: 14,
+			Height: RowHeight14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameLatestCheckpoint,
 				enums.ColumnNameHighestKnownCheckpoint,
@@ -64,14 +64,14 @@ var (
 			},
 		},
 		3: {
-			Height: 14,
+			Height: RowHeight14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameCheckSyncPercentage,
 				enums.ColumnNameCheckpointsPerSecond,
 			},
 		},
 		4: {
-			Height: 14,
+			Height: RowHeight14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameTotalTransactionBlocks,
 				enums.ColumnNameTotalTransactionCertificates,
@@ -79,7 +79,7 @@ var (
 			},
 		},
 		5: {
-			Height: 14,
+			Height: RowHeight14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameTXSyncPercentage,
 				enums.ColumnNameTransactionsPerSecond,
@@ -112,7 +112,7 @@ var (
 // GetNodeColumnValues returns a map of ColumnName values to corresponding values for a node at the specified index on the specified host.
 // The function retrieves information about the node from the host's internal state and formats it into a map of NodeColumnName keys and corresponding values.
 // The function also includes emoji values in the map if the specified flag is true.
-func GetNodeColumnValues(host host.Host) (ColumnValues, error) {
+func GetNodeColumnValues(host *domainhost.Host) (ColumnValues, error) {
 	return ColumnValues{
 		enums.ColumnNameTotalTransactionBlocks:       host.Metrics.TotalTransactionsBlocks,
 		enums.ColumnNameTotalTransactionCertificates: host.Metrics.TotalTransactionCertificates,

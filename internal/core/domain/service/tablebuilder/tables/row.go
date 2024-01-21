@@ -14,7 +14,7 @@ type Row struct {
 }
 
 // NewRow creates a new row with the given header flag and length
-func NewRow(isHeader bool, isFooter bool, length int, autoMerge bool, autoMergeAlign text.Align) Row {
+func NewRow(isHeader, isFooter bool, length int, autoMerge bool, autoMergeAlign text.Align) Row {
 	return Row{
 		Values:   make(table.Row, 0, length),
 		Config:   table.RowConfig{AutoMerge: autoMerge, AutoMergeAlign: autoMergeAlign},

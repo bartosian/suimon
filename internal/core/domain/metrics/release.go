@@ -1,4 +1,4 @@
-package release
+package metrics
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const releseApiUrl = "https://api.github.com/repos/MystenLabs/sui/releases?per_page=50"
+const releseAPIURL = "https://api.github.com/repos/MystenLabs/sui/releases?per_page=50"
 
 // Release represents a GitHub release
 type Release struct {
@@ -27,7 +27,7 @@ type Release struct {
 
 // getReleases fetches releases for a given repo and filters them by network name
 func GetReleases(networkName string) ([]Release, error) {
-	resp, err := http.Get(releseApiUrl)
+	resp, err := http.Get(releseAPIURL)
 	if err != nil {
 		return nil, err
 	}
@@ -43,12 +43,14 @@ func GetReleases(networkName string) ([]Release, error) {
 	}
 
 	var allReleases []Release
+
 	err = json.Unmarshal(body, &allReleases)
 	if err != nil {
 		return nil, err
 	}
 
 	var filteredReleases []Release
+
 	for _, release := range allReleases {
 		if strings.HasPrefix(strings.ToLower(release.Name), strings.ToLower(networkName)) {
 			filteredReleases = append(filteredReleases, release)

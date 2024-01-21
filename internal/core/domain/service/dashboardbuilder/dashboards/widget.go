@@ -15,6 +15,10 @@ import (
 	"github.com/bartosian/suimon/internal/core/domain/enums"
 )
 
+const gaugeHeight4 = 4
+const gaugeTreshold99 = 99
+const maxLenBlinkValue = 50
+
 // newWidgetOfType initializes a new widget of the given type.
 // It returns the new widget and an error, if any.
 func newWidgetOfType(widgetType enums.WidgetType, color cell.Color) (widgetapi.Widget, error) {
@@ -35,6 +39,7 @@ func newWidgetOfType(widgetType enums.WidgetType, color cell.Color) (widgetapi.W
 // newWidgetByColumnName initializes a new widget based on the given column name.
 // It returns the new widget and an error, if any.
 func newWidgetByColumnName(columnName enums.ColumnName, color cell.Color) (widgetapi.Widget, error) {
+	//nolint: exhaustive,gocritic // no need to cover all cases here.
 	switch columnName {
 	case enums.ColumnNameTXSyncPercentage, enums.ColumnNameCheckSyncPercentage:
 		widget, err := newWidgetOfType(enums.WidgetTypeProgress, color)
@@ -42,7 +47,10 @@ func newWidgetByColumnName(columnName enums.ColumnName, color cell.Color) (widge
 			return nil, fmt.Errorf("failed to initialize gauge widget for %s: %w", columnName, err)
 		}
 
-		progressWidget := widget.(*gauge.Gauge)
+		progressWidget, ok := widget.(*gauge.Gauge)
+		if !ok {
+			return nil, fmt.Errorf("failed to cast widget type")
+		}
 
 		if err = progressWidget.Percent(0); err != nil {
 			return nil, fmt.Errorf("failed to set initial value for %s: %w", columnName, err)
@@ -55,7 +63,10 @@ func newWidgetByColumnName(columnName enums.ColumnName, color cell.Color) (widge
 			return nil, fmt.Errorf("failed to initialize text widget for %s: %w", columnName, err)
 		}
 
-		textWidget := widget.(*text.Text)
+		textWidget, ok := widget.(*text.Text)
+		if !ok {
+			return nil, fmt.Errorf("failed to cast widget type")
+		}
 
 		if err = textWidget.Write(enums.StatusGrey.DashboardStatus(), text.WriteCellOpts(cell.FgColor(cell.ColorGray), cell.BgColor(cell.ColorGray))); err != nil {
 			return nil, fmt.Errorf("failed to set initial value for %s: %w", columnName, err)
@@ -68,7 +79,10 @@ func newWidgetByColumnName(columnName enums.ColumnName, color cell.Color) (widge
 			return nil, fmt.Errorf("failed to initialize text widget for %s: %w", columnName, err)
 		}
 
-		sparkLineWidget := widget.(*sparkline.SparkLine)
+		sparkLineWidget, ok := widget.(*sparkline.SparkLine)
+		if !ok {
+			return nil, fmt.Errorf("failed to cast widget type")
+		}
 
 		if err = sparkLineWidget.Add([]int{0}); err != nil {
 			return nil, fmt.Errorf("failed to set initial value for %s: %w", columnName, err)
@@ -81,10 +95,13 @@ func newWidgetByColumnName(columnName enums.ColumnName, color cell.Color) (widge
 			return nil, fmt.Errorf("failed to initialize segment display widget for %s: %w", columnName, err)
 		}
 
-		displayWidget := widget.(*segmentdisplay.SegmentDisplay)
+		displayWidget, ok := widget.(*segmentdisplay.SegmentDisplay)
+		if !ok {
+			return nil, fmt.Errorf("failed to cast widget type")
+		}
 
 		err = displayWidget.Write([]*segmentdisplay.TextChunk{
-			segmentdisplay.NewChunk(dashboardLoadingBlinkValue(50), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite))),
+			segmentdisplay.NewChunk(dashboardLoadingBlinkValue(maxLenBlinkValue), segmentdisplay.WriteCellOpts(cell.FgColor(cell.ColorWhite))),
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to set initial value for %s: %w", columnName, err)
@@ -98,14 +115,14 @@ func newWidgetByColumnName(columnName enums.ColumnName, color cell.Color) (widge
 // It returns the new widget and an error, if any.
 func newProgressWidget(color cell.Color) (*gauge.Gauge, error) {
 	return gauge.New(
-		gauge.Height(4),
+		gauge.Height(gaugeHeight4),
 		gauge.Border(linestyle.Light, cell.FgColor(color)),
 		gauge.Color(color),
 		gauge.FilledTextColor(cell.ColorBlack),
 		gauge.EmptyTextColor(cell.ColorWhite),
 		gauge.HorizontalTextAlign(align.HorizontalCenter),
 		gauge.VerticalTextAlign(align.VerticalMiddle),
-		gauge.Threshold(99, linestyle.Double, cell.FgColor(cell.ColorRed), cell.Bold()),
+		gauge.Threshold(gaugeTreshold99, linestyle.Double, cell.FgColor(cell.ColorRed), cell.Bold()),
 	)
 }
 

@@ -20,12 +20,14 @@ func (tb *Builder) handleRPCTable(hosts []domainhost.Host) error {
 		return left.Metrics.TotalTransactionsBlocks > right.Metrics.TotalTransactionsBlocks
 	})
 
-	for idx, host := range hosts {
+	for idx := range hosts {
+		host := hosts[idx]
+
 		if !host.Metrics.Updated {
 			continue
 		}
 
-		columnValues := tables.GetRPCColumnValues(idx, host)
+		columnValues := tables.GetRPCColumnValues(idx, &host)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
 		tableConfig.RowsCount++

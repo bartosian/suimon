@@ -9,13 +9,14 @@ import (
 	"github.com/bartosian/suimon/internal/core/domain/service/tablebuilder/tables"
 )
 
+const base = 10
+
 // handleValidatorsAtRiskTable handles the configuration for the Validators At Risk table.
 // It takes the system state, extracts the necessary data, and updates the table configuration.
 func (tb *Builder) handleValidatorsAtRiskTable(systemState *domainmetrics.SuiSystemState) error {
 	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidatorsAtRisk)
 
 	validatorsAtRisk := systemState.ValidatorsAtRiskParsed
-	const base = 10
 
 	// Optimized sorting logic
 	sort.SliceStable(validatorsAtRisk, func(i, j int) bool {

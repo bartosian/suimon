@@ -18,6 +18,11 @@ const (
 	ColorGreen Color = "[green]"
 )
 
+const progressInterval = 100
+const progressMaxWidth = 1000
+const progresWidth = 30
+const progressTickerSleepInterval = 15
+
 // NewProgressBar creates a new progress bar with the specified action and color.
 // It takes the action string and color as input and returns a channel for controlling the progress bar.
 // The progress bar is updated at regular intervals and can be stopped by closing the returned channel.
@@ -30,15 +35,15 @@ const (
 //
 // Note: It is important to close the returned channel to stop the progress bar and free resources.
 func NewProgressBar(action string, color Color) chan<- struct{} {
-	progressTicker := time.NewTicker(100 * time.Millisecond)
+	progressTicker := time.NewTicker(progressInterval * time.Millisecond)
 	progressChan := make(chan struct{})
 
-	bar := progressbar.NewOptions(1000,
+	bar := progressbar.NewOptions(progressMaxWidth,
 		progressbar.OptionEnableColorCodes(true),
 		progressbar.OptionSetElapsedTime(false),
 		progressbar.OptionShowBytes(false),
 		progressbar.OptionClearOnFinish(),
-		progressbar.OptionSetWidth(30),
+		progressbar.OptionSetWidth(progresWidth),
 		progressbar.OptionSetDescription(fmt.Sprintf("%s [ %s... ] [reset]", color, action)),
 		progressbar.OptionSetTheme(progressbar.Theme{
 			Saucer:        "=",
@@ -67,7 +72,7 @@ func NewProgressBar(action string, color Color) chan<- struct{} {
 						os.Exit(1)
 					}
 
-					time.Sleep(15 * time.Millisecond)
+					time.Sleep(progressTickerSleepInterval * time.Millisecond)
 				}
 			}
 		}

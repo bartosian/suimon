@@ -12,8 +12,6 @@ import (
 const (
 	suimonConfigEnvVar = "SUIMON_CONFIG_PATH"
 	suimonConfigDir    = ".suimon"
-	ymlPattern         = "suimon-*.yml"
-	yamlPattern        = "suimon-*.yaml"
 )
 
 type Config struct {
@@ -67,13 +65,13 @@ func readConfigs(dirPath string) (map[string]Config, error) {
 	}
 
 	// Combine file lists
-	files := append(ymlFiles, yamlFiles...)
+	ymlFiles = append(ymlFiles, yamlFiles...)
 
-	if len(files) == 0 {
+	if len(ymlFiles) == 0 {
 		return nil, fmt.Errorf("no Suimon configuration files found in %s", dirPath)
 	}
 
-	for _, file := range files {
+	for _, file := range ymlFiles {
 		fileData, err := os.ReadFile(file)
 		if err != nil {
 			return nil, fmt.Errorf("error reading file %s: %w", file, err)

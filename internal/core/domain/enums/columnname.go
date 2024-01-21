@@ -80,8 +80,8 @@ const (
 	ColumnNameEpochTotalTransactions            ColumnName = "TOTAL\nTRANSACTIONS"
 	ColumnNameEpochStartTimestamp               ColumnName = "EPOCH START TIME UTC"
 	ColumnNameEpochEndTimestamp                 ColumnName = "EPOCH END TIME UTC"
-	ColumnNameEpochFirstCheckpointId            ColumnName = "FIRST\nCHECKPOINT ID"
-	ColumnNameEpochLastCheckpointId             ColumnName = "LAST\nCHECKPOINT ID"
+	ColumnNameEpochFirstCheckpointID            ColumnName = "FIRST\nCHECKPOINT ID"
+	ColumnNameEpochLastCheckpointID             ColumnName = "LAST\nCHECKPOINT ID"
 	ColumnNameEpochProtocolVersion              ColumnName = "PROTOCOL\nVERSION"
 	ColumnNameEpochReferenceGasPrice            ColumnName = "REFERENCE\nGAS PRICE"
 	ColumnNameEpochTotalStake                   ColumnName = "TOTAL STAKE,\nSUI"
@@ -95,7 +95,7 @@ const (
 	ColumnNameEpochLeftoverStorageFundInflow    ColumnName = "LEFTOVER STORAGE FUND\nINFLOW, SUI"
 )
 
-// System State section
+// nolint: dupl,nolintlint,gocritic // they are not duplicate
 const (
 	ColumnNameCurrentEpoch                                ColumnName = "CURRENT\nEPOCH"
 	ColumnNameSystemEpoch                                 ColumnName = "EPOCH"
@@ -144,12 +144,12 @@ const (
 	ColumnNameProtocolVersion             ColumnName = "PROTOCOL VERSION"
 )
 
-// FeatureFlags section within Protocol
+// nolint: dupl,nolintlint,gocritic // they are not duplicate
 const (
 	ColumnNameFeatureFlagAcceptZkloginInMultisig                  ColumnName = "ACCEPT ZKLOGIN\nIN MULTISIG"
 	ColumnNameFeatureFlagAdvanceEpochStartTimeInSafeMode          ColumnName = "ADVANCE EPOCH\nSTART TIME\nIN SAFE MODE"
 	ColumnNameFeatureFlagAdvanceToHighestSupportedProtocolVersion ColumnName = "ADVANCE TO\nHIGHEST SUPPORTED\nPROTOCOL VERSION"
-	ColumnNameFeatureFlagAllowReceivingObjectId                   ColumnName = "ALLOW RECEIVING\nOBJECT ID"
+	ColumnNameFeatureFlagAllowReceivingObjectID                   ColumnName = "ALLOW RECEIVING\nOBJECT ID"
 	ColumnNameFeatureFlagBanEntryInit                             ColumnName = "BAN ENTRY INIT"
 	ColumnNameFeatureFlagCommitRootStateDigest                    ColumnName = "COMMIT ROOT\nSTATE DIGEST"
 	ColumnNameFeatureFlagConsensusOrderEndOfEpochLast             ColumnName = "CONSENSUS ORDER\nEND OF EPOCH LAST"

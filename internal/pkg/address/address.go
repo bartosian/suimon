@@ -23,8 +23,10 @@ type Endpoint struct {
 const (
 	errInvalidPeerFormatProvided = "invalid peer format provided: %s"
 	errInvalidPortProvided       = "invalid port provided: %s"
-	errInvalidIpProvided         = "invalid ip provided: %s"
-	errInvalidUrlProvided        = "invalid url provided: %s"
+	errInvalidIPProvided         = "invalid ip provided: %s"
+	errInvalidURLProvided        = "invalid url provided: %s"
+	ipProtocol4                  = 4
+	peerParts                    = 5
 )
 
 // GetHostWithPath returns the host with the path, if available.
@@ -38,7 +40,7 @@ func (hp *Endpoint) GetHostWithPath() *string {
 	hostPath := *hp.Host
 
 	if hp.Path != nil {
-		hostPath = hostPath + *hp.Path
+		hostPath += *hp.Path
 	}
 
 	return &hostPath
@@ -49,7 +51,7 @@ func (hp *Endpoint) GetHostWithPath() *string {
 // If the address is in the format "protocol/ip4/host/udp/port", it returns the host and port as an Endpoint.
 // If the IP provided is a loopback or unspecified IP, it replaces it with the public IP.
 // Returns the parsed Endpoint and nil error if successful, otherwise returns nil and an error.
-func ParseIpPort(address string) (*Endpoint, error) {
+func ParseIPPort(address string) (*Endpoint, error) {
 	ip, port, err := net.SplitHostPort(address)
 	if err != nil {
 		return nil, err
@@ -78,7 +80,7 @@ func ParseIpPort(address string) (*Endpoint, error) {
 func ParsePeer(address string) (*Endpoint, error) {
 	components := strings.Split(address, "/")
 
-	if len(components) != 5 {
+	if len(components) != peerParts {
 		return nil, fmt.Errorf(errInvalidPeerFormatProvided, address)
 	}
 
@@ -126,7 +128,7 @@ func ParseURL(address string) (*Endpoint, error) {
 
 	scheme, hostName, port, path := u.Scheme, u.Hostname(), u.Port(), u.Path
 	if hostName == "" {
-		return nil, fmt.Errorf(errInvalidUrlProvided, address)
+		return nil, fmt.Errorf(errInvalidURLProvided, address)
 	}
 
 	endpoint := &Endpoint{
@@ -185,14 +187,14 @@ func ParseIP(address string) (*string, error) {
 		return &ipResult, nil
 	}
 
-	return nil, fmt.Errorf(errInvalidIpProvided, address)
+	return nil, fmt.Errorf(errInvalidIPProvided, address)
 }
 
 // GetPublicIP retrieves the public IP address using the default consensus and returns it.
 // It returns the public IP address if successful, otherwise returns nil.
 func GetPublicIP() net.IP {
 	consensus := externalIP.DefaultConsensus(nil, nil)
-	if err := consensus.UseIPProtocol(4); err != nil {
+	if err := consensus.UseIPProtocol(ipProtocol4); err != nil {
 		return nil
 	}
 

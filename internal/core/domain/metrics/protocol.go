@@ -15,7 +15,7 @@ type FeatureFlags struct {
 	AcceptZkloginInMultisig                  bool `json:"accept_zklogin_in_multisig"`
 	AdvanceEpochStartTimeInSafeMode          bool `json:"advance_epoch_start_time_in_safe_mode"`
 	AdvanceToHighestSupportedProtocolVersion bool `json:"advance_to_highest_supported_protocol_version"`
-	AllowReceivingObjectId                   bool `json:"allow_receiving_object_id"`
+	AllowReceivingObjectID                   bool `json:"allow_receiving_object_id"`
 	BanEntryInit                             bool `json:"ban_entry_init"`
 	CommitRootStateDigest                    bool `json:"commit_root_state_digest"`
 	ConsensusOrderEndOfEpochLast             bool `json:"consensus_order_end_of_epoch_last"`

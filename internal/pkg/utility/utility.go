@@ -18,6 +18,9 @@ import (
 )
 
 const gb = 1024 * 1024 * 1024
+const cpuMax = 100
+const millisecondsInSecond = 1000
+const secondsInMinute = 60
 
 type UsageData struct {
 	Total          int
@@ -75,7 +78,7 @@ func GetDirSize(path string) (float64, error) {
 	})
 
 	if size != 0 {
-		size = size / gb
+		size /= gb
 	}
 
 	return size, err
@@ -171,7 +174,7 @@ func GetCPUUsage() (*UsageData, error) {
 
 	pct := int(percentage[0])
 
-	total := cores * 100
+	total := cores * cpuMax
 	free := total - int(percent.Percent(pct, total))
 	used := total - free
 
@@ -214,7 +217,7 @@ func ParseEpochTime(epoch string) (*time.Time, error) {
 		return nil, err
 	}
 
-	epochTime := time.Unix(epochInt/1000, (epochInt%1000)*int64(time.Millisecond))
+	epochTime := time.Unix(epochInt/millisecondsInSecond, (epochInt%millisecondsInSecond)*int64(time.Millisecond))
 
 	return &epochTime, nil
 }
@@ -222,7 +225,7 @@ func ParseEpochTime(epoch string) (*time.Time, error) {
 // DurationToHoursAndMinutes converts a duration in milliseconds to a formatted string representing hours and minutes.
 func DurationToHoursAndMinutes(duration time.Duration) string {
 	hours := int64(duration.Hours())
-	minutes := int64(duration.Minutes()) % 60
+	minutes := int64(duration.Minutes()) % secondsInMinute
 
 	return fmt.Sprintf("%02d:%02d", hours, minutes)
 }
@@ -246,9 +249,11 @@ func GetDurationTillTime(start time.Time, duration time.Duration) (time.Duration
 // If the string cannot be parsed, an error is returned.
 func ParseIntFromString(str string) (int, error) {
 	re := regexp.MustCompile(`^\d+`)
+
 	match := re.FindString(str)
 	if match == "" {
 		return 0, fmt.Errorf("could not parse integer from string: %s", str)
 	}
+
 	return strconv.Atoi(match)
 }

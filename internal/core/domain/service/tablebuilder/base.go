@@ -10,22 +10,25 @@ import (
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
 	"github.com/bartosian/suimon/internal/core/domain/host"
-	"github.com/bartosian/suimon/internal/core/domain/release"
+	"github.com/bartosian/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/suimon/internal/core/domain/service/tablebuilder/tables"
 	"github.com/bartosian/suimon/internal/core/gateways/cligw"
 )
 
+const slashingPct50 = 50
+const slashingPct100 = 50
+
 type Builder struct {
 	tableType  enums.TableType
 	hosts      []host.Host
-	Releases   []release.Release
+	Releases   []metrics.Release
 	cliGateway *cligw.Gateway
 	writer     table.Writer
 	config     *tables.TableConfig
 }
 
 // NewBuilder creates a new instance of the table builder, using the CLI gateway
-func NewBuilder(tableType enums.TableType, hosts []host.Host, releases []release.Release, cliGateway *cligw.Gateway) *Builder {
+func NewBuilder(tableType enums.TableType, hosts []host.Host, releases []metrics.Release, cliGateway *cligw.Gateway) *Builder {
 	tableWR := table.NewWriter()
 	tableWR.SetOutputMirror(os.Stdout)
 
@@ -40,7 +43,7 @@ func NewBuilder(tableType enums.TableType, hosts []host.Host, releases []release
 
 // setColumns sets the column configurations for the table builder based on the configuration in the builder's table config
 func (tb *Builder) setColumns() {
-	var columnsConfig []table.ColumnConfig
+	columnsConfig := make([]table.ColumnConfig, len(tb.config.Columns))
 
 	for _, column := range tb.config.Columns {
 		columnsConfig = append(columnsConfig, *column.Config)
@@ -76,6 +79,7 @@ func (tb *Builder) setRows() error {
 					header.AppendValue(columnName.ToString())
 					footer.PrependValue(tables.EmptyValue)
 				}
+
 				row.AppendValue(columnValue)
 			}
 
@@ -85,6 +89,7 @@ func (tb *Builder) setRows() error {
 					header.PrependValue(tables.EmptyValue)
 					footer.PrependValue(tables.EmptyValue)
 				}
+
 				row.PrependValue(tables.EmptyValue)
 			}
 
@@ -125,8 +130,7 @@ func (tb *Builder) setColors() {
 		valuesRowFgColor := text.Colors{fgWhite}
 
 		var handler = func(row table.Row) text.Colors {
-			switch tb.tableType {
-			case enums.TableTypeValidatorReports:
+			if tb.tableType == enums.TableTypeValidatorReports {
 				valueString, ok := row[1].(string)
 				if !ok {
 					return valuesRowFgColor
@@ -137,31 +141,31 @@ func (tb *Builder) setColors() {
 					return valuesRowFgColor
 				}
 
-				if slashingPct > 100 {
+				if slashingPct > slashingPct100 {
 					return text.Colors{bgRed, fgWhite}
 				}
 
-				if slashingPct > 50 {
+				if slashingPct > slashingPct50 {
 					return text.Colors{bgYellow, fgBlack}
 				}
 
 				return valuesRowFgColor
-			default:
-				for _, column := range row {
-					switch value := column.(type) {
-					case int, int16, int32, int64:
+			}
+
+			for _, column := range row {
+				switch value := column.(type) {
+				case int, int16, int32, int64:
+					return valuesRowFgColor
+				case bool:
+					return valuesRowFgColor
+				case string:
+					if _, err := strconv.Atoi(value); err == nil {
 						return valuesRowFgColor
-					case bool:
-						return valuesRowFgColor
-					case string:
-						if _, err := strconv.Atoi(value); err == nil {
-							return valuesRowFgColor
-						}
 					}
 				}
-
-				return text.Colors{fgBlack, bgWhite}
 			}
+
+			return text.Colors{fgBlack, bgWhite}
 		}
 
 		return handler

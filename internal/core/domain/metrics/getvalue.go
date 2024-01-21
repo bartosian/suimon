@@ -10,9 +10,13 @@ import (
 	"github.com/bartosian/suimon/internal/core/domain/enums"
 )
 
+const secondsInHour = 60
+
 type MetricValue interface{}
 
 // GetValue returns the metric value for the given metric type.
+//
+//nolint:gocyclo // temporary disabled.
 func (metrics *Metrics) GetValue(metric enums.MetricType) MetricValue {
 	switch metric {
 	case enums.MetricTypeSuiSystemState:
@@ -75,6 +79,10 @@ func (metrics *Metrics) GetValue(metric enums.MetricType) MetricValue {
 		return metrics.TotalSignatureErrors
 	case enums.MetricTypeNonConsensusLatencySum:
 		return metrics.NonConsensusLatency
+	case enums.MetricTypeValidatorsApy:
+		return nil
+	case enums.MetricTypeProtocol:
+		return nil
 	default:
 		return nil
 	}
@@ -102,7 +110,7 @@ func (metrics *Metrics) GetMillisecondsTillNextEpoch() (int64, error) {
 func (metrics *Metrics) GetTimeUntilNextEpochDisplay() []string {
 	duration := time.Duration(metrics.TimeTillNextEpoch) * time.Millisecond
 	hours := int(duration.Hours())
-	minutes := int(duration.Minutes()) - (hours * 60)
+	minutes := int(duration.Minutes()) - (hours * secondsInHour)
 	second := time.Now().Second()
 
 	if hours < 0 {

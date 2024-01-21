@@ -10,7 +10,7 @@ import (
 const (
 	TableNoData    = "no data"
 	EmptyValue     = ""
-	RpcPortDefault = "9000"
+	RPCPortDefault = "9000"
 )
 
 type (
@@ -62,6 +62,7 @@ func (cols ColumnsConfig) SetNoDataValue() ColumnsConfig {
 	for idx, col := range cols {
 		newCols[idx] = *col.SetNoDataValue()
 	}
+
 	return newCols
 }
 
@@ -73,6 +74,7 @@ func (cols ColumnsConfig) SetColumnValues(values ColumnValues) {
 		if value, ok := values[idx]; ok {
 			newCol.SetValue(value)
 		}
+
 		cols[idx] = newCol
 	}
 }

@@ -53,6 +53,7 @@ func (c *Controller) chooseConfiguration() error {
 
 	c.selectedConfig = c.configs[selectedConfigName.Value]
 	c.network = selectedConfigName.Value
+
 	return nil
 }
 
@@ -219,8 +220,11 @@ func (c *Controller) selectHostForDashboard() (*domainhost.Host, error) {
 
 	// Create a list of host addresses for the user to select from.
 	hostAddresses := make([]string, len(hosts))
-	for i, host := range hosts {
-		hostAddresses[i] = host.Endpoint.Address
+
+	for idx := range hosts {
+		host := hosts[idx]
+
+		hostAddresses[idx] = host.Endpoint.Address
 	}
 
 	// Select the host to render.
@@ -242,7 +246,9 @@ func (c *Controller) selectHostForDashboard() (*domainhost.Host, error) {
 	hostAddress := selectedHostAddress.Value
 
 	// Get the selected host from the slice of pointers.
-	for _, host := range hosts {
+	for idx := range hosts {
+		host := hosts[idx]
+
 		if host.Endpoint.Address == hostAddress {
 			return &host, nil
 		}

@@ -13,11 +13,11 @@ var (
 	messageInfoColor = color.New(color.FgWhite, color.Bold)
 )
 
-func (gateway *Gateway) Info(label string, value string) {
+func (gateway *Gateway) Info(label, value string) {
 	gateway.InfoWithOpts(label, value, MsgOpts{})
 }
 
-func (gateway *Gateway) InfoWithOpts(label string, value string, opts MsgOpts) {
+func (gateway *Gateway) InfoWithOpts(label, value string, opts MsgOpts) {
 	labelLine := gateway.infoLabel(label, opts.Indent)
 
 	valueLine := ""

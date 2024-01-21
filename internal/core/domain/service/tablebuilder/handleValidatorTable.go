@@ -1,3 +1,4 @@
+//nolint:dupl // temporary disabled
 package tablebuilder
 
 import (
@@ -23,12 +24,14 @@ func (tb *Builder) handleValidatorTable(hosts []domainhost.Host) error {
 		return left.Metrics.HighestSyncedCheckpoint > right.Metrics.HighestSyncedCheckpoint
 	})
 
-	for idx, host := range hosts {
+	for idx := range hosts {
+		host := hosts[idx]
+
 		if !host.Metrics.Updated {
 			continue
 		}
 
-		columnValues := tables.GetValidatorColumnValues(idx, host)
+		columnValues := tables.GetValidatorColumnValues(idx, &host)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
 		tableConfig.RowsCount++

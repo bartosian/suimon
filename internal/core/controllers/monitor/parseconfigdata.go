@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
-	"github.com/bartosian/suimon/internal/core/domain/release"
+	domainmetrics "github.com/bartosian/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/suimon/internal/pkg/progress"
 )
 
@@ -37,10 +37,12 @@ func (c *Controller) ParseConfigData(monitorType enums.MonitorType) error {
 	tablesToParse := c.determineTablesToParse(monitorType)
 
 	errChan := make(chan error, len(tablesToParse))
+
 	var wg sync.WaitGroup
 
 	for _, tableType := range tablesToParse {
 		wg.Add(1)
+
 		go func(table enums.TableType) {
 			defer wg.Done()
 
@@ -63,6 +65,7 @@ func (c *Controller) ParseConfigData(monitorType enums.MonitorType) error {
 // The function returns a slice of tables to parse.
 func (c *Controller) determineTablesToParse(monitorType enums.MonitorType) []enums.TableType {
 	var tablesToParse []enums.TableType
+
 	switch monitorType {
 	case enums.MonitorTypeStatic:
 		tablesToParse = make([]enums.TableType, 0, len(c.selectedTables))
@@ -86,6 +89,7 @@ func checkErrors(errChan <-chan error) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -130,7 +134,7 @@ func (c *Controller) getTableData(tableType enums.TableType) error {
 // processReleases fetches the release data for the current network.
 // It stores the fetched releases in the Controller's state and returns any error encountered during the process.
 func (c *Controller) processReleases() error {
-	releases, err := release.GetReleases(c.network)
+	releases, err := domainmetrics.GetReleases(c.network)
 	if err != nil {
 		return fmt.Errorf("error getting releases: %w", err)
 	}
@@ -165,7 +169,6 @@ func (c *Controller) processStandardTableTypes(tableType enums.TableType) error 
 // The function retrieves the relevant metric for each host, sorts the hosts by their metric values, and updates the CheckerController's internal state accordingly.
 // Returns an error if the specified table type is invalid or if there is an issue sorting the hosts based on their corresponding metric values.
 func (c *Controller) sortHosts(tableType enums.TableType) error {
-
 	if tableType == enums.TableTypeGasPriceAndSubsidy {
 		return nil
 	}
@@ -206,12 +209,12 @@ func (c *Controller) setHostsHealth(tableType enums.TableType) error {
 		checkpointSyncBacklog := metrics.HighestKnownCheckpoint - metrics.HighestSyncedCheckpoint
 
 		// Set transaction sync percentage.
-		if err := hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, rpcHost); err != nil {
+		if err := hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, &rpcHost); err != nil {
 			return fmt.Errorf("error setting transaction sync percentage for host: %w", err)
 		}
 
 		// Set checkpoint sync percentage.
-		if err := hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, rpcHost); err != nil {
+		if err := hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, &rpcHost); err != nil {
 			return fmt.Errorf("error setting checkpoint sync percentage for host: %w", err)
 		}
 
@@ -226,7 +229,7 @@ func (c *Controller) setHostsHealth(tableType enums.TableType) error {
 		}
 
 		// Set host status.
-		hosts[idx].SetStatus(rpcHost)
+		hosts[idx].SetStatus(&rpcHost)
 	}
 
 	return nil

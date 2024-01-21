@@ -6,49 +6,49 @@ import (
 	"github.com/mum4k/termdash/cell"
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
-	"github.com/bartosian/suimon/internal/core/domain/host"
+	domainhost "github.com/bartosian/suimon/internal/core/domain/host"
 )
 
 var (
 	ColumnsConfigValidator = ColumnsConfig{
 		// Overview section
-		enums.ColumnNameCurrentEpoch: 20,
-		enums.ColumnNameUptime:       25,
-		enums.ColumnNameVersion:      25,
-		enums.ColumnNameCommit:       25,
+		enums.ColumnNameCurrentEpoch: ColumnWidth20,
+		enums.ColumnNameUptime:       ColumnWidth25,
+		enums.ColumnNameVersion:      ColumnWidth25,
+		enums.ColumnNameCommit:       ColumnWidth25,
 
 		// Transactions section
-		enums.ColumnNameTotalTransactionCertificates: 33,
-		enums.ColumnNameTotalTransactionEffects:      33,
-		enums.ColumnNameCertificatesCreated:          33,
-		enums.ColumnNameCertificatesPerSecond:        49,
+		enums.ColumnNameTotalTransactionCertificates: ColumnWidth33,
+		enums.ColumnNameTotalTransactionEffects:      ColumnWidth33,
+		enums.ColumnNameCertificatesCreated:          ColumnWidth33,
+		enums.ColumnNameCertificatesPerSecond:        ColumnWidth49,
 
 		// Checkpoints section
-		enums.ColumnNameLastExecutedCheckpoint:  33,
-		enums.ColumnNameHighestKnownCheckpoint:  33,
-		enums.ColumnNameHighestSyncedCheckpoint: 33,
-		enums.ColumnNameCheckSyncPercentage:     49,
-		enums.ColumnNameCheckpointsPerSecond:    49,
+		enums.ColumnNameLastExecutedCheckpoint:  ColumnWidth33,
+		enums.ColumnNameHighestKnownCheckpoint:  ColumnWidth33,
+		enums.ColumnNameHighestSyncedCheckpoint: ColumnWidth33,
+		enums.ColumnNameCheckSyncPercentage:     ColumnWidth49,
+		enums.ColumnNameCheckpointsPerSecond:    ColumnWidth49,
 
 		// Rounds section
-		enums.ColumnNameCurrentRound:          33,
-		enums.ColumnNameHighestProcessedRound: 33,
-		enums.ColumnNameLastCommittedRound:    33,
-		enums.ColumnNameRoundsPerSecond:       49,
+		enums.ColumnNameCurrentRound:          ColumnWidth33,
+		enums.ColumnNameHighestProcessedRound: ColumnWidth33,
+		enums.ColumnNameLastCommittedRound:    ColumnWidth33,
+		enums.ColumnNameRoundsPerSecond:       ColumnWidth49,
 
 		// Peers section
-		enums.ColumnNameNetworkPeers:        19,
-		enums.ColumnNamePrimaryNetworkPeers: 19,
-		enums.ColumnNameWorkerNetworkPeers:  19,
+		enums.ColumnNameNetworkPeers:        ColumnWidth19,
+		enums.ColumnNamePrimaryNetworkPeers: ColumnWidth19,
+		enums.ColumnNameWorkerNetworkPeers:  ColumnWidth19,
 
 		// Performance section
-		enums.ColumnNameSkippedConsensusTransactions: 19,
-		enums.ColumnNameTotalSignatureErrors:         19,
+		enums.ColumnNameSkippedConsensusTransactions: ColumnWidth19,
+		enums.ColumnNameTotalSignatureErrors:         ColumnWidth19,
 	}
 
 	RowsConfigValidator = RowsConfig{
 		0: {
-			Height: 14,
+			Height: ColumnWidth14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameCurrentEpoch,
 				enums.ColumnNameUptime,
@@ -57,7 +57,7 @@ var (
 			},
 		},
 		1: {
-			Height: 14,
+			Height: ColumnWidth14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameNetworkPeers,
 				enums.ColumnNamePrimaryNetworkPeers,
@@ -67,7 +67,7 @@ var (
 			},
 		},
 		2: {
-			Height: 14,
+			Height: ColumnWidth14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameLastExecutedCheckpoint,
 				enums.ColumnNameHighestKnownCheckpoint,
@@ -75,14 +75,14 @@ var (
 			},
 		},
 		3: {
-			Height: 14,
+			Height: ColumnWidth14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameCheckSyncPercentage,
 				enums.ColumnNameCheckpointsPerSecond,
 			},
 		},
 		4: {
-			Height: 14,
+			Height: ColumnWidth14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameTotalTransactionCertificates,
 				enums.ColumnNameTotalTransactionEffects,
@@ -90,7 +90,7 @@ var (
 			},
 		},
 		5: {
-			Height: 14,
+			Height: ColumnWidth14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameCurrentRound,
 				enums.ColumnNameHighestProcessedRound,
@@ -98,7 +98,7 @@ var (
 			},
 		},
 		6: {
-			Height: 14,
+			Height: ColumnWidth14,
 			Columns: []enums.ColumnName{
 				enums.ColumnNameCertificatesPerSecond,
 				enums.ColumnNameRoundsPerSecond,
@@ -138,7 +138,7 @@ var (
 // GetValidatorColumnValues returns a map of ColumnName values to corresponding values for a node at the specified index on the specified host.
 // The function retrieves information about the node from the host's internal state and formats it into a map of NodeColumnName keys and corresponding values.
 // The function also includes emoji values in the map if the specified flag is true.
-func GetValidatorColumnValues(host host.Host) (ColumnValues, error) {
+func GetValidatorColumnValues(host *domainhost.Host) (ColumnValues, error) {
 	return ColumnValues{
 		enums.ColumnNameTotalTransactionCertificates:            host.Metrics.TotalTransactionCertificates,
 		enums.ColumnNameTotalTransactionEffects:                 host.Metrics.TotalTransactionEffects,
