@@ -15,9 +15,9 @@ const rpcClientTimeout = 3 * time.Second
 
 type Gateway struct {
 	ctx        context.Context
-	url        string
 	client     jsonrpc.RPCClient
 	cliGateway *cligw.Gateway
+	url        string
 }
 
 func NewGateway(cliGW *cligw.Gateway, url string) ports.RPCGateway {

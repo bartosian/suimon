@@ -23,13 +23,13 @@ type Gateways struct {
 type Host struct {
 	AddressInfo
 
+	gateways Gateways
+	IPInfo   *ports.IPResult
+
 	TableType enums.TableType
 
 	Status  enums.Status
-	IPInfo  *ports.IPResult
 	Metrics metrics.Metrics
-
-	gateways Gateways
 }
 
 func NewHost(

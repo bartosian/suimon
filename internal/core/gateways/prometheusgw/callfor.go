@@ -49,9 +49,9 @@ func (gateway *Gateway) CallFor(metrics ports.Metrics) (result ports.MetricsResu
 
 	go func() {
 		//nolint:bodyclose // The response body is closed below to handle the response properly.
-		resp, err := gateway.client.Do(req)
+		resp, reqErr := gateway.client.Do(req)
 
-		respChan <- responseWithError{response: resp, err: err}
+		respChan <- responseWithError{response: resp, err: reqErr}
 	}()
 
 	select {

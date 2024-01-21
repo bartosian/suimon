@@ -27,6 +27,7 @@ linters:
     - dogsled
     - dupl
     - errcheck
+    - govet
     - exportloopref
     - exhaustive
     - goconst

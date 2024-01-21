@@ -14,8 +14,8 @@ type RowsConfig []RowConfig
 // RowConfig is a type that represents the configuration for a single row in a grid.
 // It contains a height and a list of column names that should be included in the row.
 type RowConfig struct {
-	Height  int
 	Columns []enums.ColumnName
+	Height  int
 }
 
 // Rows is a type that represents a set of grid rows, each of which is an element in the grid.

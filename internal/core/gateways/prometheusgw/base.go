@@ -13,9 +13,9 @@ const httpClientTimeout = 3 * time.Second
 
 type Gateway struct {
 	ctx        context.Context
-	url        string
 	client     *http.Client
 	cliGateway *cligw.Gateway
+	url        string
 }
 
 func NewGateway(cliGW *cligw.Gateway, url string) ports.PrometheusGateway {

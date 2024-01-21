@@ -19,12 +19,12 @@ const slashingPct50 = 50
 const slashingPct100 = 50
 
 type Builder struct {
+	writer     table.Writer
+	cliGateway *cligw.Gateway
+	config     *tables.TableConfig
 	tableType  enums.TableType
 	hosts      []host.Host
 	Releases   []metrics.Release
-	cliGateway *cligw.Gateway
-	writer     table.Writer
-	config     *tables.TableConfig
 }
 
 // NewBuilder creates a new instance of the table builder, using the CLI gateway

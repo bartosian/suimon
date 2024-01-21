@@ -21,15 +21,15 @@ type GeoGateway interface {
 }
 
 type MetricResult struct {
-	Value  float64
 	Labels prometheus.Labels
+	Value  float64
 }
 
 type MetricsResult map[enums.PrometheusMetricName]MetricResult
 
 type MetricConfig struct {
-	MetricType enums.PrometheusMetricType
 	Labels     prometheus.Labels
+	MetricType enums.PrometheusMetricType
 }
 
 type Metrics map[enums.PrometheusMetricName]MetricConfig
@@ -41,7 +41,7 @@ type Company struct {
 }
 
 type IPResult struct {
-	IP           net.IP
+	Company      *Company
 	Hostname     string
 	City         string
 	Region       string
@@ -49,5 +49,5 @@ type IPResult struct {
 	CountryName  string
 	CountryEmoji string
 	Location     string
-	Company      *Company
+	IP           net.IP
 }

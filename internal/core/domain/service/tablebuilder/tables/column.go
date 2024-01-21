@@ -21,8 +21,8 @@ type (
 	ColumnValues map[enums.ColumnName]any
 
 	Column struct {
-		Values []any
 		Config *table.ColumnConfig
+		Values []any
 	}
 )
 

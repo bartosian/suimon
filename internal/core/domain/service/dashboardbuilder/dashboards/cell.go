@@ -34,9 +34,9 @@ type Cells map[enums.ColumnName]*Cell
 
 // Cell is a struct that represents a single cell in a dashboard grid. It contains a widget and a list of options.
 type Cell struct {
+	LastUpdatedAt time.Time
 	Widget        widgetapi.Widget
 	Options       []container.Option
-	LastUpdatedAt time.Time
 }
 
 // NewCell is a function that creates a new Cell struct given a cellName and a widget. It returns a pointer to the new Cell and an error (if any).

@@ -31,13 +31,13 @@ func (gateway *Gateway) InfoWithOpts(label, value string, opts MsgOpts) {
 }
 
 func (Gateway) infoLabel(label string, indent int) string {
-	var icon string
+	var newIcon string
 
 	for icon, i := infoIcon, indent; i > 0; i-- {
-		icon = fmt.Sprintf("  %s", icon)
+		newIcon = fmt.Sprintf("  %s", icon)
 	}
 
-	bang := iconInfoColor.Sprint(icon)
+	bang := iconInfoColor.Sprint(newIcon)
 	formattedLabel := messageInfoColor.Sprint(label)
 
 	return fmt.Sprintf("%s %s", bang, formattedLabel)

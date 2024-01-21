@@ -18,13 +18,13 @@ import (
 
 type Builder struct {
 	ctx        context.Context
-	tableType  enums.TableType
 	cliGateway *cligw.Gateway
 	terminal   *termbox.Terminal
 	dashboard  *container.Container
 	host       *domainhost.Host
 	cells      dashboards.Cells
 	quitter    func(k *terminalapi.Keyboard)
+	tableType  enums.TableType
 }
 
 // NewBuilder creates a new Builder instance with the provided CLI gateway.

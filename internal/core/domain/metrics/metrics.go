@@ -16,6 +16,8 @@ const (
 type (
 	// Transactions represents information about transactions on the Sui blockchain network.
 	Transactions struct {
+		TransactionsHistory          []int
+		CertificatesHistory          []int
 		TotalTransactionsBlocks      int
 		TotalTransactionCertificates int
 		CertificatesCreated          int
@@ -24,12 +26,11 @@ type (
 		TotalTransactionEffects      int
 		TransactionsPerSecond        int
 		TxSyncPercentage             int
-		TransactionsHistory          []int
-		CertificatesHistory          []int
 	}
 
 	// Checkpoints represents information about checkpoints on the Sui blockchain network.
 	Checkpoints struct {
+		CheckpointsHistory      []int
 		LatestCheckpoint        int
 		HighestKnownCheckpoint  int
 		HighestSyncedCheckpoint int
@@ -38,16 +39,15 @@ type (
 		CheckpointExecBacklog   int
 		CheckpointSyncBacklog   int
 		CheckSyncPercentage     int
-		CheckpointsHistory      []int
 	}
 
 	// Rounds represents information about rounds on the Sui blockchain network.
 	Rounds struct {
+		RoundsHistory         []int
 		CurrentRound          int
 		HighestProcessedRound int
 		RoundsPerSecond       int
 		LastCommittedRound    int
-		RoundsHistory         []int
 	}
 
 	// Peers represents information about peers on the Sui blockchain network.
@@ -59,11 +59,11 @@ type (
 
 	// Epoch represents information about the current epoch on the Sui blockchain network.
 	Epoch struct {
-		CurrentEpoch             int
 		EpochStartTimeUTC        string
-		EpochTotalDuration       int
 		EpochDurationHHMM        string
 		DurationTillEpochEndHHMM string
+		CurrentEpoch             int
+		EpochTotalDuration       int
 		EpochPercentage          int
 		TimeTillNextEpoch        int64
 	}
@@ -86,23 +86,24 @@ type (
 
 	// Metrics represents various metrics about the Sui blockchain network.
 	Metrics struct {
-		Updated bool
-
-		SystemState         SuiSystemState
 		ValidatorsApyParsed ValidatorsApyParsed
 
 		Uptime  string
 		Version string
 		Commit  string
 
-		Transactions
-		Checkpoints
+		SystemState SuiSystemState
+
+		Epoch
 		Protocol
 		Rounds
-		Peers
-		Epoch
+
+		Transactions
+		Checkpoints
 		GasPrice
+		Peers
 		Errors
+		Updated bool
 	}
 )
 

@@ -3,9 +3,9 @@ package cligw
 type (
 	SelectChoiceList []SelectChoice
 	SelectChoice     struct {
+		Data  any
 		Label string
 		Value string
-		Data  any
 	}
 )
 
