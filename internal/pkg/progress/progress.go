@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/schollz/progressbar/v3"
+	progressbar "github.com/schollz/progressbar/v3"
 )
 
 type Color string
