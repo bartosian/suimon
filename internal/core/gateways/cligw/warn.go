@@ -35,7 +35,7 @@ func (Gateway) WarnWithOpts(msg string, opts MsgOpts) {
 
 	formattedIcon := iconWarnColor.Sprint(icon)
 	formattedMsg := messageWarnColor.Sprint(msg)
-	
+
 	result := fmt.Sprintf("%s  %s", formattedIcon, formattedMsg)
 
 	fmt.Println(result)
