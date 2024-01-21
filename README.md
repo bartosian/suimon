@@ -28,6 +28,7 @@ So if you're looking for a powerful, reliable tool for monitoring the SUI networ
     - [Windows](#windows)
   - [Build and Installation from Source](#build-and-installation-from-source)
   - [Installation using Homebrew](#installation-using-homebrew)
+  - [Upgrading Suimon using Homebrew](#upgrading-suimon-using-homebrew)
   - [Suimon Configuration Files](#suimon-configuration-files)
     - [Example Suimon Config Directory](#example-suimon-config-directory)
     - [Suimon Configuration Fields](#suimon-configuration-fields)
@@ -156,6 +157,48 @@ For macOS users, suimon can be seamlessly installed using the Homebrew package m
 
    - Following the installation, it's essential to set up the suimon configuration file. Detailed instructions for this setup are provided in the subsequent section of this document.
      Upon completion of these steps, suimon will be configured and ready for use on your macOS system.
+
+## Upgrading Suimon using Homebrew
+
+For macOS users who have previously installed Suimon via Homebrew, upgrading to the latest version can be done efficiently. Follow these steps to ensure Suimon is up-to-date and functioning optimally.
+
+1. **Update Homebrew Repository**
+
+   - Before upgrading, ensure your Homebrew repository is up to date:
+     ```
+     brew update
+     ```
+
+2. **Upgrade Suimon**
+
+   - Once the repository is updated, proceed to upgrade Suimon:
+     ```
+     brew upgrade suimon
+     ```
+
+3. **Verify the Upgrade**
+
+   - After the upgrade, it's a good practice to check the installed version of Suimon:
+     ```
+     suimon version
+     ```
+Occasionally, cache-related issues might occur, causing problems with the installation or upgrade process. To resolve these issues:
+
+1. **Clear Homebrew Cache**
+
+   - Clear the Homebrew cache to remove any corrupted or outdated files:
+     ```
+     brew cleanup
+     ```
+
+2. **Reinstall Suimon (Optional)**
+
+   - If issues persist after cleaning the cache, a fresh reinstall of Suimon might be necessary:
+     ```
+     brew reinstall suimon
+     ```
+
+For macOS users, suimon can be seamlessly installed using the Homebrew package manager. Please adhere to the subsequent steps to facilitate the installation.     
   
 ## Suimon Configuration Files
 
@@ -300,11 +343,13 @@ Tables are static monitors that provide a detailed snapshot of the network and i
 | 📡 PUBLIC RPC             | Displays detailed information about the network's RPC endpoints.              |
 | 💻 FULL NODES             | Displays detailed information about the network's nodes.                      |
 | 🤖 VALIDATORS             | Displays detailed information about the network's validators.                 |
-| 💾 SYSTEM STATE           | Displays the current gas price and subsidy values for the network.            |
+| 💾 SYSTEM STATE           | Displays the current gas price and subsidy values in the network.             |
+| 🌐 PROTOCOL               | Displays the protocol config for the latest version number.                   |
 | 📊 VALIDATORS PARAMS      | Displays the validators related thresholds and counts on the network.         |
 | 🚨 VALIDATORS AT RISK     | Displays the number of validators that are currently at risk of being slashed.|
 | 📢 VALIDATORS REPORTS     | Displays the latest reports submitted by validators.                          |
 | ✅ ACTIVE VALIDATORS      | Displays the current list of active validators on the network.                |
+| 📈 RELEASE HISTORY        | Displays the release history for the selected network.                        |
 
 ### Table Examples
 
@@ -355,6 +400,12 @@ Tables are static monitors that provide a detailed snapshot of the network and i
   This table provides valuable information about the current list of active validators on the network. This table displays important metrics such as APY, stake, commission, rewards, and other relevant information that can help network administrators monitor the performance of active validators.
   <br><br>
   ![Screenshot of my app](static/images/table-active-validators.png)
+
+- `📈 RELEASE HISTORY`
+  <br><br> 
+  This table presents a comprehensive overview of the release history for specific networks such as mainnet, testnet, among others. It details various releases, including their dates, versions, features, and changes implemented in each network iteration.
+  <br><br>
+  ![Screenshot of my app](static/images/table-releases.png)  
 
 ## Dashboards
 
