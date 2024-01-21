@@ -43,7 +43,7 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 
 			var result responseWithError
 
-			rpcUrl, err := addressInfo.GetUrlRPC()
+			rpcURL, err := addressInfo.GetURLRPC()
 			if err != nil {
 				result.err = err
 				respChan <- result
@@ -51,9 +51,9 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 				return
 			}
 
-			rpcGateway := rpcgw.NewGateway(c.gateways.cli, rpcUrl)
+			rpcGateway := rpcgw.NewGateway(c.gateways.cli, rpcURL)
 
-			metricsUrl, err := addressInfo.GetUrlPrometheus()
+			metricsURL, err := addressInfo.GetURLPrometheus()
 			if err != nil {
 				result.err = err
 				respChan <- result
@@ -61,7 +61,7 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 				return
 			}
 
-			prometheusGateway := prometheusgw.NewGateway(c.gateways.cli, metricsUrl)
+			prometheusGateway := prometheusgw.NewGateway(c.gateways.cli, metricsURL)
 			geoGateway := geogw.NewGateway(c.gateways.cli, c.selectedConfig.IPLookup.AccessToken)
 
 			createdHost := host.NewHost(table, addressInfo, rpcGateway, geoGateway, prometheusGateway, c.gateways.cli)

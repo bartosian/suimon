@@ -41,11 +41,11 @@ type Cell struct {
 
 // NewCell is a function that creates a new Cell struct given a cellName and a widget. It returns a pointer to the new Cell and an error (if any).
 func NewCell(cellName string, color cell.Color, widget widgetapi.Widget) (*Cell, error) {
-	options := append(CellConfigDefault, container.BorderTitle(cellName), container.BorderColor(color))
+	CellConfigDefault = append(CellConfigDefault, container.BorderTitle(cellName), container.BorderColor(color))
 
 	dashCell := Cell{
 		Widget:        widget,
-		Options:       options,
+		Options:       CellConfigDefault,
 		LastUpdatedAt: time.Now(),
 	}
 
@@ -98,7 +98,7 @@ func writeToTextWidget(widget *text.Text, value any) error {
 	}
 
 	valueString = log.RemoveNonPrintableChars(valueString)
-	if len(valueString) == 0 {
+	if valueString == "" {
 		return nil
 	}
 

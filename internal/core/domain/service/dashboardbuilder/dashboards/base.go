@@ -18,90 +18,91 @@ const (
 	emptyRowHeight = 1
 )
 
-var (
-	DashboardConfigDefault = []container.Option{
-		container.Border(linestyle.Light),
-		container.BorderColor(cell.ColorGreen),
-		container.BorderTitle(dashboardName),
-		container.FocusedColor(cell.ColorGreen),
-		container.AlignHorizontal(align.HorizontalCenter),
-		container.AlignVertical(align.VerticalMiddle),
-		container.TitleColor(cell.ColorRed),
-		container.TitleFocusedColor(cell.ColorRed),
-		container.Focused(),
-	}
+var DashboardConfigDefault = []container.Option{
+	container.Border(linestyle.Light),
+	container.BorderColor(cell.ColorGreen),
+	container.BorderTitle(dashboardName),
+	container.FocusedColor(cell.ColorGreen),
+	container.AlignHorizontal(align.HorizontalCenter),
+	container.AlignVertical(align.VerticalMiddle),
+	container.TitleColor(cell.ColorRed),
+	container.TitleFocusedColor(cell.ColorRed),
+	container.Focused(),
+}
 
-	CellConfigDefault = []container.Option{
-		container.Border(linestyle.Light),
-		container.AlignVertical(align.VerticalMiddle),
-		container.AlignHorizontal(align.HorizontalCenter),
-		container.TitleColor(cell.ColorRed),
-		container.FocusedColor(cell.ColorWhite),
-	}
-)
+var CellConfigDefault = []container.Option{
+	container.Border(linestyle.Light),
+	container.AlignVertical(align.VerticalMiddle),
+	container.AlignHorizontal(align.HorizontalCenter),
+	container.TitleColor(cell.ColorRed),
+	container.FocusedColor(cell.ColorWhite),
+}
 
 // GetColumnsConfig returns the columns configuration based on the specified dashboard type.
 func GetColumnsConfig(dashboard enums.TableType) (ColumnsConfig, error) {
-	switch dashboard {
-	case enums.TableTypeNode:
-		return ColumnsConfigNode, nil
-	case enums.TableTypeValidator:
-		return ColumnsConfigValidator, nil
-	case enums.TableTypeRPC:
-		return ColumnsConfigRPC, nil
-	case enums.TableTypeGasPriceAndSubsidy:
-		return ColumnsConfigSystemState, nil
-	default:
+	configMap := map[enums.TableType]ColumnsConfig{
+		enums.TableTypeNode:               ColumnsConfigNode,
+		enums.TableTypeValidator:          ColumnsConfigValidator,
+		enums.TableTypeRPC:                ColumnsConfigRPC,
+		enums.TableTypeGasPriceAndSubsidy: ColumnsConfigSystemState,
+	}
+
+	config, ok := configMap[dashboard]
+	if !ok {
 		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
+
+	return config, nil
 }
 
 // GetColumnsValues returns the columns values based on the specified dashboard type and host.
-func GetColumnsValues(dashboard enums.TableType, host domainhost.Host) (ColumnValues, error) {
-	switch dashboard {
-	case enums.TableTypeNode:
-		return GetNodeColumnValues(host), nil
-	case enums.TableTypeValidator:
-		return GetValidatorColumnValues(host), nil
-	case enums.TableTypeRPC:
-		return GetRPCColumnValues(host), nil
-	case enums.TableTypeGasPriceAndSubsidy:
-		return GeSystemStateColumnValues(host)
-	default:
-		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
+func GetColumnsValues(dashboard enums.TableType, host *domainhost.Host) (ColumnValues, error) {
+	columnsValuesFuncMap := map[enums.TableType]func(*domainhost.Host) (ColumnValues, error){
+		enums.TableTypeNode:               GetNodeColumnValues,
+		enums.TableTypeValidator:          GetValidatorColumnValues,
+		enums.TableTypeRPC:                GetRPCColumnValues,
+		enums.TableTypeGasPriceAndSubsidy: GeSystemStateColumnValues,
 	}
+
+	if columnValuesFunc, ok := columnsValuesFuncMap[dashboard]; ok {
+		return columnValuesFunc(host)
+	}
+
+	return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 }
 
 // GetRowsConfig returns the rows configuration based on the specified dashboard type.
 func GetRowsConfig(dashboard enums.TableType) (RowsConfig, error) {
-	switch dashboard {
-	case enums.TableTypeNode:
-		return RowsConfigNode, nil
-	case enums.TableTypeValidator:
-		return RowsConfigValidator, nil
-	case enums.TableTypeRPC:
-		return RowsConfigRPC, nil
-	case enums.TableTypeGasPriceAndSubsidy:
-		return RowsConfigSystemState, nil
-	default:
+	rowsConfigMap := map[enums.TableType]RowsConfig{
+		enums.TableTypeNode:               RowsConfigNode,
+		enums.TableTypeValidator:          RowsConfigValidator,
+		enums.TableTypeRPC:                RowsConfigRPC,
+		enums.TableTypeGasPriceAndSubsidy: RowsConfigSystemState,
+	}
+
+	config, ok := rowsConfigMap[dashboard]
+	if !ok {
 		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
+
+	return config, nil
 }
 
 // GetCellsConfig returns the cells configuration based on the specified dashboard type.
 func GetCellsConfig(dashboard enums.TableType) (CellsConfig, error) {
-	switch dashboard {
-	case enums.TableTypeNode:
-		return CellsConfigNode, nil
-	case enums.TableTypeValidator:
-		return CellsConfigValidator, nil
-	case enums.TableTypeRPC:
-		return CellsConfigRPC, nil
-	case enums.TableTypeGasPriceAndSubsidy:
-		return CellsConfigSystemState, nil
-	default:
+	cellsConfigMap := map[enums.TableType]CellsConfig{
+		enums.TableTypeNode:               CellsConfigNode,
+		enums.TableTypeValidator:          CellsConfigValidator,
+		enums.TableTypeRPC:                CellsConfigRPC,
+		enums.TableTypeGasPriceAndSubsidy: CellsConfigSystemState,
+	}
+
+	config, ok := cellsConfigMap[dashboard]
+	if !ok {
 		return nil, fmt.Errorf("unknown dashboard type: %v", dashboard)
 	}
+
+	return config, nil
 }
 
 // GetColumns returns a slice of Columns based on the given ColumnsConfig and Cells.
@@ -128,7 +129,7 @@ func GetColumns(columnsConfig ColumnsConfig, cells Cells) (Columns, error) {
 // and a Columns object that maps column names to column objects.
 // It returns a Rows object and an error. The Rows object is a slice of Row objects,
 // where each Row object represents a row in the terminal grid.
-func GetRows(rowsConfig RowsConfig, cells Cells, columns Columns) (Rows, error) {
+func GetRows(rowsConfig RowsConfig, columns Columns) (Rows, error) {
 	rows := make(Rows, 0, len(rowsConfig))
 
 	for _, rowConfig := range rowsConfig {

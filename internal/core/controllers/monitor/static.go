@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
+	"github.com/bartosian/suimon/internal/core/domain/host"
+	"github.com/bartosian/suimon/internal/core/domain/metrics"
 	"github.com/bartosian/suimon/internal/core/domain/service/tablebuilder"
 )
 
@@ -28,22 +30,25 @@ func (c *Controller) Static() error {
 // It retrieves the corresponding hosts for each table and initializes the table builder.
 // If an error occurs during table initialization, it returns an error.
 func (c *Controller) InitTables() error {
-	selectedTables := c.selectedTables
+	for _, tableType := range c.selectedTables {
+		var hosts []host.Host
 
-	for _, tableType := range selectedTables {
-		hosts, err := c.getHostsByTableType(tableType)
-		if err != nil {
-			return err
+		var releases []metrics.Release
+
+		if tableType == enums.TableTypeReleases {
+			releases = c.releases
+		} else {
+			hosts, _ = c.getHostsByTableType(tableType)
 		}
 
-		if len(hosts) == 0 {
+		if len(hosts) == 0 && len(releases) == 0 {
 			continue
 		}
 
-		builder := tablebuilder.NewBuilder(tableType, hosts, c.gateways.cli)
+		builder := tablebuilder.NewBuilder(tableType, hosts, releases, c.gateways.cli)
 		c.builders.static[tableType] = builder
 
-		if err = builder.Init(); err != nil {
+		if err := builder.Init(); err != nil {
 			return fmt.Errorf("error initializing table %s: %w", tableType, err)
 		}
 	}

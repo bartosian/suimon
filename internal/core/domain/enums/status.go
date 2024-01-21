@@ -6,6 +6,8 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
+const statusWidgetLength = 100
+
 type Status string
 
 const (
@@ -29,15 +31,16 @@ func (i Status) ColorStatus() string {
 		colors = append(colors, text.BgYellow, text.FgYellow)
 	case StatusGreen:
 		colors = append(colors, text.BgGreen, text.FgGreen)
+	case StatusGrey:
 	}
 
 	return colors.Sprint("|    |")
 }
 
 func (i Status) DashboardStatus() string {
-	statusWidget := make([]string, 100)
+	statusWidget := make([]string, statusWidgetLength)
 
-	repeatedPattern := strings.Repeat("    ", 100)
+	repeatedPattern := strings.Repeat("    ", statusWidgetLength)
 
 	for idx := range statusWidget {
 		statusWidget[idx] = repeatedPattern

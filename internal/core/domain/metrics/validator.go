@@ -9,6 +9,8 @@ import (
 	"strconv"
 )
 
+const number2 = 2
+
 // Validators represents a validator nodes on the Sui blockchain network.
 type (
 	Validators         []*Validator
@@ -64,7 +66,7 @@ func (validators Validators) GetMaxRefGasPrice() (int, error) {
 		return 0, nil
 	}
 
-	var maxRefGasPrice int = math.MinInt
+	var maxRefGasPrice = math.MinInt
 
 	for _, validator := range validators {
 		validatorGasPrice, err := strconv.Atoi(validator.NextEpochGasPrice)
@@ -128,7 +130,7 @@ func (validators Validators) GetMedianRefGasPrice() (int, error) {
 	})
 
 	if len(validators)%2 == 0 {
-		return (gasPrices[len(validators)/2-1] + gasPrices[len(validators)/2]) / 2, nil
+		return (gasPrices[len(validators)/2-1] + gasPrices[len(validators)/2]) / number2, nil
 	}
 
 	return gasPrices[len(validators)/2], nil
@@ -209,21 +211,23 @@ func (validators Validators) GetNextRefGasPrice() (int, error) {
 	})
 
 	for _, validator := range validators {
-		if cumulativePower < validatorsQuorum {
-			validatorGasPrice, err := strconv.Atoi(validator.NextEpochGasPrice)
-			if err != nil {
-				return 0, fmt.Errorf("unexpected metric value type for NextEpochGasPrice: %s", validator.NextEpochGasPrice)
-			}
-
-			referenceGasPrice = validatorGasPrice
-
-			validatorVotingPower, err := strconv.Atoi(validator.VotingPower)
-			if err != nil {
-				return 0, fmt.Errorf("unexpected metric value type for VotingPower: %s", validator.VotingPower)
-			}
-
-			cumulativePower += validatorVotingPower
+		if cumulativePower > validatorsQuorum {
+			continue
 		}
+
+		validatorGasPrice, err := strconv.Atoi(validator.NextEpochGasPrice)
+		if err != nil {
+			return 0, fmt.Errorf("unexpected metric value type for NextEpochGasPrice: %s", validator.NextEpochGasPrice)
+		}
+
+		referenceGasPrice = validatorGasPrice
+
+		validatorVotingPower, err := strconv.Atoi(validator.VotingPower)
+		if err != nil {
+			return 0, fmt.Errorf("unexpected metric value type for VotingPower: %s", validator.VotingPower)
+		}
+
+		cumulativePower += validatorVotingPower
 	}
 
 	return referenceGasPrice, nil

@@ -20,22 +20,23 @@ var parserMap = map[enums.TableType]addressParser{
 // getAddressInfoByTableType retrieves the list of addresses for hosts that support the specified table type from the CheckerController's internal state.
 // The function returns an error if the specified table type is invalid or if there are no hosts that support the specified table type.
 // Returns a slice of AddressInfo structs and an error if the specified table type is invalid or if there are no hosts that support the specified table type.
-func (c *Controller) getAddressInfoByTableType(table enums.TableType) (addresses []host.AddressInfo, err error) {
+func (c *Controller) getAddressInfoByTableType(table enums.TableType) ([]host.AddressInfo, error) {
+	addressFuncMap := map[enums.TableType]func(parser addressParser) ([]host.AddressInfo, error){
+		enums.TableTypeNode:      c.getNodeAddresses,
+		enums.TableTypeValidator: c.getValidatorAddresses,
+		enums.TableTypeRPC:       c.getRPCAddresses,
+	}
+
 	parser, ok := parserMap[table]
 	if !ok {
 		return nil, fmt.Errorf("invalid table type: %v", table)
 	}
 
-	switch table {
-	case enums.TableTypeNode:
-		return c.getNodeAddresses(parser)
-	case enums.TableTypeValidator:
-		return c.getValidatorAddresses(parser)
-	case enums.TableTypeRPC:
-		return c.getRPCAddresses(parser)
+	if addressFunc, ok := addressFuncMap[table]; ok {
+		return addressFunc(parser)
 	}
 
-	return addresses, nil
+	return nil, fmt.Errorf("address function not found for table type: %v", table)
 }
 
 // getNodeAddresses extracts the JSON-RPC and metrics addresses from the selected config's full nodes and

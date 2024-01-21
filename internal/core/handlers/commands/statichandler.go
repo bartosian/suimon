@@ -1,3 +1,4 @@
+//nolint:dupl // temporary disabled
 package cmdhandlers
 
 import (

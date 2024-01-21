@@ -19,10 +19,14 @@ const (
 	ErrUnsupportedSuiAddressAttr       = "unsupported suiAddress attribute type: %v"
 	utcTimeZone                        = "America/New_York"
 	suiRate                            = 1_000_000_000
+	secondsInDay                       = 86400
+	base10                             = 10
 )
 
 // SetValue updates a metric with the given value, parsing it if necessary.
 // It returns an error if the value type is not supported for the given metric.
+//
+//nolint:gocyclo // temporary disabled
 func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 	metrics.Updated = true
 
@@ -30,9 +34,12 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		return int(math.Round(input))
 	}
 
+	//nolint: exhaustive,gocritic // no need to cover all the cases
 	switch metric {
 	case enums.MetricTypeSuiSystemState:
 		return metrics.SetSystemStateValue(value)
+	case enums.MetricTypeProtocol:
+		return metrics.SetProtocolValue(value)
 	case enums.MetricTypeValidatorsApy:
 		return metrics.SetValidatorsApyValue(value)
 	case enums.MetricTypeTotalTransactionBlocks:
@@ -69,6 +76,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 			if err != nil {
 				return err
 			}
+
 			metrics.LatestCheckpoint = valueInt
 		default:
 			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
@@ -145,7 +153,7 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
-		metrics.Uptime = fmt.Sprintf("%.2f", valueFloat/86400)
+		metrics.Uptime = fmt.Sprintf("%.2f", valueFloat/secondsInDay)
 	case enums.MetricTypeVersion:
 		valueString, ok := value.(string)
 		if !ok {
@@ -496,23 +504,36 @@ func (metrics *Metrics) CalculateCertificatesRatio() {
 // The valueRPC argument is the value retrieved from the Sui RPC endpoint for the corresponding metric.
 // Returns true if the metric value is healthy, false otherwise.
 func (metrics *Metrics) IsHealthy(metric enums.MetricType, valueRPC any) bool {
+	//nolint: exhaustive,gocritic // no need to cover all the cases
 	switch metric {
 	case enums.MetricTypeTotalTransactionBlocks:
 		return metrics.TxSyncPercentage >= TotalTransactionsSyncPercentage
 	case enums.MetricTypeTransactionsPerSecond:
-		valueRPCInt := valueRPC.(int)
+		valueRPCInt, ok := valueRPC.(int)
+		if !ok {
+			return false
+		}
 
 		return metrics.TransactionsPerSecond >= valueRPCInt-TransactionsPerSecondLag
 	case enums.MetricTypeLatestCheckpoint:
-		valueRPCInt := valueRPC.(int)
+		valueRPCInt, ok := valueRPC.(int)
+		if !ok {
+			return false
+		}
 
 		return metrics.CheckSyncPercentage >= TotalCheckpointsSyncPercentage || metrics.LatestCheckpoint >= valueRPCInt-LatestCheckpointLag
 	case enums.MetricTypeHighestSyncedCheckpoint:
-		valueRPCInt := valueRPC.(int)
+		valueRPCInt, ok := valueRPC.(int)
+		if !ok {
+			return false
+		}
 
 		return metrics.CheckSyncPercentage >= TotalCheckpointsSyncPercentage || metrics.HighestSyncedCheckpoint >= valueRPCInt-HighestSyncedCheckpointLag
 	case enums.MetricTypeCheckpointsPerSecond:
-		valueRPCInt := valueRPC.(int)
+		valueRPCInt, ok := valueRPC.(int)
+		if !ok {
+			return false
+		}
 
 		return metrics.CheckpointsPerSecond >= valueRPCInt-CheckpointsPerSecondLag
 	case enums.MetricTypeVersion:
@@ -533,7 +554,7 @@ func (validators Validators) GetMinRefGasPrice() (int, error) {
 		return 0, nil
 	}
 
-	var minRefGasPrice int = math.MaxInt
+	var minRefGasPrice = math.MaxInt
 
 	for _, validator := range validators {
 		validatorGasPrice, err := strconv.Atoi(validator.NextEpochGasPrice)
@@ -553,6 +574,24 @@ func (validators Validators) GetMinRefGasPrice() (int, error) {
 	return minRefGasPrice, nil
 }
 
+func (metrics *Metrics) SetProtocolValue(value any) error {
+	// Parse the JSON data of the Protocol object.
+	dataBytes, err := json.Marshal(value.(map[string]interface{}))
+	if err != nil {
+		return fmt.Errorf(ErrUnexpectedMetricValueType, enums.MetricTypeProtocol, value)
+	}
+
+	// Unmarshal the JSON data into a Protocol struct.
+	var protocol Protocol
+	if err = json.Unmarshal(dataBytes, &protocol); err != nil {
+		return fmt.Errorf(ErrUnexpectedMetricValueType, enums.MetricTypeProtocol, value)
+	}
+
+	metrics.Protocol = protocol
+
+	return nil
+}
+
 // MistToSui converts a string representing a value in "mist" units to its
 // equivalent value in "sui" units.
 //
@@ -562,7 +601,7 @@ func (validators Validators) GetMinRefGasPrice() (int, error) {
 // value cannot be converted to an integer.
 func MistToSui(mist string) (int64, error) {
 	// Convert the input string to an int64
-	mistInt, ok := new(big.Int).SetString(mist, 10)
+	mistInt, ok := new(big.Int).SetString(mist, base10)
 	if !ok {
 		// Return an error if the input value cannot be converted to an integer
 		return 0, fmt.Errorf("unexpected metric value type: %s", mist)

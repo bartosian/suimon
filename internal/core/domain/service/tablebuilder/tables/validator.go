@@ -6,7 +6,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
-	"github.com/bartosian/suimon/internal/core/domain/host"
+	domainhost "github.com/bartosian/suimon/internal/core/domain/host"
 )
 
 var (
@@ -74,7 +74,7 @@ var (
 // The function retrieves information about the validator from the host's internal state and formats it into a map of ValidatorColumnName keys and corresponding values.
 // The function also includes emoji values in the map if the specified flag is true.
 // Returns a map of ValidatorColumnName keys to corresponding values.
-func GetValidatorColumnValues(idx int, host host.Host) ColumnValues {
+func GetValidatorColumnValues(idx int, host *domainhost.Host) ColumnValues {
 	status := host.Status.StatusToPlaceholder()
 
 	var country string

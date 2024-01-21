@@ -2,7 +2,7 @@ package env
 
 import "os"
 
-func GetEnvWithDefault(key string, defaultValue string) string {
+func GetEnvWithDefault(key, defaultValue string) string {
 	if value, ok := os.LookupEnv(key); ok {
 		return value
 	}

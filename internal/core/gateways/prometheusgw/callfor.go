@@ -35,7 +35,7 @@ func (gateway *Gateway) CallFor(metrics ports.Metrics) (result ports.MetricsResu
 		return nil, fmt.Errorf("no metrics provided")
 	}
 
-	req, err := http.NewRequest("GET", gateway.url, nil)
+	req, err := http.NewRequest("GET", gateway.url, http.NoBody)
 	if err != nil {
 		return nil, err
 	}
@@ -48,6 +48,7 @@ func (gateway *Gateway) CallFor(metrics ports.Metrics) (result ports.MetricsResu
 	respChan := make(chan responseWithError, 1)
 
 	go func() {
+		//nolint:bodyclose // The response body is closed below to handle the response properly.
 		resp, err := gateway.client.Do(req)
 
 		respChan <- responseWithError{response: resp, err: err}
@@ -75,6 +76,7 @@ func (gateway *Gateway) CallFor(metrics ports.Metrics) (result ports.MetricsResu
 		}
 
 		parser := expfmt.TextParser{}
+
 		data, err := parser.TextToMetricFamilies(response.Body)
 		if err != nil {
 			return nil, err
@@ -118,7 +120,8 @@ func getMetricValueWithLabelFiltering(metrics MetricsData, metricName string, me
 		if matchLabels(labels, metric.Label) {
 			result.Labels = extractLabels(metric.Label)
 			result.Value = extractMetricValue[metricType](metric)
-			return result, nil // Return immediately upon finding the first matching metric
+
+			return result, nil
 		}
 	}
 
@@ -132,6 +135,7 @@ func matchLabels(expected prometheus.Labels, actual []*ioPrometheusClient.LabelP
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -141,15 +145,17 @@ func extractLabels(labels []*ioPrometheusClient.LabelPair) prometheus.Labels {
 	for _, label := range labels {
 		labelsResult[label.GetName()] = label.GetValue()
 	}
+
 	return labelsResult
 }
 
 // labelMatches checks if the key-value pair exists in the given labels
-func labelMatches(key string, value string, labels []*ioPrometheusClient.LabelPair) bool {
+func labelMatches(key, value string, labels []*ioPrometheusClient.LabelPair) bool {
 	for _, label := range labels {
 		if label.GetName() == key && label.GetValue() == value {
 			return true
 		}
 	}
+
 	return false
 }

@@ -1,3 +1,4 @@
+//nolint:dupl // temporary disabled
 package cligw
 
 import (

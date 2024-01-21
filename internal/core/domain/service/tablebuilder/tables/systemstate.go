@@ -58,15 +58,17 @@ var (
 			enums.ColumnNameSystemTotalStake,
 			enums.ColumnNameSystemStorageFundTotalObjectStorageRebates,
 			enums.ColumnNameSystemStorageFundNonRefundableBalance,
+		},
+		1: {
 			enums.ColumnNameSystemStakeSubsidyStartEpoch,
 			enums.ColumnNameSystemStakeSubsidyBalance,
 			enums.ColumnNameSystemStakeSubsidyDistributionCounter,
 			enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount,
-		},
-		1: {
 			enums.ColumnNameSystemStakeSubsidyPeriodLength,
 			enums.ColumnNameSystemStakeSubsidyDecreaseRate,
 			enums.ColumnNameSystemReferenceGasPrice,
+		},
+		2: {
 			enums.ColumnNameSystemMinReferenceGasPrice,
 			enums.ColumnNameSystemMaxReferenceGasPrice,
 			enums.ColumnNameSystemMeanReferenceGasPrice,
@@ -194,7 +196,7 @@ func GetValidatorParamsColumnValues(systemState *domainmetrics.SuiSystemState) (
 // GetValidatorReportColumnValues returns a map of ColumnName values to corresponding values for the system state validator.
 // The function retrieves information about the system state from the host's internal state and formats it into a map of ColumnName keys and corresponding values.
 // Returns a map of ColumnName keys to corresponding values.
-func GetValidatorReportColumnValues(reportedName string, slashingPct string, reporter domainmetrics.ValidatorReporter) ColumnValues {
+func GetValidatorReportColumnValues(reportedName, slashingPct string, reporter domainmetrics.ValidatorReporter) ColumnValues {
 	return ColumnValues{
 		enums.ColumnNameSystemValidatorReportedName:       reportedName,
 		enums.ColumnNameSystemValidatorSlashingPercentage: slashingPct,

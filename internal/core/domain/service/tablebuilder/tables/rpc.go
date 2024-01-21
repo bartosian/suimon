@@ -4,7 +4,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
-	"github.com/bartosian/suimon/internal/core/domain/host"
+	domainhost "github.com/bartosian/suimon/internal/core/domain/host"
 )
 
 var (
@@ -33,12 +33,14 @@ var (
 // GetRPCColumnValues returns a map of NodeColumnName values to corresponding values for the RPC service on the specified host.
 // The function retrieves information about the RPC service from the host's internal state and formats it into a map of NodeColumnName keys and corresponding values.
 // Returns a map of NodeColumnName keys to corresponding values.
-func GetRPCColumnValues(idx int, host host.Host) ColumnValues {
+func GetRPCColumnValues(idx int, host *domainhost.Host) ColumnValues {
 	status := host.Status.StatusToPlaceholder()
+
 	port := host.Ports[enums.PortTypeRPC]
 	if port == "" {
-		port = RpcPortDefault
+		port = RPCPortDefault
 	}
+
 	address := host.Endpoint.Address
 
 	return ColumnValues{

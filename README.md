@@ -300,11 +300,11 @@ Tables are static monitors that provide a detailed snapshot of the network and i
 | 📡 PUBLIC RPC             | Displays detailed information about the network's RPC endpoints.              |
 | 💻 FULL NODES             | Displays detailed information about the network's nodes.                      |
 | 🤖 VALIDATORS             | Displays detailed information about the network's validators.                 |
-| 💰 EPOCH, GAS AND SUBSIDY | Displays the current gas price and subsidy values for the network.            |
+| 💾 SYSTEM STATE           | Displays the current gas price and subsidy values for the network.            |
 | 📊 VALIDATORS PARAMS      | Displays the validators related thresholds and counts on the network.         |
 | 🚨 VALIDATORS AT RISK     | Displays the number of validators that are currently at risk of being slashed.|
 | 📢 VALIDATORS REPORTS     | Displays the latest reports submitted by validators.                          |
-| ✅ ACTIVE VALIDATORS       | Displays the current list of active validators on the network.               |
+| ✅ ACTIVE VALIDATORS      | Displays the current list of active validators on the network.                |
 
 ### Table Examples
 
@@ -329,7 +329,7 @@ Tables are static monitors that provide a detailed snapshot of the network and i
   ![Screenshot of my app](static/images/table-validators.png)
   <br><br>
 
-- `💰 EPOCH, GAS AND SUBSIDY`
+- `💾 SYSTEM STATE`
   <br><br>
   This table is a valuable resource for obtaining metrics about the current epoch, reference gas prices, and subsidies in a network. This table provides information about the current epoch, such as its number, start, and end time, and total duration. The table also provides information about the reference gas price and subsidies, such as their current values and estimated values for the next epoch.
   <br><br>
@@ -365,7 +365,7 @@ Dashboards are dynamic monitors that provide real-time information about the net
 | 📡 PUBLIC RPC             | Displays detailed information about the network's RPC endpoints.   |
 | 💻 FULL NODES             | Displays detailed information about the network's nodes.           |
 | 🤖 VALIDATORS             | Displays detailed information about the network's validators.      |
-| 💰 EPOCH, GAS AND SUBSIDY | Displays the current gas price and subsidy values for the network. |
+| 💾 SYSTEM STATE           | Displays the current gas price and subsidy values for the network. |
 
 ### Dashboard Examples
 
@@ -390,7 +390,7 @@ Dashboards are dynamic monitors that provide real-time information about the net
   ![Screenshot of my app](static/images/dashboard-validators.png)
   <br><br>
 
-- `💰 EPOCH, GAS AND SUBSIDY`
+- `💾 SYSTEM STATE`
   <br><br>
   This table is a valuable resource for obtaining metrics about the current epoch, reference gas prices, and subsidies in a network. This table provides information about the current epoch, such as its number, start, and end time, and total duration. The table also provides information about the reference gas price and subsidies, such as their current values and estimated values for the next epoch.
   <br><br>

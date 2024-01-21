@@ -97,6 +97,7 @@ type (
 
 		Transactions
 		Checkpoints
+		Protocol
 		Rounds
 		Peers
 		Epoch

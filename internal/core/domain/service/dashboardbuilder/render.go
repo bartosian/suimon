@@ -42,9 +42,10 @@ func (db *Builder) Render() (err error) {
 	return errGroup.Wait()
 }
 
-func startTickers() (queryTicker *time.Ticker, renderTicker *time.Ticker) {
+func startTickers() (queryTicker, renderTicker *time.Ticker) {
 	queryTicker = time.NewTicker(queryInterval)
 	renderTicker = time.NewTicker(renderInterval)
+
 	return
 }
 

@@ -1,3 +1,4 @@
+//nolint:dupl // these files are different.
 package cligw
 
 import (
@@ -23,6 +24,7 @@ func (gateway *Gateway) Warnf(msg string, vars ...interface{}) {
 
 func (gateway *Gateway) WarnfWithOpts(msg string, opts MsgOpts, vars ...interface{}) {
 	msg = fmt.Sprintf(msg, vars)
+
 	gateway.WarnWithOpts(msg, opts)
 }
 
@@ -35,7 +37,7 @@ func (Gateway) WarnWithOpts(msg string, opts MsgOpts) {
 
 	formattedIcon := iconWarnColor.Sprint(icon)
 	formattedMsg := messageWarnColor.Sprint(msg)
-	
+
 	result := fmt.Sprintf("%s  %s", formattedIcon, formattedMsg)
 
 	fmt.Println(result)

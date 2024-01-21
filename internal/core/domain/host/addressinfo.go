@@ -27,63 +27,63 @@ type AddressInfo struct {
 // GetUrlRPC generates a URL for the RPC endpoint of the address.
 // It constructs the URL using the protocol, host, port, and path
 // components of the endpoint, as well as the default port value.
-func (addr *AddressInfo) GetUrlRPC() (string, error) {
+func (addr *AddressInfo) GetURLRPC() (string, error) {
 	endpoint := addr.Endpoint
 	ports := addr.Ports
 	protocol := getProtocol(endpoint.SSL)
 
-	hostUrl, err := url.Parse(fmt.Sprintf("%s://", protocol))
+	hostURL, err := url.Parse(fmt.Sprintf("%s://", protocol))
 	if err != nil {
 		return "", err
 	}
 
 	if endpoint.Host != nil {
-		hostUrl.Host = *endpoint.Host
+		hostURL.Host = *endpoint.Host
 	} else {
-		hostUrl.Host = *endpoint.IP
+		hostURL.Host = *endpoint.IP
 	}
 
 	if rpcPort, ok := ports[enums.PortTypeRPC]; ok {
-		hostUrl.Host = net.JoinHostPort(hostUrl.Host, rpcPort)
+		hostURL.Host = net.JoinHostPort(hostURL.Host, rpcPort)
 	} else if endpoint.IP != nil {
-		hostUrl.Host = net.JoinHostPort(*endpoint.IP, rpcPortDefault)
+		hostURL.Host = net.JoinHostPort(*endpoint.IP, rpcPortDefault)
 	}
 
 	if endpoint.Path != nil {
-		hostUrl.Path = *endpoint.Path
+		hostURL.Path = *endpoint.Path
 	}
 
-	return hostUrl.String(), nil
+	return hostURL.String(), nil
 }
 
 // GetUrlPrometheus generates a URL for the Prometheus endpoint of the address.
 // It constructs the URL using the protocol, host, port, and path
 // components of the endpoint, as well as the default port and path values.
-func (addr *AddressInfo) GetUrlPrometheus() (string, error) {
+func (addr *AddressInfo) GetURLPrometheus() (string, error) {
 	endpoint := addr.Endpoint
 	ports := addr.Ports
 	protocol := getProtocol(endpoint.SSL)
 
-	hostUrl, err := url.Parse(fmt.Sprintf("%s://", protocol))
+	hostURL, err := url.Parse(fmt.Sprintf("%s://", protocol))
 	if err != nil {
 		return "", err
 	}
 
 	if endpoint.Host != nil {
-		hostUrl.Host = *endpoint.Host
+		hostURL.Host = *endpoint.Host
 	} else {
-		hostUrl.Host = *endpoint.IP
+		hostURL.Host = *endpoint.IP
 	}
 
 	if metricsPort, ok := ports[enums.PortTypeMetrics]; ok {
-		hostUrl.Host = net.JoinHostPort(hostUrl.Host, metricsPort)
+		hostURL.Host = net.JoinHostPort(hostURL.Host, metricsPort)
 	} else if endpoint.IP != nil {
-		hostUrl.Host = net.JoinHostPort(*endpoint.IP, metricsPortDefault)
+		hostURL.Host = net.JoinHostPort(*endpoint.IP, metricsPortDefault)
 	}
 
-	hostUrl.Path = metricsPathDefault
+	hostURL.Path = metricsPathDefault
 
-	return hostUrl.String(), nil
+	return hostURL.String(), nil
 }
 
 // getProtocol returns the protocol based on the secure flag.

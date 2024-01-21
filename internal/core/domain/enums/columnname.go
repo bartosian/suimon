@@ -80,8 +80,8 @@ const (
 	ColumnNameEpochTotalTransactions            ColumnName = "TOTAL\nTRANSACTIONS"
 	ColumnNameEpochStartTimestamp               ColumnName = "EPOCH START TIME UTC"
 	ColumnNameEpochEndTimestamp                 ColumnName = "EPOCH END TIME UTC"
-	ColumnNameEpochFirstCheckpointId            ColumnName = "FIRST\nCHECKPOINT ID"
-	ColumnNameEpochLastCheckpointId             ColumnName = "LAST\nCHECKPOINT ID"
+	ColumnNameEpochFirstCheckpointID            ColumnName = "FIRST\nCHECKPOINT ID"
+	ColumnNameEpochLastCheckpointID             ColumnName = "LAST\nCHECKPOINT ID"
 	ColumnNameEpochProtocolVersion              ColumnName = "PROTOCOL\nVERSION"
 	ColumnNameEpochReferenceGasPrice            ColumnName = "REFERENCE\nGAS PRICE"
 	ColumnNameEpochTotalStake                   ColumnName = "TOTAL STAKE,\nSUI"
@@ -95,7 +95,7 @@ const (
 	ColumnNameEpochLeftoverStorageFundInflow    ColumnName = "LEFTOVER STORAGE FUND\nINFLOW, SUI"
 )
 
-// System State section
+// nolint: dupl,nolintlint,gocritic // they are not duplicate
 const (
 	ColumnNameCurrentEpoch                                ColumnName = "CURRENT\nEPOCH"
 	ColumnNameSystemEpoch                                 ColumnName = "EPOCH"
@@ -135,6 +135,68 @@ const (
 	ColumnNameSystemStakeSubsidyCurrentDistributionAmount ColumnName = "STAKE SUBSIDY\nDISTRIBUTION AMOUNT, SUI"
 	ColumnNameSystemStakeSubsidyPeriodLength              ColumnName = "STAKE SUBSIDY\nPERIOD LENGTH"
 	ColumnNameSystemStakeSubsidyDecreaseRate              ColumnName = "STAKE SUBSIDY\nDECREASE RATE"
+)
+
+// Protocol section
+const (
+	ColumnNameMinSupportedProtocolVersion ColumnName = "MIN SUPPORTED\nPROTOCOL VERSION"
+	ColumnNameMaxSupportedProtocolVersion ColumnName = "MAX SUPPORTED\nPROTOCOL VERSION"
+	ColumnNameProtocolVersion             ColumnName = "PROTOCOL VERSION"
+)
+
+// nolint: dupl,nolintlint,gocritic // they are not duplicate
+const (
+	ColumnNameFeatureFlagAcceptZkloginInMultisig                  ColumnName = "ACCEPT ZKLOGIN\nIN MULTISIG"
+	ColumnNameFeatureFlagAdvanceEpochStartTimeInSafeMode          ColumnName = "ADVANCE EPOCH\nSTART TIME\nIN SAFE MODE"
+	ColumnNameFeatureFlagAdvanceToHighestSupportedProtocolVersion ColumnName = "ADVANCE TO\nHIGHEST SUPPORTED\nPROTOCOL VERSION"
+	ColumnNameFeatureFlagAllowReceivingObjectID                   ColumnName = "ALLOW RECEIVING\nOBJECT ID"
+	ColumnNameFeatureFlagBanEntryInit                             ColumnName = "BAN ENTRY INIT"
+	ColumnNameFeatureFlagCommitRootStateDigest                    ColumnName = "COMMIT ROOT\nSTATE DIGEST"
+	ColumnNameFeatureFlagConsensusOrderEndOfEpochLast             ColumnName = "CONSENSUS ORDER\nEND OF EPOCH LAST"
+	ColumnNameFeatureFlagDisableInvariantViolationCheckInSwapLoc  ColumnName = "DISABLE INVARIANT\nVIOLATION CHECK\nIN SWAP LOC"
+	ColumnNameFeatureFlagDisallowAddingAbilitiesOnUpgrade         ColumnName = "DISALLOW ADDING\nABILITIES\nON UPGRADE"
+	ColumnNameFeatureFlagDisallowChangeStructTypeParamsOnUpgrade  ColumnName = "DISALLOW CHANGE\nSTRUCT TYPE PARAMS\nON UPGRADE"
+	ColumnNameFeatureFlagEnableEffectsV2                          ColumnName = "ENABLE\nEFFECTS V2"
+	ColumnNameFeatureFlagEnableJwkConsensusUpdates                ColumnName = "ENABLE JWK\nCONSENSUS\nUPDATES"
+	ColumnNameFeatureFlagEndOfEpochTransactionSupported           ColumnName = "END OF EPOCH\nTRANSACTION\nSUPPORTED"
+	ColumnNameFeatureFlagHardenedOtwCheck                         ColumnName = "HARDENED\nOTW CHECK"
+	ColumnNameFeatureFlagIncludeConsensusDigestInPrologue         ColumnName = "INCLUDE\nCONSENSUS DIGEST\nIN PROLOGUE"
+	ColumnNameFeatureFlagLoadedChildObjectFormat                  ColumnName = "LOADED CHILD\nOBJECT FORMAT"
+	ColumnNameFeatureFlagLoadedChildObjectFormatType              ColumnName = "LOADED CHILD\nOBJECT FORMAT\nTYPE"
+	ColumnNameFeatureFlagLoadedChildObjectsFixed                  ColumnName = "LOADED CHILD\nOBJECTS FIXED"
+	ColumnNameFeatureFlagMissingTypeIsCompatibilityError          ColumnName = "MISSING TYPE\nIS COMPATIBILITY\nERROR"
+	ColumnNameFeatureFlagNarwhalCertificateV2                     ColumnName = "NARWHAL\nCERTIFICATE V2"
+	ColumnNameFeatureFlagNarwhalHeaderV2                          ColumnName = "NARWHAL\nHEADER V2"
+	ColumnNameFeatureFlagNarwhalNewLeaderElectionSchedule         ColumnName = "NARWHAL\nNEW LEADER\nELECTION SCHEDULE"
+	ColumnNameFeatureFlagNarwhalVersionedMetadata                 ColumnName = "NARWHAL\nVERSIONED METADATA"
+	ColumnNameFeatureFlagNoExtraneousModuleBytes                  ColumnName = "NO EXTRANEOUS\nMODULE BYTES"
+	ColumnNameFeatureFlagPackageDigestHashModule                  ColumnName = "PACKAGE\nDIGEST HASH\nMODULE"
+	ColumnNameFeatureFlagPackageUpgrades                          ColumnName = "PACKAGE\nUPGRADES"
+	ColumnNameFeatureFlagRandomBeacon                             ColumnName = "RANDOM\nBEACON"
+	ColumnNameFeatureFlagReceiveObjects                           ColumnName = "RECEIVE\nOBJECTS"
+	ColumnNameFeatureFlagRecomputeHasPublicTransferInExecution    ColumnName = "RECOMPUTE HAS\nPUBLIC TRANSFER\nIN EXECUTION"
+	ColumnNameFeatureFlagScoringDecisionWithValidityCutoff        ColumnName = "SCORING DECISION\nWITH VALIDITY\nCUTOFF"
+	ColumnNameFeatureFlagSharedObjectDeletion                     ColumnName = "SHARED OBJECT\nDELETION"
+	ColumnNameFeatureFlagSimpleConservationChecks                 ColumnName = "SIMPLE\nCONSERVATION\nCHECKS"
+	ColumnNameFeatureFlagSimplifiedUnwrapThenDelete               ColumnName = "SIMPLIFIED\nUNWRAP\nTHEN DELETE"
+	ColumnNameFeatureFlagThroughputAwareConsensusSubmission       ColumnName = "THROUGHPUT AWARE\nCONSENSUS\nSUBMISSION"
+	ColumnNameFeatureFlagTxnBaseCostAsMultiplier                  ColumnName = "TXN BASE COST\nAS MULTIPLIER"
+	ColumnNameFeatureFlagUpgradedMultisigSupported                ColumnName = "UPGRADED MULTISIG\nSUPPORTED"
+	ColumnNameFeatureFlagVerifyLegacyZkloginAddress               ColumnName = "VERIFY LEGACY ZK\nLOGIN ADDRESS"
+	ColumnNameFeatureFlagZkLoginAuth                              ColumnName = "ZK LOGIN AUTH"
+)
+
+// Release section
+const (
+	ColumnNameTagName     ColumnName = "TAG"
+	ColumnNameCommitHash  ColumnName = "TARGET"
+	ColumnNameReleaseName ColumnName = "RELEASE"
+	ColumnNameDraft       ColumnName = "DRAFT"
+	ColumnNamePreRelease  ColumnName = "PRERELEASE"
+	ColumnNameCreatedAt   ColumnName = "CREATED AT"
+	ColumnNamePublishedAt ColumnName = "PUBLISHED AT"
+	ColumnNameAuthor      ColumnName = "AUTHOR"
+	ColumnNameURL         ColumnName = "RELEASE URL"
 )
 
 func (e ColumnName) ToString() string {

@@ -16,16 +16,19 @@ func (c *Controller) RenderTables() error {
 	rpcProvided := len(c.hosts.rpc) > 0
 	nodeProvided := len(c.hosts.node) > 0
 	validatorProvided := len(c.hosts.validator) > 0
+	releasesProvided := len(c.releases) > 0
 
 	tableTypeEnabled := map[enums.TableType]bool{
 		enums.TableTypeRPC:                rpcProvided,
 		enums.TableTypeNode:               nodeProvided,
 		enums.TableTypeValidator:          validatorProvided,
 		enums.TableTypeGasPriceAndSubsidy: rpcProvided,
+		enums.TableTypeProtocol:           rpcProvided,
 		enums.TableTypeValidatorsParams:   rpcProvided,
 		enums.TableTypeValidatorsAtRisk:   rpcProvided,
 		enums.TableTypeValidatorReports:   rpcProvided,
 		enums.TableTypeActiveValidators:   rpcProvided,
+		enums.TableTypeReleases:           releasesProvided,
 	}
 
 	for _, tableType := range selectedTables {

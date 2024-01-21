@@ -12,6 +12,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const versionInfoParts = 2
+
 var (
 	// rpcMethodToMetric maps an RPC method to a metric type.
 	rpcMethodToMetric = map[enums.RPCMethod]enums.MetricType{
@@ -19,11 +21,9 @@ var (
 		enums.RPCMethodGetLatestCheckpointSequenceNumber: enums.MetricTypeLatestCheckpoint,
 		enums.RPCMethodGetSuiSystemState:                 enums.MetricTypeSuiSystemState,
 		enums.RPCMethodGetValidatorsApy:                  enums.MetricTypeValidatorsApy,
+		enums.RPCMethodGetProtocol:                       enums.MetricTypeProtocol,
 	}
-	// rpcMethodToParams maps an RPC method to a params list.
-	rpcMethodToParams = map[enums.RPCMethod][]any{
-		enums.RPCMethodGetEpochs: {nil, 100, true},
-	}
+
 	// prometheusToMetric maps a Prometheus metric name to a metric type.
 	prometheusToMetric = map[enums.PrometheusMetricName]enums.MetricType{
 		enums.PrometheusMetricNameTotalTransactionCertificates: enums.MetricTypeTotalTransactionCertificates,
@@ -46,7 +46,7 @@ var (
 		enums.PrometheusMetricNameNonConsensusLatencySum:       enums.MetricTypeNonConsensusLatencySum,
 	}
 	// tableToRpcMethods maps a table type to a list of RPC methods.
-	tableToRpcMethods = map[enums.TableType][]enums.RPCMethod{
+	tableToRPCMethods = map[enums.TableType][]enums.RPCMethod{
 		enums.TableTypeNode: {
 			enums.RPCMethodGetTotalTransactionBlocks,
 			enums.RPCMethodGetLatestCheckpointSequenceNumber,
@@ -56,6 +56,7 @@ var (
 			enums.RPCMethodGetLatestCheckpointSequenceNumber,
 			enums.RPCMethodGetSuiSystemState,
 			enums.RPCMethodGetValidatorsApy,
+			enums.RPCMethodGetProtocol,
 		},
 	}
 	// tablesToCallMetrics maps a table type to a boolean value indicating whether to call metrics for that table type.
@@ -65,66 +66,42 @@ var (
 	}
 )
 
-// getPrometheusMetricsForTableType returns a list of Prometheus metrics that should be collected for a table type.
+// newMetricConfig creates a new MetricConfig with the provided metric type and optional labels.
+func newMetricConfig(metricType enums.PrometheusMetricType, labels ...prometheus.Labels) ports.MetricConfig {
+	var label prometheus.Labels
+	if len(labels) > 0 {
+		label = labels[0]
+	}
+
+	return ports.MetricConfig{
+		MetricType: metricType,
+		Labels:     label,
+	}
+}
+
+// getPrometheusMetricsForTableType returns a set of Prometheus metrics configurations based on the specified table type.
 func getPrometheusMetricsForTableType(table enums.TableType) ports.Metrics {
 	metrics := ports.Metrics{
-		enums.PrometheusMetricNameTotalTransactionCertificates: {
-			MetricType: enums.PrometheusMetricTypeCounter,
-		},
-		enums.PrometheusMetricNameTotalTransactionEffects: {
-			MetricType: enums.PrometheusMetricTypeCounter,
-		},
-		enums.PrometheusMetricNameHighestKnownCheckpoint: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameHighestSyncedCheckpoint: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameLastExecutedCheckpoint: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameCurrentEpoch: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameEpochTotalDuration: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameSuiNetworkPeers: {
-			MetricType: enums.PrometheusMetricTypeGauge,
-		},
-		enums.PrometheusMetricNameUptime: {
-			MetricType: enums.PrometheusMetricTypeCounter,
-		},
+		enums.PrometheusMetricNameTotalTransactionCertificates: newMetricConfig(enums.PrometheusMetricTypeCounter),
+		enums.PrometheusMetricNameTotalTransactionEffects:      newMetricConfig(enums.PrometheusMetricTypeCounter),
+		enums.PrometheusMetricNameHighestKnownCheckpoint:       newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameHighestSyncedCheckpoint:      newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameLastExecutedCheckpoint:       newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameCurrentEpoch:                 newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameEpochTotalDuration:           newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameSuiNetworkPeers:              newMetricConfig(enums.PrometheusMetricTypeGauge),
+		enums.PrometheusMetricNameUptime:                       newMetricConfig(enums.PrometheusMetricTypeCounter),
 	}
 
 	if table == enums.TableTypeValidator {
-		metrics[enums.PrometheusMetricNameLastCommittedRound] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeGauge,
-		}
-		metrics[enums.PrometheusMetricNamePrimaryNetworkPeers] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeGauge,
-		}
-		metrics[enums.PrometheusMetricNameHighestProcessedRound] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeGauge,
-			Labels: prometheus.Labels{
-				"source": "own",
-			},
-		}
-		metrics[enums.PrometheusMetricNameWorkerNetworkPeers] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeGauge,
-		}
-		metrics[enums.PrometheusMetricNameTotalSignatureErrors] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeCounter,
-		}
-		metrics[enums.PrometheusMetricNameSkippedConsensusTransactions] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeCounter,
-		}
-		metrics[enums.PrometheusMetricNameCurrentRound] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeGauge,
-		}
-		metrics[enums.PrometheusMetricNameCertificatesCreated] = ports.MetricConfig{
-			MetricType: enums.PrometheusMetricTypeCounter,
-		}
+		metrics[enums.PrometheusMetricNameLastCommittedRound] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNamePrimaryNetworkPeers] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNameHighestProcessedRound] = newMetricConfig(enums.PrometheusMetricTypeGauge, prometheus.Labels{"source": "own"})
+		metrics[enums.PrometheusMetricNameWorkerNetworkPeers] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNameTotalSignatureErrors] = newMetricConfig(enums.PrometheusMetricTypeCounter)
+		metrics[enums.PrometheusMetricNameSkippedConsensusTransactions] = newMetricConfig(enums.PrometheusMetricTypeCounter)
+		metrics[enums.PrometheusMetricNameCurrentRound] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNameCertificatesCreated] = newMetricConfig(enums.PrometheusMetricTypeCounter)
 	}
 
 	return metrics
@@ -178,13 +155,13 @@ func (host *Host) processPrometheusMetrics(result ports.MetricsResult) error {
 
 		if metricType == enums.MetricTypeUptime {
 			if value, ok := metricValue.Labels["version"]; ok {
-				versionInfo := strings.SplitN(value, "-", 2)
+				versionInfo := strings.SplitN(value, "-", versionInfoParts)
 
 				if err := host.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0]); err != nil {
 					return err
 				}
 
-				if len(versionInfo) == 2 {
+				if len(versionInfo) == versionInfoParts {
 					if err := host.Metrics.SetValue(enums.MetricTypeCommit, versionInfo[1]); err != nil {
 						return err
 					}
@@ -202,7 +179,7 @@ func (host *Host) processPrometheusMetrics(result ports.MetricsResult) error {
 func (host *Host) GetMetrics() error {
 	var errGroup errgroup.Group
 
-	rpcMethods := tableToRpcMethods[host.TableType]
+	rpcMethods := tableToRPCMethods[host.TableType]
 	for _, method := range rpcMethods {
 		method := method
 
@@ -233,9 +210,7 @@ func (host *Host) GetDataByMetric(method enums.RPCMethod) error {
 		return fmt.Errorf("unsupported RPC method: %v", method)
 	}
 
-	params := rpcMethodToParams[method]
-
-	result, err := host.gateways.rpc.CallFor(method, params...)
+	result, err := host.gateways.rpc.CallFor(method)
 	if err != nil {
 		return err
 	}
