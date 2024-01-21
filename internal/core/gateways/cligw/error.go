@@ -29,13 +29,13 @@ func (gateway *Gateway) ErrorfWithOpts(msg string, opts MsgOpts, vars ...interfa
 }
 
 func (Gateway) ErrorWithOpts(msg string, opts MsgOpts) {
-	var icon string
+	var newIcon string
 
 	for icon, i := errorIcon, opts.Indent; i > 0; i-- {
-		icon = fmt.Sprintf("  %s", icon)
+		newIcon = fmt.Sprintf("  %s", icon)
 	}
 
-	formattedIcon := iconErrColor.Sprint(icon)
+	formattedIcon := iconErrColor.Sprint(newIcon)
 	formattedMsg := messageErrColor.Sprint(msg)
 
 	result := fmt.Sprintf("%s %s", formattedIcon, formattedMsg)

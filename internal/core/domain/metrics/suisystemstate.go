@@ -12,13 +12,13 @@ const validatorsQuorum = 6667
 type (
 	// SuiSystemState represents the current state of the Sui blockchain system.
 	SuiSystemState struct {
+		AddressToValidator                    AddressToValidator
 		Epoch                                 string          `json:"epoch"`
 		ProtocolVersion                       string          `json:"protocolVersion"`
 		SystemStateVersion                    string          `json:"systemStateVersion"`
 		StorageFundTotalObjectStorageRebates  string          `json:"storageFundTotalObjectStorageRebates"`
 		StorageFundNonRefundableBalance       string          `json:"storageFundNonRefundableBalance"`
 		ReferenceGasPrice                     string          `json:"referenceGasPrice"`
-		SafeMode                              bool            `json:"safeMode"`
 		SafeModeStorageRewards                string          `json:"safeModeStorageRewards"`
 		SafeModeComputationRewards            string          `json:"safeModeComputationRewards"`
 		SafeModeStorageRebates                string          `json:"safeModeStorageRebates"`
@@ -35,23 +35,23 @@ type (
 		StakeSubsidyDistributionCounter       string          `json:"stakeSubsidyDistributionCounter"`
 		StakeSubsidyCurrentDistributionAmount string          `json:"stakeSubsidyCurrentDistributionAmount"`
 		StakeSubsidyPeriodLength              string          `json:"stakeSubsidyPeriodLength"`
-		StakeSubsidyDecreaseRate              int             `json:"stakeSubsidyDecreaseRate"`
 		TotalStake                            string          `json:"totalStake"`
-		ActiveValidators                      Validators      `json:"activeValidators"`
 		PendingActiveValidatorsID             string          `json:"pendingActiveValidatorsId"`
 		PendingActiveValidatorsSize           string          `json:"pendingActiveValidatorsSize"`
-		PendingRemovals                       []interface{}   `json:"pendingRemovals"`
 		StakingPoolMappingsID                 string          `json:"stakingPoolMappingsId"`
 		StakingPoolMappingsSize               string          `json:"stakingPoolMappingsSize"`
 		InactivePoolsID                       string          `json:"inactivePoolsId"`
 		InactivePoolsSize                     string          `json:"inactivePoolsSize"`
 		ValidatorCandidatesID                 string          `json:"validatorCandidatesId"`
 		ValidatorCandidatesSize               string          `json:"validatorCandidatesSize"`
+		ActiveValidators                      Validators      `json:"activeValidators"`
+		PendingRemovals                       []interface{}   `json:"pendingRemovals"`
 		AtRiskValidators                      [][]interface{} `json:"atRiskValidators"`
 		ValidatorReportRecords                [][]interface{} `json:"validatorReportRecords"`
-		AddressToValidator                    AddressToValidator
 		ValidatorsAtRiskParsed                ValidatorsAtRisk
 		ValidatorReportsParsed                ValidatorsReports
+		StakeSubsidyDecreaseRate              int  `json:"stakeSubsidyDecreaseRate"`
+		SafeMode                              bool `json:"safeMode"`
 	}
 
 	// ValidatorsApy represents the APYs of validators.
@@ -71,8 +71,8 @@ type (
 	// ValidatorReport represents validator reporters
 	ValidatorReport struct {
 		Name               string
-		SlashingPercentage float64
 		Reporters          []ValidatorReporter
+		SlashingPercentage float64
 	}
 
 	// ValidatorReporter contains information about a validator reporter

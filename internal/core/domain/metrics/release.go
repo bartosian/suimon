@@ -15,14 +15,14 @@ type Release struct {
 	TagName     string `json:"tag_name"`
 	CommitHash  string `json:"target_commitish"`
 	Name        string `json:"name"`
-	Draft       bool   `json:"draft"`
-	PreRelease  bool   `json:"prerelease"`
 	PublishedAt string `json:"published_at"`
 	CreatedAt   string `json:"created_at"`
 	URL         string `json:"html_url"`
 	Author      struct {
 		Login string `json:"login"`
 	} `json:"author"`
+	Draft      bool `json:"draft"`
+	PreRelease bool `json:"prerelease"`
 }
 
 // getReleases fetches releases for a given repo and filters them by network name

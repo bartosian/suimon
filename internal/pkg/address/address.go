@@ -12,11 +12,11 @@ import (
 )
 
 type Endpoint struct {
-	Address string
 	IP      *string
 	Host    *string
 	Path    *string
 	Port    *string
+	Address string
 	SSL     bool
 }
 
@@ -137,7 +137,7 @@ func ParseURL(address string) (*Endpoint, error) {
 		SSL:     scheme == "https",
 	}
 
-	if ip, err := ParseIP(hostName); err == nil {
+	if ip, pasreErr := ParseIP(hostName); pasreErr == nil {
 		endpoint.IP = ip
 	}
 

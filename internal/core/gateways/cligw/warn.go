@@ -29,13 +29,13 @@ func (gateway *Gateway) WarnfWithOpts(msg string, opts MsgOpts, vars ...interfac
 }
 
 func (Gateway) WarnWithOpts(msg string, opts MsgOpts) {
-	var icon string
+	var newIcon string
 
 	for icon, i := warnIcon, opts.Indent; i > 0; i-- {
-		icon = fmt.Sprintf("  %s", icon)
+		newIcon = fmt.Sprintf("  %s", icon)
 	}
 
-	formattedIcon := iconWarnColor.Sprint(icon)
+	formattedIcon := iconWarnColor.Sprint(newIcon)
 	formattedMsg := messageWarnColor.Sprint(msg)
 
 	result := fmt.Sprintf("%s  %s", formattedIcon, formattedMsg)

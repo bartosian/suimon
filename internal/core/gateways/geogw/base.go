@@ -19,9 +19,9 @@ const (
 
 type Gateway struct {
 	ctx         context.Context
-	accessToken string
 	client      *ipinfo.Client
 	cliGateway  *cligw.Gateway
+	accessToken string
 }
 
 func NewGateway(cliGW *cligw.Gateway, accessToken string) ports.GeoGateway {

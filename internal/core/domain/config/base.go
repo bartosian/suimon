@@ -15,6 +15,9 @@ const (
 )
 
 type Config struct {
+	IPLookup struct {
+		AccessToken string `yaml:"access-token"`
+	} `yaml:"ip-lookup"`
 	PublicRPC []string `yaml:"public-rpc"`
 	FullNodes []struct {
 		JSONRPCAddress string `yaml:"json-rpc-address"`
@@ -23,9 +26,6 @@ type Config struct {
 	Validators []struct {
 		MetricsAddress string `yaml:"metrics-address"`
 	} `yaml:"validators"`
-	IPLookup struct {
-		AccessToken string `yaml:"access-token"`
-	} `yaml:"ip-lookup"`
 }
 
 // NewConfig reads the Suimon configuration files from the directory specified by

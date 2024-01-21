@@ -20,8 +20,8 @@ const (
 )
 
 type AddressInfo struct {
-	Endpoint address.Endpoint
 	Ports    map[enums.PortType]string
+	Endpoint address.Endpoint
 }
 
 // GetUrlRPC generates a URL for the RPC endpoint of the address.

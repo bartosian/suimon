@@ -105,10 +105,10 @@ type SortConfig []table.SortBy
 
 // TableConfig represents the overall configuration for a table.
 type TableConfig struct {
-	Name         string        // The name of the table
-	Style        table.Style   // The style of the table
 	Columns      ColumnsConfig // Configuration for the table's columns
+	Name         string        // The name of the table
 	Rows         RowsConfig    // Configuration for the table's rows
+	Style        table.Style   // The style of the table
 	ColumnsCount int           // The total number of columns in the table
 	RowsCount    int           // The total number of rows in the table
 }
