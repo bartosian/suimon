@@ -124,11 +124,7 @@ func (host *Host) GetPrometheusMetrics() error {
 	}
 
 	// Process metrics and labels
-	if err := host.processPrometheusMetrics(result); err != nil {
-		return err
-	}
-
-	return nil
+	return host.processPrometheusMetrics(result)
 }
 
 // processPrometheusMetrics processes the Prometheus metrics result and sets the values in the host's Metrics.

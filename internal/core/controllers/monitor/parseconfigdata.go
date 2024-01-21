@@ -108,11 +108,7 @@ func (c *Controller) ParseConfigRPC() error {
 		return err
 	}
 
-	if err := c.setHostsHealth(enums.TableTypeRPC); err != nil {
-		return err
-	}
-
-	return nil
+	return c.setHostsHealth(enums.TableTypeRPC)
 }
 
 // getTableData fetches the data for the specified table type.
