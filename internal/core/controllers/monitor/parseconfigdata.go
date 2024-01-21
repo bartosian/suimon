@@ -18,6 +18,7 @@ var rpcTables = map[enums.TableType]bool{
 	enums.TableTypeGasPriceAndSubsidy: true,
 	enums.TableTypeValidatorsParams:   true,
 	enums.TableTypeRPC:                true,
+	enums.TableTypeProtocol:           true,
 }
 
 // ParseConfigData retrieves data from hosts and sets their health based on the selected tables.
@@ -123,7 +124,7 @@ func (c *Controller) getTableData(tableType enums.TableType) error {
 		return c.processReleases()
 	}
 
-	return c.processOtherTableTypes(tableType)
+	return c.processStandardTableTypes(tableType)
 }
 
 // processReleases fetches the release data for the current network.
@@ -139,10 +140,10 @@ func (c *Controller) processReleases() error {
 	return nil
 }
 
-// processOtherTableTypes fetches the data for the specified table type other than 'Releases'.
+// processStandardTableTypes fetches the data for the specified table type other than 'Releases'.
 // It retrieves the address information based on the table type, creates hosts, sets the hosts by table type, and sets their health status.
 // The function returns an error if there is an issue fetching the address information, creating hosts, setting hosts by table type, or setting their health status.
-func (c *Controller) processOtherTableTypes(tableType enums.TableType) error {
+func (c *Controller) processStandardTableTypes(tableType enums.TableType) error {
 	addresses, err := c.getAddressInfoByTableType(tableType)
 	if err != nil {
 		return fmt.Errorf("error getting address info: %w", err)

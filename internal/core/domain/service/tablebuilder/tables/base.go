@@ -68,6 +68,7 @@ var columnsConfigMap = map[enums.TableType]ColumnsConfig{
 	enums.TableTypeValidatorReports:   ColumnsConfigSystem,
 	enums.TableTypeActiveValidators:   ColumnsConfigActiveValidator,
 	enums.TableTypeReleases:           ColumnsConfigRelease,
+	enums.TableTypeProtocol:           ColumnsConfigProtocol,
 }
 
 // Define the mapping of TableType enums to their corresponding RowsConfig.
@@ -81,6 +82,7 @@ var rowsConfigMap = map[enums.TableType]RowsConfig{
 	enums.TableTypeNode:               RowsConfigNode,
 	enums.TableTypeActiveValidators:   RowsActiveValidator,
 	enums.TableTypeReleases:           RowsRelease,
+	enums.TableTypeProtocol:           RowsConfigProtocol,
 }
 
 // Define the mapping of TableType enums to their corresponding text.Colors.
@@ -89,6 +91,7 @@ var tableColorMap = map[enums.TableType]text.Colors{
 	enums.TableTypeValidator:        {text.BgHiBlue, text.FgBlack},
 	enums.TableTypeValidatorsAtRisk: {text.BgHiBlue, text.FgBlack},
 	enums.TableTypeActiveValidators: {text.BgHiBlue, text.FgBlack},
+	enums.TableTypeProtocol:         {text.BgHiBlue, text.FgBlack},
 }
 
 // defaultTableColor defines the default color configuration.

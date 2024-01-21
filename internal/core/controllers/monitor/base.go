@@ -82,6 +82,10 @@ func NewController(
 	}
 }
 
+// getHostsByTableType is a method of the Controller struct that returns a list of hosts for a given table type.
+// It acquires a read lock on the controller lock before accessing the hosts data.
+// The method uses a switch statement to determine which type of hosts to return based on the table type.
+// The method returns a list of hosts and an error. The error is returned if the table type is unknown or if there are no RPC hosts available for the specified table types.
 func (c *Controller) getHostsByTableType(table enums.TableType) (hosts []host.Host, err error) {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
@@ -97,7 +101,8 @@ func (c *Controller) getHostsByTableType(table enums.TableType) (hosts []host.Ho
 		enums.TableTypeGasPriceAndSubsidy,
 		enums.TableTypeValidatorsParams,
 		enums.TableTypeValidatorsAtRisk,
-		enums.TableTypeValidatorReports:
+		enums.TableTypeValidatorReports,
+		enums.TableTypeProtocol:
 
 		if len(c.hosts.rpc) > 0 {
 			return c.hosts.rpc[:1], nil

@@ -58,15 +58,17 @@ var (
 			enums.ColumnNameSystemTotalStake,
 			enums.ColumnNameSystemStorageFundTotalObjectStorageRebates,
 			enums.ColumnNameSystemStorageFundNonRefundableBalance,
+		},
+		1: {
 			enums.ColumnNameSystemStakeSubsidyStartEpoch,
 			enums.ColumnNameSystemStakeSubsidyBalance,
 			enums.ColumnNameSystemStakeSubsidyDistributionCounter,
 			enums.ColumnNameSystemStakeSubsidyCurrentDistributionAmount,
-		},
-		1: {
 			enums.ColumnNameSystemStakeSubsidyPeriodLength,
 			enums.ColumnNameSystemStakeSubsidyDecreaseRate,
 			enums.ColumnNameSystemReferenceGasPrice,
+		},
+		2: {
 			enums.ColumnNameSystemMinReferenceGasPrice,
 			enums.ColumnNameSystemMaxReferenceGasPrice,
 			enums.ColumnNameSystemMeanReferenceGasPrice,

@@ -5,6 +5,7 @@ import (
 
 	"github.com/bartosian/suimon/internal/core/domain/enums"
 	domainhost "github.com/bartosian/suimon/internal/core/domain/host"
+	domainmetrics "github.com/bartosian/suimon/internal/core/domain/metrics"
 )
 
 const utcTimeZone = "America/New_York"
@@ -16,50 +17,38 @@ func (tb *Builder) Init() error {
 		return errors.New("hosts are not initialized")
 	}
 
-	handlerMap := map[enums.TableType]func([]domainhost.Host) error{
-		enums.TableTypeNode:               tb.handleNodeTable,
-		enums.TableTypeRPC:                tb.handleRPCTable,
-		enums.TableTypeValidator:          tb.handleValidatorTable,
-		enums.TableTypeGasPriceAndSubsidy: tb.handleSystemStateTableWrapper,
-		enums.TableTypeValidatorsParams:   tb.handleValidatorParamsTableWrapper,
-		enums.TableTypeValidatorsAtRisk:   tb.handleValidatorsAtRiskTableWrapper,
-		enums.TableTypeValidatorReports:   tb.handleValidatorReportsTableWrapper,
-		enums.TableTypeActiveValidators:   tb.handleActiveValidatorsTableWrapper,
-		enums.TableTypeReleases:           tb.handleReleasesTableWrapper,
+	handlerMap := map[enums.TableType]func() error{
+		enums.TableTypeNode:               func() error { return tb.handleNodeTable(tb.hosts) },
+		enums.TableTypeRPC:                func() error { return tb.handleRPCTable(tb.hosts) },
+		enums.TableTypeValidator:          func() error { return tb.handleValidatorTable(tb.hosts) },
+		enums.TableTypeGasPriceAndSubsidy: func() error { return tb.handleTableWithMetrics(tb.hosts, tb.handleSystemStateTable) },
+		enums.TableTypeProtocol:           func() error { return tb.handleTableWithMetrics(tb.hosts, tb.handleProtocolTable) },
+		enums.TableTypeValidatorsParams:   func() error { return tb.handleTableWithSystemState(tb.hosts, tb.handleValidatorParamsTable) },
+		enums.TableTypeValidatorsAtRisk:   func() error { return tb.handleTableWithSystemState(tb.hosts, tb.handleValidatorsAtRiskTable) },
+		enums.TableTypeValidatorReports:   func() error { return tb.handleTableWithSystemState(tb.hosts, tb.handleValidatorReportsTable) },
+		enums.TableTypeActiveValidators:   func() error { return tb.handleTableWithMetrics(tb.hosts, tb.handleActiveValidatorsTable) },
+		enums.TableTypeReleases:           func() error { return tb.handleReleasesTable(tb.Releases) },
 	}
 
 	if handler, ok := handlerMap[tb.tableType]; ok {
-		return handler(tb.hosts)
+		return handler()
 	}
 
 	return nil
 }
 
-func (tb *Builder) handleSystemStateTableWrapper(hosts []domainhost.Host) error {
-	metrics := hosts[0].Metrics
-	return tb.handleSystemStateTable(&metrics)
+// handleTableWithMetrics is a generic wrapper for handling tables that require metrics.
+func (tb *Builder) handleTableWithMetrics(hosts []domainhost.Host, handlerFunc func(*domainmetrics.Metrics) error) error {
+	if len(hosts) == 0 {
+		return errors.New("no hosts available")
+	}
+	return handlerFunc(&hosts[0].Metrics)
 }
 
-func (tb *Builder) handleValidatorParamsTableWrapper(hosts []domainhost.Host) error {
-	systemState := hosts[0].Metrics.SystemState
-	return tb.handleValidatorParamsTable(&systemState)
-}
-
-func (tb *Builder) handleValidatorsAtRiskTableWrapper(hosts []domainhost.Host) error {
-	systemState := hosts[0].Metrics.SystemState
-	return tb.handleValidatorsAtRiskTable(&systemState)
-}
-
-func (tb *Builder) handleValidatorReportsTableWrapper(hosts []domainhost.Host) error {
-	systemState := hosts[0].Metrics.SystemState
-	return tb.handleValidatorReportsTable(&systemState)
-}
-
-func (tb *Builder) handleActiveValidatorsTableWrapper(hosts []domainhost.Host) error {
-	metrics := hosts[0].Metrics
-	return tb.handleActiveValidatorsTable(&metrics)
-}
-
-func (tb *Builder) handleReleasesTableWrapper(hosts []domainhost.Host) error {
-	return tb.handleReleasesTable(tb.Releases)
+// handleTableWithSystemState is a generic wrapper for handling tables that require system state.
+func (tb *Builder) handleTableWithSystemState(hosts []domainhost.Host, handlerFunc func(*domainmetrics.SuiSystemState) error) error {
+	if len(hosts) == 0 {
+		return errors.New("no hosts available")
+	}
+	return handlerFunc(&hosts[0].Metrics.SystemState)
 }

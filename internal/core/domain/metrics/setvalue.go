@@ -33,6 +33,8 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 	switch metric {
 	case enums.MetricTypeSuiSystemState:
 		return metrics.SetSystemStateValue(value)
+	case enums.MetricTypeProtocol:
+		return metrics.SetProtocolValue(value)
 	case enums.MetricTypeValidatorsApy:
 		return metrics.SetValidatorsApyValue(value)
 	case enums.MetricTypeTotalTransactionBlocks:
@@ -551,6 +553,24 @@ func (validators Validators) GetMinRefGasPrice() (int, error) {
 	}
 
 	return minRefGasPrice, nil
+}
+
+func (metrics *Metrics) SetProtocolValue(value any) error {
+	// Parse the JSON data of the Protocol object.
+	dataBytes, err := json.Marshal(value.(map[string]interface{}))
+	if err != nil {
+		return fmt.Errorf(ErrUnexpectedMetricValueType, enums.MetricTypeProtocol, value)
+	}
+
+	// Unmarshal the JSON data into a Protocol struct.
+	var protocol Protocol
+	if err = json.Unmarshal(dataBytes, &protocol); err != nil {
+		return fmt.Errorf(ErrUnexpectedMetricValueType, enums.MetricTypeProtocol, value)
+	}
+
+	metrics.Protocol = protocol
+
+	return nil
 }
 
 // MistToSui converts a string representing a value in "mist" units to its

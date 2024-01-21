@@ -19,6 +19,7 @@ var (
 		enums.RPCMethodGetLatestCheckpointSequenceNumber: enums.MetricTypeLatestCheckpoint,
 		enums.RPCMethodGetSuiSystemState:                 enums.MetricTypeSuiSystemState,
 		enums.RPCMethodGetValidatorsApy:                  enums.MetricTypeValidatorsApy,
+		enums.RPCMethodGetProtocol:                       enums.MetricTypeProtocol,
 	}
 
 	// prometheusToMetric maps a Prometheus metric name to a metric type.
@@ -53,6 +54,7 @@ var (
 			enums.RPCMethodGetLatestCheckpointSequenceNumber,
 			enums.RPCMethodGetSuiSystemState,
 			enums.RPCMethodGetValidatorsApy,
+			enums.RPCMethodGetProtocol,
 		},
 	}
 	// tablesToCallMetrics maps a table type to a boolean value indicating whether to call metrics for that table type.
