@@ -77,17 +77,17 @@ func (gateway *Gateway) CallFor(metrics ports.Metrics) (result ports.MetricsResu
 
 		parser := expfmt.TextParser{}
 
-		data, err := parser.TextToMetricFamilies(response.Body)
-		if err != nil {
-			return nil, err
+		data, parseErr := parser.TextToMetricFamilies(response.Body)
+		if parseErr != nil {
+			return nil, parseErr
 		}
 
 		metricsResult := make(ports.MetricsResult)
 
 		for metricName, metricConfig := range metrics {
-			result, err := getMetricValueWithLabelFiltering(data, metricName.ToString(), metricConfig)
-			if err != nil {
-				return nil, err
+			result, getMetricValueErr := getMetricValueWithLabelFiltering(data, metricName.ToString(), metricConfig)
+			if getMetricValueErr != nil {
+				return nil, getMetricValueErr
 			}
 
 			metricsResult[metricName] = result
@@ -149,7 +149,7 @@ func extractLabels(labels []*ioPrometheusClient.LabelPair) prometheus.Labels {
 	return labelsResult
 }
 
-// labelMatches checks if the key-value pair exists in the given labels
+// labelMatches checks if the key-value pair exists in the given labels.
 func labelMatches(key, value string, labels []*ioPrometheusClient.LabelPair) bool {
 	for _, label := range labels {
 		if label.GetName() == key && label.GetValue() == value {

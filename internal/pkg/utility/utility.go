@@ -71,9 +71,11 @@ func GetDirSize(path string) (float64, error) {
 		if err != nil {
 			return err
 		}
+
 		if !info.IsDir() {
 			size += float64(info.Size())
 		}
+
 		return nil
 	})
 

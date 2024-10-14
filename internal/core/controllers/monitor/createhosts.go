@@ -68,16 +68,16 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 			result.response = createdHost
 
 			if c.selectedConfig.IPLookup.AccessToken != "" {
-				if err := createdHost.SetIPInfo(); err != nil {
-					result.err = err
+				if createErr := createdHost.SetIPInfo(); createErr != nil {
+					result.err = createErr
 					respChan <- result
 
 					return
 				}
 			}
 
-			if err := createdHost.GetMetrics(); err != nil {
-				result.err = err
+			if getMetricsErr := createdHost.GetMetrics(); getMetricsErr != nil {
+				result.err = getMetricsErr
 				respChan <- result
 
 				return

@@ -1,7 +1,7 @@
 package cmdhandlers
 
 import (
-	"fmt"
+	"log/slog"
 
 	"github.com/spf13/cobra"
 
@@ -53,6 +53,6 @@ func (h *MonitorHandler) newCommand() *cobra.Command {
 
 func (h *MonitorHandler) handleCommand(_ *cobra.Command, _ []string) {
 	if err := h.controller.Monitor(); err != nil {
-		fmt.Printf("Failed to run! %s\n", err)
+		slog.Error("Failed to run", "error", err)
 	}
 }

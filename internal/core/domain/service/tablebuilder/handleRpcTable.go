@@ -17,6 +17,7 @@ func (tb *Builder) handleRPCTable(hosts []domainhost.Host) error {
 		if left.Status != right.Status {
 			return left.Status > right.Status
 		}
+
 		return left.Metrics.TotalTransactionsBlocks > right.Metrics.TotalTransactionsBlocks
 	})
 
@@ -30,6 +31,7 @@ func (tb *Builder) handleRPCTable(hosts []domainhost.Host) error {
 		columnValues := tables.GetRPCColumnValues(idx, &host)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
+
 		tableConfig.RowsCount++
 	}
 

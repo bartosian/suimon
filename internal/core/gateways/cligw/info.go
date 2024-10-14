@@ -2,6 +2,7 @@ package cligw
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/fatih/color"
 )
@@ -27,7 +28,7 @@ func (gateway *Gateway) InfoWithOpts(label, value string, opts MsgOpts) {
 
 	result := fmt.Sprintf("%s %s", labelLine, valueLine)
 
-	fmt.Println(result)
+	slog.Info(result)
 }
 
 func (Gateway) infoLabel(label string, indent int) string {

@@ -150,7 +150,7 @@ func (host *Host) processPrometheusMetrics(result ports.MetricsResult) error {
 		delete(result, metricName)
 
 		if metricType == enums.MetricTypeUptime {
-			if value, ok := metricValue.Labels["version"]; ok {
+			if value, labelExists := metricValue.Labels["version"]; labelExists {
 				versionInfo := strings.SplitN(value, "-", versionInfoParts)
 
 				if err := host.Metrics.SetValue(enums.MetricTypeVersion, versionInfo[0]); err != nil {

@@ -27,7 +27,7 @@ type Builder struct {
 	Releases   []metrics.Release
 }
 
-// NewBuilder creates a new instance of the table builder, using the CLI gateway
+// NewBuilder creates a new instance of the table builder, using the CLI gateway.
 func NewBuilder(tableType enums.TableType, hosts []host.Host, releases []metrics.Release, cliGateway *cligw.Gateway) *Builder {
 	tableWR := table.NewWriter()
 	tableWR.SetOutputMirror(os.Stdout)
@@ -41,7 +41,7 @@ func NewBuilder(tableType enums.TableType, hosts []host.Host, releases []metrics
 	}
 }
 
-// setColumns sets the column configurations for the table builder based on the configuration in the builder's table config
+// setColumns sets the column configurations for the table builder based on the configuration in the builder's table config.
 func (tb *Builder) setColumns() {
 	columnsConfig := make([]table.ColumnConfig, len(tb.config.Columns))
 
@@ -52,7 +52,7 @@ func (tb *Builder) setColumns() {
 	tb.writer.SetColumnConfigs(columnsConfig)
 }
 
-// setRows sets the rows of the table builder based on the configuration in the builder's table config
+// setRows sets the rows of the table builder based on the configuration in the builder's table config.
 func (tb *Builder) setRows() error {
 	rowsConfig := tb.config.Rows
 	columnsConfig := tb.config.Columns
@@ -108,7 +108,7 @@ func (tb *Builder) setRows() error {
 	return nil
 }
 
-// setStyle sets the style for the table builder based on the configuration in the builder's table config
+// setStyle sets the style for the table builder based on the configuration in the builder's table config.
 func (tb *Builder) setStyle() {
 	tb.writer.SetTitle(tb.config.Name)
 	tb.writer.SetStyle(tb.config.Style)
@@ -116,7 +116,7 @@ func (tb *Builder) setStyle() {
 	tb.setColors()
 }
 
-// setColors sets the row colors for the table builder based on the current state of the table
+// setColors sets the row colors for the table builder based on the current state of the table.
 func (tb *Builder) setColors() {
 	var (
 		fgWhite  = text.FgWhite

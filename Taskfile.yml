@@ -1,0 +1,31 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Build the suimon binary
+    cmds:
+      - go build -o .build/suimon cmd/main.go
+
+  lint:
+    desc: Lint the suimon code
+    cmds:
+      - golangci-lint run ./...
+
+  update-deps:
+    desc: Update Go dependencies
+    cmds:
+      - go get -u ./...
+      - go mod tidy          
+
+  tag:
+    desc: Create a new release tag
+    vars:
+      TAG:
+        sh: |
+          echo "Enter release tag:" && read tag && echo $tag
+      MESSAGE:
+        sh: |
+          echo "Enter tag message:" && read message && echo $message
+    cmds:
+      - git tag -a "v{{.TAG}}" -m "{{.MESSAGE}}"
+      - git push origin "v{{.TAG}}"    

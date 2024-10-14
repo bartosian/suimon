@@ -65,17 +65,17 @@ type (
 	ValidatorsApyParsed map[string]float64
 
 	// ValidatorsReports is a map where the key is the address of a validator and the value is a ValidatorReports instance
-	// containing all the reports for that validator
+	// containing all the reports for that validator.
 	ValidatorsReports []ValidatorReport
 
-	// ValidatorReport represents validator reporters
+	// ValidatorReport represents validator reporters.
 	ValidatorReport struct {
 		Name               string
 		Reporters          []ValidatorReporter
 		SlashingPercentage float64
 	}
 
-	// ValidatorReporter contains information about a validator reporter
+	// ValidatorReporter contains information about a validator reporter.
 	ValidatorReporter struct {
 		Name        string
 		Address     string
@@ -92,7 +92,7 @@ type (
 	}
 )
 
-// parseValidatorsAtRisk is a helper function that parses the validators at risk from the raw JSON data
+// parseValidatorsAtRisk is a helper function that parses the validators at risk from the raw JSON data.
 func (systemState *SuiSystemState) parseValidatorsAtRisk() error {
 	if len(systemState.AtRiskValidators) == 0 {
 		return nil
@@ -156,13 +156,13 @@ func (systemState *SuiSystemState) parseValidatorReports() error {
 		validatorReporters := make([]ValidatorReporter, 0, len(reporters))
 
 		for _, reporterAddress := range reporters {
-			reporter, ok := reporterAddress.(string)
-			if !ok {
+			reporter, convertErr := reporterAddress.(string)
+			if !convertErr {
 				return fmt.Errorf(ErrUnsupportedSuiAddressAttr, reporterAddress)
 			}
 
-			reporterValidator, ok := systemState.AddressToValidator[reporter]
-			if !ok {
+			reporterValidator, addressExists := systemState.AddressToValidator[reporter]
+			if !addressExists {
 				return fmt.Errorf("failed to loookup validator by address: %s", reporterAddress)
 			}
 

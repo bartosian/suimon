@@ -205,23 +205,23 @@ func (c *Controller) setHostsHealth(tableType enums.TableType) error {
 		checkpointSyncBacklog := metrics.HighestKnownCheckpoint - metrics.HighestSyncedCheckpoint
 
 		// Set transaction sync percentage.
-		if err := hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, &rpcHost); err != nil {
-			return fmt.Errorf("error setting transaction sync percentage for host: %w", err)
+		if setPctProgressErr := hosts[idx].SetPctProgress(enums.MetricTypeTxSyncPercentage, &rpcHost); setPctProgressErr != nil {
+			return fmt.Errorf("error setting transaction sync percentage for host: %w", setPctProgressErr)
 		}
 
 		// Set checkpoint sync percentage.
-		if err := hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, &rpcHost); err != nil {
-			return fmt.Errorf("error setting checkpoint sync percentage for host: %w", err)
+		if setPctProgressErr := hosts[idx].SetPctProgress(enums.MetricTypeCheckSyncPercentage, &rpcHost); setPctProgressErr != nil {
+			return fmt.Errorf("error setting checkpoint sync percentage for host: %w", setPctProgressErr)
 		}
 
 		// Set checkpoint execution backlog.
-		if err := hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointExecBacklog, checkpointExecBacklog); err != nil {
-			return fmt.Errorf("error setting checkpoint execution backlog for host: %w", err)
+		if setCheckpointExecBacklogErr := hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointExecBacklog, checkpointExecBacklog); setCheckpointExecBacklogErr != nil {
+			return fmt.Errorf("error setting checkpoint execution backlog for host: %w", setCheckpointExecBacklogErr)
 		}
 
 		// Set checkpoint sync backlog.
-		if err := hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointSyncBacklog, checkpointSyncBacklog); err != nil {
-			return fmt.Errorf("error setting checkpoint sync backlog for host: %w", err)
+		if setCheckpointSyncBacklogErr := hosts[idx].Metrics.SetValue(enums.MetricTypeCheckpointSyncBacklog, checkpointSyncBacklog); setCheckpointSyncBacklogErr != nil {
+			return fmt.Errorf("error setting checkpoint sync backlog for host: %w", setCheckpointSyncBacklogErr)
 		}
 
 		// Set host status.

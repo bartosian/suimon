@@ -18,9 +18,11 @@ func (tb *Builder) handleValidatorTable(hosts []domainhost.Host) error {
 		if left.Status != right.Status {
 			return left.Status > right.Status
 		}
+
 		if left.Metrics.CurrentRound != right.Metrics.CurrentRound {
 			return left.Metrics.CurrentRound > right.Metrics.CurrentRound
 		}
+
 		return left.Metrics.HighestSyncedCheckpoint > right.Metrics.HighestSyncedCheckpoint
 	})
 
@@ -34,6 +36,7 @@ func (tb *Builder) handleValidatorTable(hosts []domainhost.Host) error {
 		columnValues := tables.GetValidatorColumnValues(idx, &host)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
+
 		tableConfig.RowsCount++
 	}
 

@@ -1,4 +1,7 @@
+# IDE
 .idea/
-/suimon/vendor/
-dist/
 .vscode/
+
+# Build Outputs
+.build
+dist

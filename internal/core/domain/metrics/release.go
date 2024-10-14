@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"strings"
 )
 
 const releseAPIURL = "https://api.github.com/repos/MystenLabs/sui/releases?per_page=50"
 
-// Release represents a GitHub release
+// Release represents a GitHub release.
 type Release struct {
 	TagName     string `json:"tag_name"`
 	CommitHash  string `json:"target_commitish"`
@@ -25,13 +26,18 @@ type Release struct {
 	PreRelease bool `json:"prerelease"`
 }
 
-// getReleases fetches releases for a given repo and filters them by network name
+// getReleases fetches releases for a given repo and filters them by network name.
 func GetReleases(networkName string) ([]Release, error) {
 	resp, err := http.Get(releseAPIURL)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			slog.Error("failed to close response body", "error", closeErr)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)

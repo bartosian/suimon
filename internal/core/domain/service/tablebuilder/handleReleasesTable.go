@@ -21,6 +21,7 @@ func (tb *Builder) handleReleasesTable(releases []metrics.Release) error {
 		columnValues := tables.GetReleaseColumnValues(idx, &release)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
+
 		tableConfig.RowsCount++
 	}
 
