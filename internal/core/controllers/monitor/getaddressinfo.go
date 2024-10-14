@@ -27,13 +27,18 @@ func (c *Controller) getAddressInfoByTableType(table enums.TableType) ([]host.Ad
 		enums.TableTypeRPC:       c.getRPCAddresses,
 	}
 
-	parser, ok := parserMap[table]
-	if !ok {
+	parser, parserExists := parserMap[table]
+	if !parserExists {
 		return nil, fmt.Errorf("invalid table type: %v", table)
 	}
 
-	if addressFunc, ok := addressFuncMap[table]; ok {
-		return addressFunc(parser)
+	if addressFunc, existsFunc := addressFuncMap[table]; existsFunc {
+		addresses, err := addressFunc(parser)
+		if err != nil {
+			return nil, err
+		}
+
+		return addresses, nil
 	}
 
 	return nil, fmt.Errorf("address function not found for table type: %v", table)
@@ -59,9 +64,9 @@ func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.Ad
 		var addressInfo host.AddressInfo
 
 		if addressRPC != "" {
-			endpointRPC, err := parser(addressRPC)
-			if err != nil {
-				return nil, fmt.Errorf("invalid format for full-node json-rpc-address in config file: %w", err)
+			endpointRPC, parseErr := parser(addressRPC)
+			if parseErr != nil {
+				return nil, fmt.Errorf("invalid format for full-node json-rpc-address in config file: %w", parseErr)
 			}
 
 			addressInfo = host.AddressInfo{
@@ -75,9 +80,9 @@ func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.Ad
 		}
 
 		if addressMetrics != "" {
-			endpointMetrics, err := parser(addressMetrics)
-			if err != nil {
-				return nil, fmt.Errorf("invalid format for full-node metrics-address in config file: %w", err)
+			endpointMetrics, parseErr := parser(addressMetrics)
+			if parseErr != nil {
+				return nil, fmt.Errorf("invalid format for full-node metrics-address in config file: %w", parseErr)
 			}
 
 			// If addressInfo is still empty, initialize it with endpointMetrics
@@ -107,7 +112,7 @@ func (c *Controller) getNodeAddresses(parser addressParser) (addresses []host.Ad
 func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
 	validatorsConfig := c.selectedConfig.Validators
 	if len(validatorsConfig) == 0 {
-		return
+		return []host.AddressInfo{}, nil
 	}
 
 	for _, validator := range validatorsConfig {
@@ -117,9 +122,9 @@ func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []ho
 			return nil, errors.New("invalid format for validator in dashboards file: metrics-address is required")
 		}
 
-		endpointMetrics, err := parser(addressMetrics)
-		if err != nil {
-			return nil, fmt.Errorf("invalid format for validator metrics-address in config file: %w", err)
+		endpointMetrics, parseErr := parser(addressMetrics)
+		if parseErr != nil {
+			return nil, fmt.Errorf("invalid format for validator metrics-address in config file: %w", parseErr)
 		}
 
 		addressInfo := host.AddressInfo{Endpoint: *endpointMetrics, Ports: make(map[enums.PortType]string)}
@@ -149,9 +154,9 @@ func (c *Controller) getRPCAddresses(parser addressParser) (addresses []host.Add
 	}
 
 	for _, rpc := range rpcConfig {
-		endpoint, err := parser(rpc)
-		if err != nil {
-			return nil, fmt.Errorf("invalid format for public-rpc in config file: %w", err)
+		endpoint, parseErr := parser(rpc)
+		if parseErr != nil {
+			return nil, fmt.Errorf("invalid format for public-rpc in config file: %w", parseErr)
 		}
 
 		addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}

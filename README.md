@@ -22,11 +22,7 @@ So if you're looking for a powerful, reliable tool for monitoring the SUI networ
 
 - [SUIMON: Command Line Tool for Monitoring SUI Network](#suimon-command-line-tool-for-monitoring-sui-network)
   - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
-    - [Ubuntu](#ubuntu)
-    - [MacOS](#macos)
-    - [Windows](#windows)
-  - [Build and Installation from Source](#build-and-installation-from-source)
+  - [Installation from Source](#installation-from-source)
   - [Installation using Homebrew](#installation-using-homebrew)
   - [Upgrading Suimon using Homebrew](#upgrading-suimon-using-homebrew)
   - [Suimon Configuration Files](#suimon-configuration-files)
@@ -40,41 +36,11 @@ So if you're looking for a powerful, reliable tool for monitoring the SUI networ
   - [License](#license)
 - [Acknowledgments](#acknowledgments)
 
-## Installation
-
-There are installation scripts for several common environments, including Ubuntu, Mac OS, and Windows. These scripts are provided for convenience only and do not guarantee that Suimon will run without issues on your system.
-
-### Ubuntu
-
-```shell
-wget -O $HOME/suimon_install.sh https://raw.githubusercontent.com/bartosian/suimon/main/scripts/ubuntu/install.sh && \
-chmod +x $HOME/suimon_install.sh && \
-$HOME/suimon_install.sh && \
-rm $HOME/suimon_install.sh
-```
-
-### MacOS
-
-```shell
-curl -o $HOME/suimon_install.sh https://raw.githubusercontent.com/bartosian/suimon/main/scripts/macos/install.sh && \
-chmod +x $HOME/suimon_install.sh && \
-$HOME/suimon_install.sh && \
-rm $HOME/suimon_install.sh
-```
-
-### Windows
-
-```shell
-Invoke-WebRequest -OutFile $HOME\suimon_install.ps1 https://raw.githubusercontent.com/bartosian/suimon/main/scripts/windows/install.ps1 ; \
-powershell -ExecutionPolicy Bypass -File $HOME\suimon_install.ps1 ; \
-Remove-Item $HOME\suimon_install.ps1
-```
-
-## Build and Installation from Source
+## Installation from Source
 
 Building and installing from the source is useful if you want to customize the code or if there is no pre-built binary available for your platform. It can also be a good learning experience if you are interested in how Suimon works.
 
-1. **Install Go**
+1. **Install Dependencies**
 
    - The Suimon installation requires Go. If you don't already have Go installed, please visit [https://golang.org/dl](https://golang.org/dl) and [https://go.dev/doc/install](https://go.dev/doc/install) for instructions on how to download and install Go on your system. Download the binary release that is suitable for your system and follow the installation instructions.
 
@@ -98,7 +64,7 @@ Building and installing from the source is useful if you want to customize the c
 
    - Build the Suimon package by running the following command:
      ```
-     go build -o suimon .
+     go build -o suimon cmd/main.go
      ```
 
 5. **Move the built binary to the executable PATH**

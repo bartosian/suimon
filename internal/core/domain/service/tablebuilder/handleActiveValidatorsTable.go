@@ -27,6 +27,7 @@ func (tb *Builder) handleActiveValidatorsTable(metrics *domainmetrics.Metrics) e
 		if leftErr != nil {
 			return false
 		}
+
 		if rightErr != nil {
 			return true
 		}
@@ -37,6 +38,7 @@ func (tb *Builder) handleActiveValidatorsTable(metrics *domainmetrics.Metrics) e
 		if leftStakeErr != nil {
 			return false
 		}
+
 		if rightStakeErr != nil {
 			return true
 		}

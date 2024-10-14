@@ -98,8 +98,8 @@ func rerenderLoop(db *Builder, ticker *time.Ticker) func() error {
 						return fmt.Errorf("failed to get metric for column %s", columnName)
 					}
 
-					if err := cell.Write(columnValue); err != nil {
-						return err
+					if writeErr := cell.Write(columnValue); writeErr != nil {
+						return writeErr
 					}
 				}
 			case <-db.ctx.Done():

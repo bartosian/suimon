@@ -1,3 +1,39 @@
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - ineffassign
+    - typecheck
+    - goimports
+    - govet
+    - staticcheck
+    - godot
+    - misspell
+    - whitespace
+    - goconst
+    - gocritic
+    - nolintlint
+    - nakedret
+    - forbidigo
+    - wsl
+    - revive
+    - errorlint
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  fix: true
+  exclude-dirs:
+    - packages/js/
+    - packages/go/proto/
+    - packages/go/db/
+    - node_modules
+
 linters-settings:
   errcheck:
     check-type-assertions: true
@@ -9,53 +45,32 @@ linters-settings:
       - diagnostic
       - experimental
       - opinionated
-      - performance
       - style
   govet:
-    check-shadowing: true
-    enable:
-      - fieldalignment
+    # Enable all analyzers.
+    # Default: false
+    enable-all: true
+    # Disable analyzers by name.
+    # Run `go tool vet help` to see all analyzers.
+    # Default: []
+    disable:
+      - fieldalignment # too strict
+    # Settings per analyzer.
+    settings:
+      shadow:
+        # Whether to be strict about shadowing; can be noisy.
+        # Default: false
+        strict: true
   nolintlint:
     require-explanation: true
     require-specific: true
-
-linters:
-  disable-all: true
-  enable:
-    - bodyclose
-    - deadcode
-    - dogsled
-    - dupl
-    - errcheck
-    - govet
-    - exportloopref
-    - exhaustive
-    - goconst
-    - gocritic
-    - gofmt
-    - goimports
-    - gomnd
-    - gocyclo
-    - gosec
-    - gosimple
-    - ineffassign
-    - misspell
-    - nolintlint
-    - nakedret
-    - prealloc
-    - predeclared
-    - revive
-    - staticcheck
-    - structcheck
-    - stylecheck
-    - thelper
-    - tparallel
-    - typecheck
-    - unconvert
-    - unparam
-    - varcheck
-    - whitespace
-    - wsl
-
-run:
-  issues-exit-code: 1
+  nakedret:
+    # Make an issue if func has more lines of code than this setting, and it has naked returns.
+    max-func-lines: 16
+  revive:
+    rules:
+      - name: package-comments
+        severity: warning
+        disabled: true
+output:
+  sort-results: true

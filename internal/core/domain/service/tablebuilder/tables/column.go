@@ -26,7 +26,7 @@ type (
 	}
 )
 
-// NewDefaultColumnConfig creates a new column configuration with the given alignment settings and hidden flag
+// NewDefaultColumnConfig creates a new column configuration with the given alignment settings and hidden flag.
 func NewDefaultColumnConfig(alignHeader, align text.Align, hidden bool) Column {
 	return Column{
 		Config: &table.ColumnConfig{
@@ -39,7 +39,7 @@ func NewDefaultColumnConfig(alignHeader, align text.Align, hidden bool) Column {
 	}
 }
 
-// SetValue sets the value of the column to the given value, appending it to the existing values slice
+// SetValue sets the value of the column to the given value, appending it to the existing values slice.
 func (col *Column) SetValue(value any) {
 	if value == nil || value == "" {
 		value = TableNoData
@@ -48,7 +48,7 @@ func (col *Column) SetValue(value any) {
 	col.Values = append(col.Values, value)
 }
 
-// SetNoDataValue creates a new copy of the column with a nil value set
+// SetNoDataValue creates a new copy of the column with a nil value set.
 func (col *Column) SetNoDataValue() *Column {
 	newColumn := *col
 	newColumn.SetValue(nil)
@@ -56,7 +56,7 @@ func (col *Column) SetNoDataValue() *Column {
 	return &newColumn
 }
 
-// SetNoDataValue creates a new slice of columns with a nil value set for each column
+// SetNoDataValue creates a new slice of columns with a nil value set for each column.
 func (cols ColumnsConfig) SetNoDataValue() ColumnsConfig {
 	newCols := make(ColumnsConfig, len(cols))
 	for idx, col := range cols {
@@ -66,7 +66,7 @@ func (cols ColumnsConfig) SetNoDataValue() ColumnsConfig {
 	return newCols
 }
 
-// SetColumnValues creates a new slice of columns with the given values set for each column at the corresponding index
+// SetColumnValues creates a new slice of columns with the given values set for each column at the corresponding index.
 func (cols ColumnsConfig) SetColumnValues(values ColumnValues) {
 	for idx, col := range cols {
 		newCol := col

@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"fmt"
+	"log/slog"
 
 	"github.com/bartosian/suimon/internal/core/gateways/cligw"
 	"github.com/bartosian/suimon/internal/core/ports"
@@ -22,5 +22,5 @@ func NewVersionController(
 }
 
 func (c *VersionController) PrintVersion() {
-	fmt.Println(version)
+	slog.Info("Suimon version", "version", version)
 }

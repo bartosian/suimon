@@ -275,21 +275,21 @@ func (metrics *Metrics) SetSystemStateValue(value any) error {
 	valueSystemState.AddressToValidator = addressToValidator
 
 	// Parse the validators at risk from the raw JSON data.
-	if err := valueSystemState.parseValidatorsAtRisk(); err != nil {
-		return err
+	if parseValidatorsAtRiskErr := valueSystemState.parseValidatorsAtRisk(); parseValidatorsAtRiskErr != nil {
+		return parseValidatorsAtRiskErr
 	}
 
 	// Parse the validator reports from the raw JSON data.
-	if err := valueSystemState.parseValidatorReports(); err != nil {
-		return err
+	if parseValidatorReportsErr := valueSystemState.parseValidatorReports(); parseValidatorReportsErr != nil {
+		return parseValidatorReportsErr
 	}
 
 	// Update the SystemState property of the Metrics struct with the parsed data.
 	metrics.SystemState = valueSystemState
 
 	// Calculate the epoch metrics.
-	if err := metrics.setEpochMetrics(); err != nil {
-		return err
+	if setEpochMetricsErr := metrics.setEpochMetrics(); setEpochMetricsErr != nil {
+		return setEpochMetricsErr
 	}
 
 	// Calculate the reference gas price metrics.
@@ -321,7 +321,7 @@ func (metrics *Metrics) SetValidatorsApyValue(value any) error {
 	return nil
 }
 
-// setEpochMetrics is a helper function that sets the epoch-related metrics based on the parsed data
+// setEpochMetrics is a helper function that sets the epoch-related metrics based on the parsed data.
 func (metrics *Metrics) setEpochMetrics() error {
 	systemState := metrics.SystemState
 
@@ -347,7 +347,7 @@ func (metrics *Metrics) setEpochMetrics() error {
 	return nil
 }
 
-// setRefGasPriceMetrics is a helper function that sets the reference gas price metrics based on the parsed data
+// setRefGasPriceMetrics is a helper function that sets the reference gas price metrics based on the parsed data.
 func (metrics *Metrics) setRefGasPriceMetrics() error {
 	activeValidators := metrics.SystemState.ActiveValidators
 

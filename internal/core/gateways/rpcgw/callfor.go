@@ -23,9 +23,9 @@ func (gateway *Gateway) CallFor(method enums.RPCMethod, params ...interface{}) (
 	go func() {
 		var resp any
 
-		err := gateway.client.CallFor(ctx, &resp, method.String(), params)
+		callErr := gateway.client.CallFor(ctx, &resp, method.String(), params)
 
-		if err != nil || resp == nil {
+		if callErr != nil || resp == nil {
 			respChan <- responseWithError{response: nil, err: fmt.Errorf("failed to get response from RPC client: %w", err)}
 		} else {
 			respChan <- responseWithError{response: resp, err: nil}

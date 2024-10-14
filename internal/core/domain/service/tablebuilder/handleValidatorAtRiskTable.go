@@ -38,6 +38,7 @@ func (tb *Builder) handleValidatorsAtRiskTable(systemState *domainmetrics.SuiSys
 		columnValues := tables.GetValidatorAtRiskColumnValues(idx, validator)
 
 		tableConfig.Columns.SetColumnValues(columnValues)
+
 		tableConfig.RowsCount++
 	}
 

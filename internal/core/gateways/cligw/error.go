@@ -3,6 +3,7 @@ package cligw
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/fatih/color"
 )
@@ -40,5 +41,5 @@ func (Gateway) ErrorWithOpts(msg string, opts MsgOpts) {
 
 	result := fmt.Sprintf("%s %s", formattedIcon, formattedMsg)
 
-	fmt.Println(result)
+	slog.Error(result)
 }

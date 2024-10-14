@@ -2,7 +2,7 @@ package enums
 
 type ColumnName string
 
-// Overview section
+// Overview section.
 const (
 	ColumnNameIndex   ColumnName = "IDX"
 	ColumnNameHealth  ColumnName = "HEALTH"
@@ -14,7 +14,7 @@ const (
 	ColumnNameCountry ColumnName = "COUNTRY"
 )
 
-// Transactions section
+// Transactions section.
 const (
 	ColumnNameTotalTransactionBlocks                  ColumnName = "TOTAL TX\nBLOCKS"
 	ColumnNameTotalTransactionCertificates            ColumnName = "TOTAL TX\nCERTIFICATES"
@@ -28,7 +28,7 @@ const (
 	ColumnNameCertificatesPerSecond                   ColumnName = "CERTIFICATES PER SECOND"
 )
 
-// Checkpoints section
+// Checkpoints section.
 const (
 	ColumnNameLatestCheckpoint        ColumnName = "LATEST\nCHECKPOINT"
 	ColumnNameHighestKnownCheckpoint  ColumnName = "HIGHEST KNOWN\nCHECKPOINT"
@@ -40,7 +40,7 @@ const (
 	ColumnNameCheckpointsPerSecond    ColumnName = "CHECKPOINTS PER SECOND"
 )
 
-// Rounds section
+// Rounds section.
 const (
 	ColumnNameCurrentRound          ColumnName = "CURRENT\nROUND"
 	ColumnNameHighestProcessedRound ColumnName = "HIGHEST\nPROCESSED ROUND"
@@ -48,14 +48,14 @@ const (
 	ColumnNameRoundsPerSecond       ColumnName = "ROUNDS PER SECOND"
 )
 
-// Peers section
+// Peers section.
 const (
 	ColumnNameNetworkPeers        ColumnName = "NETWORK\nPEERS"
 	ColumnNamePrimaryNetworkPeers ColumnName = "PRIMARY\nNETWORK PEERS"
 	ColumnNameWorkerNetworkPeers  ColumnName = "WORKER\nNETWORK PEERS"
 )
 
-// Validator section
+// Validator section.
 const (
 	ColumnNameValidatorName                     ColumnName = "NAME"
 	ColumnNameValidatorNetAddress               ColumnName = "NET ADDRESS"
@@ -74,7 +74,7 @@ const (
 	ColumnNameValidatorApy                      ColumnName = "APY, %"
 )
 
-// Epoch section
+// Epoch section.
 const (
 	ColumnNameEpoch                             ColumnName = "EPOCH"
 	ColumnNameEpochTotalTransactions            ColumnName = "TOTAL\nTRANSACTIONS"
@@ -137,7 +137,7 @@ const (
 	ColumnNameSystemStakeSubsidyDecreaseRate              ColumnName = "STAKE SUBSIDY\nDECREASE RATE"
 )
 
-// Protocol section
+// Protocol section.
 const (
 	ColumnNameMinSupportedProtocolVersion ColumnName = "MIN SUPPORTED\nPROTOCOL VERSION"
 	ColumnNameMaxSupportedProtocolVersion ColumnName = "MAX SUPPORTED\nPROTOCOL VERSION"
@@ -186,7 +186,7 @@ const (
 	ColumnNameFeatureFlagZkLoginAuth                              ColumnName = "ZK LOGIN AUTH"
 )
 
-// Release section
+// Release section.
 const (
 	ColumnNameTagName     ColumnName = "TAG"
 	ColumnNameCommitHash  ColumnName = "TARGET"

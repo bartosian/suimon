@@ -72,14 +72,14 @@ func readConfigs(dirPath string) (map[string]Config, error) {
 	}
 
 	for _, file := range ymlFiles {
-		fileData, err := os.ReadFile(file)
-		if err != nil {
-			return nil, fmt.Errorf("error reading file %s: %w", file, err)
+		fileData, readErr := os.ReadFile(file)
+		if readErr != nil {
+			return nil, fmt.Errorf("error reading file %s: %w", file, readErr)
 		}
 
 		var config Config
-		if err := yaml.Unmarshal(fileData, &config); err != nil {
-			return nil, fmt.Errorf("error unmarshaling YAML in file %s: %w", file, err)
+		if unmarshalErr := yaml.Unmarshal(fileData, &config); unmarshalErr != nil {
+			return nil, fmt.Errorf("error unmarshaling YAML in file %s: %w", file, unmarshalErr)
 		}
 
 		filename := strings.TrimSuffix(filepath.Base(file), filepath.Ext(file))
