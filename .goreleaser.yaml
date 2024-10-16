@@ -52,7 +52,7 @@ brews:
       owner: bartosian
       name: homebrew-tools
       branch: main
-      token: "{{ .Env.HOMEBREW_GITHUB_TOKEN }}"
+      token: "{{ .Env.GITHUB_TOKEN }}"
 
 release:
   github:
