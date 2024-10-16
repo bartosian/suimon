@@ -43,17 +43,16 @@ changelog:
 
 brews:
   - name: suimon
-    tap:
-      owner: bartosian
-      name: homebrew-tools
-      branch: main
-      token: "{{ .Env.GITHUB_TOKEN }}"
-
-    url_template: "https://github.com/bartosian/suimon/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
     homepage: "https://github.com/bartosian/homebrew-tools"
+    url_template: "https://github.com/bartosian/suimon/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
     commit_author:
       name: bartosian
       email: official@bartestnet.com
+    repository:
+      owner: bartosian
+      name: homebrew-tools
+      branch: main
+      token: "{{ .Env.HOMEBREW_GITHUB_TOKEN }}"
 
 release:
   github:
