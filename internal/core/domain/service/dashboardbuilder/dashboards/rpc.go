@@ -9,7 +9,6 @@ import (
 
 var (
 	ColumnsConfigRPC = ColumnsConfig{
-		// Overview section
 		enums.ColumnNameCurrentEpoch:            ColumnWidth19,
 		enums.ColumnNameSystemTimeTillNextEpoch: ColumnWidth19,
 		enums.ColumnNameTotalTransactionBlocks:  ColumnWidth30,

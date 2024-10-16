@@ -3,14 +3,14 @@ package enums
 type TableType string
 
 const (
-	TableTypeRPC                TableType = "📡 PUBLIC RPC"
+	TableTypeRPC                TableType = "📡 REFERENCE RPC"
 	TableTypeNode               TableType = "💻 FULL NODES"
 	TableTypeValidator          TableType = "🤖 VALIDATORS"
 	TableTypeGasPriceAndSubsidy TableType = "💾 SYSTEM STATE"
 	TableTypeProtocol           TableType = "🌐 PROTOCOL"
-	TableTypeValidatorsParams   TableType = "📊 VALIDATORS PARAMS"
+	TableTypeValidatorParams    TableType = "📊 VALIDATOR PARAMS"
 	TableTypeValidatorsAtRisk   TableType = "🚨 VALIDATORS AT RISK"
-	TableTypeValidatorReports   TableType = "📢 VALIDATORS REPORTS"
+	TableTypeValidatorReports   TableType = "📢 VALIDATOR REPORTS"
 	TableTypeActiveValidators   TableType = "✅ ACTIVE VALIDATORS"
 	TableTypeReleases           TableType = "📈 RELEASE HISTORY"
 )

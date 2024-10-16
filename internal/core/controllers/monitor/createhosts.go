@@ -28,6 +28,12 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 
 	var wg sync.WaitGroup
 
+	// Helper function to send error responses
+	sendErrorResponse := func(result responseWithError, err error) {
+		result.err = err
+		respChan <- result
+	}
+
 	for _, addressInfo := range addresses {
 		address := addressInfo.Endpoint.Address
 		if _, ok := processedAddresses[address]; ok {
@@ -45,41 +51,34 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 
 			rpcURL, err := addressInfo.GetURLRPC()
 			if err != nil {
-				result.err = err
-				respChan <- result
+				sendErrorResponse(result, err)
+				return
+			}
 
+			metricsURL, err := addressInfo.GetURLPrometheus()
+			if err != nil {
+				sendErrorResponse(result, err)
 				return
 			}
 
 			rpcGateway := rpcgw.NewGateway(c.gateways.cli, rpcURL)
-
-			metricsURL, err := addressInfo.GetURLPrometheus()
-			if err != nil {
-				result.err = err
-				respChan <- result
-
-				return
-			}
-
 			prometheusGateway := prometheusgw.NewGateway(c.gateways.cli, metricsURL)
 			geoGateway := geogw.NewGateway(c.gateways.cli, c.selectedConfig.IPLookup.AccessToken)
 
 			createdHost := host.NewHost(table, addressInfo, rpcGateway, geoGateway, prometheusGateway, c.gateways.cli)
 			result.response = createdHost
 
+			// If IP lookup token exists, set IP info
 			if c.selectedConfig.IPLookup.AccessToken != "" {
 				if createErr := createdHost.SetIPInfo(); createErr != nil {
-					result.err = createErr
-					respChan <- result
-
+					sendErrorResponse(result, createErr)
 					return
 				}
 			}
 
+			// Fetch metrics
 			if getMetricsErr := createdHost.GetMetrics(); getMetricsErr != nil {
-				result.err = getMetricsErr
-				respChan <- result
-
+				sendErrorResponse(result, err)
 				return
 			}
 
@@ -87,23 +86,24 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 		}(addressInfo)
 	}
 
+	// Close the response channel once all goroutines finish
 	go func() {
 		wg.Wait()
 		close(respChan)
 	}()
 
+	// Collect results and errors
 	var mErr *multierror.Error
 
 	for result := range respChan {
 		if result.err != nil {
 			mErr = multierror.Append(mErr, result.err)
-
-			continue
+		} else {
+			hosts = append(hosts, *result.response)
 		}
-
-		hosts = append(hosts, *result.response)
 	}
 
+	// Return errors if no hosts are created
 	if len(hosts) == 0 {
 		return nil, mErr.ErrorOrNil()
 	}
