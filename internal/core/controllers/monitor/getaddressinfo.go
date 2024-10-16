@@ -139,24 +139,24 @@ func (c *Controller) getValidatorAddresses(parser addressParser) (addresses []ho
 	return addresses, nil
 }
 
-// getRPCAddresses returns the list of public RPC addresses.
+// getRPCAddresses returns the list of reference RPC addresses.
 // It takes an addressParser as input and returns a list of host.AddressInfo and an error.
 // It processes the RPC addresses and initializes the hosts.
-// If the publicRPCConfig is empty, it returns an error.
-// If the rpc-address is missing for any public RPC, it returns an error.
-// If there is an error in parsing the public RPC address, it returns an error.
+// If the referenceRPCConfig is empty, it returns an error.
+// If the rpc-address is missing for any reference RPC, it returns an error.
+// If there is an error in parsing the reference RPC address, it returns an error.
 // The function appends the processed addresses to the list and returns it along with any encountered error.
 // This function is part of the Controller struct.
 func (c *Controller) getRPCAddresses(parser addressParser) (addresses []host.AddressInfo, err error) {
-	rpcConfig := c.selectedConfig.PublicRPC
+	rpcConfig := c.selectedConfig.ReferenceRPC
 	if len(rpcConfig) == 0 {
-		return nil, errors.New("public-rpc not provided in config file")
+		return nil, errors.New("reference-rpc not provided in config file")
 	}
 
 	for _, rpc := range rpcConfig {
 		endpoint, parseErr := parser(rpc)
 		if parseErr != nil {
-			return nil, fmt.Errorf("invalid format for public-rpc in config file: %w", parseErr)
+			return nil, fmt.Errorf("invalid format for reference-rpc in config file: %w", parseErr)
 		}
 
 		addressInfo := host.AddressInfo{Endpoint: *endpoint, Ports: make(map[enums.PortType]string)}

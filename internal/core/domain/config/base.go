@@ -18,8 +18,8 @@ type Config struct {
 	IPLookup struct {
 		AccessToken string `yaml:"access-token"`
 	} `yaml:"ip-lookup"`
-	PublicRPC []string `yaml:"public-rpc"`
-	FullNodes []struct {
+	ReferenceRPC []string `yaml:"reference-rpc"`
+	FullNodes    []struct {
 		JSONRPCAddress string `yaml:"json-rpc-address"`
 		MetricsAddress string `yaml:"metrics-address"`
 	} `yaml:"full-nodes"`

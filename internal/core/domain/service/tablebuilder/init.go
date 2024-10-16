@@ -21,7 +21,7 @@ func (tb *Builder) Init() error {
 		enums.TableTypeValidator:          func() error { return tb.handleValidatorTable(tb.hosts) },
 		enums.TableTypeGasPriceAndSubsidy: func() error { return tb.handleTableWithMetrics(tb.hosts, tb.handleSystemStateTable) },
 		enums.TableTypeProtocol:           func() error { return tb.handleTableWithMetrics(tb.hosts, tb.handleProtocolTable) },
-		enums.TableTypeValidatorsParams:   func() error { return tb.handleTableWithSystemState(tb.hosts, tb.handleValidatorParamsTable) },
+		enums.TableTypeValidatorParams:    func() error { return tb.handleTableWithSystemState(tb.hosts, tb.handleValidatorParamsTable) },
 		enums.TableTypeValidatorsAtRisk:   func() error { return tb.handleTableWithSystemState(tb.hosts, tb.handleValidatorsAtRiskTable) },
 		enums.TableTypeValidatorReports:   func() error { return tb.handleTableWithSystemState(tb.hosts, tb.handleValidatorReportsTable) },
 		enums.TableTypeActiveValidators:   func() error { return tb.handleTableWithMetrics(tb.hosts, tb.handleActiveValidatorsTable) },
