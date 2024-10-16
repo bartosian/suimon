@@ -28,7 +28,6 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 
 	var wg sync.WaitGroup
 
-	// Helper function to send error responses
 	sendErrorResponse := func(result responseWithError, err error) {
 		result.err = err
 		respChan <- result
@@ -68,7 +67,6 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 			createdHost := host.NewHost(table, addressInfo, rpcGateway, geoGateway, prometheusGateway, c.gateways.cli)
 			result.response = createdHost
 
-			// If IP lookup token exists, set IP info
 			if c.selectedConfig.IPLookup.AccessToken != "" {
 				if createErr := createdHost.SetIPInfo(); createErr != nil {
 					sendErrorResponse(result, createErr)
@@ -76,7 +74,6 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 				}
 			}
 
-			// Fetch metrics
 			if getMetricsErr := createdHost.GetMetrics(); getMetricsErr != nil {
 				sendErrorResponse(result, err)
 				return
@@ -86,13 +83,11 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 		}(addressInfo)
 	}
 
-	// Close the response channel once all goroutines finish
 	go func() {
 		wg.Wait()
 		close(respChan)
 	}()
 
-	// Collect results and errors
 	var mErr *multierror.Error
 
 	for result := range respChan {
@@ -103,7 +98,6 @@ func (c *Controller) createHosts(table enums.TableType, addresses []host.Address
 		}
 	}
 
-	// Return errors if no hosts are created
 	if len(hosts) == 0 {
 		return nil, mErr.ErrorOrNil()
 	}

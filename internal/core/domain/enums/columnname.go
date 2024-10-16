@@ -21,7 +21,7 @@ const (
 	ColumnNameTotalTransactionEffects                 ColumnName = "TOTAL TX\nEFFECTS"
 	ColumnNameTXSyncPercentage                        ColumnName = "TX SYNC PCT"
 	ColumnNameSkippedConsensusTransactions            ColumnName = "SKIPPED\nCONSENSUS TX"
-	ColumnNameCertificatesCreated                     ColumnName = "CERTIFICATES\nCREATED"
+	ColumnNameTotalTransactionCertificatesCreated     ColumnName = "TOTAL TX CERTIFICATES\nCREATED"
 	ColumnNameHandleCertificateNonConsensusLatencySum ColumnName = "CERTIFICATE\nNON CONSENSUS LATENCY"
 	ColumnNameTotalSignatureErrors                    ColumnName = "SIGNATURE\nERRORS"
 	ColumnNameTransactionsPerSecond                   ColumnName = "TRANSACTIONS PER SECOND"
@@ -42,10 +42,10 @@ const (
 
 // Rounds section.
 const (
-	ColumnNameCurrentRound          ColumnName = "CURRENT\nROUND"
-	ColumnNameHighestProcessedRound ColumnName = "HIGHEST\nPROCESSED ROUND"
-	ColumnNameLastCommittedRound    ColumnName = "LAST COMMITTED\nROUND"
-	ColumnNameRoundsPerSecond       ColumnName = "ROUNDS PER SECOND"
+	ColumnNameHighestAcceptedRound                 ColumnName = "HIGHEST\nACCEPTED ROUND"
+	ColumnNameLastCommittedLeaderRound             ColumnName = "LAST COMMITTED\nLEADER ROUND"
+	ColumnNameConsensusRoundProberCurrentRoundGaps ColumnName = "CONSENSUS CURRENT\nROUND GAPS"
+	ColumnNameRoundsPerSecond                      ColumnName = "ROUNDS PER SECOND"
 )
 
 // Peers section.
@@ -57,21 +57,23 @@ const (
 
 // Validator section.
 const (
-	ColumnNameValidatorName                     ColumnName = "NAME"
-	ColumnNameValidatorNetAddress               ColumnName = "NET ADDRESS"
-	ColumnNameValidatorVotingPower              ColumnName = "VOTING\nPOWER"
-	ColumnNameValidatorGasPrice                 ColumnName = "GAS\nPRICE"
-	ColumnNameValidatorCommissionRate           ColumnName = "COMMISSION\nRATE"
-	ColumnNameValidatorNextEpochStake           ColumnName = "NEXT EPOCH\nSTAKE, SUI"
-	ColumnNameValidatorNextEpochGasPrice        ColumnName = "NEXT EPOCH\nGAS PRICE"
-	ColumnNameValidatorNextEpochCommissionRate  ColumnName = "NEXT EPOCH\nCOMMISSION RATE"
-	ColumnNameValidatorStakingPoolSuiBalance    ColumnName = "STAKING POOL SUI\nBALANCE, SUI"
-	ColumnNameValidatorRewardsPool              ColumnName = "REWARDS POOL, SUI"
-	ColumnNameValidatorPoolTokenBalance         ColumnName = "POOL TOKEN\nBALANCE, SUI"
-	ColumnNameValidatorPendingStake             ColumnName = "PENDING STAKE, SUI"
-	ColumnNameValidatorPendingTotalSuiWithdraw  ColumnName = "PENDING TOTAL\nSUI WITHDRAW"
-	ColumnNameValidatorPendingPoolTokenWithdraw ColumnName = "PENDING POOL\nTOKEN WITHDRAW"
-	ColumnNameValidatorApy                      ColumnName = "APY, %"
+	ColumnNameValidatorName                         ColumnName = "NAME"
+	ColumnNameValidatorNetAddress                   ColumnName = "NET ADDRESS"
+	ColumnNameValidatorVotingPower                  ColumnName = "VOTING\nPOWER"
+	ColumnNameValidatorGasPrice                     ColumnName = "GAS\nPRICE"
+	ColumnNameValidatorCommissionRate               ColumnName = "COMMISSION\nRATE"
+	ColumnNameValidatorNextEpochStake               ColumnName = "NEXT EPOCH\nSTAKE, SUI"
+	ColumnNameValidatorNextEpochGasPrice            ColumnName = "NEXT EPOCH\nGAS PRICE"
+	ColumnNameValidatorNextEpochCommissionRate      ColumnName = "NEXT EPOCH\nCOMMISSION RATE"
+	ColumnNameValidatorStakingPoolSuiBalance        ColumnName = "STAKING POOL SUI\nBALANCE, SUI"
+	ColumnNameValidatorRewardsPool                  ColumnName = "REWARDS POOL, SUI"
+	ColumnNameValidatorPoolTokenBalance             ColumnName = "POOL TOKEN\nBALANCE, SUI"
+	ColumnNameValidatorPendingStake                 ColumnName = "PENDING STAKE, SUI"
+	ColumnNameValidatorPendingTotalSuiWithdraw      ColumnName = "PENDING TOTAL\nSUI WITHDRAW"
+	ColumnNameValidatorPendingPoolTokenWithdraw     ColumnName = "PENDING POOL\nTOKEN WITHDRAW"
+	ColumnNameValidatorApy                          ColumnName = "APY, %"
+	ColumnNameValidatorCurrentVotingRight           ColumnName = "CURRENT VOTING\nRIGHT, %"
+	ColumnNameValidatorTotalTransactionCertificates ColumnName = "TOTAL TRANSACTION\nCERTIFICATES"
 )
 
 // Epoch section.
@@ -197,6 +199,11 @@ const (
 	ColumnNamePublishedAt ColumnName = "PUBLISHED AT"
 	ColumnNameAuthor      ColumnName = "AUTHOR"
 	ColumnNameURL         ColumnName = "RELEASE URL"
+)
+
+// Object section.
+const (
+	ColumnNameNumberSharedObjectTransactions ColumnName = "NUMBER OF\nSHARED OBJ TX"
 )
 
 func (e ColumnName) ToString() string {

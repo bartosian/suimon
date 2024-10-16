@@ -26,25 +26,26 @@ var (
 
 	// prometheusToMetric maps a Prometheus metric name to a metric type.
 	prometheusToMetric = map[enums.PrometheusMetricName]enums.MetricType{
-		enums.PrometheusMetricNameTotalTransactionCertificates: enums.MetricTypeTotalTransactionCertificates,
-		enums.PrometheusMetricNameTotalTransactionEffects:      enums.MetricTypeTotalTransactionEffects,
-		enums.PrometheusMetricNameHighestKnownCheckpoint:       enums.MetricTypeHighestKnownCheckpoint,
-		enums.PrometheusMetricNameHighestSyncedCheckpoint:      enums.MetricTypeHighestSyncedCheckpoint,
-		enums.PrometheusMetricNameLastExecutedCheckpoint:       enums.MetricTypeLastExecutedCheckpoint,
-		enums.PrometheusMetricNameCurrentEpoch:                 enums.MetricTypeCurrentEpoch,
-		enums.PrometheusMetricNameEpochTotalDuration:           enums.MetricTypeEpochTotalDuration,
-		enums.PrometheusMetricNameCurrentRound:                 enums.MetricTypeCurrentRound,
-		enums.PrometheusMetricNameHighestProcessedRound:        enums.MetricTypeHighestProcessedRound,
-		enums.PrometheusMetricNameLastCommittedRound:           enums.MetricTypeLastCommittedRound,
-		enums.PrometheusMetricNamePrimaryNetworkPeers:          enums.MetricTypePrimaryNetworkPeers,
-		enums.PrometheusMetricNameWorkerNetworkPeers:           enums.MetricTypeWorkerNetworkPeers,
-		enums.PrometheusMetricNameSuiNetworkPeers:              enums.MetricTypeSuiNetworkPeers,
-		enums.PrometheusMetricNameSkippedConsensusTransactions: enums.MetricTypeSkippedConsensusTransactions,
-		enums.PrometheusMetricNameTotalSignatureErrors:         enums.MetricTypeTotalSignatureErrors,
-		enums.PrometheusMetricNameUptime:                       enums.MetricTypeUptime,
-		enums.PrometheusMetricNameCertificatesCreated:          enums.MetricTypeCertificatesCreated,
-		enums.PrometheusMetricNameNonConsensusLatencySum:       enums.MetricTypeNonConsensusLatencySum,
+		enums.PrometheusMetricNameTotalTransactionCertificates:         enums.MetricTypeTotalTransactionCertificates,
+		enums.PrometheusMetricNameTotalTransactionEffects:              enums.MetricTypeTotalTransactionEffects,
+		enums.PrometheusMetricNameHighestKnownCheckpoint:               enums.MetricTypeHighestKnownCheckpoint,
+		enums.PrometheusMetricNameHighestSyncedCheckpoint:              enums.MetricTypeHighestSyncedCheckpoint,
+		enums.PrometheusMetricNameLastExecutedCheckpoint:               enums.MetricTypeLastExecutedCheckpoint,
+		enums.PrometheusMetricNameCurrentEpoch:                         enums.MetricTypeCurrentEpoch,
+		enums.PrometheusMetricNameEpochTotalDuration:                   enums.MetricTypeEpochTotalDuration,
+		enums.PrometheusMetricNameSuiNetworkPeers:                      enums.MetricTypeSuiNetworkPeers,
+		enums.PrometheusMetricNameSkippedConsensusTransactions:         enums.MetricTypeSkippedConsensusTransactions,
+		enums.PrometheusMetricNameTotalSignatureErrors:                 enums.MetricTypeTotalSignatureErrors,
+		enums.PrometheusMetricNameUptime:                               enums.MetricTypeUptime,
+		enums.PrometheusMetricNameNonConsensusLatencySum:               enums.MetricTypeNonConsensusLatencySum,
+		enums.PrometheusMetricNameCurrentVotingRight:                   enums.MetricTypeCurrentVotingRight,
+		enums.PrometheusMetricNameTotalTransactionCertificatesCreated:  enums.MetricTypeTotalTransactionCertificatesCreated,
+		enums.PrometheusMetricNameConsensusLastCommittedLeaderRound:    enums.MetricTypeConsensusLastCommittedLeaderRound,
+		enums.PrometheusMetricNameConsensusHighestAcceptedRound:        enums.MetricTypeConsensusHighestAcceptedRound,
+		enums.PrometheusMetricNameConsensusRoundProberCurrentRoundGaps: enums.MetricTypeConsensusRoundProberCurrentRoundGaps,
+		enums.PrometheusMetricNameNumberSharedObjectTransactions:       enums.MetricTypeNumberSharedObjectTransactions,
 	}
+
 	// tableToRpcMethods maps a table type to a list of RPC methods.
 	tableToRPCMethods = map[enums.TableType][]enums.RPCMethod{
 		enums.TableTypeNode: {
@@ -94,14 +95,14 @@ func getPrometheusMetricsForTableType(table enums.TableType) ports.Metrics {
 	}
 
 	if table == enums.TableTypeValidator {
-		metrics[enums.PrometheusMetricNameLastCommittedRound] = newMetricConfig(enums.PrometheusMetricTypeGauge)
-		metrics[enums.PrometheusMetricNamePrimaryNetworkPeers] = newMetricConfig(enums.PrometheusMetricTypeGauge)
-		metrics[enums.PrometheusMetricNameHighestProcessedRound] = newMetricConfig(enums.PrometheusMetricTypeGauge, prometheus.Labels{"source": "own"})
-		metrics[enums.PrometheusMetricNameWorkerNetworkPeers] = newMetricConfig(enums.PrometheusMetricTypeGauge)
 		metrics[enums.PrometheusMetricNameTotalSignatureErrors] = newMetricConfig(enums.PrometheusMetricTypeCounter)
 		metrics[enums.PrometheusMetricNameSkippedConsensusTransactions] = newMetricConfig(enums.PrometheusMetricTypeCounter)
-		metrics[enums.PrometheusMetricNameCurrentRound] = newMetricConfig(enums.PrometheusMetricTypeGauge)
-		metrics[enums.PrometheusMetricNameCertificatesCreated] = newMetricConfig(enums.PrometheusMetricTypeCounter)
+		metrics[enums.PrometheusMetricNameCurrentVotingRight] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNameTotalTransactionCertificatesCreated] = newMetricConfig(enums.PrometheusMetricTypeCounter)
+		metrics[enums.PrometheusMetricNameConsensusLastCommittedLeaderRound] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNameConsensusHighestAcceptedRound] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNameConsensusRoundProberCurrentRoundGaps] = newMetricConfig(enums.PrometheusMetricTypeGauge)
+		metrics[enums.PrometheusMetricNameNumberSharedObjectTransactions] = newMetricConfig(enums.PrometheusMetricTypeCounter)
 	}
 
 	return metrics
@@ -123,7 +124,6 @@ func (host *Host) GetPrometheusMetrics() error {
 		return errors.New("failed to get metrics from Prometheus")
 	}
 
-	// Process metrics and labels
 	return host.processPrometheusMetrics(result)
 }
 
@@ -137,7 +137,6 @@ func (host *Host) processPrometheusMetrics(result ports.MetricsResult) error {
 	for metricName, metricValue := range result {
 		metricType, ok := prometheusToMetric[metricName]
 		if !ok {
-			// Ignore unused metric
 			delete(result, metricName)
 			continue
 		}

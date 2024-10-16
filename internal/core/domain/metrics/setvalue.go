@@ -88,6 +88,13 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		}
 
 		metrics.HighestKnownCheckpoint = convFToI(valueFloat)
+	case enums.MetricTypeCurrentVotingRight:
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
+		}
+
+		metrics.CurrentVotingRight = valueFloat / 100
 	case enums.MetricTypeHighestSyncedCheckpoint:
 		valueFloat, ok := value.(float64)
 		if !ok {
@@ -168,42 +175,28 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		}
 
 		metrics.Commit = valueString
-	case enums.MetricTypeCurrentRound:
+	case enums.MetricTypeConsensusLastCommittedLeaderRound:
 		valueFloat, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
-		metrics.CurrentRound = convFToI(valueFloat)
-	case enums.MetricTypeHighestProcessedRound:
+		metrics.LastCommittedLeaderRound = convFToI(valueFloat)
+	case enums.MetricTypeConsensusHighestAcceptedRound:
 		valueFloat, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
-		metrics.HighestProcessedRound = convFToI(valueFloat)
+		metrics.HighestAcceptedRound = convFToI(valueFloat)
 		metrics.CalculateRoundsRatio()
-	case enums.MetricTypeLastCommittedRound:
+	case enums.MetricTypeConsensusRoundProberCurrentRoundGaps:
 		valueFloat, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
-		metrics.LastCommittedRound = convFToI(valueFloat)
-	case enums.MetricTypePrimaryNetworkPeers:
-		valueFloat, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
-		}
-
-		metrics.PrimaryNetworkPeers = convFToI(valueFloat)
-	case enums.MetricTypeWorkerNetworkPeers:
-		valueFloat, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
-		}
-
-		metrics.WorkerNetworkPeers = convFToI(valueFloat)
+		metrics.ConsensusRoundProberCurrentRoundGaps = convFToI(valueFloat)
 	case enums.MetricTypeSkippedConsensusTransactions:
 		valueFloat, ok := value.(float64)
 		if !ok {
@@ -211,13 +204,13 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		}
 
 		metrics.SkippedConsensusTransactions = convFToI(valueFloat)
-	case enums.MetricTypeCertificatesCreated:
+	case enums.MetricTypeTotalTransactionCertificatesCreated:
 		valueFloat, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
 		}
 
-		metrics.CertificatesCreated = convFToI(valueFloat)
+		metrics.TotalTransactionCertificatesCreated = convFToI(valueFloat)
 		metrics.CalculateCertificatesRatio()
 	case enums.MetricTypeTotalSignatureErrors:
 		valueFloat, ok := value.(float64)
@@ -247,6 +240,13 @@ func (metrics *Metrics) SetValue(metric enums.MetricType, value any) error {
 		}
 
 		metrics.CheckSyncPercentage = valueInt
+	case enums.MetricTypeNumberSharedObjectTransactions:
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf(ErrUnexpectedMetricValueType, metric, value)
+		}
+
+		metrics.NumberSharedObjectTransactions = convFToI(valueFloat)
 	}
 
 	return nil
@@ -454,7 +454,7 @@ func (metrics *Metrics) CalculateRoundsRatio() {
 		roundsEnd     int
 	)
 
-	roundsHistory = append(roundsHistory, metrics.HighestProcessedRound)
+	roundsHistory = append(roundsHistory, metrics.HighestAcceptedRound)
 	if len(roundsHistory) < RoundsPerSecondWindow {
 		metrics.RoundsHistory = roundsHistory
 
@@ -481,7 +481,7 @@ func (metrics *Metrics) CalculateCertificatesRatio() {
 		certificatesEnd     int
 	)
 
-	certificatesHistory = append(certificatesHistory, metrics.CertificatesCreated)
+	certificatesHistory = append(certificatesHistory, metrics.TotalTransactionCertificatesCreated)
 	if len(certificatesHistory) < CertificatesPerSecondWindow {
 		metrics.CertificatesHistory = certificatesHistory
 
