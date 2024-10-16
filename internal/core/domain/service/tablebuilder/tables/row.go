@@ -13,13 +13,21 @@ type Row struct {
 	IsFooter bool
 }
 
-// NewRow creates a new row with the given header flag and length.
-func NewRow(isHeader, isFooter bool, length int, autoMerge bool, autoMergeAlign text.Align) Row {
+type NewRowConfig struct {
+	IsHeader       bool
+	IsFooter       bool
+	Length         int
+	AutoMerge      bool
+	AutoMergeAlign text.Align
+}
+
+// NewRow creates a new row based on the provided configuration.
+func NewRow(config NewRowConfig) Row {
 	return Row{
-		Values:   make(table.Row, 0, length),
-		Config:   table.RowConfig{AutoMerge: autoMerge, AutoMergeAlign: autoMergeAlign},
-		IsHeader: isHeader,
-		IsFooter: isFooter,
+		Values:   make(table.Row, 0, config.Length),
+		Config:   table.RowConfig{AutoMerge: config.AutoMerge, AutoMergeAlign: config.AutoMergeAlign},
+		IsHeader: config.IsHeader,
+		IsFooter: config.IsFooter,
 	}
 }
 

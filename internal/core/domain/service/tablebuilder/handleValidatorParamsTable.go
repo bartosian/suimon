@@ -8,7 +8,7 @@ import (
 
 // handleValidatorParamsTable handles the configuration for the Validator Counts table.
 func (tb *Builder) handleValidatorParamsTable(systemState *domainmetrics.SuiSystemState) error {
-	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidatorsParams)
+	tableConfig := tables.NewDefaultTableConfig(enums.TableTypeValidatorParams)
 
 	columnValues, err := tables.GetValidatorParamsColumnValues(systemState)
 	if err != nil {

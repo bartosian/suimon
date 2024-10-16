@@ -64,7 +64,7 @@ Building and installing from the source is useful if you want to customize the c
 
    - Build the Suimon package by running the following command:
      ```
-     go build -o suimon cmd/main.go
+     go build -o .build/suimon cmd/main.go
      ```
 
 5. **Move the built binary to the executable PATH**
@@ -74,7 +74,7 @@ Building and installing from the source is useful if you want to customize the c
      ```
    - For example, if the output of the `echo $PATH` command includes `/usr/local/bin`, you can move the `suimon` binary to this directory by running the following command:
      ```
-     mv suimon /usr/local/bin/
+     mv .build/suimon /usr/local/bin/
      ```
    - If you're not sure which directory to use, you can create a new directory in your home directory called `bin` by running the following command:
      ```
@@ -86,7 +86,7 @@ Building and installing from the source is useful if you want to customize the c
      ```
      Finally, move the `suimon` binary to the `bin` directory by running the following command:
      ```
-     mv suimon $HOME/bin/
+     mv .build/suimon $HOME/bin/
      ```
 6. **Create a Suimon config directory and put the config file there**
 
@@ -185,7 +185,6 @@ Here is an example file tree for the `~/.suimon` directory with separate configu
 ```
 ~/.suimon
 ├── suimon-testnet.yaml
-├── suimon-devnet.yaml
 └── suimon-mainnet.yaml
 ```
 
@@ -194,12 +193,11 @@ Here is an example file tree for the `~/.suimon` directory with separate configu
 `Suimon` configuration files contain fields that allow you to customize the behavior of the tool to fit your specific use case. These files also enable you to add or remove monitored network entities and specify how they should be monitored. The suimon-testnet.yaml file, for instance, is a template configuration file that you can use as a starting point to create your own configuration file for testnet network. Before using Suimon, be sure to modify the configuration file with your own data and settings.
 
 ```yaml
-# This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators.
-# Please make sure to provide at least one working endpoint.
-public-rpc:
+# This section lists the reference public RPC endpoints that the client will use to monitor the network and assess the health of nodes and validators.
+# These endpoints serve as a benchmark against which the health of other full nodes is measured.
+# Please ensure that at least one working endpoint is provided.
+reference-rpc:
   - https://fullnode.testnet.sui.io:443
-  - https://rpc-ws-testnet-w3.suiprovider.xyz:443
-  - https://sui-api.rpc.com:443
 
 # if you wish to monitor the nodes, update this section with the nodes information
 full-nodes:
@@ -220,27 +218,25 @@ ip-lookup:
   access-token: 55f30ce0213aa7 # temporary access token with requests limit
 ```
 
-1. **public-rpc**
+1. **reference-rpc**
 
-The `public-rpc` section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators. Therefore, it is essential to provide accurate and up-to-date endpoint information in this section.
-This field is required to request system metrics and to calculate the health of nodes and validators. The other fields are optional and can be updated if needed.
+The `reference-rpc` section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of nodes and validators. It is essential to provide accurate and up-to-date endpoint information in this section.
+
+These endpoints are required for requesting system metrics and assessing the health of nodes and validators. Other fields in the configuration are optional and can be updated as needed.
 
 ```yaml
-public-rpc:
-  - https://wave3-rpc.testnet.sui.io:443"
-  - https://rpc-ws-testnet-w3.suiprovider.xyz:443
-  - https://sui-api.rpc.com:443
+reference-rpc:
+  - https://fullnode.testnet.sui.io:443
 ```
 
 These endpoints are managed by the SUI team, which you can use alongside your own to monitor the relevant networks.
 
-| Network | RPC Endpoint                      |
-| ------- | --------------------------------- |
-| Devnet  | `https://fullnode.devnet.sui.io`  |
-| Testnet | `https://fullnode.testnet.sui.io` |
-| Mainnet | `https://fullnode.mainnet.sui.io` |
+| Network | RPC Endpoint                          |
+| ------- | ------------------------------------- |
+| Testnet | `https://fullnode.testnet.sui.io:443` |
+| Mainnet | `https://fullnode.mainnet.sui.io:443` |
 
-3. **full-nodes**
+1. **full-nodes**
 
 The `full-nodes` section lists the full nodes for monitoring in the SUI network. The user can update this section with information for any number of nodes, following the example format provided. It is important to note that the RPC address is required to be provided for each node, while the metrics address is optional.
 
@@ -306,9 +302,9 @@ Tables are static monitors that provide a detailed snapshot of the network and i
 
 | Table Type                | Description                                                                   |
 |---------------------------|-------------------------------------------------------------------------------|
-| 📡 PUBLIC RPC             | Displays detailed information about the network's RPC endpoints.              |
-| 💻 FULL NODES             | Displays detailed information about the network's nodes.                      |
-| 🤖 VALIDATORS             | Displays detailed information about the network's validators.                 |
+| 📡 REFERENCE RPC          | Displays detailed information about the reference RPC endpoints.              |
+| 💻 FULL NODES             | Displays detailed information about the full nodes.                           |
+| 🤖 VALIDATORS             | Displays detailed information about the validators.                           |
 | 💾 SYSTEM STATE           | Displays the current gas price and subsidy values in the network.             |
 | 🌐 PROTOCOL               | Displays the protocol config for the latest version number.                   |
 | 📊 VALIDATORS PARAMS      | Displays the validators related thresholds and counts on the network.         |
@@ -319,11 +315,11 @@ Tables are static monitors that provide a detailed snapshot of the network and i
 
 ### Table Examples
 
-- `📡 PUBLIC RPC`
+- `📡 REFERENCE RPC`
   <br><br>
-  The table is a valuable resource for obtaining detailed information about a network’s RPC (Remote Procedure Call) endpoints. This table provides detailed information about the network’s RPC endpoints, such as their addresses, port numbers, health, total transaction blocks, latest checkpoints, and other ones.
+  The table is a valuable resource for obtaining detailed information about the network’s reference RPC (Remote Procedure Call) endpoints. It provides comprehensive data, such as the endpoint addresses, port numbers, health status, total transaction blocks, latest checkpoints, and other key metrics. These reference endpoints serve as benchmarks for monitoring and assessing the health of the network.
   <br><br>
-  ![Screenshot of my app](static/images/table-public-rpc.png)
+  ![Screenshot of my app](static/images/table-reference-rpc.png)
   <br><br>
 
 - `💻 FULL NODES`
@@ -386,18 +382,18 @@ Dashboards are dynamic monitors that provide real-time information about the net
 
 | Dashboard Type            | Description                                                        |
 | ------------------------- | ------------------------------------------------------------------ |
-| 📡 PUBLIC RPC             | Displays detailed information about the network's RPC endpoints.   |
-| 💻 FULL NODES             | Displays detailed information about the network's nodes.           |
-| 🤖 VALIDATORS             | Displays detailed information about the network's validators.      |
+| 📡 REFERENCE RPC          | Displays detailed information about the reference RPC endpoints.   |
+| 💻 FULL NODES             | Displays detailed information about the full nodes.                |
+| 🤖 VALIDATORS             | Displays detailed information about the validators.      |
 | 💾 SYSTEM STATE           | Displays the current gas price and subsidy values for the network. |
 
 ### Dashboard Examples
 
-- `📡 PUBLIC RPC`
+- `📡 REFERENCE RPC`
   <br><br>
   The table is a valuable resource for obtaining detailed information about a network’s RPC (Remote Procedure Call) endpoints. This table provides detailed information about the network’s RPC endpoints, such as their addresses, port numbers, health, total transaction blocks, latest checkpoints, and other ones.
   <br><br>
-  ![Screenshot of my app](static/images/dashboard-public-rpc.png)
+  ![Screenshot of my app](static/images/dashboard-reference-rpc.png)
   <br><br>
 
 - `💻 FULL NODES`

@@ -30,25 +30,16 @@ type Builders struct {
 }
 
 type Controller struct {
-	builders Builders // 8 bytes
-
-	// Pointers (8 bytes each on 64-bit systems), group together
-	configs        map[string]config.Config // 8 bytes
-	gateways       Gateways                 // 8 bytes
-	selectedConfig config.Config            // size depends on the struct definition
-
-	// Strings and slices (16 bytes each on 64-bit systems), group together
-	network string // 16 bytes (pointer + len)
-
-	// Enum and struct types, smaller than pointers, group together
-	selectedDashboard enums.TableType   // size depends on the underlying type, typically int32 or int
-	hosts             Hosts             // 8 bytes
-	releases          []metrics.Release // 8 bytes
-
-	selectedTables []enums.TableType // 16 bytes (pointer + len + cap)
-
-	lock sync.RWMutex // 8 bytes on 64-bit, keep first due to its size and to avoid false sharing
-
+	builders          Builders
+	configs           map[string]config.Config
+	gateways          Gateways
+	selectedConfig    config.Config
+	network           string
+	selectedDashboard enums.TableType
+	hosts             Hosts
+	releases          []metrics.Release
+	selectedTables    []enums.TableType
+	lock              sync.RWMutex
 }
 
 // NewController creates a new instance of the Controller.
@@ -90,7 +81,7 @@ func (c *Controller) getHostsByTableType(table enums.TableType) (hosts []host.Ho
 		return c.hosts.rpc, nil
 	case enums.TableTypeActiveValidators,
 		enums.TableTypeGasPriceAndSubsidy,
-		enums.TableTypeValidatorsParams,
+		enums.TableTypeValidatorParams,
 		enums.TableTypeValidatorsAtRisk,
 		enums.TableTypeValidatorReports,
 		enums.TableTypeProtocol:
@@ -123,7 +114,7 @@ func (c *Controller) setHostsByTableType(table enums.TableType, hosts []host.Hos
 		c.hosts.rpc = hosts
 	case enums.TableTypeActiveValidators,
 		enums.TableTypeGasPriceAndSubsidy,
-		enums.TableTypeValidatorsParams,
+		enums.TableTypeValidatorParams,
 		enums.TableTypeValidatorsAtRisk,
 		enums.TableTypeValidatorReports,
 		enums.TableTypeProtocol,

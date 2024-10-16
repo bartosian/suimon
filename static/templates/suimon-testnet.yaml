@@ -1,7 +1,8 @@
-# This section lists the public RPC endpoints that the client will use to monitor the network and calculate the health of the nodes and validators.
-# Please make sure to have at least one working endpoint.
-public-rpc:
-  - https://fullnode.testnet.sui.io
+# This section lists the reference public RPC endpoints that the client will use to monitor the network and assess the health of nodes and validators.
+# These endpoints serve as a benchmark against which the health of other full nodes is measured.
+# Please ensure that at least one working endpoint is provided.
+reference-rpc:
+  - https://fullnode.testnet.sui.io:443
 
 # if you wish to monitor the node, update this section with the node information
 full-nodes:

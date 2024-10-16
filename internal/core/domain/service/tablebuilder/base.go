@@ -1,7 +1,7 @@
 package tablebuilder
 
 import (
-	"errors"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -59,47 +59,78 @@ func (tb *Builder) setRows() error {
 	itemsCount := tb.config.RowsCount
 	columnsPerRow := len(rowsConfig[0])
 
-	header := tables.NewRow(true, false, columnsPerRow, true, text.AlignCenter)
-	footer := tables.NewRow(false, false, columnsPerRow, true, text.AlignCenter)
+	// Prepare footer with empty values
+	footer := tables.NewRow(tables.NewRowConfig{
+		IsHeader:       false,
+		IsFooter:       true,
+		Length:         columnsPerRow,
+		AutoMerge:      true,
+		AutoMergeAlign: text.AlignCenter,
+	})
 
 	for itemIndex := 0; itemIndex < itemsCount; itemIndex++ {
 		for rowIndex, columns := range rowsConfig {
-			row := tables.NewRow(false, true, columnsPerRow, true, text.AlignCenter)
+			isFirstRow := itemIndex == 0 && rowIndex == 0
+			isEvenRow := rowIndex%2 == 0
+			multipleRows := len(rowsConfig) > 1
 
+			header := tables.NewRow(tables.NewRowConfig{
+				IsHeader:       true,
+				IsFooter:       false,
+				Length:         columnsPerRow,
+				AutoMerge:      true,
+				AutoMergeAlign: text.AlignCenter,
+			})
+			row := tables.NewRow(tables.NewRowConfig{
+				IsHeader:       false,
+				IsFooter:       true,
+				Length:         columnsPerRow,
+				AutoMerge:      true,
+				AutoMergeAlign: text.AlignCenter,
+			})
+
+			// Build the row and header
 			for _, columnName := range columns {
 				columnConfig, ok := columnsConfig[columnName]
 				if !ok {
 					tb.cliGateway.Errorf("column %s not found", columnName)
-					return errors.New("column not found")
+					return fmt.Errorf("column %s not found", columnName)
 				}
 
 				columnValue := columnConfig.Values[itemIndex]
 
-				if itemIndex == 0 && rowIndex == 0 {
+				if isFirstRow {
 					header.AppendValue(columnName.ToString())
 					footer.PrependValue(tables.EmptyValue)
+				} else if multipleRows && (rowIndex != 0 || itemIndex > 0 && isEvenRow) {
+					header.AppendValue(columnName.ToString())
 				}
 
 				row.AppendValue(columnValue)
 			}
 
-			emptySpacesNeeded := columnsPerRow - len(columns)
-			for i := 0; i < emptySpacesNeeded; i++ {
-				if itemIndex == 0 && rowIndex == 0 {
-					header.PrependValue(tables.EmptyValue)
-					footer.PrependValue(tables.EmptyValue)
+			// Handle empty spaces in rows
+			for i := len(columns); i < columnsPerRow; i++ {
+				emptyValue := tables.EmptyValue
+				if isFirstRow {
+					header.PrependValue(emptyValue)
+					footer.PrependValue(emptyValue)
+				} else if multipleRows && (rowIndex != 0 || itemIndex > 0 && isEvenRow) {
+					header.PrependValue(emptyValue)
 				}
 
-				row.PrependValue(tables.EmptyValue)
+				row.PrependValue(emptyValue)
 			}
 
-			if itemIndex == 0 && rowIndex == 0 {
+			// Append header and footer for the first row
+			if isFirstRow {
 				tb.writer.AppendHeader(header.Values, header.Config)
 				tb.writer.AppendFooter(footer.Values, footer.Config)
-			} else if len(rowsConfig) > 1 && (rowIndex != 0 || itemIndex > 0 && rowIndex%2 == 0) {
+			} else if multipleRows && (rowIndex != 0 || itemIndex > 0 && isEvenRow) {
 				tb.writer.AppendRow(header.Values, header.Config)
 			}
 
+			// Append the row and separator
 			tb.writer.AppendRow(row.Values, row.Config)
 			tb.writer.AppendSeparator()
 		}

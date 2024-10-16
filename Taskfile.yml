@@ -1,6 +1,16 @@
 version: '3'
 
 tasks:
+  run:
+    desc: Run the suimon binary
+    cmds:
+      - go run cmd/main.go {{.CLI_ARGS}}
+
+  run:monitor:
+    desc: Run the suimon binary in monitor mode
+    cmds:
+      - go run cmd/main.go monitor     
+
   build:
     desc: Build the suimon binary
     cmds:

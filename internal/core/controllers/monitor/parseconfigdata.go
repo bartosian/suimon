@@ -16,7 +16,7 @@ var rpcTables = map[enums.TableType]bool{
 	enums.TableTypeValidatorReports:   true,
 	enums.TableTypeValidatorsAtRisk:   true,
 	enums.TableTypeGasPriceAndSubsidy: true,
-	enums.TableTypeValidatorsParams:   true,
+	enums.TableTypeValidatorParams:    true,
 	enums.TableTypeRPC:                true,
 	enums.TableTypeProtocol:           true,
 }
@@ -101,7 +101,7 @@ func (c *Controller) ParseConfigRPC() error {
 	}
 
 	if len(c.hosts.rpc) == 0 {
-		return errors.New("no public RPC provided")
+		return errors.New("no reference RPC provided")
 	}
 
 	if err := c.sortHosts(enums.TableTypeRPC); err != nil {
