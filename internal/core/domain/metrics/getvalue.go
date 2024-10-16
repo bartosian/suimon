@@ -24,7 +24,7 @@ func (metrics *Metrics) GetValue(metric enums.MetricType) MetricValue {
 	case enums.MetricTypeTotalTransactionBlocks:
 		return metrics.TotalTransactionsBlocks
 	case enums.MetricTypeTotalTransactionCertificates:
-		return metrics.TotalTransactionCertificates
+		return metrics.TotalTransactionCertificatesCreated
 	case enums.MetricTypeTotalTransactionEffects:
 		return metrics.TotalTransactionEffects
 	case enums.MetricTypeTransactionsPerSecond:
@@ -61,18 +61,10 @@ func (metrics *Metrics) GetValue(metric enums.MetricType) MetricValue {
 		return metrics.Version
 	case enums.MetricTypeCommit:
 		return metrics.Commit
-	case enums.MetricTypeCurrentRound:
-		return metrics.CurrentRound
-	case enums.MetricTypeHighestProcessedRound:
-		return metrics.HighestProcessedRound
-	case enums.MetricTypeLastCommittedRound:
-		return metrics.LastCommittedRound
-	case enums.MetricTypeCertificatesCreated:
-		return metrics.CertificatesCreated
-	case enums.MetricTypePrimaryNetworkPeers:
-		return metrics.PrimaryNetworkPeers
-	case enums.MetricTypeWorkerNetworkPeers:
-		return metrics.WorkerNetworkPeers
+	case enums.MetricTypeConsensusRoundProberCurrentRoundGaps:
+		return metrics.ConsensusRoundProberCurrentRoundGaps
+	case enums.MetricTypeTotalTransactionCertificatesCreated:
+		return metrics.TotalTransactionCertificatesCreated
 	case enums.MetricTypeSkippedConsensusTransactions:
 		return metrics.SkippedConsensusTransactions
 	case enums.MetricTypeTotalSignatureErrors:
@@ -83,6 +75,14 @@ func (metrics *Metrics) GetValue(metric enums.MetricType) MetricValue {
 		return nil
 	case enums.MetricTypeProtocol:
 		return nil
+	case enums.MetricTypeCurrentVotingRight:
+		return metrics.CurrentVotingRight
+	case enums.MetricTypeConsensusLastCommittedLeaderRound:
+		return metrics.LastCommittedLeaderRound
+	case enums.MetricTypeConsensusHighestAcceptedRound:
+		return metrics.HighestAcceptedRound
+	case enums.MetricTypeNumberSharedObjectTransactions:
+		return metrics.NumberSharedObjectTransactions
 	default:
 		return nil
 	}

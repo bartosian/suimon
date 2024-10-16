@@ -19,8 +19,8 @@ func (tb *Builder) handleValidatorTable(hosts []domainhost.Host) error {
 			return left.Status > right.Status
 		}
 
-		if left.Metrics.CurrentRound != right.Metrics.CurrentRound {
-			return left.Metrics.CurrentRound > right.Metrics.CurrentRound
+		if left.Metrics.LastCommittedLeaderRound != right.Metrics.LastCommittedLeaderRound {
+			return left.Metrics.LastCommittedLeaderRound > right.Metrics.LastCommittedLeaderRound
 		}
 
 		return left.Metrics.HighestSyncedCheckpoint > right.Metrics.HighestSyncedCheckpoint

@@ -18,10 +18,10 @@ var (
 		enums.ColumnNameCommit:       ColumnWidth25,
 
 		// Transactions section
-		enums.ColumnNameTotalTransactionCertificates: ColumnWidth33,
-		enums.ColumnNameTotalTransactionEffects:      ColumnWidth33,
-		enums.ColumnNameCertificatesCreated:          ColumnWidth33,
-		enums.ColumnNameCertificatesPerSecond:        ColumnWidth49,
+		enums.ColumnNameTotalTransactionCertificates:        ColumnWidth33,
+		enums.ColumnNameTotalTransactionEffects:             ColumnWidth33,
+		enums.ColumnNameTotalTransactionCertificatesCreated: ColumnWidth33,
+		enums.ColumnNameCertificatesPerSecond:               ColumnWidth49,
 
 		// Checkpoints section
 		enums.ColumnNameLastExecutedCheckpoint:  ColumnWidth33,
@@ -31,10 +31,10 @@ var (
 		enums.ColumnNameCheckpointsPerSecond:    ColumnWidth49,
 
 		// Rounds section
-		enums.ColumnNameCurrentRound:          ColumnWidth33,
-		enums.ColumnNameHighestProcessedRound: ColumnWidth33,
-		enums.ColumnNameLastCommittedRound:    ColumnWidth33,
-		enums.ColumnNameRoundsPerSecond:       ColumnWidth49,
+		enums.ColumnNameLastCommittedLeaderRound:             ColumnWidth33,
+		enums.ColumnNameHighestAcceptedRound:                 ColumnWidth33,
+		enums.ColumnNameConsensusRoundProberCurrentRoundGaps: ColumnWidth33,
+		enums.ColumnNameRoundsPerSecond:                      ColumnWidth49,
 
 		// Peers section
 		enums.ColumnNameNetworkPeers:        ColumnWidth19,
@@ -86,15 +86,15 @@ var (
 			Columns: []enums.ColumnName{
 				enums.ColumnNameTotalTransactionCertificates,
 				enums.ColumnNameTotalTransactionEffects,
-				enums.ColumnNameCertificatesCreated,
+				enums.ColumnNameTotalTransactionCertificatesCreated,
 			},
 		},
 		5: {
 			Height: ColumnWidth14,
 			Columns: []enums.ColumnName{
-				enums.ColumnNameCurrentRound,
-				enums.ColumnNameHighestProcessedRound,
-				enums.ColumnNameLastCommittedRound,
+				enums.ColumnNameLastCommittedLeaderRound,
+				enums.ColumnNameHighestAcceptedRound,
+				enums.ColumnNameConsensusRoundProberCurrentRoundGaps,
 			},
 		},
 		6: {
@@ -125,10 +125,10 @@ var (
 		enums.ColumnNameCheckpointsPerSecond:                    {"CHECKPOINTS VOLUME", cell.ColorBlue},
 		enums.ColumnNameTotalTransactionCertificates:            {"TOTAL TRANSACTION CERTIFICATES", cell.ColorYellow},
 		enums.ColumnNameTotalTransactionEffects:                 {"TOTAL TRANSACTION EFFECTS", cell.ColorYellow},
-		enums.ColumnNameCertificatesCreated:                     {"CERTIFICATES CREATED", cell.ColorYellow},
-		enums.ColumnNameCurrentRound:                            {"CURRENT ROUND", cell.ColorRed},
-		enums.ColumnNameHighestProcessedRound:                   {"HIGHEST PROCESSED ROUND", cell.ColorRed},
-		enums.ColumnNameLastCommittedRound:                      {"LAST COMMITTED ROUND", cell.ColorRed},
+		enums.ColumnNameTotalTransactionCertificatesCreated:     {"CERTIFICATES CREATED", cell.ColorYellow},
+		enums.ColumnNameLastCommittedLeaderRound:                {"LAST COMMITTED LEADER ROUND", cell.ColorRed},
+		enums.ColumnNameHighestAcceptedRound:                    {"HIGHEST ACCEPTED ROUND", cell.ColorRed},
+		enums.ColumnNameConsensusRoundProberCurrentRoundGaps:    {"CONSENSUS ROUND PROBER CURRENT ROUND GAPS", cell.ColorRed},
 		enums.ColumnNameRoundsPerSecond:                         {"ROUNDS RATIO", cell.ColorRed},
 		enums.ColumnNameCertificatesPerSecond:                   {"CERTIFICATES RATIO", cell.ColorYellow},
 		enums.ColumnNameHandleCertificateNonConsensusLatencySum: {"CERTIFICATE NON CONSENSUS LATENCY", cell.ColorRed},
@@ -154,15 +154,13 @@ func GetValidatorColumnValues(host *domainhost.Host) (ColumnValues, error) {
 		enums.ColumnNameUptime:                                  host.Metrics.Uptime,
 		enums.ColumnNameVersion:                                 host.Metrics.Version,
 		enums.ColumnNameCommit:                                  host.Metrics.Commit,
-		enums.ColumnNameCurrentRound:                            host.Metrics.CurrentRound,
-		enums.ColumnNameHighestProcessedRound:                   host.Metrics.HighestProcessedRound,
-		enums.ColumnNameLastCommittedRound:                      host.Metrics.LastCommittedRound,
+		enums.ColumnNameLastCommittedLeaderRound:                host.Metrics.LastCommittedLeaderRound,
+		enums.ColumnNameHighestAcceptedRound:                    host.Metrics.HighestAcceptedRound,
+		enums.ColumnNameConsensusRoundProberCurrentRoundGaps:    host.Metrics.ConsensusRoundProberCurrentRoundGaps,
 		enums.ColumnNameRoundsPerSecond:                         host.Metrics.RoundsPerSecond,
-		enums.ColumnNamePrimaryNetworkPeers:                     host.Metrics.PrimaryNetworkPeers,
-		enums.ColumnNameWorkerNetworkPeers:                      host.Metrics.WorkerNetworkPeers,
 		enums.ColumnNameSkippedConsensusTransactions:            host.Metrics.SkippedConsensusTransactions,
 		enums.ColumnNameTotalSignatureErrors:                    host.Metrics.TotalSignatureErrors,
-		enums.ColumnNameCertificatesCreated:                     host.Metrics.CertificatesCreated,
+		enums.ColumnNameTotalTransactionCertificatesCreated:     host.Metrics.TotalTransactionCertificatesCreated,
 		enums.ColumnNameCertificatesPerSecond:                   host.Metrics.CertificatesPerSecond,
 		enums.ColumnNameHandleCertificateNonConsensusLatencySum: host.Metrics.NonConsensusLatency,
 	}, nil

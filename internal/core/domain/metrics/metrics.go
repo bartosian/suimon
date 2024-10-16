@@ -16,16 +16,16 @@ const (
 type (
 	// Transactions represents information about transactions on the Sui blockchain network.
 	Transactions struct {
-		TransactionsHistory          []int
-		CertificatesHistory          []int
-		TotalTransactionsBlocks      int
-		TotalTransactionCertificates int
-		CertificatesCreated          int
-		CertificatesPerSecond        int
-		NonConsensusLatency          int
-		TotalTransactionEffects      int
-		TransactionsPerSecond        int
-		TxSyncPercentage             int
+		TransactionsHistory                 []int
+		CertificatesHistory                 []int
+		TotalTransactionsBlocks             int
+		TotalTransactionCertificates        int
+		TotalTransactionCertificatesCreated int
+		CertificatesPerSecond               int
+		NonConsensusLatency                 int
+		TotalTransactionEffects             int
+		TransactionsPerSecond               int
+		TxSyncPercentage                    int
 	}
 
 	// Checkpoints represents information about checkpoints on the Sui blockchain network.
@@ -43,18 +43,16 @@ type (
 
 	// Rounds represents information about rounds on the Sui blockchain network.
 	Rounds struct {
-		RoundsHistory         []int
-		CurrentRound          int
-		HighestProcessedRound int
-		RoundsPerSecond       int
-		LastCommittedRound    int
+		RoundsHistory                        []int
+		LastCommittedLeaderRound             int
+		HighestAcceptedRound                 int
+		RoundsPerSecond                      int
+		ConsensusRoundProberCurrentRoundGaps int
 	}
 
 	// Peers represents information about peers on the Sui blockchain network.
 	Peers struct {
-		NetworkPeers        int
-		PrimaryNetworkPeers int
-		WorkerNetworkPeers  int
+		NetworkPeers int
 	}
 
 	// Epoch represents information about the current epoch on the Sui blockchain network.
@@ -84,6 +82,11 @@ type (
 		EstimatedNextReferenceGasPrice     int // The gas price (in wei) that is estimated to be included in the next block based on recent network activity and congestion.
 	}
 
+	// Object represents information about objects on the Sui blockchain network.
+	Objects struct {
+		NumberSharedObjectTransactions int
+	}
+
 	// Metrics represents various metrics about the Sui blockchain network.
 	Metrics struct {
 		ValidatorsApyParsed ValidatorsApyParsed
@@ -94,10 +97,12 @@ type (
 
 		SystemState SuiSystemState
 
+		CurrentVotingRight float64
+
 		Epoch
 		Protocol
 		Rounds
-
+		Objects
 		Transactions
 		Checkpoints
 		GasPrice
@@ -106,50 +111,3 @@ type (
 		Updated bool
 	}
 )
-
-// NewMetrics initializes a new instance of Metrics with default values.
-func NewMetrics() *Metrics {
-	return &Metrics{
-		Updated:     false,
-		SystemState: SuiSystemState{},
-		Uptime:      "",
-		Version:     "",
-		Commit:      "",
-		Transactions: Transactions{
-			TotalTransactionsBlocks:      0,
-			TotalTransactionCertificates: 0,
-			TotalTransactionEffects:      0,
-			TransactionsPerSecond:        0.0,
-			TxSyncPercentage:             0,
-		},
-		Checkpoints: Checkpoints{
-			LatestCheckpoint:        0,
-			HighestKnownCheckpoint:  0,
-			HighestSyncedCheckpoint: 0,
-			LastExecutedCheckpoint:  0,
-			CheckpointExecBacklog:   0,
-			CheckpointSyncBacklog:   0,
-			CheckpointsPerSecond:    0.0,
-			CheckSyncPercentage:     0,
-		},
-		Rounds: Rounds{
-			CurrentRound:          0,
-			HighestProcessedRound: 0,
-			LastCommittedRound:    0,
-		},
-		Peers: Peers{
-			NetworkPeers:        0,
-			PrimaryNetworkPeers: 0,
-			WorkerNetworkPeers:  0,
-		},
-		Epoch: Epoch{
-			CurrentEpoch:       0,
-			EpochTotalDuration: 0,
-			TimeTillNextEpoch:  0,
-		},
-		Errors: Errors{
-			TotalSignatureErrors:         0,
-			SkippedConsensusTransactions: 0,
-		},
-	}
-}
