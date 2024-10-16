@@ -127,17 +127,23 @@ func ParseURL(address string) (*Endpoint, error) {
 	}
 
 	scheme, hostName, port, path := u.Scheme, u.Hostname(), u.Port(), u.Path
+
 	if hostName == "" {
 		return nil, fmt.Errorf(errInvalidURLProvided, address)
 	}
 
+	fullAddress := fmt.Sprintf("%s://%s%s", scheme, hostName, path)
+	if port != "" {
+		fullAddress = fmt.Sprintf("%s://%s:%s%s", scheme, hostName, port, path)
+	}
+
 	endpoint := &Endpoint{
-		Address: fmt.Sprintf("%s://%s%s", scheme, hostName, path),
+		Address: fullAddress,
 		Host:    &hostName,
 		SSL:     scheme == "https",
 	}
 
-	if ip, pasreErr := ParseIP(hostName); pasreErr == nil {
+	if ip, parseErr := ParseIP(hostName); parseErr == nil {
 		endpoint.IP = ip
 	}
 
@@ -153,8 +159,7 @@ func ParseURL(address string) (*Endpoint, error) {
 		endpoint.Path = &path
 	}
 
-	ip, err := GetIPByDomain(address)
-	if err == nil {
+	if ip, getErr := GetIPByDomain(address); getErr == nil {
 		endpoint.IP = ip
 	}
 

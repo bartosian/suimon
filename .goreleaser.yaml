@@ -1,3 +1,5 @@
+version: 2
+
 project_name: suimon
 
 dist: dist
@@ -30,7 +32,7 @@ checksum:
   name_template: 'checksums.txt'
 
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
@@ -41,17 +43,16 @@ changelog:
 
 brews:
   - name: suimon
-    tap:
+    homepage: "https://github.com/bartosian/homebrew-tools"
+    url_template: "https://github.com/bartosian/suimon/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    commit_author:
+      name: bartosian
+      email: official@bartestnet.com
+    repository:
       owner: bartosian
       name: homebrew-tools
       branch: main
       token: "{{ .Env.GITHUB_TOKEN }}"
-
-    url_template: "https://github.com/bartosian/suimon/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    homepage: "https://github.com/bartosian/homebrew-tools"
-    commit_author:
-      name: bartosian
-      email: official@bartestnet.com
 
 release:
   github:
