@@ -1,3 +1,5 @@
+
+
 # SUIMON: Command Line Tool for Monitoring SUI Network
 
 <div style="text-align:center;">
@@ -94,7 +96,7 @@ Building and installing from the source is useful if you want to customize the c
 
      ```
      mkdir $HOME/.suimon && \
-     cp $HOME/suimon/main/static/templates/suimon-testnet.yaml $HOME/.suimon/suimon-testnet.yaml
+     cp $HOME/suimon/static/templates/suimon-example.yaml $HOME/.suimon/suimon-testnet.yaml
      ```
 
      The 'suimon-testnet.yaml' file that you have just copied is a template file and must be customized with your specific environment data before running the Suimon tool.
